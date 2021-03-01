@@ -1,0 +1,23 @@
+# GoLang Actions
+
+## Configuration
+
+### Cross-Platform
+
+```yaml
+golang:
+  platform:
+  - goos: linux
+    goarch: amd64
+  - goos: windows
+    goarch: amd64
+  - goos: darwin
+    goarch: amd64
+  - goos: linux
+    goarch: arm64
+```
+
+## Actions
+
+- `go-build`
+- `go-test`
