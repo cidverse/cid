@@ -13,7 +13,7 @@ import (
 func DetectGolangProject(projectDir string) bool {
 	// go.mod
 	if _, err := os.Stat(projectDir+"/go.mod"); !os.IsNotExist(err) {
-		log.Debug().Str("file", projectDir+"/go.mod").Msg("found a go.mod file")
+		log.Debug().Str("file", projectDir+"/go.mod").Msg("found go.mod")
 		return true
 	}
 

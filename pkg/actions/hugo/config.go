@@ -1,9 +1,9 @@
-package golang
+package hugo
 
 import "github.com/jinzhu/configor"
 
-var GoConfig = struct {
-	GoLang struct {
+var HugoConfig = struct {
+	Hugo struct {
 		Platform []struct {
 			Goos string `required:"true"`
 			Goarch string `required:"true"`
@@ -12,5 +12,5 @@ var GoConfig = struct {
 }{}
 
 func loadConfig(projectDirectory string) {
-	configor.Load(&GoConfig, projectDirectory + "/mpi.yml")
+	configor.Load(&HugoConfig, projectDirectory + "/mpi.yml")
 }

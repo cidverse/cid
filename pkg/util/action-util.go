@@ -1,6 +1,7 @@
 package util
 
 import (
+	"github.com/PhilippHeuer/cid/pkg/actions/hugo"
 	"github.com/PhilippHeuer/cid/pkg/common/api"
 	"github.com/PhilippHeuer/cid/pkg/actions/golang"
 )
@@ -10,6 +11,7 @@ func GetAllActions() []api.ActionStep {
 	var actions []api.ActionStep
 	actions = append(actions, golang.BuildAction())
 	actions = append(actions, golang.TestAction())
+	actions = append(actions, hugo.BuildAction())
 
 	return actions
 }
