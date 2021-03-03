@@ -1,8 +1,12 @@
 package golang
 
-import "github.com/jinzhu/configor"
+import (
+	"github.com/PhilippHeuer/cid/pkg/common/api"
+	"github.com/jinzhu/configor"
+)
 
-var GoConfig = struct {
+var Config = struct {
+	Paths api.PathConfig
 	GoLang struct {
 		Platform []struct {
 			Goos string `required:"true"`
@@ -12,5 +16,5 @@ var GoConfig = struct {
 }{}
 
 func loadConfig(projectDirectory string) {
-	configor.Load(&GoConfig, projectDirectory + "/mpi.yml")
+	configor.Load(&Config, projectDirectory + "/mpi.yml")
 }

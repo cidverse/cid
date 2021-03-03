@@ -1,8 +1,12 @@
 package hugo
 
-import "github.com/jinzhu/configor"
+import (
+	"github.com/PhilippHeuer/cid/pkg/common/api"
+	"github.com/jinzhu/configor"
+)
 
-var HugoConfig = struct {
+var Config = struct {
+	Paths api.PathConfig
 	Hugo struct {
 		Platform []struct {
 			Goos string `required:"true"`
@@ -12,5 +16,5 @@ var HugoConfig = struct {
 }{}
 
 func loadConfig(projectDirectory string) {
-	configor.Load(&HugoConfig, projectDirectory + "/mpi.yml")
+	configor.Load(&Config, projectDirectory + "/mpi.yml")
 }

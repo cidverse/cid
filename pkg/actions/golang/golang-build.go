@@ -37,8 +37,8 @@ func (n BuildActionStruct) Execute(projectDir string, env []string) {
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
-	if GoConfig.GoLang.Platform != nil && len(GoConfig.GoLang.Platform) > 0 {
-		for _, crossBuild := range GoConfig.GoLang.Platform {
+	if Config.GoLang.Platform != nil && len(Config.GoLang.Platform) > 0 {
+		for _, crossBuild := range Config.GoLang.Platform {
 			crossCompile(env, crossBuild.Goos, crossBuild.Goarch)
 		}
 	} else {

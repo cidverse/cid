@@ -13,6 +13,11 @@ type ActionStep interface {
 	Execute(projectDir string, env []string)
 }
 
+// PathConfig contains the path configuration for build/tmp directories
+type PathConfig struct {
+	Artifact string `default:"dist"`
+}
+
 // GetValueFromEnv gets a env value from a list of environment variables
 func GetValueFromEnv(env []string, key string) string {
 	for _, envvar := range env {

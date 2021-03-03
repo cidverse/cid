@@ -39,7 +39,7 @@ func (n BuildActionStruct) Execute(projectDir string, env []string) {
 	loadConfig(projectDir)
 
 	env = api.GetEffectiveEnv(env)
-	command.RunCommand(`hugo --minify`, env)
+	command.RunCommand(`hugo --minify --destination ` + Config.Paths.Artifact, env)
 }
 
 // BuildAction

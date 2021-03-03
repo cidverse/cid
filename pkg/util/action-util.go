@@ -1,9 +1,9 @@
 package util
 
 import (
+	"github.com/PhilippHeuer/cid/pkg/actions/golang"
 	"github.com/PhilippHeuer/cid/pkg/actions/hugo"
 	"github.com/PhilippHeuer/cid/pkg/common/api"
-	"github.com/PhilippHeuer/cid/pkg/actions/golang"
 )
 
 // GetName returns the name
