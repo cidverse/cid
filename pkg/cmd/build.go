@@ -38,7 +38,7 @@ var buildCmd = &cobra.Command{
 		}
 
 		// actions
-		action := util.FindAction("build", projectDirectory)
+		action := util.FindActionByStage("build", projectDirectory)
 		if action == nil {
 			log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect project type")
 		}

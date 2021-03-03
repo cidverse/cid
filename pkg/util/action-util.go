@@ -16,9 +16,19 @@ func GetAllActions() []api.ActionStep {
 	return actions
 }
 
-func FindAction(stage string, projectDir string) api.ActionStep {
+func FindActionByStage(stage string, projectDir string) api.ActionStep {
 	for _, action := range GetAllActions() {
 		if stage == action.GetStage() && action.Check(projectDir) {
+			return action
+		}
+	}
+
+	return nil
+}
+
+func FindActionByName(name string) api.ActionStep {
+	for _, action := range GetAllActions() {
+		if name == action.GetName() {
 			return action
 		}
 	}
