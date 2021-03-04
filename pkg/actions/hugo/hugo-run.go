@@ -7,47 +7,47 @@ import (
 )
 
 // Action implementation
-type BuildActionStruct struct {
+type RunActionStruct struct {
 	stage   string
 	name    string
 	version string
 }
 
 // GetStage returns the stage
-func (n BuildActionStruct) GetStage() string {
+func (n RunActionStruct) GetStage() string {
 	return n.stage
 }
 
 // GetName returns the name
-func (n BuildActionStruct) GetName() string {
+func (n RunActionStruct) GetName() string {
 	return n.name
 }
 
 // GetVersion returns the name
-func (n BuildActionStruct) GetVersion() string {
+func (n RunActionStruct) GetVersion() string {
 	return n.version
 }
 
 // Check if this package can handle the current environment
-func (n BuildActionStruct) Check(projectDir string) bool {
+func (n RunActionStruct) Check(projectDir string) bool {
 	loadConfig(projectDir)
 	return DetectHugoProject(projectDir)
 }
 
 // Check if this package can handle the current environment
-func (n BuildActionStruct) Execute(projectDir string, env []string, args []string) {
+func (n RunActionStruct) Execute(projectDir string, env []string, args []string) {
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
 	env = api.GetEffectiveEnv(env)
-	command.RunCommand(`hugo --minify --destination `+ projectDir+`/`+Config.Paths.Artifact, env)
+	command.RunCommand(`hugo server`, env)
 }
 
 // BuildAction
-func BuildAction() BuildActionStruct {
-	entity := BuildActionStruct{
-		stage: "build",
-		name: "hugo-build",
+func RunAction() RunActionStruct {
+	entity := RunActionStruct{
+		stage: "run",
+		name: "hugo-run",
 		version: "0.1.0",
 	}
 

@@ -35,6 +35,6 @@ var optimizeCmd = &cobra.Command{
 		if action == nil {
 			log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect the project type")
 		}
-		action.Execute(projectDirectory, ciEnv)
+		action.Execute(projectDirectory, ciEnv, args)
 	},
 }

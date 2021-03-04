@@ -10,15 +10,15 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(testCmd)
+	rootCmd.AddCommand(runCmd)
 }
 
-var testCmd = &cobra.Command{
-	Use:   "test",
-	Short: "tests the current project",
-	Long:  `tests the current project`,
+var runCmd = &cobra.Command{
+	Use:   "run",
+	Short: `runs the current project`,
+	Long:  `runs the current project`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debug().Str("command", "test").Msg("running command")
+		log.Debug().Str("command", "run").Msg("running command")
 
 		// normalize environment
 		originalEnv := ncicommon.GetFullEnv()
@@ -31,7 +31,7 @@ var testCmd = &cobra.Command{
 		}
 
 		// actions
-		action := util.FindActionByStage("test", projectDirectory)
+		action := util.FindActionByStage("run", projectDirectory)
 		if action == nil {
 			log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect the project type")
 		}

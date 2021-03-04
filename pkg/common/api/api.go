@@ -10,7 +10,7 @@ type ActionStep interface {
 	GetStage() string
 	GetName() string
 	Check(projectDir string) bool
-	Execute(projectDir string, env []string)
+	Execute(projectDir string, env []string, args []string)
 }
 
 // PathConfig contains the path configuration for build/tmp directories

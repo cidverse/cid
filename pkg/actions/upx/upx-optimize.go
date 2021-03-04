@@ -41,7 +41,7 @@ func (n OptimizeActionStruct) Check(projectDir string) bool {
 }
 
 // Check if this package can handle the current environment
-func (n OptimizeActionStruct) Execute(projectDir string, env []string) {
+func (n OptimizeActionStruct) Execute(projectDir string, env []string, args []string) {
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
