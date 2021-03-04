@@ -20,7 +20,7 @@ func DetectGolangProject(projectDir string) bool {
 	return false
 }
 
-func crossCompile(env []string, goos string, goarch string) {
+func crossCompile(projectDir string, env []string, goos string, goarch string) {
 	buildAt := time.Now().UTC().Format(time.RFC3339)
 	log.Info().Str("goos", goos).Str("goarch", goarch).Msg("running go build")
 
@@ -34,5 +34,5 @@ func crossCompile(env []string, goos string, goarch string) {
 	env = common.SetEnvironment(env, "GOPROXY", "https://goproxy.io,direct")
 	env = common.SetEnvironment(env, "GOOS", goos)
 	env = common.SetEnvironment(env, "GOARCH", goarch)
-	command.RunCommand(`go build -o `+Config.Paths.Artifact+`/`+goos+`_`+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+common.GetEnvironmentOrDefault(env, "NCI_COMMIT_REF_RELEASE", "")+` -X main.CommitHash=`+common.GetEnvironmentOrDefault(env, "NCI_COMMIT_SHA_SHORT", "")+` -X main.BuildAt=`+buildAt+`" .`, env)
+	command.RunCommand(`go build -o `+projectDir+`/`+Config.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+common.GetEnvironmentOrDefault(env, "NCI_COMMIT_REF_RELEASE", "")+` -X main.CommitHash=`+common.GetEnvironmentOrDefault(env, "NCI_COMMIT_SHA_SHORT", "")+` -X main.BuildAt=`+buildAt+`" .`, env)
 }

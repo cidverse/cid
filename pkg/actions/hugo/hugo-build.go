@@ -30,6 +30,7 @@ func (n BuildActionStruct) GetVersion() string {
 
 // Check if this package can handle the current environment
 func (n BuildActionStruct) Check(projectDir string) bool {
+	loadConfig(projectDir)
 	return DetectHugoProject(projectDir)
 }
 
@@ -39,7 +40,7 @@ func (n BuildActionStruct) Execute(projectDir string, env []string) {
 	loadConfig(projectDir)
 
 	env = api.GetEffectiveEnv(env)
-	command.RunCommand(`hugo --minify --destination ` + Config.Paths.Artifact, env)
+	command.RunCommand(`hugo --minify --destination `+ projectDir+`/`+Config.Paths.Artifact, env)
 }
 
 // BuildAction

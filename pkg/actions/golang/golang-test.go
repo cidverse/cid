@@ -29,6 +29,7 @@ func (n TestActionStruct) GetVersion() string {
 
 // Check if this package can handle the current environment
 func (n TestActionStruct) Check(projectDir string) bool {
+	loadConfig(projectDir)
 	return DetectGolangProject(projectDir)
 }
 

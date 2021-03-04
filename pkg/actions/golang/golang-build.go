@@ -29,6 +29,7 @@ func (n BuildActionStruct) GetVersion() string {
 
 // Check if this package can handle the current environment
 func (n BuildActionStruct) Check(projectDir string) bool {
+	loadConfig(projectDir)
 	return DetectGolangProject(projectDir)
 }
 
@@ -39,10 +40,10 @@ func (n BuildActionStruct) Execute(projectDir string, env []string) {
 
 	if Config.GoLang.Platform != nil && len(Config.GoLang.Platform) > 0 {
 		for _, crossBuild := range Config.GoLang.Platform {
-			crossCompile(env, crossBuild.Goos, crossBuild.Goarch)
+			crossCompile(projectDir, env, crossBuild.Goos, crossBuild.Goarch)
 		}
 	} else {
-		crossCompile(env, runtime.GOOS, runtime.GOARCH)
+		crossCompile(projectDir, env, runtime.GOOS, runtime.GOARCH)
 	}
 }
 
