@@ -15,8 +15,8 @@ func init() {
 
 var testCmd = &cobra.Command{
 	Use:   "test",
-	Short: "Runs the test stage for the current project.",
-	Long:  `Runs the test stage, this generally builds your sourcecode.`,
+	Short: "tests the current project",
+	Long:  `tests the current project`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debug().Str("command", "test").Msg("running command")
 

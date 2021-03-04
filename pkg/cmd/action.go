@@ -15,8 +15,8 @@ func init() {
 
 var actionCmd = &cobra.Command{
 	Use:   "action",
-	Short: "Directly runs a action.",
-	Long:  `Directly runs a action.`,
+	Short: "runs the actions specified in the arguments",
+	Long:  `runs the actions specified in the arguments`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debug().Str("command", "action").Msg("running command")
 
