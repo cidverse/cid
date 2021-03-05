@@ -54,6 +54,7 @@ func FindActionByName(name string) api.ActionStep {
 func RunStageActions(stage string, projectDirectory string, ciEnv []string, args []string) {
 	// load workflow config
 	loadConfig(projectDirectory)
+	finalEnv := api.GetEffectiveEnv(ciEnv)
 
 	if Config.Workflow != nil && len(Config.Workflow) > 0 {
 		for _, currentStage := range Config.Workflow {
@@ -62,8 +63,7 @@ func RunStageActions(stage string, projectDirectory string, ciEnv []string, args
 					for _, currentAction := range currentStage.Actions {
 						action := FindActionByName(currentAction.Name)
 						if action != nil {
-							ciEnv = api.GetEffectiveEnv(ciEnv)
-							action.Execute(projectDirectory, ciEnv, args)
+							action.Execute(projectDirectory, finalEnv, args)
 						} else {
 							log.Error().Str("action", currentAction.Name).Msg("skipping action, does not exist")
 						}
@@ -85,6 +85,6 @@ func RunStageActions(stage string, projectDirectory string, ciEnv []string, args
 		log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect project type")
 	}
 	for _, action := range actions {
-		action.Execute(projectDirectory, ciEnv, args)
+		action.Execute(projectDirectory, finalEnv, args)
 	}
 }

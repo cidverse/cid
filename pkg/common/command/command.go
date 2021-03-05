@@ -13,7 +13,7 @@ func RunCommand(command string, env []string) error {
 	workDir := filesystem.GetWorkingDirectory()
 	cmdArgs := strings.SplitN(command, " ", 2)
 	cmdBinary := cmdArgs[0]
-	log.Debug().Str("command", command).Str("binary", cmdBinary).Str("os", runtime.GOOS).Str("workdir", workDir).Msg("Running Command")
+	log.Debug().Str("command", command).Str("binary", cmdBinary).Str("os", runtime.GOOS).Str("workdir", workDir).Msg("running command")
 
 	// Run Command
 	if runtime.GOOS == "linux" {
@@ -32,7 +32,9 @@ func RunCommand(command string, env []string) error {
 		log.Debug().Str("command", command).Msg("Command Execution OK")
 	} else if runtime.GOOS == "windows" {
 		// powershell needs .\ prefix for executables in the current directory
-		if _, err := os.Stat(workDir+cmdBinary); !os.IsNotExist(err) {
+		if _, err := os.Stat(workDir+`/`+cmdBinary+`.bat`); !os.IsNotExist(err) {
+			command = `.\`+command
+		} else if _, err := os.Stat(workDir+`/`+cmdBinary); !os.IsNotExist(err) {
 			command = `.\`+command
 		}
 
@@ -44,11 +46,14 @@ func RunCommand(command string, env []string) error {
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
 		if err != nil {
-			log.Fatal().Str("command", command).Str("error", err.Error()).Msg("Command Execution Failed")
+			if exitError, ok := err.(*exec.ExitError); ok {
+				log.Fatal().Str("command", command).Str("error", string(exitError.ExitCode())).Msg("Command Execution Failed")
+			}
+
 			return err
 		}
 
-		log.Debug().Str("command", command).Msg("Command Execution OK")
+		log.Debug().Str("command", command).Str("exit_code", "0").Msg("Command Execution OK")
 	} else if runtime.GOOS == "darwin" {
 		cmd := exec.Command("sh", "-c", command)
 		cmd.Env = env
