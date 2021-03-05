@@ -6,11 +6,14 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 )
 
 func RunCommand(command string, env []string) error {
 	workDir := filesystem.GetWorkingDirectory()
-	log.Debug().Str("command", command).Str("os", runtime.GOOS).Str("workdir", workDir).Msg("Running Command")
+	cmdArgs := strings.SplitN(command, " ", 2)
+	cmdBinary := cmdArgs[0]
+	log.Debug().Str("command", command).Str("binary", cmdBinary).Str("os", runtime.GOOS).Str("workdir", workDir).Msg("Running Command")
 
 	// Run Command
 	if runtime.GOOS == "linux" {
@@ -28,6 +31,11 @@ func RunCommand(command string, env []string) error {
 
 		log.Debug().Str("command", command).Msg("Command Execution OK")
 	} else if runtime.GOOS == "windows" {
+		// powershell needs .\ prefix for executables in the current directory
+		if _, err := os.Stat(workDir+cmdBinary); !os.IsNotExist(err) {
+			command = `.\`+command
+		}
+
 		cmd := exec.Command("powershell", command)
 		cmd.Env = env
 		cmd.Dir = workDir

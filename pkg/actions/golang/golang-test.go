@@ -1,7 +1,6 @@
 package golang
 
 import (
-	"github.com/PhilippHeuer/cid/pkg/common/api"
 	"github.com/PhilippHeuer/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
 )
@@ -39,7 +38,6 @@ func (n TestActionStruct) Execute(projectDir string, env []string, args []string
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
-	env = api.GetEffectiveEnv(env)
 	command.RunCommand(`go test -cover ./...`, env)
 }
 

@@ -1,7 +1,6 @@
 package upx
 
 import (
-	"github.com/PhilippHeuer/cid/pkg/common/api"
 	"github.com/PhilippHeuer/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
 	"os"
@@ -45,7 +44,6 @@ func (n OptimizeActionStruct) Execute(projectDir string, env []string, args []st
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
-	env = api.GetEffectiveEnv(env)
 	command.RunCommand(`upx --lzma `+projectDir+`/`+Config.Paths.Artifact+`/bin/*`, env)
 }
 

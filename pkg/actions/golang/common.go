@@ -2,7 +2,6 @@ package golang
 
 import (
 	"github.com/EnvCLI/normalize-ci/pkg/common"
-	"github.com/PhilippHeuer/cid/pkg/common/api"
 	"github.com/PhilippHeuer/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
 	"os"
@@ -29,7 +28,6 @@ func crossCompile(projectDir string, env []string, goos string, goarch string) {
 		fileExt = ".exe"
 	}
 
-	env = api.GetEffectiveEnv(env)
 	env = common.SetEnvironment(env, "CGO_ENABLED", "false")
 	env = common.SetEnvironment(env, "GOPROXY", "https://goproxy.io,direct")
 	env = common.SetEnvironment(env, "GOOS", goos)

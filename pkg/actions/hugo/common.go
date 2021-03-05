@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-// DetectHugoProject checks if the target directory is a go project
+// DetectHugoProject checks if the target directory is a hugo project
 func DetectHugoProject(projectDir string) bool {
 	// config.toml
 	if _, err := os.Stat(projectDir+"/config.toml"); !os.IsNotExist(err) {

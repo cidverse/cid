@@ -3,6 +3,7 @@ package mpi
 import (
 	"github.com/PhilippHeuer/cid/pkg/actions/golang"
 	"github.com/PhilippHeuer/cid/pkg/actions/hugo"
+	"github.com/PhilippHeuer/cid/pkg/actions/java"
 	"github.com/PhilippHeuer/cid/pkg/actions/upx"
 	"github.com/PhilippHeuer/cid/pkg/common/api"
 	"github.com/rs/zerolog/log"
@@ -14,6 +15,7 @@ func GetAllActions() []api.ActionStep {
 	actions = append(actions, golang.RunAction())
 	actions = append(actions, golang.BuildAction())
 	actions = append(actions, golang.TestAction())
+	actions = append(actions, java.BuildAction())
 	actions = append(actions, hugo.RunAction())
 	actions = append(actions, hugo.BuildAction())
 	actions = append(actions, upx.OptimizeAction())
@@ -52,7 +54,7 @@ func FindActionByName(name string) api.ActionStep {
 func RunStageActions(stage string, projectDirectory string, ciEnv []string, args []string) {
 	// load workflow config
 	loadConfig(projectDirectory)
-	
+
 	if Config.Workflow != nil && len(Config.Workflow) > 0 {
 		for _, currentStage := range Config.Workflow {
 			if currentStage.Stage == stage {
@@ -60,6 +62,7 @@ func RunStageActions(stage string, projectDirectory string, ciEnv []string, args
 					for _, currentAction := range currentStage.Actions {
 						action := FindActionByName(currentAction.Name)
 						if action != nil {
+							ciEnv = api.GetEffectiveEnv(ciEnv)
 							action.Execute(projectDirectory, ciEnv, args)
 						} else {
 							log.Error().Str("action", currentAction.Name).Msg("skipping action, does not exist")
