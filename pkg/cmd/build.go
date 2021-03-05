@@ -4,7 +4,7 @@ import (
 	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
 	ncimain "github.com/EnvCLI/normalize-ci/pkg/normalizeci"
 	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
-	"github.com/PhilippHeuer/cid/pkg/util"
+	"github.com/PhilippHeuer/cid/pkg/mpi"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -38,10 +38,6 @@ var buildCmd = &cobra.Command{
 		}
 
 		// actions
-		action := util.FindActionByStage("build", projectDirectory)
-		if action == nil {
-			log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect project type")
-		}
-		action.Execute(projectDirectory, ciEnv, args)
+		mpi.RunStageActions("build", projectDirectory, ciEnv, args)
 	},
 }

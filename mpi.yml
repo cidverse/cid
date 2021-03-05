@@ -14,3 +14,11 @@ golang:
     goarch: amd64
   - goos: linux
     goarch: arm64
+
+
+# actions
+workflow:
+- stage: build
+  actions:
+  - name: golang-build
+  - name: upx-optimize

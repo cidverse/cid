@@ -4,7 +4,7 @@ import (
 	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
 	ncimain "github.com/EnvCLI/normalize-ci/pkg/normalizeci"
 	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
-	"github.com/PhilippHeuer/cid/pkg/util"
+	"github.com/PhilippHeuer/cid/pkg/mpi"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -15,8 +15,8 @@ func init() {
 
 var optimizeCmd = &cobra.Command{
 	Use:   "optimize",
-	Short: "Runs optimizations on the generated artifacts.",
-	Long:  `Runs optimizations on the generated artifacts.`,
+	Short: "runs optimizations on the generated artifacts.",
+	Long:  `runs optimizations on the generated artifacts.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debug().Str("command", "optimize").Msg("running command")
 
@@ -31,10 +31,6 @@ var optimizeCmd = &cobra.Command{
 		}
 
 		// actions
-		action := util.FindActionByStage("optimize", projectDirectory)
-		if action == nil {
-			log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect the project type")
-		}
-		action.Execute(projectDirectory, ciEnv, args)
+		mpi.RunStageActions("optimize", projectDirectory, ciEnv, args)
 	},
 }
