@@ -15,6 +15,7 @@ func GetAllActions() []api.ActionStep {
 	actions = append(actions, golang.RunAction())
 	actions = append(actions, golang.BuildAction())
 	actions = append(actions, golang.TestAction())
+	actions = append(actions, java.RunAction())
 	actions = append(actions, java.BuildAction())
 	actions = append(actions, hugo.RunAction())
 	actions = append(actions, hugo.BuildAction())

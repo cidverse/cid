@@ -45,7 +45,7 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 		command.RunCommand(`gradlew clean assemble --no-daemon --warning-mode=all --console=plain`, env)
 	} else if buildSystem == "maven" {
 		command.RunCommand(`mvn versions:set -DnewVersion=$NCI_COMMIT_REF_RELEASE`, env)
-		command.RunCommand(`mvn clean package -DskipTests=true`, env)
+		command.RunCommand(`mvn package -DskipTests=true`, env)
 	}
 }
 

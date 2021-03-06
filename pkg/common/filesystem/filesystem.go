@@ -44,3 +44,24 @@ func GetProjectDirectory() (string, error) {
 
 	return "", errors.New("didn't find any repositories for the current working directory")
 }
+
+func FindFilesInDirectory(directory string, extension string) ([]string, error) {
+	var files []string
+
+	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
+		if len(extension) > 0 {
+			if strings.HasSuffix(path, extension) {
+				files = append(files, path)
+			}
+		} else {
+			files = append(files, path)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
+}
