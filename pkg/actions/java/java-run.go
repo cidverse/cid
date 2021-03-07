@@ -51,7 +51,7 @@ func (n RunActionStruct) Execute(projectDir string, env []string, args []string)
 	} else {
 		log.Fatal().Msg("can't detect build system")
 	}
-	
+
 	files, filesErr := filesystem.FindFilesInDirectory(projectDir + `/build/libs`, `.jar`)
 	if filesErr != nil {
 		log.Fatal().Err(filesErr).Str("path", projectDir + `/build/libs`).Msg("failed to list files")

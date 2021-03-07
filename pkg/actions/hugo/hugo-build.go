@@ -38,7 +38,7 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
-	command.RunCommand(`hugo --minify --destination `+ projectDir+`/`+Config.Paths.Artifact, env)
+	command.RunCommand(`hugo --minify --gc --log --verboseLog --source `+projectDir+` --destination `+ projectDir+`/`+Config.Paths.Artifact, env)
 }
 
 // BuildAction
