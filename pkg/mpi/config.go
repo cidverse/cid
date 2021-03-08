@@ -20,5 +20,5 @@ type WorkflowAction struct {
 }
 
 func loadConfig(projectDirectory string) {
-	configor.New(&configor.Config{ENVPrefix: "MPI"}).Load(&Config, projectDirectory + "/mpi.yml")
+	configor.New(&configor.Config{ENVPrefix: "MPI"}).Load(&Config, projectDirectory + "/cid.yml")
 }

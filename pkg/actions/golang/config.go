@@ -16,5 +16,5 @@ var Config = struct {
 }{}
 
 func loadConfig(projectDirectory string) {
-	configor.Load(&Config, projectDirectory + "/mpi.yml")
+	configor.Load(&Config, projectDirectory + "/cid.yml")
 }
