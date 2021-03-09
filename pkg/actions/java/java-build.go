@@ -1,7 +1,6 @@
 package java
 
 import (
-	"github.com/EnvCLI/normalize-ci/pkg/common"
 	"github.com/PhilippHeuer/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
 )
@@ -41,8 +40,7 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 
 	buildSystem := DetectJavaBuildSystem(projectDir)
 	if buildSystem == "gradle" {
-		common.SetEnvironment(env, `GRADLE_OPTS`, `-XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError -Xmx512m`)
-		command.RunCommand(`gradlew clean assemble --no-daemon --warning-mode=all --console=plain`, env)
+		command.RunCommand(`gradlew assemble --no-daemon --warning-mode=all --console=plain`, env)
 	} else if buildSystem == "maven" {
 		command.RunCommand(`mvn versions:set -DnewVersion=$NCI_COMMIT_REF_RELEASE`, env)
 		command.RunCommand(`mvn package -DskipTests=true`, env)
