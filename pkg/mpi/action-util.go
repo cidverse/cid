@@ -75,7 +75,7 @@ func RunStageActions(stage string, projectDirectory string, ciEnv []string, args
 					// stage configuration present but no actions configured
 				}
 			} else {
-				// not custom actions configured for this stage
+				// no custom actions configured for this stage
 			}
 		}
 	}

@@ -2,7 +2,7 @@ package java
 
 import (
 	"github.com/PhilippHeuer/cid/pkg/common/api"
-	"github.com/jinzhu/configor"
+	"github.com/PhilippHeuer/cid/pkg/common/config"
 )
 
 var Config = struct {
@@ -10,5 +10,5 @@ var Config = struct {
 }{}
 
 func loadConfig(projectDirectory string) {
-	configor.Load(&Config, projectDirectory + "/cid.yml")
+	config.LoadConfigurationFile(&Config, projectDirectory + "/cid.yml")
 }

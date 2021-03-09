@@ -2,7 +2,7 @@ package mpi
 
 import (
 	"github.com/PhilippHeuer/cid/pkg/common/api"
-	"github.com/jinzhu/configor"
+	"github.com/PhilippHeuer/cid/pkg/common/config"
 )
 
 var Config = struct {
@@ -20,5 +20,5 @@ type WorkflowAction struct {
 }
 
 func loadConfig(projectDirectory string) {
-	configor.New(&configor.Config{ENVPrefix: "MPI"}).Load(&Config, projectDirectory + "/cid.yml")
+	config.LoadConfigurationFile(&Config, projectDirectory + "/cid.yml")
 }
