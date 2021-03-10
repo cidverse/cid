@@ -4,6 +4,7 @@ import (
 	"github.com/PhilippHeuer/cid/pkg/actions/golang"
 	"github.com/PhilippHeuer/cid/pkg/actions/hugo"
 	"github.com/PhilippHeuer/cid/pkg/actions/java"
+	"github.com/PhilippHeuer/cid/pkg/actions/python"
 	"github.com/PhilippHeuer/cid/pkg/actions/upx"
 	"github.com/PhilippHeuer/cid/pkg/common/api"
 	"github.com/rs/zerolog/log"
@@ -20,6 +21,9 @@ func GetAllActions() []api.ActionStep {
 	actions = append(actions, hugo.RunAction())
 	actions = append(actions, hugo.BuildAction())
 	actions = append(actions, upx.OptimizeAction())
+	actions = append(actions, python.BuildAction())
+	actions = append(actions, python.RunAction())
+	actions = append(actions, python.CheckAction())
 
 	return actions
 }
