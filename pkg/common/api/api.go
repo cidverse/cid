@@ -9,6 +9,7 @@ import (
 type ActionStep interface {
 	GetStage() string
 	GetName() string
+	GetVersion() string
 	Check(projectDir string) bool
 	Execute(projectDir string, env []string, args []string)
 }

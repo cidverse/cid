@@ -14,18 +14,20 @@ import (
 // GetName returns the name
 func GetAllActions() []api.ActionStep {
 	var actions []api.ActionStep
+
 	actions = append(actions, golang.RunAction())
 	actions = append(actions, golang.BuildAction())
 	actions = append(actions, golang.TestAction())
 	actions = append(actions, java.RunAction())
 	actions = append(actions, java.BuildAction())
-	actions = append(actions, hugo.RunAction())
-	actions = append(actions, hugo.BuildAction())
-	actions = append(actions, upx.OptimizeAction())
 	actions = append(actions, python.BuildAction())
 	actions = append(actions, python.RunAction())
 	actions = append(actions, python.CheckAction())
 	actions = append(actions, node.BuildAction())
+
+	actions = append(actions, hugo.RunAction())
+	actions = append(actions, hugo.BuildAction())
+	actions = append(actions, upx.OptimizeAction())
 
 	return actions
 }
