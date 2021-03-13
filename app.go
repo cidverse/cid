@@ -30,8 +30,7 @@ func init() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
 	// Only log the warning severity or above.
-	// zerolog.SetGlobalLevel(zerolog.WarnLevel)
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 
 	// Set Version Information
 	cmd.Version = Version
