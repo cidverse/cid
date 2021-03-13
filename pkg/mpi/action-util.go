@@ -4,6 +4,7 @@ import (
 	"github.com/PhilippHeuer/cid/pkg/actions/golang"
 	"github.com/PhilippHeuer/cid/pkg/actions/hugo"
 	"github.com/PhilippHeuer/cid/pkg/actions/java"
+	"github.com/PhilippHeuer/cid/pkg/actions/node"
 	"github.com/PhilippHeuer/cid/pkg/actions/python"
 	"github.com/PhilippHeuer/cid/pkg/actions/upx"
 	"github.com/PhilippHeuer/cid/pkg/common/api"
@@ -24,6 +25,7 @@ func GetAllActions() []api.ActionStep {
 	actions = append(actions, python.BuildAction())
 	actions = append(actions, python.RunAction())
 	actions = append(actions, python.CheckAction())
+	actions = append(actions, node.BuildAction())
 
 	return actions
 }

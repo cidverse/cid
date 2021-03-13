@@ -16,6 +16,7 @@ type ActionStep interface {
 // PathConfig contains the path configuration for build/tmp directories
 type PathConfig struct {
 	Artifact string `default:"dist"`
+	Cache string `default:""`
 }
 
 // GetValueFromEnv gets a env value from a list of environment variables
@@ -37,4 +38,13 @@ func GetEffectiveEnv(env []string) []string {
 	finalEnv = append(finalEnv, env...)
 
 	return finalEnv
+}
+
+// GetCacheDir returns the caching directory for a module
+func GetCacheDir(pathConfig PathConfig, module string) string {
+	if len(pathConfig.Cache) > 0 {
+		return pathConfig.Cache + `/` + module
+	}
+
+	return os.TempDir() + `/.cid/` + module
 }
