@@ -56,11 +56,10 @@ func (n RunActionStruct) Execute(projectDir string, env []string, args []string)
 	if filesErr != nil {
 		log.Fatal().Err(filesErr).Str("path", projectDir + `/build/libs`).Msg("failed to list files")
 	}
-
 	if len(files) == 1 {
 		command.RunCommand(`java -jar ` + files[0] + ` ` + strings.Join(args, " "), env)
 	} else {
-		log.Warn().Int("count", len(files)).Msg("path build/libs should only contain a single jar file!")
+		log.Warn().Int("count", len(files)).Msg("path build/libs should contain a single jar file! If you have a modular project please ensure that the final jar is moved into build/libs.")
 	}
 }
 

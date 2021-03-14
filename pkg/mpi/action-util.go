@@ -1,6 +1,7 @@
 package mpi
 
 import (
+	"github.com/PhilippHeuer/cid/pkg/actions/container"
 	"github.com/PhilippHeuer/cid/pkg/actions/golang"
 	"github.com/PhilippHeuer/cid/pkg/actions/hugo"
 	"github.com/PhilippHeuer/cid/pkg/actions/java"
@@ -28,6 +29,8 @@ func GetAllActions() []api.ActionStep {
 	actions = append(actions, hugo.RunAction())
 	actions = append(actions, hugo.BuildAction())
 	actions = append(actions, upx.OptimizeAction())
+
+	actions = append(actions, container.PackageAction())
 
 	return actions
 }

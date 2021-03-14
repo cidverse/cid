@@ -1,8 +1,11 @@
 package java
 
 import (
+	"archive/zip"
 	"github.com/rs/zerolog/log"
+	"io"
 	"os"
+	"strings"
 )
 
 // DetectJavaProject checks if the target directory is a java project
@@ -31,4 +34,29 @@ func DetectJavaBuildSystem(projectDir string) string {
 	}
 
 	return ""
+}
+
+func IsJarExecutable(jarFile string) bool {
+	jar, err := zip.OpenReader(jarFile)
+	if err != nil {
+		return false
+	}
+	defer jar.Close()
+
+	// check for manifest file
+	for _, file := range jar.File {
+		if file.Name == "META-INF/MANIFEST.MF" {
+			fc, _ := file.Open()
+			defer fc.Close()
+
+			contentBytes, _ := io.ReadAll(fc)
+			content := string(contentBytes)
+
+			if strings.Contains(content, "Main-Class") {
+				return true
+			}
+		}
+	}
+
+	return false
 }

@@ -3,6 +3,7 @@ package filesystem
 import (
 	"errors"
 	"github.com/rs/zerolog/log"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -64,4 +65,32 @@ func FindFilesInDirectory(directory string, extension string) ([]string, error) 
 	}
 
 	return files, nil
+}
+
+func CreateFileWithContent(file string, data string) error {
+	err := ioutil.WriteFile(file, []byte(data), 0)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RemoveFile(file string) error {
+	err := os.Remove(file)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func MoveFile(oldLocation string, newLocation string) error {
+	err := os.Rename(oldLocation, newLocation)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
