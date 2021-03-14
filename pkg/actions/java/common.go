@@ -36,10 +36,10 @@ func DetectJavaBuildSystem(projectDir string) string {
 	return ""
 }
 
-func IsJarExecutable(jarFile string) bool {
+func GetJarManifestContent(jarFile string) (string, error) {
 	jar, err := zip.OpenReader(jarFile)
 	if err != nil {
-		return false
+		return "", err
 	}
 	defer jar.Close()
 
@@ -52,10 +52,18 @@ func IsJarExecutable(jarFile string) bool {
 			contentBytes, _ := io.ReadAll(fc)
 			content := string(contentBytes)
 
-			if strings.Contains(content, "Main-Class") {
-				return true
-			}
+			return content, nil
 		}
+	}
+
+	return "", nil
+}
+
+func IsJarExecutable(jarFile string) bool {
+	manifestContent, _ := GetJarManifestContent(jarFile)
+
+	if strings.Contains(manifestContent, "Main-Class") {
+		return true
 	}
 
 	return false

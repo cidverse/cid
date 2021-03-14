@@ -5,6 +5,16 @@
 # Base Image
 FROM amazoncorretto:15-alpine
 
+##############################################################
+## Environment
+#############################################################
+
+ENV JVM_USER_LANGUAGE="en" \
+    JVM_USER_COUNTRY="US" \
+    JVM_USER_TIMEZONE="UTC" \
+    JVM_FILE_ENCODING="UTF8" \
+    JAVA_OPTS_CUSTOM=""
+
 ############################################################
 # Installation
 ############################################################
@@ -28,7 +38,7 @@ CMD "java" \
   "-Duser.timezone=${JVM_USER_TIMEZONE:-UTC}" \
   "-Dorg.jboss.logging.provider=log4j2" \
   "-Dfile.encoding=${JVM_FILE_ENCODING:-UTF8}" \
-  "${JAVA_OPTS_CUSTOM:--Dhello=world}" \
+  "${JAVA_OPTS_CUSTOM:-}" \
   "-XX:-TieredCompilation" \
   "-XX:+UseStringDeduplication" \
   "-XX:+UseSerialGC" \

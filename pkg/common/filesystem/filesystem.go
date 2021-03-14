@@ -87,6 +87,7 @@ func RemoveFile(file string) error {
 }
 
 func MoveFile(oldLocation string, newLocation string) error {
+	log.Info().Str("oldLocation", oldLocation).Str("newLocation", newLocation).Msg("moving file")
 	err := os.Rename(oldLocation, newLocation)
 	if err != nil {
 		return err

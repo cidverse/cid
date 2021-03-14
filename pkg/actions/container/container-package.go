@@ -1,16 +1,11 @@
 package container
 
 import (
-	_ "embed"
 	"github.com/EnvCLI/normalize-ci/pkg/common"
 	"github.com/PhilippHeuer/cid/pkg/common/command"
 	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
 )
-
-// Embed the file content as string.
-//go:embed Java15.Dockerfile
-var DockerfileJava15 string
 
 // Action implementation
 type PackageActionStruct struct {
@@ -55,7 +50,12 @@ func (n PackageActionStruct) Execute(projectDir string, env []string, args []str
 	// auto detect a usable dockerfile
 	appType := DetectAppType(projectDir)
 	if appType == "jar" {
-		filesystem.CreateFileWithContent(dockerfile, DockerfileJava15)
+		dockerfileContent, dockerfileContentErr := GetFileContent(DockerfileFS, "dockerfiles/Java15.Dockerfile")
+		if dockerfileContentErr != nil {
+			log.Fatal().Err(dockerfileContentErr).Msg("failed to get dockerfile from resources.")
+		}
+
+		filesystem.CreateFileWithContent(dockerfile, dockerfileContent)
 	}
 
 	// run build
