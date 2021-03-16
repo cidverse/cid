@@ -31,6 +31,11 @@ func (n BuildActionStruct) GetVersion() string {
 	return n.version
 }
 
+// SetConfig is used to pass a custom configuration to each action
+func (n BuildActionStruct) SetConfig(config string) {
+
+}
+
 // Check if this package can handle the current environment
 func (n BuildActionStruct) Check(projectDir string) bool {
 	loadConfig(projectDir)

@@ -2,6 +2,7 @@ package golang
 
 import (
 	"github.com/rs/zerolog/log"
+	"gopkg.in/yaml.v2"
 	"runtime"
 )
 
@@ -25,6 +26,15 @@ func (n BuildActionStruct) GetName() string {
 // GetVersion returns the name
 func (n BuildActionStruct) GetVersion() string {
 	return n.version
+}
+
+// SetConfig is used to pass a custom configuration to each action
+func (n BuildActionStruct) SetConfig(config string) {
+	// parse config
+	yamlErr := yaml.Unmarshal([]byte(config), &Config.GoLang)
+	if yamlErr != nil {
+		log.Fatal().Err(yamlErr).Str("action", n.GetName()).Str("config", config).Msg("failed to parse configuration")
+	}
 }
 
 // Check if this package can handle the current environment

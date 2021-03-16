@@ -10,6 +10,7 @@ import (
 	"github.com/PhilippHeuer/cid/pkg/actions/upx"
 	"github.com/PhilippHeuer/cid/pkg/common/api"
 	"github.com/rs/zerolog/log"
+	"gopkg.in/yaml.v2"
 )
 
 // GetName returns the name
@@ -63,22 +64,18 @@ func FindActionByName(name string) api.ActionStep {
 	return nil
 }
 
-func RunStageActions(stage string, projectDirectory string, ciEnv []string, args []string) {
+func RunStageActions(stage string, projectDirectory string, env []string, args []string) {
 	// load workflow config
 	loadConfig(projectDirectory)
-	finalEnv := api.GetEffectiveEnv(ciEnv)
+	env = api.GetEffectiveEnv(env)
 
+	// custom workflow
 	if Config.Workflow != nil && len(Config.Workflow) > 0 {
 		for _, currentStage := range Config.Workflow {
 			if currentStage.Stage == stage {
 				if len(currentStage.Actions) > 0 {
 					for _, currentAction := range currentStage.Actions {
-						action := FindActionByName(currentAction.Name)
-						if action != nil {
-							action.Execute(projectDirectory, finalEnv, args)
-						} else {
-							log.Error().Str("action", currentAction.Name).Msg("skipping action, does not exist")
-						}
+						RunAction(currentAction, projectDirectory, env, args)
 					}
 
 					return
@@ -97,6 +94,26 @@ func RunStageActions(stage string, projectDirectory string, ciEnv []string, args
 		log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect project type")
 	}
 	for _, action := range actions {
-		action.Execute(projectDirectory, finalEnv, args)
+		action.Execute(projectDirectory, env, args)
+	}
+}
+
+func RunAction(action WorkflowAction, projectDirectory string, env []string, args []string) {
+	configAsYaml, _ := yaml.Marshal(&action.Config)
+	log.Debug().Str("config", string(configAsYaml)).Msg("action specific config")
+
+	if len(action.Type) == 0 || action.Type == "builtin" {
+		builtinAction := FindActionByName(action.Name)
+		if builtinAction != nil {
+			// pass config
+			builtinAction.SetConfig(string(configAsYaml))
+
+			// run action
+			builtinAction.Execute(projectDirectory, env, args)
+		} else {
+			log.Error().Str("action", action.Name).Msg("skipping action, does not exist")
+		}
+	} else {
+		log.Error().Str("action", action.Name).Str("type", action.Type).Msg("type is not supported")
 	}
 }

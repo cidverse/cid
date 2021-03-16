@@ -28,6 +28,11 @@ func (n OptimizeActionStruct) GetVersion() string {
 	return n.version
 }
 
+// SetConfig is used to pass a custom configuration to each action
+func (n OptimizeActionStruct) SetConfig(config string) {
+
+}
+
 // Check if this package can handle the current environment
 func (n OptimizeActionStruct) Check(projectDir string) bool {
 	loadConfig(projectDir)

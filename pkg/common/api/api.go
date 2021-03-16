@@ -10,6 +10,7 @@ type ActionStep interface {
 	GetStage() string
 	GetName() string
 	GetVersion() string
+	SetConfig(config string)
 	Check(projectDir string) bool
 	Execute(projectDir string, env []string, args []string)
 }

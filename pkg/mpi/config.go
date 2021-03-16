@@ -16,7 +16,9 @@ type WorkflowStage struct {
 }
 
 type WorkflowAction struct {
-	Name string
+	Name string `required:"true"`
+	Type string `default:"builtin"`
+	Config interface{}
 }
 
 func loadConfig(projectDirectory string) {
