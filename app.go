@@ -41,7 +41,7 @@ func init() {
 // CLI Main Entrypoint
 func main() {
 	// detect debug mode
-	debugValue, debugIsSet := os.LookupEnv("MPI_DEBUG")
+	debugValue, debugIsSet := os.LookupEnv("CID_DEBUG")
 	if debugIsSet && strings.ToLower(debugValue) == "true" {
 		zerolog.SetGlobalLevel(zerolog.TraceLevel)
 	}

@@ -33,7 +33,7 @@ func (n TestActionStruct) SetConfig(config string) {
 }
 
 // Check if this package can handle the current environment
-func (n TestActionStruct) Check(projectDir string) bool {
+func (n TestActionStruct) Check(projectDir string, env []string) bool {
 	loadConfig(projectDir)
 	return DetectGolangProject(projectDir)
 }

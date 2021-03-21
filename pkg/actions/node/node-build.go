@@ -35,7 +35,7 @@ func (n BuildActionStruct) SetConfig(config string) {
 }
 
 // Check will evaluate if this action can be executed for the specified project
-func (n BuildActionStruct) Check(projectDir string) bool {
+func (n BuildActionStruct) Check(projectDir string, env []string) bool {
 	loadConfig(projectDir)
 	return DetectNodeProject(projectDir)
 }

@@ -23,7 +23,7 @@ var buildCmd = &cobra.Command{
 
 		// normalize environment
 		originalEnv := ncicommon.GetFullEnv()
-		ciEnv := ncimain.RunNormalization(originalEnv)
+		env := ncimain.RunNormalization(originalEnv)
 
 		// find project directory
 		projectDirectory, projectDirectoryErr := filesystem.GetProjectDirectory()
@@ -34,10 +34,14 @@ var buildCmd = &cobra.Command{
 		// allow to overwrite NCI_COMMIT_REF_RELEASE with a custom verrsion
 		version := cmd.Flag("version").Value.String()
 		if len(version) > 0 {
-			ciEnv = ncicommon.SetEnvironment(ciEnv, "NCI_COMMIT_REF_RELEASE", version)
+			env = ncicommon.SetEnvironment(env, "NCI_COMMIT_REF_RELEASE", version)
 		}
 
+		// get release version
+		releaseVersion := ncicommon.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)
+		log.Info().Str(`version`, releaseVersion).Msg("building version")
+
 		// actions
-		mpi.RunStageActions("build", projectDirectory, ciEnv, args)
+		mpi.RunStageActions("build", projectDirectory, env, args)
 	},
 }

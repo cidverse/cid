@@ -11,7 +11,7 @@ type ActionStep interface {
 	GetName() string
 	GetVersion() string
 	SetConfig(config string)
-	Check(projectDir string) bool
+	Check(projectDir string, env []string) bool
 	Execute(projectDir string, env []string, args []string)
 }
 

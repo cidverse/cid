@@ -35,7 +35,7 @@ func (n RunActionStruct) SetConfig(config string) {
 }
 
 // Check if this package can handle the current environment
-func (n RunActionStruct) Check(projectDir string) bool {
+func (n RunActionStruct) Check(projectDir string, env []string) bool {
 	loadConfig(projectDir)
 	return DetectPythonProject(projectDir)
 }

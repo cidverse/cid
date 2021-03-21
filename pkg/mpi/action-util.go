@@ -13,37 +13,41 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// GetName returns the name
+// GetAllActions returns all supported builtin-actions - ORDER MATTERS!
 func GetAllActions() []api.ActionStep {
 	var actions []api.ActionStep
 
 	actions = append(actions, golang.RunAction())
 	actions = append(actions, golang.BuildAction())
 	actions = append(actions, golang.TestAction())
+
 	actions = append(actions, java.RunAction())
 	actions = append(actions, java.BuildAction())
+
 	actions = append(actions, python.BuildAction())
 	actions = append(actions, python.RunAction())
 	actions = append(actions, python.CheckAction())
+
 	actions = append(actions, node.BuildAction())
 
 	actions = append(actions, hugo.RunAction())
 	actions = append(actions, hugo.BuildAction())
-	actions = append(actions, upx.OptimizeAction())
+
+	actions = append(actions, upx.BuildAction())
 
 	actions = append(actions, container.PackageAction())
 
 	return actions
 }
 
-func FindActionByStage(stage string, projectDir string) []api.ActionStep {
+func FindActionsByStage(stage string, projectDir string, env []string) []api.ActionStep {
 	var actions []api.ActionStep
 
 	for _, action := range GetAllActions() {
 		if stage == action.GetStage() {
 			log.Debug().Str("action", action.GetName()).Msg("checking action conditions")
 
-			if action.Check(projectDir) {
+			if action.Check(projectDir, env) {
 				actions = append(actions, action)
 			} else {
 				log.Debug().Str("action", action.GetName()).Msg("check failed")
@@ -80,16 +84,16 @@ func RunStageActions(stage string, projectDirectory string, env []string, args [
 
 					return
 				} else {
-					// stage configuration present but no actions configured
+					log.Debug().Str("stage",stage).Msg("stage config present but no actions specified")
 				}
 			} else {
-				// no custom actions configured for this stage
+				log.Debug().Str("stage",stage).Msg("no custom workflow configured for this stage")
 			}
 		}
 	}
 
 	// actions
-	actions := FindActionByStage(stage, projectDirectory)
+	actions := FindActionsByStage(stage, projectDirectory, env)
 	if len(actions) == 0 {
 		log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect project type")
 	}

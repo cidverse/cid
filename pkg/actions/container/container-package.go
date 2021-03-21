@@ -35,7 +35,7 @@ func (n PackageActionStruct) SetConfig(config string) {
 }
 
 // Check if this package can handle the current environment
-func (n PackageActionStruct) Check(projectDir string) bool {
+func (n PackageActionStruct) Check(projectDir string, env []string) bool {
 	loadConfig(projectDir)
 
 	if len(DetectAppType(projectDir)) > 0 {
@@ -64,7 +64,7 @@ func (n PackageActionStruct) Execute(projectDir string, env []string, args []str
 	}
 
 	// run build
-	command.RunCommand(`docker build -t `+common.GetEnvironment(env, `NCI_CONTAINERREGISTRY_REPOSITORY`)+`:`+common.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)+` `+projectDir, env)
+	command.RunCommand(`docker build --no-cache -t `+common.GetEnvironment(env, `NCI_CONTAINERREGISTRY_REPOSITORY`)+`:`+common.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)+` `+projectDir, env)
 
 	// remove dockerfile
 	filesystem.RemoveFile(dockerfile)

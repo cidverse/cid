@@ -1,6 +1,7 @@
 package java
 
 import (
+	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
 	"github.com/PhilippHeuer/cid/pkg/common/command"
 	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
@@ -37,7 +38,7 @@ func (n BuildActionStruct) SetConfig(config string) {
 }
 
 // Check if this package can handle the current environment
-func (n BuildActionStruct) Check(projectDir string) bool {
+func (n BuildActionStruct) Check(projectDir string, env []string) bool {
 	loadConfig(projectDir)
 	return DetectJavaProject(projectDir)
 }
@@ -47,12 +48,15 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
+	// get release version
+	releaseVersion := ncicommon.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)
+
 	// run build
 	buildSystem := DetectJavaBuildSystem(projectDir)
 	if buildSystem == "gradle" {
-		command.RunCommand(`gradlew assemble --no-daemon --warning-mode=all --console=plain`, env)
+		command.RunCommand(`gradlew -Pversion=`+releaseVersion+` assemble --no-daemon --warning-mode=all --console=plain`, env)
 	} else if buildSystem == "maven" {
-		command.RunCommand(`mvn versions:set -DnewVersion=$NCI_COMMIT_REF_RELEASE`, env)
+		command.RunCommand(`mvn versions:set -DnewVersion=`+releaseVersion, env)
 		command.RunCommand(`mvn package -DskipTests=true`, env)
 	}
 
