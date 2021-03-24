@@ -23,6 +23,7 @@ func GetAllActions() []api.ActionStep {
 
 	actions = append(actions, java.RunAction())
 	actions = append(actions, java.BuildAction())
+	actions = append(actions, java.PublishAction())
 
 	actions = append(actions, python.BuildAction())
 	actions = append(actions, python.RunAction())

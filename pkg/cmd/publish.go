@@ -10,16 +10,16 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(buildCmd)
-	buildCmd.Flags().StringP("version", "v", "", "build a custom version")
+	rootCmd.AddCommand(publishCmd)
+	publishCmd.Flags().StringP("version", "v", "", "publish a custom version")
 }
 
-var buildCmd = &cobra.Command{
-	Use:   "build",
-	Short: "builds the current project",
-	Long:  `builds the current project`,
+var publishCmd = &cobra.Command{
+	Use:   "publish",
+	Short: "publishes the current project",
+	Long:  `publishes the current project`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debug().Str("command", "build").Msg("running command")
+		log.Debug().Str("command", "publish").Msg("running command")
 
 		// normalize environment
 		originalEnv := ncicommon.GetFullEnv()
@@ -39,9 +39,9 @@ var buildCmd = &cobra.Command{
 
 		// get release version
 		releaseVersion := ncicommon.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)
-		log.Info().Str(`version`, releaseVersion).Msg("building version")
+		log.Info().Str(`version`, releaseVersion).Msg("publishing version")
 
 		// actions
-		mpi.RunStageActions("build", projectDirectory, env, args)
+		mpi.RunStageActions("publish", projectDirectory, env, args)
 	},
 }
