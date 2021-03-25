@@ -95,3 +95,31 @@ func MoveFile(oldLocation string, newLocation string) error {
 
 	return nil
 }
+
+// GetFileContent will retrieve the content of a file as text
+func GetFileContent(file string) (string, error) {
+	if _, err := os.Stat(file); !os.IsNotExist(err) {
+		fileBytes, fileErr := ioutil.ReadFile(file)
+		if fileErr == nil {
+			return string(fileBytes), nil
+		} else {
+			return "", err
+		}
+	}
+
+	return "", errors.New("file does not exist")
+}
+
+// FileContainsString will check if a file contains the string
+func FileContainsString(file string, str string) bool {
+	content, contentErr := GetFileContent(file)
+	if contentErr != nil {
+		return false
+	}
+
+	if strings.Contains(content, str) {
+		return true
+	}
+
+	return false
+}

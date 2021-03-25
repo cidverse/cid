@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/PhilippHeuer/cid/pkg/common/api"
 	"github.com/spf13/cobra"
 	"runtime"
 )
@@ -24,6 +25,11 @@ var versionCmd = &cobra.Command{
 	Short: "Print the version number of Hugo",
 	Long:  `All software has versions. This is Hugo's`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("mpi v"+Version+"-" + CommitHash + " " + runtime.GOOS + "/" + runtime.GOARCH + " BuildDate=" + BuildAt)
+		versionPrefix := ""
+		if api.IsVersionStable(Version) {
+			versionPrefix = "v"
+		}
+
+		fmt.Println("mpi "+versionPrefix+Version+"-" + CommitHash + " " + runtime.GOOS + "/" + runtime.GOARCH + " BuildDate=" + BuildAt)
 	},
 }

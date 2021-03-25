@@ -2,8 +2,10 @@ package java
 
 import (
 	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
+	"github.com/PhilippHeuer/cid/pkg/common/api"
 	"github.com/PhilippHeuer/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
+	"strings"
 )
 
 // Publish
@@ -46,11 +48,27 @@ func (n PublishActionStruct) Execute(projectDir string, env []string, args []str
 
 	// get release version
 	releaseVersion := ncicommon.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)
+	isStableRelease := api.IsVersionStable(releaseVersion)
 
-	// run build
+	// publish
 	buildSystem := DetectJavaBuildSystem(projectDir)
 	if buildSystem == "gradle" {
-		command.RunCommand(`gradlew -Pversion="`+releaseVersion+`" publishAllPublicationsToSonatypeRepository --no-daemon --warning-mode=all --console=plain`, env)
+		// gradle tasks
+		gradleTasks, gradleTasksErr := command.RunSilentCommand(`gradlew tasks --all`, env)
+		if gradleTasksErr != nil {
+			log.Warn().Msg("can't list available gradle tasks")
+			return
+		}
+
+		if strings.Contains(gradleTasks, "publishAllPublicationsToSonatypeRepository") {
+			// - stable release
+			if isStableRelease {
+				command.RunCommand(`gradlew -Pversion="`+releaseVersion+`" publishAllPublicationsToSonatypeRepository --no-daemon --warning-mode=all --console=plain`, env)
+			}
+		} else {
+			log.Warn().Msg("no supported gradle release plugin found")
+		}
+
 		//command.RunCommand(`gradlew closeRepository --no-daemon --warning-mode=all --console=plain`, env)
 		//command.RunCommand(`gradlew releaseRepository --no-daemon --warning-mode=all --console=plain`, env)
 	} else if buildSystem == "maven" {
