@@ -4,7 +4,7 @@ import (
 	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
 	ncimain "github.com/EnvCLI/normalize-ci/pkg/normalizeci"
 	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
-	"github.com/PhilippHeuer/cid/pkg/mpi"
+	"github.com/PhilippHeuer/cid/pkg/main"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -42,6 +42,6 @@ var buildCmd = &cobra.Command{
 		log.Info().Str(`version`, releaseVersion).Msg("building version")
 
 		// actions
-		mpi.RunStageActions("build", projectDirectory, env, args)
+		main.RunStageActions("build", projectDirectory, env, args)
 	},
 }

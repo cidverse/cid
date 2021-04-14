@@ -1,4 +1,4 @@
-package mpi
+package main
 
 import (
 	"github.com/PhilippHeuer/cid/pkg/common/api"

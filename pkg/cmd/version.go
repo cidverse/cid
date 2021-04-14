@@ -22,14 +22,14 @@ func init() {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print the version number of Hugo",
-	Long:  `All software has versions. This is Hugo's`,
+	Short: "Print the version number of cid",
+	Long:  `All software has versions. This is cid's`,
 	Run: func(cmd *cobra.Command, args []string) {
 		versionPrefix := ""
 		if api.IsVersionStable(Version) {
 			versionPrefix = "v"
 		}
 
-		fmt.Println("mpi "+versionPrefix+Version+"-" + CommitHash + " " + runtime.GOOS + "/" + runtime.GOARCH + " BuildDate=" + BuildAt)
+		fmt.Println("cid "+versionPrefix+Version+"-" + CommitHash + " " + runtime.GOOS + "/" + runtime.GOARCH + " BuildDate=" + BuildAt)
 	},
 }

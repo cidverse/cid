@@ -4,7 +4,7 @@ import (
 	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
 	ncimain "github.com/EnvCLI/normalize-ci/pkg/normalizeci"
 	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
-	"github.com/PhilippHeuer/cid/pkg/mpi"
+	"github.com/PhilippHeuer/cid/pkg/main"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -32,7 +32,7 @@ var actionCmd = &cobra.Command{
 
 		// actions
 		actionName := args[0]
-		action := mpi.FindActionByName(actionName)
+		action := main.FindActionByName(actionName)
 		if action == nil {
 			log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect the project type")
 		}

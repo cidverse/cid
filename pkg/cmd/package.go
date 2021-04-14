@@ -4,7 +4,7 @@ import (
 	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
 	ncimain "github.com/EnvCLI/normalize-ci/pkg/normalizeci"
 	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
-	"github.com/PhilippHeuer/cid/pkg/mpi"
+	"github.com/PhilippHeuer/cid/pkg/main"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -31,6 +31,6 @@ var packageCmd = &cobra.Command{
 		}
 
 		// actions
-		mpi.RunStageActions("package", projectDirectory, ciEnv, args)
+		main.RunStageActions("package", projectDirectory, ciEnv, args)
 	},
 }
