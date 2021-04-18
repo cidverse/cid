@@ -21,10 +21,16 @@ func DetectJavaProject(projectDir string) bool {
 
 // DetectJavaBuildSystem returns the build system used in the project
 func DetectJavaBuildSystem(projectDir string) string {
-	// gradle
+	// gradle - groovy
 	if _, err := os.Stat(projectDir+"/build.gradle"); !os.IsNotExist(err) {
 		log.Debug().Str("file", projectDir+"/build.gradle").Msg("found gradle project")
-		return "gradle"
+		return "gradle-groovy"
+	}
+
+	// gradle - kotlin dsl
+	if _, err := os.Stat(projectDir+"/build.gradle.kts"); !os.IsNotExist(err) {
+		log.Debug().Str("file", projectDir+"/build.gradle.kts").Msg("found gradle project")
+		return "gradle-kotlin"
 	}
 
 	// maven

@@ -47,7 +47,7 @@ func (n RunActionStruct) Execute(projectDir string, env []string, args []string)
 	loadConfig(projectDir)
 
 	buildSystem := DetectJavaBuildSystem(projectDir)
-	if buildSystem == "gradle" {
+	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
 		common.SetEnvironment(env, `GRADLE_OPTS`, `-XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError -Xmx512m`)
 
 		command.RunCommand(`gradlew build --no-daemon --warning-mode=all --console=plain`, env)

@@ -53,7 +53,7 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 
 	// run build
 	buildSystem := DetectJavaBuildSystem(projectDir)
-	if buildSystem == "gradle" {
+	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
 		command.RunCommand(`gradlew -Pversion="`+releaseVersion+`" assemble --no-daemon --warning-mode=all --console=plain`, env)
 	} else if buildSystem == "maven" {
 		command.RunCommand(`mvn versions:set -DnewVersion=`+releaseVersion, env)

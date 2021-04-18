@@ -52,7 +52,7 @@ func (n PublishActionStruct) Execute(projectDir string, env []string, args []str
 
 	// publish
 	buildSystem := DetectJavaBuildSystem(projectDir)
-	if buildSystem == "gradle" {
+	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
 		// gradle tasks
 		gradleTasks, gradleTasksErr := command.RunSilentCommand(`gradlew tasks --all`, env)
 		if gradleTasksErr != nil {
