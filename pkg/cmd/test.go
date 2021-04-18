@@ -4,7 +4,7 @@ import (
 	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
 	ncimain "github.com/EnvCLI/normalize-ci/pkg/normalizeci"
 	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
-	"github.com/PhilippHeuer/cid/pkg/main"
+	"github.com/PhilippHeuer/cid/pkg/app"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -31,6 +31,6 @@ var testCmd = &cobra.Command{
 		}
 
 		// actions
-		main.RunStageActions("test", projectDirectory, ciEnv, args)
+		app.RunStageActions("test", projectDirectory, ciEnv, args)
 	},
 }
