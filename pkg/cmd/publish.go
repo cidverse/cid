@@ -30,6 +30,7 @@ var publishCmd = &cobra.Command{
 		if projectDirectoryErr != nil {
 			log.Fatal().Err(projectDirectoryErr).Msg(projectDirectoryErr.Error())
 		}
+		app.Load(projectDirectory)
 
 		// allow to overwrite NCI_COMMIT_REF_RELEASE with a custom verrsion
 		version := cmd.Flag("version").Value.String()

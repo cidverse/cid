@@ -29,6 +29,7 @@ var optimizeCmd = &cobra.Command{
 		if projectDirectoryErr != nil {
 			log.Fatal().Err(projectDirectoryErr).Msg(projectDirectoryErr.Error())
 		}
+		app.Load(projectDirectory)
 
 		// actions
 		app.RunStageActions("optimize", projectDirectory, ciEnv, args)

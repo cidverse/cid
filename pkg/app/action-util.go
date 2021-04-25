@@ -14,8 +14,41 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// GetAllActions returns all supported builtin-actions - ORDER MATTERS!
-func GetAllActions() []api.ActionStep {
+var actions []api.ActionStep
+
+func Load(projectDirectory string) {
+	// load configuration for the current project
+	config.LoadConfig(projectDirectory)
+
+	// preload project actions
+	GetProjectActions(projectDirectory)
+
+	// dependency detection
+	// this will try to discover version constraints from the projects automatically
+	dependencyDetectors := [...]map[string]string{
+		golang.GetDependencies(projectDirectory),
+	}
+
+	for _, dep := range dependencyDetectors {
+		for key, version := range dep {
+			_, present := config.Config.Dependencies[key]
+			if !present {
+				config.Config.Dependencies[key] = version
+			}
+		}
+	}
+}
+
+var actionCache = make(map[string][]api.ActionStep)
+
+// GetProjectActions returns all supported actions
+func GetProjectActions(projectDirectory string) []api.ActionStep {
+	_, isPresent := actionCache[projectDirectory]
+	if isPresent {
+		return actionCache[projectDirectory]
+	}
+
+
 	var actions []api.ActionStep
 
 	actions = append(actions, golang.RunAction())
@@ -39,17 +72,18 @@ func GetAllActions() []api.ActionStep {
 
 	actions = append(actions, container.PackageAction())
 
+	actionCache[projectDirectory] = actions
 	return actions
 }
 
-func FindActionsByStage(stage string, projectDir string, env []string) []api.ActionStep {
+func FindActionsByStage(stage string, projectDirectory string, env []string) []api.ActionStep {
 	var actions []api.ActionStep
 
-	for _, action := range GetAllActions() {
+	for _, action := range GetProjectActions(projectDirectory) {
 		if stage == action.GetStage() {
 			log.Debug().Str("action", action.GetName()).Msg("checking action conditions")
 
-			if action.Check(projectDir, env) {
+			if action.Check(projectDirectory, env) {
 				actions = append(actions, action)
 			} else {
 				log.Debug().Str("action", action.GetName()).Msg("check failed")
@@ -60,8 +94,8 @@ func FindActionsByStage(stage string, projectDir string, env []string) []api.Act
 	return actions
 }
 
-func FindActionByName(name string) api.ActionStep {
-	for _, action := range GetAllActions() {
+func FindActionByName(name string, projectDirectory string) api.ActionStep {
+	for _, action := range GetProjectActions(projectDirectory) {
 		if name == action.GetName() {
 			return action
 		}
@@ -71,8 +105,6 @@ func FindActionByName(name string) api.ActionStep {
 }
 
 func RunStageActions(stage string, projectDirectory string, env []string, args []string) {
-	// load workflow config
-	config.LoadConfig(projectDirectory)
 	env = api.GetEffectiveEnv(env)
 
 	// custom workflow
@@ -114,7 +146,7 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env []stri
 	log.Debug().Str("config", string(configAsYaml)).Msg("action specific config")
 
 	if len(action.Type) == 0 || action.Type == "builtin" {
-		builtinAction := FindActionByName(action.Name)
+		builtinAction := FindActionByName(action.Name, projectDirectory)
 		if builtinAction != nil {
 			// pass config
 			builtinAction.SetConfig(string(configAsYaml))

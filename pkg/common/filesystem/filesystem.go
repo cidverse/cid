@@ -96,6 +96,20 @@ func MoveFile(oldLocation string, newLocation string) error {
 	return nil
 }
 
+// GetFileBytes will retrieve the content of a file as bytes
+func GetFileBytes(file string) ([]byte, error) {
+	if _, err := os.Stat(file); !os.IsNotExist(err) {
+		fileBytes, fileErr := ioutil.ReadFile(file)
+		if fileErr == nil {
+			return fileBytes, nil
+		} else {
+			return nil, err
+		}
+	}
+
+	return nil, errors.New("file does not exist")
+}
+
 // GetFileContent will retrieve the content of a file as text
 func GetFileContent(file string) (string, error) {
 	if _, err := os.Stat(file); !os.IsNotExist(err) {

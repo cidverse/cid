@@ -29,6 +29,7 @@ var packageCmd = &cobra.Command{
 		if projectDirectoryErr != nil {
 			log.Fatal().Err(projectDirectoryErr).Msg(projectDirectoryErr.Error())
 		}
+		app.Load(projectDirectory)
 
 		// actions
 		app.RunStageActions("package", projectDirectory, ciEnv, args)

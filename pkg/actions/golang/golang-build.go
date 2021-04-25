@@ -50,10 +50,10 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 
 	if Config.GoLang.Platform != nil && len(Config.GoLang.Platform) > 0 {
 		for _, crossBuild := range Config.GoLang.Platform {
-			crossCompile(projectDir, env, crossBuild.Goos, crossBuild.Goarch)
+			CrossCompile(projectDir, env, crossBuild.Goos, crossBuild.Goarch)
 		}
 	} else {
-		crossCompile(projectDir, env, runtime.GOOS, runtime.GOARCH)
+		CrossCompile(projectDir, env, runtime.GOOS, runtime.GOARCH)
 	}
 }
 

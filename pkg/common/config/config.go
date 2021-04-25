@@ -42,4 +42,7 @@ const(
 
 func LoadConfig(projectDirectory string) {
 	LoadConfigurationFile(&Config, projectDirectory + "/cid.yml")
+	if Config.Dependencies == nil {
+		Config.Dependencies = make(map[string]string)
+	}
 }

@@ -9,5 +9,6 @@ require (
 	github.com/mattn/go-colorable v0.1.8
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/cobra v1.1.3
+	golang.org/x/mod v0.4.2
 	gopkg.in/yaml.v2 v2.4.0
 )

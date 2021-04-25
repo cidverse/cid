@@ -29,6 +29,7 @@ var testCmd = &cobra.Command{
 		if projectDirectoryErr != nil {
 			log.Fatal().Err(projectDirectoryErr).Msg(projectDirectoryErr.Error())
 		}
+		app.Load(projectDirectory)
 
 		// actions
 		app.RunStageActions("test", projectDirectory, ciEnv, args)

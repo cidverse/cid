@@ -29,10 +29,11 @@ var actionCmd = &cobra.Command{
 		if projectDirectoryErr != nil {
 			log.Fatal().Err(projectDirectoryErr).Msg(projectDirectoryErr.Error())
 		}
+		app.Load(projectDirectory)
 
 		// actions
 		actionName := args[0]
-		action := app.FindActionByName(actionName)
+		action := app.FindActionByName(actionName, projectDirectory)
 		if action == nil {
 			log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect the project type")
 		}

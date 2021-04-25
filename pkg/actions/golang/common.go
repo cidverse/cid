@@ -3,9 +3,11 @@ package golang
 import (
 	"github.com/EnvCLI/normalize-ci/pkg/common"
 	"github.com/PhilippHeuer/cid/pkg/common/command"
+	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
 	"os"
 	"time"
+	"golang.org/x/mod/modfile"
 )
 
 // DetectGolangProject checks if the target directory is a go project
@@ -19,7 +21,27 @@ func DetectGolangProject(projectDir string) bool {
 	return false
 }
 
-func crossCompile(projectDir string, env []string, goos string, goarch string) {
+func GetDependencies(projectDir string) map[string]string {
+	var deps = make(map[string]string)
+
+	if DetectGolangProject(projectDir) {
+		contentBytes, contentReadErr := filesystem.GetFileBytes(projectDir+"/go.mod")
+		if contentReadErr != nil {
+			return deps
+		}
+
+		goMod, goModParseError := modfile.ParseLax(projectDir+"/go.mod", contentBytes, nil)
+		if goModParseError != nil {
+			return deps
+		}
+
+		deps["bin/go"] = ">= "+goMod.Go.Version
+	}
+
+	return deps
+}
+
+func CrossCompile(projectDir string, env []string, goos string, goarch string) {
 	buildAt := time.Now().UTC().Format(time.RFC3339)
 	log.Info().Str("goos", goos).Str("goarch", goarch).Msg("running go build")
 
