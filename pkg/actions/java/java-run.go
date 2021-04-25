@@ -50,9 +50,9 @@ func (n RunActionStruct) Execute(projectDir string, env []string, args []string)
 	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
 		common.SetEnvironment(env, `GRADLE_OPTS`, `-XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError -Xmx512m`)
 
-		command.RunCommand(`gradlew build --no-daemon --warning-mode=all --console=plain`, env)
+		command.RunCommand(`gradlew build --no-daemon --warning-mode=all --console=plain`, env, projectDir)
 	} else if buildSystem == "maven" {
-		command.RunCommand(`mvn package -DskipTests=true`, env)
+		command.RunCommand(`mvn package -DskipTests=true`, env, projectDir)
 	} else {
 		log.Fatal().Msg("can't detect build system")
 	}
@@ -62,7 +62,7 @@ func (n RunActionStruct) Execute(projectDir string, env []string, args []string)
 		log.Fatal().Err(filesErr).Str("path", projectDir + `/build/libs`).Msg("failed to list files")
 	}
 	if len(files) == 1 {
-		command.RunCommand(`java -jar ` + files[0] + ` ` + strings.Join(args, " "), env)
+		command.RunCommand(`java -jar ` + files[0] + ` ` + strings.Join(args, " "), env, projectDir)
 	} else {
 		log.Warn().Int("count", len(files)).Msg("path build/libs should contain a single jar file! If you have a modular project please ensure that the final jar is moved into build/libs.")
 	}

@@ -32,5 +32,5 @@ func crossCompile(projectDir string, env []string, goos string, goarch string) {
 	env = common.SetEnvironment(env, "GOPROXY", "https://goproxy.io,direct")
 	env = common.SetEnvironment(env, "GOOS", goos)
 	env = common.SetEnvironment(env, "GOARCH", goarch)
-	command.RunCommand(`go build -o `+projectDir+`/`+Config.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+common.GetEnvironmentOrDefault(env, "NCI_COMMIT_REF_RELEASE", "")+` -X main.CommitHash=`+common.GetEnvironmentOrDefault(env, "NCI_COMMIT_SHA_SHORT", "")+` -X main.BuildAt=`+buildAt+`" .`, env)
+	command.RunCommand(`go build -o `+projectDir+`/`+Config.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+common.GetEnvironmentOrDefault(env, "NCI_COMMIT_REF_RELEASE", "")+` -X main.CommitHash=`+common.GetEnvironmentOrDefault(env, "NCI_COMMIT_SHA_SHORT", "")+` -X main.BuildAt=`+buildAt+`" .`, env, projectDir)
 }

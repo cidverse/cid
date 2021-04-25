@@ -43,7 +43,7 @@ func (n TestActionStruct) Execute(projectDir string, env []string, args []string
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
-	command.RunCommand(`go test -cover ./...`, env)
+	command.RunCommand(`go test -cover ./...`, env, projectDir)
 }
 
 // BuildAction

@@ -64,7 +64,7 @@ func (n PackageActionStruct) Execute(projectDir string, env []string, args []str
 	}
 
 	// run build
-	command.RunCommand(`docker build --no-cache -t `+common.GetEnvironment(env, `NCI_CONTAINERREGISTRY_REPOSITORY`)+`:`+common.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)+` `+projectDir, env)
+	command.RunCommand(`docker build --no-cache -t `+common.GetEnvironment(env, `NCI_CONTAINERREGISTRY_REPOSITORY`)+`:`+common.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)+` `+projectDir, env, projectDir)
 
 	// remove dockerfile
 	filesystem.RemoveFile(dockerfile)

@@ -44,7 +44,7 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
-	command.RunCommand(`upx --lzma `+projectDir+`/`+Config.Paths.Artifact+`/bin/*`, env)
+	command.RunCommand(`upx --lzma `+projectDir+`/`+Config.Paths.Artifact+`/bin/*`, env, projectDir)
 }
 
 // BuildAction

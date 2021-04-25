@@ -43,7 +43,7 @@ func (n CheckActionStruct) Execute(projectDir string, env []string, args []strin
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
-	command.RunCommand(`flake8 .`, env)
+	command.RunCommand(`flake8 .`, env, projectDir)
 }
 
 // RunAction

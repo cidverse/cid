@@ -51,7 +51,7 @@ func (n RunActionStruct) Execute(projectDir string, env []string, args []string)
 	}
 
 	if len(files) == 1 && files[0] != "setup.py" {
-		command.RunCommand(`python ` + files[0] + ` ` + strings.Join(args, " "), env)
+		command.RunCommand(`python ` + files[0] + ` ` + strings.Join(args, " "), env, projectDir)
 	} else {
 		log.Warn().Int("count", len(files)).Msg("project directory should only contain a single .py file, which is the main app entrypoint!")
 	}

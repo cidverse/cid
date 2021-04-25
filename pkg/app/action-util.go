@@ -9,6 +9,7 @@ import (
 	"github.com/PhilippHeuer/cid/pkg/actions/python"
 	"github.com/PhilippHeuer/cid/pkg/actions/upx"
 	"github.com/PhilippHeuer/cid/pkg/common/api"
+	"github.com/PhilippHeuer/cid/pkg/common/config"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )
@@ -71,12 +72,12 @@ func FindActionByName(name string) api.ActionStep {
 
 func RunStageActions(stage string, projectDirectory string, env []string, args []string) {
 	// load workflow config
-	loadConfig(projectDirectory)
+	config.LoadConfig(projectDirectory)
 	env = api.GetEffectiveEnv(env)
 
 	// custom workflow
-	if Config.Workflow != nil && len(Config.Workflow) > 0 {
-		for _, currentStage := range Config.Workflow {
+	if config.Config.Workflow != nil && len(config.Config.Workflow) > 0 {
+		for _, currentStage := range config.Config.Workflow {
 			if currentStage.Stage == stage {
 				if len(currentStage.Actions) > 0 {
 					for _, currentAction := range currentStage.Actions {
@@ -103,7 +104,12 @@ func RunStageActions(stage string, projectDirectory string, env []string, args [
 	}
 }
 
-func RunAction(action WorkflowAction, projectDirectory string, env []string, args []string) {
+func RunAction(action config.WorkflowAction, projectDirectory string, env []string, args []string) {
+	if len(action.Type) == 0 {
+		action.Type = "builtin"
+	}
+	log.Info().Str("action", action.Name).Str("actionType", action.Type).Msg("running action")
+
 	configAsYaml, _ := yaml.Marshal(&action.Config)
 	log.Debug().Str("config", string(configAsYaml)).Msg("action specific config")
 

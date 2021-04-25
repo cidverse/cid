@@ -45,11 +45,11 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 
 	buildSystem := DetectPythonBuildSystem(projectDir)
 	if buildSystem == "requirements.txt" {
-		command.RunCommand(`pip install -r requirements.txt`, env)
+		command.RunCommand(`pip install -r requirements.txt`, env, projectDir)
 	} else if buildSystem == "pipenv" {
-		command.RunCommand(`pipenv install`, env)
+		command.RunCommand(`pipenv install`, env, projectDir)
 	} else if buildSystem == "setup.py" {
-		command.RunCommand(`pip install ` + projectDir, env)
+		command.RunCommand(`pip install ` + projectDir, env, projectDir)
 	}
 }
 

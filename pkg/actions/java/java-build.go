@@ -54,10 +54,10 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 	// run build
 	buildSystem := DetectJavaBuildSystem(projectDir)
 	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
-		command.RunCommand(`gradlew -Pversion="`+releaseVersion+`" assemble --no-daemon --warning-mode=all --console=plain`, env)
+		command.RunCommand(`gradlew -Pversion="`+releaseVersion+`" assemble --no-daemon --warning-mode=all --console=plain`, env, projectDir)
 	} else if buildSystem == "maven" {
-		command.RunCommand(`mvn versions:set -DnewVersion=`+releaseVersion, env)
-		command.RunCommand(`mvn package -DskipTests=true`, env)
+		command.RunCommand(`mvn versions:set -DnewVersion=`+releaseVersion, env, projectDir)
+		command.RunCommand(`mvn package -DskipTests=true`, env, projectDir)
 	}
 
 	// find artifacts

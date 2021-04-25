@@ -49,7 +49,7 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 	packageConfig := ParsePackageJSON(projectDir + `/package.json`)
 
 	// dependencies
-	command.RunCommand(`yarn install --frozen-lockfile --cache-folder `+api.GetCacheDir(Config.Paths, "yarn"), env)
+	command.RunCommand(`yarn install --frozen-lockfile --cache-folder `+api.GetCacheDir(Config.Paths, "yarn"), env, projectDir)
 
 	// dependency specific
 	reactDependencyVersion, reactDependencyPresent := packageConfig.Dependencies[`react`]
@@ -63,7 +63,7 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 	buildScriptLine, buildScriptPresent := packageConfig.Scripts[`build`]
 	if buildScriptPresent {
 		log.Debug().Str("build", buildScriptLine).Msg("found build script")
-		command.RunCommand(`yarn build --cache-folder `+api.GetCacheDir(Config.Paths, "yarn")+` ` + projectDir, env)
+		command.RunCommand(`yarn build --cache-folder `+api.GetCacheDir(Config.Paths, "yarn")+` ` + projectDir, env, projectDir)
 	}
 }
 

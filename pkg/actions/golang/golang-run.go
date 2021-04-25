@@ -44,7 +44,7 @@ func (n RunActionStruct) Execute(projectDir string, env []string, args []string)
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
-	command.RunCommand(`go run . `+strings.Join(args, " "), env)
+	command.RunCommand(`go run . `+strings.Join(args, " "), env, projectDir)
 }
 
 // BuildAction

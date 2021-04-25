@@ -110,6 +110,16 @@ func GetFileContent(file string) (string, error) {
 	return "", errors.New("file does not exist")
 }
 
+// FileExists checks if the file exists and returns a boolean
+func FileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if err != nil {
+		return false
+	}
+
+	return !info.IsDir()
+}
+
 // FileContainsString will check if a file contains the string
 func FileContainsString(file string, str string) bool {
 	content, contentErr := GetFileContent(file)
