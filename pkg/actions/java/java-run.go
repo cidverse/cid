@@ -54,7 +54,7 @@ func (n RunActionStruct) Execute(projectDirectory string, env []string, args []s
 	} else if buildSystem == "maven" {
 		MavenWrapperSetup(projectDirectory)
 
-		command.RunCommand(getMavenCommandPrefix(projectDirectory)+` package -DskipTests=true`, env, projectDirectory)
+		command.RunCommand(getMavenCommandPrefix(projectDirectory)+" package -DskipTests=true --batch-mode", env, projectDirectory)
 	} else {
 		log.Fatal().Msg("can't detect build system")
 	}

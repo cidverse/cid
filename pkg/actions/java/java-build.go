@@ -58,8 +58,8 @@ func (n BuildActionStruct) Execute(projectDirectory string, env []string, args [
 	} else if buildSystem == "maven" {
 		MavenWrapperSetup(projectDirectory)
 
-		command.RunCommand(getMavenCommandPrefix(projectDirectory)+` versions:set -DnewVersion=`+releaseVersion, env, projectDirectory)
-		command.RunCommand(getMavenCommandPrefix(projectDirectory)+` package -DskipTests=true`, env, projectDirectory)
+		command.RunCommand(getMavenCommandPrefix(projectDirectory)+" versions:set -DnewVersion="+releaseVersion+"--batch-mode", env, projectDirectory)
+		command.RunCommand(getMavenCommandPrefix(projectDirectory)+" package -DskipTests=true --batch-mode", env, projectDirectory)
 	}
 
 	// find artifacts
