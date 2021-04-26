@@ -2,23 +2,27 @@
 paths:
   artifact: dist
 
-# golang
-golang:
-  # cross platform build
-  platform:
-  - goos: linux
-    goarch: amd64
-  - goos: windows
-    goarch: amd64
-  - goos: darwin
-    goarch: amd64
-  - goos: linux
-    goarch: arm64
+# mode
+mode: PREFER_LOCAL
 
+# build-tool dependencies
+dependencies:
+  bin/go: ">= 1.16.0"
 
 # actions
 workflow:
 - stage: build
   actions:
   - name: golang-build
-  - name: upx-optimize
+    config:
+      # cross platform build
+      platform:
+      - goos: windows
+        goarch: amd64
+      - goos: linux
+        goarch: amd64
+      - goos: linux
+        goarch: arm64
+      - goos: darwin
+        goarch: amd64
+  #- name: upx-optimize

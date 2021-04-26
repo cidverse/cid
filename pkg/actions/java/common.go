@@ -2,11 +2,14 @@ package java
 
 import (
 	"archive/zip"
+	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
 	"io"
 	"os"
 	"strings"
 )
+
+const GradleCommandPrefix = `java "-Dorg.gradle.appname=gradlew" "-classpath" "gradle/wrapper/gradle-wrapper.jar" "org.gradle.wrapper.GradleWrapperMain"`
 
 // DetectJavaProject checks if the target directory is a java project
 func DetectJavaProject(projectDir string) bool {
@@ -20,26 +23,48 @@ func DetectJavaProject(projectDir string) bool {
 }
 
 // DetectJavaBuildSystem returns the build system used in the project
-func DetectJavaBuildSystem(projectDir string) string {
+func DetectJavaBuildSystem(projectDirectory string) string {
 	// gradle - groovy
-	if _, err := os.Stat(projectDir+"/build.gradle"); !os.IsNotExist(err) {
-		log.Debug().Str("file", projectDir+"/build.gradle").Msg("found gradle project")
+	if _, err := os.Stat(projectDirectory+"/build.gradle"); !os.IsNotExist(err) {
+		log.Debug().Str("file", projectDirectory+"/build.gradle").Msg("found gradle project")
 		return "gradle-groovy"
 	}
 
 	// gradle - kotlin dsl
-	if _, err := os.Stat(projectDir+"/build.gradle.kts"); !os.IsNotExist(err) {
-		log.Debug().Str("file", projectDir+"/build.gradle.kts").Msg("found gradle project")
+	if _, err := os.Stat(projectDirectory+"/build.gradle.kts"); !os.IsNotExist(err) {
+		log.Debug().Str("file", projectDirectory+"/build.gradle.kts").Msg("found gradle project")
 		return "gradle-kotlin"
 	}
 
 	// maven
-	if _, err := os.Stat(projectDir+"/pom.xml"); !os.IsNotExist(err) {
-		log.Debug().Str("file", projectDir+"/pom.xml").Msg("found maven project")
+	if _, err := os.Stat(projectDirectory+"/pom.xml"); !os.IsNotExist(err) {
+		log.Debug().Str("file", projectDirectory+"/pom.xml").Msg("found maven project")
 		return "maven"
 	}
 
 	return ""
+}
+
+// MavenWrapperSetup makes sure that the maven wrapper is setup correctly for a maven project
+func MavenWrapperSetup(projectDirectory string) {
+	mavenVersion := "3.8.1"
+	mavenWrapperVersion := "0.5.6"
+
+	// commit maven wrapper notification
+	if !filesystem.FileExists("mvnw") {
+		log.Warn().Msg("Maven projects should have the maven wrapper committed into the repository! Check out https://www.baeldung.com/maven-wrapper")
+	}
+	os.MkdirAll(projectDirectory+"/.mvn/wrapper", 755)
+
+	// check for maven wrapper properties file
+	if !filesystem.FileExists(projectDirectory+"/.mvn/wrapper/maven-wrapper.properties") {
+		filesystem.SaveFileContent(projectDirectory+"/.mvn/wrapper/maven-wrapper.properties", "distributionUrl=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/"+mavenVersion+"/apache-maven-"+mavenVersion+"-bin.zip")
+	}
+
+	// ensure the maven wrapper jar is present
+	if !filesystem.FileExists(projectDirectory+"/.mvn/wrapper/maven-wrapper.jar") {
+		filesystem.DownloadFile("https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/"+mavenWrapperVersion+"/maven-wrapper-"+mavenWrapperVersion+".jar", projectDirectory+"/.mvn/wrapper/maven-wrapper.jar")
+	}
 }
 
 func GetJarManifestContent(jarFile string) (string, error) {
@@ -73,4 +98,8 @@ func IsJarExecutable(jarFile string) bool {
 	}
 
 	return false
+}
+
+func getMavenCommandPrefix(projectDirectory string) string {
+	return `java "-Dmaven.multiModuleProjectDirectory=`+projectDirectory+`" "-classpath" ".mvn/wrapper/maven-wrapper.jar" "org.apache.maven.wrapper.MavenWrapperMain"`
 }

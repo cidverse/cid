@@ -44,27 +44,29 @@ func (n BuildActionStruct) Check(projectDir string, env []string) bool {
 }
 
 // Check if this package can handle the current environment
-func (n BuildActionStruct) Execute(projectDir string, env []string, args []string) {
+func (n BuildActionStruct) Execute(projectDirectory string, env []string, args []string) {
 	log.Debug().Str("action", n.name).Msg("running action")
-	loadConfig(projectDir)
+	loadConfig(projectDirectory)
 
 	// get release version
 	releaseVersion := ncicommon.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)
 
 	// run build
-	buildSystem := DetectJavaBuildSystem(projectDir)
+	buildSystem := DetectJavaBuildSystem(projectDirectory)
 	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
-		command.RunCommand(`gradlew -Pversion="`+releaseVersion+`" assemble --no-daemon --warning-mode=all --console=plain`, env, projectDir)
+		command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" assemble --no-daemon --warning-mode=all --console=plain`, env, projectDirectory)
 	} else if buildSystem == "maven" {
-		command.RunCommand(`mvn versions:set -DnewVersion=`+releaseVersion, env, projectDir)
-		command.RunCommand(`mvn package -DskipTests=true`, env, projectDir)
+		MavenWrapperSetup(projectDirectory)
+
+		command.RunCommand(getMavenCommandPrefix(projectDirectory)+` versions:set -DnewVersion=`+releaseVersion, env, projectDirectory)
+		command.RunCommand(getMavenCommandPrefix(projectDirectory)+` package -DskipTests=true`, env, projectDirectory)
 	}
 
 	// find artifacts
-	files, _ := filesystem.FindFilesInDirectory(projectDir, `.jar`)
+	files, _ := filesystem.FindFilesInDirectory(projectDirectory, `.jar`)
 	for _, file := range files {
 		if strings.Contains(file, "build"+string(os.PathSeparator)+"libs") && IsJarExecutable(file) {
-			filesystem.MoveFile(files[0], projectDir + `/dist/`+filepath.Base(files[0]))
+			filesystem.MoveFile(files[0], projectDirectory + `/dist/`+filepath.Base(files[0]))
 		}
 	}
 }

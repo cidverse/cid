@@ -41,30 +41,32 @@ func (n PublishActionStruct) Check(projectDir string, env []string) bool {
 }
 
 // Check if this package can handle the current environment
-func (n PublishActionStruct) Execute(projectDir string, env []string, args []string) {
+func (n PublishActionStruct) Execute(projectDirectory string, env []string, args []string) {
 	log.Debug().Str("action", n.name).Msg("running action")
-	loadConfig(projectDir)
+	loadConfig(projectDirectory)
 
 	// get release version
 	releaseVersion := ncicommon.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)
 	// isStableRelease := api.IsVersionStable(releaseVersion)
 
 	// publish
-	buildSystem := DetectJavaBuildSystem(projectDir)
+	buildSystem := DetectJavaBuildSystem(projectDirectory)
 	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
 		// gradle tasks
-		gradleTasks, gradleTasksErr := command.RunSystemCommand(`gradlew`, `tasks --all`, env, projectDir)
+		gradleTasks, gradleTasksErr := command.RunSystemCommand(`gradlew`, `tasks --all`, env, projectDirectory)
 		if gradleTasksErr != nil {
 			log.Warn().Msg("can't list available gradle tasks")
 			return
 		}
 
 		if strings.Contains(gradleTasks, "publish") {
-			command.RunCommand(`gradlew -Pversion="`+releaseVersion+`" publish --no-daemon --warning-mode=all --console=plain`, env, projectDir)
+			command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" publish --no-daemon --warning-mode=all --console=plain`, env, projectDirectory)
 		} else {
 			log.Warn().Msg("no supported gradle release plugin found")
 		}
 	} else if buildSystem == "maven" {
+		MavenWrapperSetup(projectDirectory)
+
 		//
 	}
 }

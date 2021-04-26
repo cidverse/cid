@@ -3,7 +3,9 @@ package filesystem
 import (
 	"errors"
 	"github.com/rs/zerolog/log"
+	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -124,6 +126,15 @@ func GetFileContent(file string) (string, error) {
 	return "", errors.New("file does not exist")
 }
 
+// SaveFileContent will save a file with the provided content
+func SaveFileContent(file string, content string) error {
+	data := []byte(content)
+
+	err := ioutil.WriteFile(file, data, 0)
+
+	return err
+}
+
 // FileExists checks if the file exists and returns a boolean
 func FileExists(filename string) bool {
 	info, err := os.Stat(filename)
@@ -146,4 +157,28 @@ func FileContainsString(file string, str string) bool {
 	}
 
 	return false
+}
+
+// DownloadFile will download a url and store it in local filepath.
+func DownloadFile(url string, filepath string) error {
+	log.Debug().Str("url", url).Str("path", filepath).Msg("Downloading file ...")
+
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
