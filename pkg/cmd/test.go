@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
-	ncimain "github.com/EnvCLI/normalize-ci/pkg/normalizeci"
-	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
-	"github.com/PhilippHeuer/cid/pkg/app"
+	"github.com/qubid/x/pkg/app"
+	"github.com/qubid/x/pkg/common/api"
+	"github.com/qubid/x/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -20,10 +19,6 @@ var testCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debug().Str("command", "test").Msg("running command")
 
-		// normalize environment
-		originalEnv := ncicommon.GetFullEnv()
-		ciEnv := ncimain.RunNormalization(originalEnv)
-
 		// find project directory
 		projectDirectory, projectDirectoryErr := filesystem.GetProjectDirectory()
 		if projectDirectoryErr != nil {
@@ -31,7 +26,10 @@ var testCmd = &cobra.Command{
 		}
 		app.Load(projectDirectory)
 
+		// normalize environment
+		env := api.GetFullCIDEnvironment(projectDirectory)
+
 		// actions
-		app.RunStageActions("test", projectDirectory, ciEnv, args)
+		app.RunStageActions("test", projectDirectory, env, args)
 	},
 }

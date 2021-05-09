@@ -3,9 +3,9 @@ package command
 import (
 	"bytes"
 	"errors"
-	"github.com/PhilippHeuer/cid/pkg/common/config"
-	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
-	"github.com/PhilippHeuer/cid/pkg/common/tools"
+	"github.com/qubid/x/pkg/common/config"
+	"github.com/qubid/x/pkg/common/filesystem"
+	"github.com/qubid/x/pkg/common/tools"
 	"github.com/rs/zerolog/log"
 	"os"
 	"os/exec"
@@ -14,7 +14,7 @@ import (
 )
 
 // RunCommand runs a command and forwards all output to console
-func RunCommand(command string, env []string, workDir string) error {
+func RunCommand(command string, env map[string]string, workDir string) error {
 	cmdArgs := strings.SplitN(command, " ", 2)
 	originalBinary := cmdArgs[0]
 	cmdBinary := originalBinary
@@ -44,7 +44,7 @@ func RunCommand(command string, env []string, workDir string) error {
 }
 
 // RunSystemCommand runs a command and stores the response in a string
-func RunSystemCommand(file string, args string, env []string, workDir string) (string, error) {
+func RunSystemCommand(file string, args string, env map[string]string, workDir string) (string, error) {
 	var resultBuff bytes.Buffer
 	log.Debug().Str("file", file).Str("args", args).Str("workdir", workDir).Msg("running command")
 
@@ -55,7 +55,7 @@ func RunSystemCommand(file string, args string, env []string, workDir string) (s
 		return "", cmdErr
 	}
 
-	cmd.Env = env
+	cmd.Env = getEnvFromMap(env)
 	cmd.Dir = workDir
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = &resultBuff
@@ -71,7 +71,7 @@ func RunSystemCommand(file string, args string, env []string, workDir string) (s
 }
 
 // RunSystemCommandPassThru runs a command and forwards all output to current console session
-func RunSystemCommandPassThru(file string, args string, env []string, workDir string) error {
+func RunSystemCommandPassThru(file string, args string, env map[string]string, workDir string) error {
 	log.Debug().Str("file", file).Str("args", args).Str("workdir", workDir).Msg("running command")
 
 	// Run Command
@@ -81,7 +81,7 @@ func RunSystemCommandPassThru(file string, args string, env []string, workDir st
 		return cmdErr
 	}
 
-	cmd.Env = env
+	cmd.Env = getEnvFromMap(env)
 	cmd.Dir = workDir
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
@@ -127,4 +127,14 @@ func fileExists(filename string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+func getEnvFromMap(env map[string]string) []string {
+	var envLines []string
+
+	for k, v := range env {
+		envLines = append(envLines, k+"="+v)
+	}
+
+	return envLines
 }

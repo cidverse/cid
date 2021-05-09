@@ -1,14 +1,24 @@
-module github.com/PhilippHeuer/cid
+module github.com/qubid/x
 
 go 1.16
 
 require (
-	github.com/EnvCLI/normalize-ci v1.0.1-0.20210418132747-e0d4bd707c9e
 	github.com/Masterminds/semver/v3 v3.1.1
+	github.com/Microsoft/go-winio v0.5.0 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20210512092938-c05353c2d58c // indirect
+	github.com/go-git/go-git/v5 v5.4.1
 	github.com/jinzhu/configor v1.2.1
+	github.com/kevinburke/ssh_config v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.8
-	github.com/rs/zerolog v1.20.0
+	github.com/oriser/regroup v0.0.0-20201024192559-010c434ff8f3
+	github.com/qubid/normalizeci v1.0.1-0.20210526221755-0eab957db679
+	github.com/rs/zerolog v1.22.0
+	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/spf13/cobra v1.1.3
+	github.com/stretchr/testify v1.7.0
+	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
 	golang.org/x/mod v0.4.2
+	golang.org/x/net v0.0.0-20210525063256-abc453219eb5 // indirect
+	golang.org/x/sys v0.0.0-20210525143221-35b2ab0089ea // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )

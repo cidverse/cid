@@ -9,6 +9,12 @@ mode: PREFER_LOCAL
 dependencies:
   bin/go: ">= 1.16.0"
 
+# project conventions
+conventions:
+  branching: GitFlow
+  commit: ConventionalCommits
+  prereleasesuffix: "-rc.{NCI_LASTRELEASE_COMMIT_AFTER_COUNT}"
+
 # actions
 workflow:
 - stage: build

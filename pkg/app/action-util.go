@@ -1,15 +1,15 @@
 package app
 
 import (
-	"github.com/PhilippHeuer/cid/pkg/actions/container"
-	"github.com/PhilippHeuer/cid/pkg/actions/golang"
-	"github.com/PhilippHeuer/cid/pkg/actions/hugo"
-	"github.com/PhilippHeuer/cid/pkg/actions/java"
-	"github.com/PhilippHeuer/cid/pkg/actions/node"
-	"github.com/PhilippHeuer/cid/pkg/actions/python"
-	"github.com/PhilippHeuer/cid/pkg/actions/upx"
-	"github.com/PhilippHeuer/cid/pkg/common/api"
-	"github.com/PhilippHeuer/cid/pkg/common/config"
+	"github.com/qubid/x/pkg/actions/container"
+	"github.com/qubid/x/pkg/actions/golang"
+	"github.com/qubid/x/pkg/actions/hugo"
+	"github.com/qubid/x/pkg/actions/java"
+	"github.com/qubid/x/pkg/actions/node"
+	"github.com/qubid/x/pkg/actions/python"
+	"github.com/qubid/x/pkg/actions/upx"
+	"github.com/qubid/x/pkg/common/api"
+	"github.com/qubid/x/pkg/common/config"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )
@@ -76,7 +76,7 @@ func GetProjectActions(projectDirectory string) []api.ActionStep {
 	return actions
 }
 
-func FindActionsByStage(stage string, projectDirectory string, env []string) []api.ActionStep {
+func FindActionsByStage(stage string, projectDirectory string, env map[string]string) []api.ActionStep {
 	var actions []api.ActionStep
 
 	for _, action := range GetProjectActions(projectDirectory) {
@@ -104,9 +104,7 @@ func FindActionByName(name string, projectDirectory string) api.ActionStep {
 	return nil
 }
 
-func RunStageActions(stage string, projectDirectory string, env []string, args []string) {
-	env = api.GetEffectiveEnv(env)
-
+func RunStageActions(stage string, projectDirectory string, env map[string]string, args []string) {
 	// custom workflow
 	if config.Config.Workflow != nil && len(config.Config.Workflow) > 0 {
 		for _, currentStage := range config.Config.Workflow {
@@ -136,7 +134,7 @@ func RunStageActions(stage string, projectDirectory string, env []string, args [
 	}
 }
 
-func RunAction(action config.WorkflowAction, projectDirectory string, env []string, args []string) {
+func RunAction(action config.WorkflowAction, projectDirectory string, env map[string]string, args []string) {
 	if len(action.Type) == 0 {
 		action.Type = "builtin"
 	}

@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
+	ncicommon "github.com/qubid/normalizeci/pkg/common"
 )
 
 // SetupTestLogger prepares the logger for test execution

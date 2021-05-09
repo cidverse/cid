@@ -2,7 +2,7 @@ package java
 
 import (
 	"archive/zip"
-	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
+	"github.com/qubid/x/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
 	"io"
 	"os"

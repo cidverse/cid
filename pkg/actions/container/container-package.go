@@ -1,9 +1,8 @@
 package container
 
 import (
-	"github.com/EnvCLI/normalize-ci/pkg/common"
-	"github.com/PhilippHeuer/cid/pkg/common/command"
-	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
+	"github.com/qubid/x/pkg/common/command"
+	"github.com/qubid/x/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
 )
 
@@ -35,7 +34,7 @@ func (n PackageActionStruct) SetConfig(config string) {
 }
 
 // Check if this package can handle the current environment
-func (n PackageActionStruct) Check(projectDir string, env []string) bool {
+func (n PackageActionStruct) Check(projectDir string, env map[string]string) bool {
 	loadConfig(projectDir)
 
 	if len(DetectAppType(projectDir)) > 0 {
@@ -46,7 +45,7 @@ func (n PackageActionStruct) Check(projectDir string, env []string) bool {
 }
 
 // Check if this package can handle the current environment
-func (n PackageActionStruct) Execute(projectDir string, env []string, args []string) {
+func (n PackageActionStruct) Execute(projectDir string, env map[string]string, args []string) {
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
@@ -64,7 +63,7 @@ func (n PackageActionStruct) Execute(projectDir string, env []string, args []str
 	}
 
 	// run build
-	command.RunCommand(`docker build --no-cache -t `+common.GetEnvironment(env, `NCI_CONTAINERREGISTRY_REPOSITORY`)+`:`+common.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)+` `+projectDir, env, projectDir)
+	command.RunCommand(`docker build --no-cache -t `+env["NCI_CONTAINERREGISTRY_REPOSITORY"]+":"+env["NCI_COMMIT_REF_RELEASE"]+` `+projectDir, env, projectDir)
 
 	// remove dockerfile
 	filesystem.RemoveFile(dockerfile)

@@ -1,7 +1,7 @@
 package python
 
 import (
-	"github.com/PhilippHeuer/cid/pkg/common/command"
+	"github.com/qubid/x/pkg/common/command"
 	"github.com/rs/zerolog/log"
 )
 
@@ -33,13 +33,13 @@ func (n CheckActionStruct) SetConfig(config string) {
 }
 
 // Check if this package can handle the current environment
-func (n CheckActionStruct) Check(projectDir string, env []string) bool {
+func (n CheckActionStruct) Check(projectDir string, env map[string]string) bool {
 	loadConfig(projectDir)
 	return DetectPythonProject(projectDir)
 }
 
 // Check if this package can handle the current environment
-func (n CheckActionStruct) Execute(projectDir string, env []string, args []string) {
+func (n CheckActionStruct) Execute(projectDir string, env map[string]string, args []string) {
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 

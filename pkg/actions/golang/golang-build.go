@@ -38,13 +38,13 @@ func (n BuildActionStruct) SetConfig(config string) {
 }
 
 // Check if this package can handle the current environment
-func (n BuildActionStruct) Check(projectDir string, env []string) bool {
+func (n BuildActionStruct) Check(projectDir string, env map[string]string) bool {
 	loadConfig(projectDir)
 	return DetectGolangProject(projectDir)
 }
 
 // Check if this package can handle the current environment
-func (n BuildActionStruct) Execute(projectDir string, env []string, args []string) {
+func (n BuildActionStruct) Execute(projectDir string, env map[string]string, args []string) {
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 

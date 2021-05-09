@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
-	ncimain "github.com/EnvCLI/normalize-ci/pkg/normalizeci"
-	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
-	"github.com/PhilippHeuer/cid/pkg/app"
+	"github.com/qubid/x/pkg/app"
+	"github.com/qubid/x/pkg/common/api"
+	"github.com/qubid/x/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -21,10 +20,6 @@ var publishCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debug().Str("command", "publish").Msg("running command")
 
-		// normalize environment
-		originalEnv := ncicommon.GetFullEnv()
-		env := ncimain.RunNormalization(originalEnv)
-
 		// find project directory
 		projectDirectory, projectDirectoryErr := filesystem.GetProjectDirectory()
 		if projectDirectoryErr != nil {
@@ -32,17 +27,22 @@ var publishCmd = &cobra.Command{
 		}
 		app.Load(projectDirectory)
 
-		// allow to overwrite NCI_COMMIT_REF_RELEASE with a custom verrsion
+		// normalize environment
+		env := api.GetFullCIDEnvironment(projectDirectory)
+
+		// allow to overwrite NCI_COMMIT_REF_RELEASE with a custom version
 		version := cmd.Flag("version").Value.String()
 		if len(version) > 0 {
-			env = ncicommon.SetEnvironment(env, "NCI_COMMIT_REF_RELEASE", version)
+			env["NCI_COMMIT_REF_RELEASE"] = version
 		}
 
-		// get release version
-		releaseVersion := ncicommon.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)
-		log.Info().Str(`version`, releaseVersion).Msg("publishing version")
+		// suggested release version
+		if len(env["NCI_NEXTRELEASE_NAME"]) > 0 {
+			env["NCI_COMMIT_REF_RELEASE"] = env["NCI_NEXTRELEASE_NAME"]
+		}
 
 		// actions
+		log.Info().Str(`version`, env["NCI_COMMIT_REF_RELEASE"]).Msg("publishing version")
 		app.RunStageActions("publish", projectDirectory, env, args)
 	},
 }

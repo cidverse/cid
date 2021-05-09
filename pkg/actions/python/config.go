@@ -1,12 +1,11 @@
 package python
 
 import (
-	"github.com/PhilippHeuer/cid/pkg/common/api"
-	"github.com/PhilippHeuer/cid/pkg/common/config"
+	"github.com/qubid/x/pkg/common/config"
 )
 
 var Config = struct {
-	Paths api.PathConfig
+	Paths config.PathConfig
 }{}
 
 func loadConfig(projectDirectory string) {

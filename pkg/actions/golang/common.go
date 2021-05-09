@@ -1,13 +1,12 @@
 package golang
 
 import (
-	"github.com/EnvCLI/normalize-ci/pkg/common"
-	"github.com/PhilippHeuer/cid/pkg/common/command"
-	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
+	"github.com/qubid/x/pkg/common/command"
+	"github.com/qubid/x/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/mod/modfile"
 	"os"
 	"time"
-	"golang.org/x/mod/modfile"
 )
 
 // DetectGolangProject checks if the target directory is a go project
@@ -41,7 +40,7 @@ func GetDependencies(projectDir string) map[string]string {
 	return deps
 }
 
-func CrossCompile(projectDir string, env []string, goos string, goarch string) {
+func CrossCompile(projectDir string, env map[string]string, goos string, goarch string) {
 	buildAt := time.Now().UTC().Format(time.RFC3339)
 	log.Info().Str("goos", goos).Str("goarch", goarch).Msg("running go build")
 
@@ -50,9 +49,9 @@ func CrossCompile(projectDir string, env []string, goos string, goarch string) {
 		fileExt = ".exe"
 	}
 
-	env = common.SetEnvironment(env, "CGO_ENABLED", "false")
-	env = common.SetEnvironment(env, "GOPROXY", "https://goproxy.io,direct")
-	env = common.SetEnvironment(env, "GOOS", goos)
-	env = common.SetEnvironment(env, "GOARCH", goarch)
-	command.RunCommand(`go build -o `+projectDir+`/`+Config.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+common.GetEnvironmentOrDefault(env, "NCI_COMMIT_REF_RELEASE", "")+` -X main.CommitHash=`+common.GetEnvironmentOrDefault(env, "NCI_COMMIT_SHA_SHORT", "")+` -X main.BuildAt=`+buildAt+`" .`, env, projectDir)
+	env["CGO_ENABLED"] = "false"
+	env["GOPROXY"] = "https://goproxy.io,direct"
+	env["GOOS"] = goos
+	env["GOARCH"] = goarch
+	command.RunCommand(`go build -o `+projectDir+`/`+Config.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+env["NCI_COMMIT_REF_RELEASE"]+` -X main.CommitHash=`+env["NCI_COMMIT_SHA_SHORT"]+` -X main.BuildAt=`+buildAt+`" .`, env, projectDir)
 }

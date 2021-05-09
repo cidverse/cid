@@ -1,9 +1,8 @@
 package java
 
 import (
-	ncicommon "github.com/EnvCLI/normalize-ci/pkg/common"
-	"github.com/PhilippHeuer/cid/pkg/common/command"
-	"github.com/PhilippHeuer/cid/pkg/common/filesystem"
+	"github.com/qubid/x/pkg/common/command"
+	"github.com/qubid/x/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
@@ -38,18 +37,18 @@ func (n BuildActionStruct) SetConfig(config string) {
 }
 
 // Check if this package can handle the current environment
-func (n BuildActionStruct) Check(projectDir string, env []string) bool {
+func (n BuildActionStruct) Check(projectDir string, env map[string]string) bool {
 	loadConfig(projectDir)
 	return DetectJavaProject(projectDir)
 }
 
 // Check if this package can handle the current environment
-func (n BuildActionStruct) Execute(projectDirectory string, env []string, args []string) {
+func (n BuildActionStruct) Execute(projectDirectory string, env map[string]string, args []string) {
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDirectory)
 
 	// get release version
-	releaseVersion := ncicommon.GetEnvironment(env, `NCI_COMMIT_REF_RELEASE`)
+	releaseVersion := env["NCI_COMMIT_REF_RELEASE"]
 
 	// run build
 	buildSystem := DetectJavaBuildSystem(projectDirectory)

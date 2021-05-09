@@ -1,9 +1,8 @@
 package node
 
 import (
-	"github.com/EnvCLI/normalize-ci/pkg/common"
-	"github.com/PhilippHeuer/cid/pkg/common/api"
-	"github.com/PhilippHeuer/cid/pkg/common/command"
+	"github.com/qubid/x/pkg/common/api"
+	"github.com/qubid/x/pkg/common/command"
 	"github.com/rs/zerolog/log"
 )
 
@@ -35,13 +34,13 @@ func (n BuildActionStruct) SetConfig(config string) {
 }
 
 // Check will evaluate if this action can be executed for the specified project
-func (n BuildActionStruct) Check(projectDir string, env []string) bool {
+func (n BuildActionStruct) Check(projectDir string, env map[string]string) bool {
 	loadConfig(projectDir)
 	return DetectNodeProject(projectDir)
 }
 
 // Execute will run the action
-func (n BuildActionStruct) Execute(projectDir string, env []string, args []string) {
+func (n BuildActionStruct) Execute(projectDir string, env map[string]string, args []string) {
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
@@ -55,8 +54,8 @@ func (n BuildActionStruct) Execute(projectDir string, env []string, args []strin
 	reactDependencyVersion, reactDependencyPresent := packageConfig.Dependencies[`react`]
 	if reactDependencyPresent {
 		log.Debug().Str("react", reactDependencyVersion).Msg("found library")
-		env = common.SetEnvironment(env, "BUILD_PATH", projectDir + `/` + Config.Paths.Artifact + `/html`) // overwrite build dir - react - react-scripts at v4.0.2+
-		env = common.SetEnvironment(env, "CI", `false`) // if ci=true, then react warnings will result in errors - allow warnings
+		env["BUILD_PATH"] = projectDir + `/` + Config.Paths.Artifact + `/html` // overwrite build dir - react - react-scripts at v4.0.2+
+		env["CI"] = "false" // if ci=true, then react warnings will result in errors - allow warnings // TODO: remove
 	}
 
 	// build script
