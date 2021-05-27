@@ -3,9 +3,9 @@ package command
 import (
 	"bytes"
 	"errors"
-	"github.com/qubid/x/pkg/common/config"
-	"github.com/qubid/x/pkg/common/filesystem"
-	"github.com/qubid/x/pkg/common/tools"
+	"github.com/cidverse/x/pkg/common/config"
+	"github.com/cidverse/x/pkg/common/filesystem"
+	"github.com/cidverse/x/pkg/common/tools"
 	"github.com/rs/zerolog/log"
 	"os"
 	"os/exec"

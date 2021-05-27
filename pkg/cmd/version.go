@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/qubid/x/pkg/common/api"
+	"github.com/cidverse/x/pkg/common/api"
 	"github.com/spf13/cobra"
 	"runtime"
 )

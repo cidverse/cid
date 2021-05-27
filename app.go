@@ -8,7 +8,7 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"github.com/qubid/x/pkg/cmd"
+	"github.com/cidverse/x/pkg/cmd"
 )
 
 // Version will be set at build time

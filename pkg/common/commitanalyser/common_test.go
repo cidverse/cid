@@ -1,7 +1,7 @@
 package commitanalyser
 
 import (
-	"github.com/qubid/normalizeci/pkg/vcsrepository"
+	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

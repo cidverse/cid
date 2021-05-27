@@ -1,7 +1,7 @@
 package python
 
 import (
-	"github.com/qubid/x/pkg/common/config"
+	"github.com/cidverse/x/pkg/common/config"
 )
 
 var Config = struct {

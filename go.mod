@@ -1,4 +1,4 @@
-module github.com/qubid/x
+module github.com/cidverse/x
 
 go 1.16
 
@@ -6,12 +6,12 @@ require (
 	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20210512092938-c05353c2d58c // indirect
-	github.com/go-git/go-git/v5 v5.4.1
+	github.com/cidverse/normalizeci v1.0.1-0.20210527194207-4591f75bd372
+	github.com/go-git/go-git/v5 v5.4.1 // indirect
 	github.com/jinzhu/configor v1.2.1
 	github.com/kevinburke/ssh_config v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.8
 	github.com/oriser/regroup v0.0.0-20201024192559-010c434ff8f3
-	github.com/qubid/normalizeci v1.0.1-0.20210526221755-0eab957db679
 	github.com/rs/zerolog v1.22.0
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/spf13/cobra v1.1.3

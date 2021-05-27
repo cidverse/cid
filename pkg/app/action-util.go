@@ -1,15 +1,15 @@
 package app
 
 import (
-	"github.com/qubid/x/pkg/actions/container"
-	"github.com/qubid/x/pkg/actions/golang"
-	"github.com/qubid/x/pkg/actions/hugo"
-	"github.com/qubid/x/pkg/actions/java"
-	"github.com/qubid/x/pkg/actions/node"
-	"github.com/qubid/x/pkg/actions/python"
-	"github.com/qubid/x/pkg/actions/upx"
-	"github.com/qubid/x/pkg/common/api"
-	"github.com/qubid/x/pkg/common/config"
+	"github.com/cidverse/x/pkg/actions/container"
+	"github.com/cidverse/x/pkg/actions/golang"
+	"github.com/cidverse/x/pkg/actions/hugo"
+	"github.com/cidverse/x/pkg/actions/java"
+	"github.com/cidverse/x/pkg/actions/node"
+	"github.com/cidverse/x/pkg/actions/python"
+	"github.com/cidverse/x/pkg/actions/upx"
+	"github.com/cidverse/x/pkg/common/api"
+	"github.com/cidverse/x/pkg/common/config"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )

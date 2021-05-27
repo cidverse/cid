@@ -41,6 +41,8 @@ github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+Ce
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
 github.com/bketelsen/crypt v0.0.3-0.20200106085610-5cbc8cc4026c/go.mod h1:MKsuJmJgSg28kpZDP6UIiPt0e0Oz0kqKNGyRaWEPv84=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
+github.com/cidverse/normalizeci v1.0.1-0.20210527194207-4591f75bd372 h1:sSYD1uvE5y9dtSD+UzbaJNIPTh5lSwl+ZQp3kTMQ0r8=
+github.com/cidverse/normalizeci v1.0.1-0.20210527194207-4591f75bd372/go.mod h1:VuWNv9ywpG83+W+sObyGS/KKfhC3g2aHhv1al5YkPZs=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/coreos/bbolt v1.3.2/go.mod h1:iRUV2dpdMOn7Bo10OQBFzIJO9kkE559Wcmn+qkEiiKk=
 github.com/coreos/etcd v3.3.13+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=
@@ -201,12 +203,6 @@ github.com/prometheus/common v0.4.0/go.mod h1:TNfzLD0ON7rHzMJeJkieUDPYmFC7Snx/y8
 github.com/prometheus/procfs v0.0.0-20181005140218-185b4288413d/go.mod h1:c3At6R/oaqEKCNdg8wHV1ftS6bRYblBhIjjI8uT2IGk=
 github.com/prometheus/procfs v0.0.0-20190507164030-5867b95ac084/go.mod h1:TjEm7ze935MbeOT/UhFTIMYKhuLP4wbCsTZCD3I8kEA=
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
-github.com/qubid/normalizeci v1.0.1-0.20210525175813-ebe4a7aeee75 h1:8AGGTFhFgpnCaituuW/uwmqQ7VGT45L92dKJjMEDZQM=
-github.com/qubid/normalizeci v1.0.1-0.20210525175813-ebe4a7aeee75/go.mod h1:qZG+QETLvgXQU8YfwXASScScfzX/jhwSNZauISzcSw0=
-github.com/qubid/normalizeci v1.0.1-0.20210525235211-5840cded3980 h1:56iuf39WtVvUA/FVpsg/eXQTGoYTR7JEcI4zPlxb/Io=
-github.com/qubid/normalizeci v1.0.1-0.20210525235211-5840cded3980/go.mod h1:AcIrQwGkLyJVCPbnFFT8eY1CVSegg/TaH/vJia8pQd0=
-github.com/qubid/normalizeci v1.0.1-0.20210526221755-0eab957db679 h1:5bfvgv4LPQKKC9Q+yhl1btAJqpWQlE517GR5/4Drwjw=
-github.com/qubid/normalizeci v1.0.1-0.20210526221755-0eab957db679/go.mod h1:AcIrQwGkLyJVCPbnFFT8eY1CVSegg/TaH/vJia8pQd0=
 github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be h1:ta7tUOvsPHVHGom5hKW5VXNc2xZIkfCKP8iaqOyYtUQ=
 github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be/go.mod h1:MIDFMn7db1kT65GmV94GzpX9Qdi7N/pQlwb+AN8wh+Q=
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=

@@ -2,7 +2,7 @@ package container
 
 import (
 	"embed"
-	"github.com/qubid/x/pkg/common/filesystem"
+	"github.com/cidverse/x/pkg/common/filesystem"
 )
 
 //go:embed dockerfiles/*

@@ -1,7 +1,7 @@
 package java
 
 import (
-	"github.com/qubid/x/pkg/common/command"
+	"github.com/cidverse/x/pkg/common/command"
 	"github.com/rs/zerolog/log"
 	"strings"
 )

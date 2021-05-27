@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"github.com/qubid/x/pkg/app"
-	"github.com/qubid/x/pkg/common/api"
-	"github.com/qubid/x/pkg/common/filesystem"
+	"github.com/cidverse/x/pkg/app"
+	"github.com/cidverse/x/pkg/common/api"
+	"github.com/cidverse/x/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
