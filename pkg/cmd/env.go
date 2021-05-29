@@ -28,7 +28,7 @@ var envCmd = &cobra.Command{
 		app.Load(projectDirectory)
 
 		// normalize environment
-		env := api.GetFullCIDEnvironment(projectDirectory)
+		env := api.GetCIDEnvironment(projectDirectory)
 
 		// print environment
 		for _, e := range env {

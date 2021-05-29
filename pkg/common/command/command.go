@@ -3,44 +3,115 @@ package command
 import (
 	"bytes"
 	"errors"
+	"github.com/EnvCLI/EnvCLI/pkg/container_runtime"
+	"github.com/cidverse/cidverseutils/pkg/cihelper"
+	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/cidverse/x/pkg/common/config"
 	"github.com/cidverse/x/pkg/common/filesystem"
 	"github.com/cidverse/x/pkg/common/tools"
 	"github.com/rs/zerolog/log"
 	"os"
 	"os/exec"
+	"path"
 	"runtime"
 	"strings"
 )
+
+// GetCommandVersion returns the version of a executable
+func GetCommandVersion(executable string) (string, error) {
+	// find version constraint from config
+	cmdConstraint := ">= 0.0.0"
+	if value, ok := config.Config.Dependencies["bin/"+executable]; ok {
+		cmdConstraint = value
+	}
+
+	// prefer local tools if we find some that match the project version constraints
+	toolData, _, toolErr := tools.FindLocalTool(executable, cmdConstraint)
+	if toolErr == nil {
+		return toolData.Version, nil
+	}
+
+	// find container image
+	containerImage, containerImageErr := tools.FindContainerImage(executable, cmdConstraint)
+	if containerImageErr == nil {
+		return containerImage.Version, nil
+	}
+
+	// can't run cmd
+	return "", errors.New("can't determinate version of " + executable)
+}
 
 // RunCommand runs a command and forwards all output to console
 func RunCommand(command string, env map[string]string, workDir string) error {
 	cmdArgs := strings.SplitN(command, " ", 2)
 	originalBinary := cmdArgs[0]
-	cmdBinary := originalBinary
 	cmdPayload := cmdArgs[1]
 
-	// decide how to execute this command
-	if config.Config.Mode == config.PreferLocal {
-		// find version constraint from config
-		cmdConstraint := ">= 0.0.0"
-		if value, ok := config.Config.Dependencies["bin/"+originalBinary]; ok {
-			cmdConstraint = value
+	// find version constraint from config
+	cmdConstraint := ">= 0.0.0"
+	if value, ok := config.Config.Dependencies["bin/"+originalBinary]; ok {
+		cmdConstraint = value
+	}
+
+	// local execution
+	cmdBinary := ""
+	_, toolExec, toolErr := tools.FindLocalTool(originalBinary, cmdConstraint)
+	if toolErr == nil {
+		cmdBinary = toolExec
+	}
+
+	// container execution
+	containerImage, containerImageErr := tools.FindContainerImage(originalBinary, cmdConstraint)
+	containerExec := container_runtime.Container{}
+	if containerImageErr == nil {
+		projectDir := vcsrepository.FindRepositoryDirectory(workDir)
+
+		containerExec.SetImage(containerImage.Image)
+		containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: cihelper.ToUnixPath(projectDir), Target: cihelper.ToUnixPath(projectDir)})
+		containerExec.SetWorkingDirectory(cihelper.ToUnixPath(workDir))
+		containerExec.SetEntrypoint("unset")
+		containerExec.SetCommand(strings.Join(cmdArgs, " "))
+		for key, value := range env {
+			containerExec.AddEnvironmentVariable(key, value)
 		}
 
-		// prefer local tools if we find some that match the project version constraints
-		tool, toolErr := tools.FindLocalTool(cmdBinary, cmdConstraint)
-		if toolErr == nil {
-			cmdBinary = tool
+		// cache
+		for _, c := range containerImage.Cache {
+			cacheDir := path.Join(os.TempDir(), "cid", c.Id)
+			_ = os.MkdirAll(cacheDir, os.ModePerm)
+
+			containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: cihelper.ToUnixPath(cacheDir), Target: c.ContainerPath})
 		}
 	}
 
-	// TODO: try to find container image
+	// decide how to execute this command
+	log.Debug().Str("commandBinary", originalBinary).Str("commandPayload", cmdPayload).Str("os", runtime.GOOS).Str("workdir", workDir).Str("mode", string(config.Config.Mode)).Msg("running command")
+	if config.Config.Mode == config.PreferLocal {
+		if len(cmdBinary) > 0 {
+			// run locally
+			return RunSystemCommandPassThru(cmdBinary, cmdPayload, env, workDir)
+		} else if containerImageErr == nil && len(containerImage.Image) > 0 {
+			// run in container
+			containerCmd := cihelper.ToUnixPathArgs(containerExec.GetRunCommand(containerExec.DetectRuntime()))
+			log.Trace().Msg("container-exec: " + containerCmd)
+			containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
+			return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir)
+		}
+	} else if config.Config.Mode == config.Strict {
+		if containerImageErr == nil && len(containerImage.Image) > 0 {
+			// run in container
+			containerCmd := cihelper.ToUnixPathArgs(containerExec.GetRunCommand(containerExec.DetectRuntime()))
+			log.Trace().Msg("container-exec: " + containerCmd)
+			containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
+			return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir)
+		} else if len(cmdBinary) > 0 {
+			// run locally
+			return RunSystemCommandPassThru(cmdBinary, cmdPayload, env, workDir)
+		}
+	}
 
-	log.Debug().Str("commandBinary", originalBinary).Str("commandPayload", cmdPayload).Str("os", runtime.GOOS).Str("workdir", workDir).Msg("running command")
-	err := RunSystemCommandPassThru(cmdBinary, cmdPayload, env, workDir)
-
-	return err
+	// can't run cmd
+	return errors.New("no method available to run binary " + originalBinary)
 }
 
 // RunSystemCommand runs a command and stores the response in a string
@@ -55,7 +126,7 @@ func RunSystemCommand(file string, args string, env map[string]string, workDir s
 		return "", cmdErr
 	}
 
-	cmd.Env = getEnvFromMap(env)
+	cmd.Env = getFullEnvFromMap(env)
 	cmd.Dir = workDir
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = &resultBuff
@@ -81,7 +152,7 @@ func RunSystemCommandPassThru(file string, args string, env map[string]string, w
 		return cmdErr
 	}
 
-	cmd.Env = getEnvFromMap(env)
+	cmd.Env = getFullEnvFromMap(env)
 	cmd.Dir = workDir
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
@@ -121,18 +192,21 @@ func GetPlatformSpecificCommand(platform string, file string, args string, workD
 	return nil, errors.New("command.GetPlatformSpecificCommand failed, platform " + platform + " is not supported!")
 }
 
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
+func getFullEnvFromMap(env map[string]string) []string {
+	// full environment
+	fullEnv := make(map[string]string)
+	for _, line := range os.Environ() {
+		z := strings.SplitN(line, "=", 2)
+		fullEnv[z[0]] = z[1]
 	}
-	return !info.IsDir()
-}
-
-func getEnvFromMap(env map[string]string) []string {
-	var envLines []string
-
+	// custom env parameters
 	for k, v := range env {
+		fullEnv[k] = v
+	}
+
+	// turn into a slice
+	var envLines []string
+	for k, v := range fullEnv {
 		envLines = append(envLines, k+"="+v)
 	}
 

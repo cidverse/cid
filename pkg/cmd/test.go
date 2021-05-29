@@ -27,7 +27,7 @@ var testCmd = &cobra.Command{
 		app.Load(projectDirectory)
 
 		// normalize environment
-		env := api.GetFullCIDEnvironment(projectDirectory)
+		env := api.GetCIDEnvironment(projectDirectory)
 
 		// actions
 		app.RunStageActions("test", projectDirectory, env, args)

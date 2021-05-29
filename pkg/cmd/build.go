@@ -28,16 +28,15 @@ var buildCmd = &cobra.Command{
 		app.Load(projectDirectory)
 
 		// normalize environment
-		env := api.GetFullCIDEnvironment(projectDirectory)
+		env := api.GetCIDEnvironment(projectDirectory)
 
 		// allow to overwrite NCI_COMMIT_REF_RELEASE with a custom version
 		version := cmd.Flag("version").Value.String()
 		if len(version) > 0 {
+			// manually overwrite version
 			env["NCI_COMMIT_REF_RELEASE"] = version
-		}
-
-		// suggested release version
-		if len(env["NCI_NEXTRELEASE_NAME"]) > 0 {
+		} else if len(env["NCI_NEXTRELEASE_NAME"]) > 0 {
+			// take suggested release version
 			env["NCI_COMMIT_REF_RELEASE"] = env["NCI_NEXTRELEASE_NAME"]
 		}
 

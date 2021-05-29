@@ -4,14 +4,19 @@ import (
 	"bytes"
 	"errors"
 	"github.com/Masterminds/semver/v3"
+	"github.com/cidverse/normalizeci/pkg/common"
 	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 )
 
 const PathSeparator = string(os.PathSeparator)
+
+type ToolCacheDir struct {
+	Id string
+	ContainerPath string
+}
 
 type ToolExecutableDiscovery struct {
 	Executable string
@@ -20,8 +25,15 @@ type ToolExecutableDiscovery struct {
 	Version string
 }
 
+type ToolContainerDiscovery struct {
+	Executable string
+	Image string
+	Version string
+	Cache []ToolCacheDir
+}
+
 // FindLocalTool tries to find a tool/cli fulfilling the specified version constraints in the local environment
-func FindLocalTool(executable string, constraint string) (string, error) {
+func FindLocalTool(executable string, constraint string) (ToolExecutableDiscovery, string, error) {
 	var toolEnvironmentDiscovery []ToolExecutableDiscovery
 	// golang
 	toolEnvironmentDiscovery = append(toolEnvironmentDiscovery, ToolExecutableDiscovery{Executable: "go", EnvironmentName: "GOROOT_1_16", SubPath: "/bin", Version: "1.16.0"})
@@ -51,22 +63,38 @@ func FindLocalTool(executable string, constraint string) (string, error) {
 	toolEnvironmentDiscovery = append(toolEnvironmentDiscovery, ToolExecutableDiscovery{Executable: "java", EnvironmentName: "JAVA_HOME_8", SubPath: "/bin", Version: "8.0.0"})
 
 	// check based on env paths
-	systemEnvironment := os.Environ()
-	for _, env := range systemEnvironment {
-		z := strings.SplitN(env, "=", 2)
-		key := z[0]
-		value := z[1]
-
-		for _, entry := range toolEnvironmentDiscovery {
-			if executable == entry.Executable {
-				if strings.Contains(key, entry.EnvironmentName) && IsVersionFulfillingConstraint(entry.Version, constraint) {
-					return FindExecutable(value+entry.SubPath, entry.Executable), nil
-				}
+	env := common.GetMachineEnvironment()
+	for _, entry := range toolEnvironmentDiscovery {
+		if executable == entry.Executable && len(env[entry.EnvironmentName]) > 0 {
+			if IsVersionFulfillingConstraint(entry.Version, constraint) {
+				return entry, FindExecutable(env[entry.EnvironmentName]+entry.SubPath, entry.Executable), nil
 			}
 		}
 	}
 
-	return "", errors.New("failed to find executable")
+	return ToolExecutableDiscovery{}, "", errors.New("failed to find executable")
+}
+
+func FindContainerImage(executable string, constraint string) (ToolContainerDiscovery, error) {
+	var toolImageDiscovery []ToolContainerDiscovery
+	// golang
+	for _, element := range []string{"1.16.4", "1.16.3", "1.16.2", "1.16.1", "1.16.0", "1.15.12", "1.15.11", "1.15.10", "1.15.9", "1.15.8", "1.15.7", "1.15.6", "1.15.5", "1.15.4", "1.15.3", "1.15.2", "1.15.1", "1.15.0"} {
+		toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "go", Image: "golang:"+element+"-alpine", Version: element, Cache: []ToolCacheDir{{"go-pkg", "/go/pkg"}}})
+		toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "gofmt", Image: "golang:"+element+"-alpine", Version: element, Cache: []ToolCacheDir{{"go-pkg", "/go/pkg"}}})
+	}
+	// golangci-lint
+	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "golangci-lint", Image: "golangci/golangci-lint:v1.40.1-alpine", Version: "1.40.1"})
+
+	// check based on env paths
+	for _, entry := range toolImageDiscovery {
+		if executable == entry.Executable {
+			if IsVersionFulfillingConstraint(entry.Version, constraint) {
+				return entry, nil
+			}
+		}
+	}
+
+	return ToolContainerDiscovery{}, errors.New("failed to find image")
 }
 
 func IsVersionFulfillingConstraint(version string, constraint string) bool {

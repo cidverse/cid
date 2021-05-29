@@ -14,6 +14,7 @@ func init() {
 
 var actionCmd = &cobra.Command{
 	Use:   "action",
+	Aliases: []string{"a", "act"},
 	Short: "runs the actions specified in the arguments",
 	Long:  `runs the actions specified in the arguments`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -27,13 +28,13 @@ var actionCmd = &cobra.Command{
 		app.Load(projectDirectory)
 
 		// normalize environment
-		env := api.GetFullCIDEnvironment(projectDirectory)
+		env := api.GetCIDEnvironment(projectDirectory)
 
 		// actions
 		actionName := args[0]
 		action := app.FindActionByName(actionName, projectDirectory)
 		if action == nil {
-			log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect the project type")
+			log.Fatal().Str("projectDirectory", projectDirectory).Str("action", actionName).Msg("can't find action by name")
 		}
 		action.Execute(projectDirectory, env, args)
 	},
