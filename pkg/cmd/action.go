@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/cidverse/x/pkg/app"
 	"github.com/cidverse/x/pkg/common/api"
-	"github.com/cidverse/x/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -20,22 +19,19 @@ var actionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debug().Str("command", "action").Msg("running command")
 
-		// find project directory
-		projectDirectory, projectDirectoryErr := filesystem.GetProjectDirectory()
-		if projectDirectoryErr != nil {
-			log.Fatal().Err(projectDirectoryErr).Msg(projectDirectoryErr.Error())
-		}
-		app.Load(projectDirectory)
+		// find project directory and load config
+		projectDir := api.FindProjectDir()
+		app.Load(projectDir)
 
 		// normalize environment
-		env := api.GetCIDEnvironment(projectDirectory)
+		env := api.GetCIDEnvironment(projectDir)
 
 		// actions
 		actionName := args[0]
-		action := app.FindActionByName(actionName, projectDirectory)
+		action := app.FindActionByName(actionName, projectDir)
 		if action == nil {
-			log.Fatal().Str("projectDirectory", projectDirectory).Str("action", actionName).Msg("can't find action by name")
+			log.Fatal().Str("projectDirectory", projectDir).Str("action", actionName).Msg("can't find action by name")
 		}
-		action.Execute(projectDirectory, env, args)
+		action.Execute(projectDir, env, args)
 	},
 }

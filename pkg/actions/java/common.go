@@ -2,7 +2,8 @@ package java
 
 import (
 	"archive/zip"
-	"github.com/cidverse/x/pkg/common/filesystem"
+	"github.com/cavaliercoder/grab"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"io"
 	"os"
@@ -63,7 +64,15 @@ func MavenWrapperSetup(projectDirectory string) {
 
 	// ensure the maven wrapper jar is present
 	if !filesystem.FileExists(projectDirectory+"/.mvn/wrapper/maven-wrapper.jar") {
-		filesystem.DownloadFile("https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/"+mavenWrapperVersion+"/maven-wrapper-"+mavenWrapperVersion+".jar", projectDirectory+"/.mvn/wrapper/maven-wrapper.jar")
+		sourceUrl := "https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/"+mavenWrapperVersion+"/maven-wrapper-"+mavenWrapperVersion+".jar"
+		targetFile := projectDirectory+"/.mvn/wrapper/maven-wrapper.jar"
+		log.Debug().Str("sourceUrl", sourceUrl).Str("targetFile", targetFile).Msg("Downloading file ...")
+
+		// download
+		_, err := grab.Get(targetFile, sourceUrl)
+		if err != nil {
+			log.Fatal().Err(err).Str("sourceUrl", sourceUrl).Str("targetFile", targetFile).Msg("failed to download file")
+		}
 	}
 }
 

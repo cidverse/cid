@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/cidverse/x/pkg/app"
 	"github.com/cidverse/x/pkg/common/api"
-	"github.com/cidverse/x/pkg/common/filesystem"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -20,15 +19,12 @@ var envCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debug().Str("command", "env").Msg("running command")
 
-		// find project directory
-		projectDirectory, projectDirectoryErr := filesystem.GetProjectDirectory()
-		if projectDirectoryErr != nil {
-			log.Fatal().Err(projectDirectoryErr).Msg(projectDirectoryErr.Error())
-		}
-		app.Load(projectDirectory)
+		// find project directory and load config
+		projectDir := api.FindProjectDir()
+		app.Load(projectDir)
 
 		// normalize environment
-		env := api.GetCIDEnvironment(projectDirectory)
+		env := api.GetCIDEnvironment(projectDir)
 
 		// print environment
 		for _, e := range env {

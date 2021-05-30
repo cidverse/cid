@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"fmt"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	ncicommon "github.com/cidverse/normalizeci/pkg/common"
 	ncimain "github.com/cidverse/normalizeci/pkg/normalizeci"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
@@ -30,6 +31,16 @@ func GetCacheDir(pathConfig config.PathConfig, module string) string {
 	}
 
 	return os.TempDir() + `/.cid/` + module
+}
+
+// FindProjectDir finds the project directory from the current dir
+func FindProjectDir() string {
+	projectDirectory, projectDirectoryErr := filesystem.GetProjectDirectory()
+	if projectDirectoryErr != nil {
+		log.Fatal().Err(projectDirectoryErr).Msg(projectDirectoryErr.Error())
+	}
+
+	return projectDirectory
 }
 
 // GetCIDEnvironment returns the normalized ci variables
