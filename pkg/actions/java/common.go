@@ -102,11 +102,7 @@ func GetJarManifestContent(jarFile string) (string, error) {
 func IsJarExecutable(jarFile string) bool {
 	manifestContent, _ := GetJarManifestContent(jarFile)
 
-	if strings.Contains(manifestContent, "Main-Class") {
-		return true
-	}
-
-	return false
+	return strings.Contains(manifestContent, "Main-Class")
 }
 
 func getMavenCommandPrefix(projectDirectory string) string {

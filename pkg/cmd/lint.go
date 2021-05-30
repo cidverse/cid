@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/cidverse/x/pkg/app"
 	"github.com/cidverse/x/pkg/common/api"
 	"github.com/rs/zerolog/log"
@@ -9,15 +8,17 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(envCmd)
+	rootCmd.AddCommand(lintCmd)
 }
 
-var envCmd = &cobra.Command{
-	Use:   "env",
-	Short: "prints the effective build environment",
-	Long:  `prints all normalized ci variables that are available for the workflow.`,
+var lintCmd = &cobra.Command{
+	Use:   "lint",
+	Short: "the lint stage analyzes source code to flag programming errors.",
+	PreRun: func(cmd *cobra.Command, args []string) {
+
+	},
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debug().Str("command", "env").Msg("running command")
+		log.Debug().Str("command", "lint").Msg("running command")
 
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
@@ -26,9 +27,10 @@ var envCmd = &cobra.Command{
 		// normalize environment
 		env := api.GetCIDEnvironment(projectDir)
 
-		// print environment
-		for _, e := range env {
-			fmt.Printf("%v\n", e)
-		}
+		// actions
+		app.RunStageActions("lint", projectDir, env, args)
+	},
+	PostRun: func(cmd *cobra.Command, args []string) {
+
 	},
 }
