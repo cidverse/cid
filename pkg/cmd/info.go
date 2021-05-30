@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/cidverse/x/pkg/app"
-	"github.com/cidverse/x/pkg/common/api"
-	"github.com/cidverse/x/pkg/common/config"
+	"github.com/cidverse/cid/pkg/app"
+	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/common/config"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"

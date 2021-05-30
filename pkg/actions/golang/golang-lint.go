@@ -1,7 +1,7 @@
 package golang
 
 import (
-	"github.com/cidverse/x/pkg/common/command"
+	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
 )
 

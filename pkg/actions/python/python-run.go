@@ -2,7 +2,7 @@ package python
 
 import (
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
-	"github.com/cidverse/x/pkg/common/command"
+	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
 	"strings"
 )

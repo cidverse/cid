@@ -1,4 +1,4 @@
-module github.com/cidverse/x
+module github.com/cidverse/cid
 
 go 1.16
 

@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/cidverse/x/pkg/app"
-	"github.com/cidverse/x/pkg/common/api"
+	"github.com/cidverse/cid/pkg/app"
+	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )

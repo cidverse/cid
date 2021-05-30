@@ -1,15 +1,15 @@
 package app
 
 import (
-	"github.com/cidverse/x/pkg/actions/container"
-	"github.com/cidverse/x/pkg/actions/golang"
-	"github.com/cidverse/x/pkg/actions/hugo"
-	"github.com/cidverse/x/pkg/actions/java"
-	"github.com/cidverse/x/pkg/actions/node"
-	"github.com/cidverse/x/pkg/actions/python"
-	"github.com/cidverse/x/pkg/actions/upx"
-	"github.com/cidverse/x/pkg/common/api"
-	"github.com/cidverse/x/pkg/common/config"
+	"github.com/cidverse/cid/pkg/actions/container"
+	"github.com/cidverse/cid/pkg/actions/golang"
+	"github.com/cidverse/cid/pkg/actions/hugo"
+	"github.com/cidverse/cid/pkg/actions/java"
+	"github.com/cidverse/cid/pkg/actions/node"
+	"github.com/cidverse/cid/pkg/actions/python"
+	"github.com/cidverse/cid/pkg/actions/upx"
+	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/common/config"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )

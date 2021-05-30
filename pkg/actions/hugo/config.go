@@ -1,7 +1,7 @@
 package hugo
 
 import (
-	"github.com/cidverse/x/pkg/common/config"
+	"github.com/cidverse/cid/pkg/common/config"
 )
 
 var Config = struct {

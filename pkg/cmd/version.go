@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/cidverse/x/pkg/common/api"
+	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/spf13/cobra"
 	"runtime"
 )

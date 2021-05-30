@@ -1,8 +1,8 @@
 package node
 
 import (
-	"github.com/cidverse/x/pkg/common/api"
-	"github.com/cidverse/x/pkg/common/command"
+	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
 )
 

@@ -2,7 +2,7 @@ package java
 
 import (
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
-	"github.com/cidverse/x/pkg/common/command"
+	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
