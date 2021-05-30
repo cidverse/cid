@@ -3,12 +3,11 @@ package api
 import (
 	"errors"
 	"fmt"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
-	ncicommon "github.com/cidverse/normalizeci/pkg/common"
-	ncimain "github.com/cidverse/normalizeci/pkg/normalizeci"
-	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/cidverse/cid/pkg/common/commitanalyser"
 	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	ncimain "github.com/cidverse/normalizeci/pkg/normalizeci"
+	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
 	"os"
 	"strings"
@@ -55,17 +54,6 @@ func GetCIDEnvironment(projectDirectory string) map[string]string {
 	}
 
 	return env
-}
-
-// GetFullCIDEnvironment returns the normalized ci variables merged with the os env
-func GetFullCIDEnvironment(projectDirectory string) map[string]string {
-	osEnv := ncicommon.GetMachineEnvironment()
-	normalizedEnv := GetCIDEnvironment(projectDirectory)
-	for k, v := range normalizedEnv {
-		osEnv[k] = v
-	}
-
-	return osEnv
 }
 
 // EnrichEnvironment enriches the environment with CID variables / release information

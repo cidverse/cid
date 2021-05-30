@@ -15,6 +15,15 @@ The workflow `actions` can detect the current project type and build your projec
 
 **WIP**
 
+# Stages
+
+| Stage | Description   |
+| ------------- |:-------------:|
+| init | initializes the project (git hooks, gitignore, etc.) |
+| build | builds the project |
+| test | runs the tests |
+| lint | analyzes source code to flag programming errors |
+
 # Configuration
 
 You can place a `cid.yml` in your project root directory (-> scm repository root directory).

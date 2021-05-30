@@ -13,10 +13,7 @@ func init() {
 
 var lintCmd = &cobra.Command{
 	Use:   "lint",
-	Short: "the lint stage analyzes source code to flag programming errors.",
-	PreRun: func(cmd *cobra.Command, args []string) {
-
-	},
+	Short: "the lint stage analyzes source code to flag programming errors",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debug().Str("command", "lint").Msg("running command")
 
@@ -29,8 +26,5 @@ var lintCmd = &cobra.Command{
 
 		// actions
 		app.RunStageActions("lint", projectDir, env, args)
-	},
-	PostRun: func(cmd *cobra.Command, args []string) {
-
 	},
 }

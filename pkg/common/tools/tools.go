@@ -65,6 +65,8 @@ func init() {
 	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "java", Image: "adoptopenjdk/openjdk16:jdk-16.0.1_9", Version: "16.0.1"})
 	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "java", Image: "adoptopenjdk/openjdk15:jdk-15.0.2_7", Version: "15.0.2"})
 	// upx
+	// gitleaks
+	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "gitleaks", Image: "zricethezav/gitleaks:v7.5.0", Version: "7.5.0"})
 }
 
 // FindLocalTool tries to find a tool/cli fulfilling the specified version constraints in the local environment
