@@ -65,7 +65,8 @@ func (n BuildActionStruct) Execute(projectDirectory string, env map[string]strin
 	files, _ := filesystem.FindFilesInDirectory(projectDirectory, `.jar`)
 	for _, file := range files {
 		if strings.Contains(file, "build"+string(os.PathSeparator)+"libs") && IsJarExecutable(file) {
-			filesystem.MoveFile(files[0], projectDirectory + `/dist/`+filepath.Base(files[0]))
+			moveErr := filesystem.MoveFile(files[0], projectDirectory+`/dist/`+filepath.Base(files[0]))
+			log.Fatal().Err(moveErr).Msg("failed to move artifacts into artifact dir")
 		}
 	}
 }

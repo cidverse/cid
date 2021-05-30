@@ -52,5 +52,8 @@ func init() {
 
 // CLI Main Entrypoint
 func main() {
-	cmd.Execute()
+	cmdErr := cmd.Execute()
+	if cmdErr != nil {
+		log.Fatal().Err(cmdErr).Msg("internal cli library error")
+	}
 }

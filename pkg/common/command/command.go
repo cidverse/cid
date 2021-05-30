@@ -41,8 +41,16 @@ func GetCommandVersion(executable string) (string, error) {
 	return "", errors.New("can't determinate version of " + executable)
 }
 
-// RunCommand runs a command and forwards all output to console
-func RunCommand(command string, env map[string]string, workDir string) error {
+// RunCommand runs a command and forwards all output to console, but will panic/exit if the command fails
+func RunCommand(command string, env map[string]string, workDir string) {
+	err := RunOptionalCommand(command, env, workDir)
+	if err != nil {
+		log.Fatal().Err(err).Str("command", command).Msg("failed to execute command")
+	}
+}
+
+// RunOptionalCommand runs a command and forwards all output to console
+func RunOptionalCommand(command string, env map[string]string, workDir string) error {
 	cmdArgs := strings.SplitN(command, " ", 2)
 	originalBinary := cmdArgs[0]
 	cmdPayload := cmdArgs[1]

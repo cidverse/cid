@@ -14,8 +14,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var actions []api.ActionStep
-
 func Load(projectDirectory string) {
 	// load configuration for the current project
 	config.LoadConfig(projectDirectory)

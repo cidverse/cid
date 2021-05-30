@@ -63,7 +63,7 @@ func (n RunActionStruct) Execute(projectDirectory string, env map[string]string,
 		log.Fatal().Err(filesErr).Str("path", projectDirectory + `/build/libs`).Msg("failed to list files")
 	}
 	if len(files) == 1 {
-		command.RunCommand(`java -jar ` + files[0] + ` ` + strings.Join(args, " "), env, projectDirectory)
+		_ = command.RunOptionalCommand(`java -jar `+files[0]+` `+strings.Join(args, " "), env, projectDirectory)
 	} else {
 		log.Warn().Int("count", len(files)).Msg("path build/libs should contain a single jar file! If you have a modular project please ensure that the final jar is moved into build/libs.")
 	}

@@ -15,5 +15,5 @@ var Config = struct {
 }{}
 
 func loadConfig(projectDirectory string) {
-	config.LoadConfigurationFile(&Config, projectDirectory + "/cid.yml")
+	_ = config.LoadConfigurationFile(&Config, projectDirectory + "/cid.yml")
 }

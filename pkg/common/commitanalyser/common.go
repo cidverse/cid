@@ -25,7 +25,7 @@ func DeterminateNextReleaseVersion(commits []vcsrepository.Commit, commitPattern
 	}
 
 	for _, commit := range commits {
-		for id, _ := range commitPatternList {
+		for id := range commitPatternList {
 			// check if commit matches the pattern
 			if commitExpr[id].MatchString(commit.Message) {
 				match, matchErr := commitGroupExpr[id].Groups(commit.Message)

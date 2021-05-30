@@ -138,7 +138,7 @@ func IsVersionFulfillingConstraint(version string, constraint string) bool {
 
 	// check
 	ok, validateErr := c.Validate(v)
-	if ok == false {
+	if !ok {
 		var allErrors bytes.Buffer
 
 		for _, err := range validateErr {

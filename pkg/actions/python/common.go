@@ -7,11 +7,7 @@ import (
 
 // DetectPythonProject checks if the target directory contains a supported python project
 func DetectPythonProject(projectDir string) bool {
-	if len(DetectPythonBuildSystem(projectDir)) > 0 {
-		return true
-	}
-
-	return false
+	return len(DetectPythonBuildSystem(projectDir)) > 0
 }
 
 // DetectPythonBuildSystem returns the build system used in the project

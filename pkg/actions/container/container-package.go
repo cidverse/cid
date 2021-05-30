@@ -37,11 +37,7 @@ func (n PackageActionStruct) SetConfig(config string) {
 func (n PackageActionStruct) Check(projectDir string, env map[string]string) bool {
 	loadConfig(projectDir)
 
-	if len(DetectAppType(projectDir)) > 0 {
-		return true
-	}
-
-	return false
+	return len(DetectAppType(projectDir)) > 0
 }
 
 // Check if this package can handle the current environment
@@ -59,14 +55,17 @@ func (n PackageActionStruct) Execute(projectDir string, env map[string]string, a
 			log.Fatal().Err(dockerfileContentErr).Msg("failed to get dockerfile from resources.")
 		}
 
-		filesystem.CreateFileWithContent(dockerfile, dockerfileContent)
+		createFileErr := filesystem.CreateFileWithContent(dockerfile, dockerfileContent)
+		if createFileErr != nil {
+			log.Fatal().Str("file", dockerfile).Msg("failed to create temporary dockerfile")
+		}
 	}
 
 	// run build
 	command.RunCommand(`docker build --no-cache -t `+env["NCI_CONTAINERREGISTRY_REPOSITORY"]+":"+env["NCI_COMMIT_REF_RELEASE"]+` `+projectDir, env, projectDir)
 
 	// remove dockerfile
-	filesystem.RemoveFile(dockerfile)
+	_ = filesystem.RemoveFile(dockerfile)
 }
 
 // PackageAction

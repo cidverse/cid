@@ -43,7 +43,7 @@ func (n RunActionStruct) Execute(projectDir string, env map[string]string, args 
 	log.Debug().Str("action", n.name).Msg("running action")
 	loadConfig(projectDir)
 
-	command.RunCommand(`hugo server --minify --gc --log --verboseLog --baseUrl "/" --watch --source `+projectDir+``, env, projectDir)
+	_ = command.RunOptionalCommand(`hugo server --minify --gc --log --verboseLog --baseUrl "/" --watch --source `+projectDir+``, env, projectDir)
 }
 
 // BuildAction

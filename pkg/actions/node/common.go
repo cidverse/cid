@@ -2,6 +2,7 @@ package node
 
 import (
 	"encoding/json"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"os"
@@ -17,12 +18,7 @@ type PackageStruct struct {
 // DetectNodeProject checks if the target directory is a java project
 func DetectNodeProject(projectDir string) bool {
 	// package.json
-	if _, err := os.Stat(projectDir+"/package.json"); !os.IsNotExist(err) {
-		log.Debug().Str("file", projectDir+"/package.json").Msg("found package.json")
-		return true
-	}
-
-	return false
+	return filesystem.FileExists(projectDir+"/package.json")
 }
 
 // ParsePackageJSON will parse the package.json to evaluate its content
@@ -38,7 +34,10 @@ func ParsePackageJSON(file string) PackageStruct {
 
 		fileBytes, fileErr := ioutil.ReadFile(file)
 		if fileErr == nil {
-			json.Unmarshal(fileBytes, &result)
+			unmarshalErr := json.Unmarshal(fileBytes, &result)
+			if unmarshalErr != nil {
+				log.Fatal().Err(unmarshalErr).Str("file", file).Msg("failed to parse package.json")
+			}
 		} else {
 			log.Debug().Err(fileErr).Str("file", file).Msg("failed to open package.json")
 		}

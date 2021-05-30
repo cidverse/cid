@@ -16,11 +16,7 @@ const GradleCommandPrefix = `java "-Dorg.gradle.appname=gradlew" "-classpath" "g
 func DetectJavaProject(projectDir string) bool {
 	buildSystem := DetectJavaBuildSystem(projectDir)
 
-	if len(buildSystem) > 0 {
-		return true
-	}
-
-	return false
+	return len(buildSystem) > 0
 }
 
 // DetectJavaBuildSystem returns the build system used in the project
@@ -55,11 +51,15 @@ func MavenWrapperSetup(projectDirectory string) {
 	if !filesystem.FileExists("mvnw") {
 		log.Warn().Msg("Maven projects should have the maven wrapper committed into the repository! Check out https://www.baeldung.com/maven-wrapper")
 	}
-	os.MkdirAll(projectDirectory+"/.mvn/wrapper", 755)
+	filesystem.CreateDirectory(projectDirectory+"/.mvn/wrapper")
 
 	// check for maven wrapper properties file
-	if !filesystem.FileExists(projectDirectory+"/.mvn/wrapper/maven-wrapper.properties") {
-		filesystem.SaveFileContent(projectDirectory+"/.mvn/wrapper/maven-wrapper.properties", "distributionUrl=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/"+mavenVersion+"/apache-maven-"+mavenVersion+"-bin.zip")
+	wrapperPropertiesFile := projectDirectory+"/.mvn/wrapper/maven-wrapper.properties"
+	if !filesystem.FileExists(wrapperPropertiesFile) {
+		saveFileErr := filesystem.SaveFileContent(wrapperPropertiesFile, "distributionUrl=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/"+mavenVersion+"/apache-maven-"+mavenVersion+"-bin.zip")
+		if saveFileErr != nil {
+			log.Fatal().Err(saveFileErr).Str("file", wrapperPropertiesFile).Msg("failed to create file")
+		}
 	}
 
 	// ensure the maven wrapper jar is present

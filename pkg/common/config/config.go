@@ -50,7 +50,7 @@ type WorkflowAction struct {
 type ExecutionModeType string
 const(
 	PreferLocal ExecutionModeType = "PREFER_LOCAL"
-	Strict                        = "STRICT"
+	Strict ExecutionModeType      = "STRICT"
 )
 
 // BranchingConventionType
@@ -67,7 +67,11 @@ const(
 
 func LoadConfig(projectDirectory string) {
 	// load
-	LoadConfigurationFile(&Config, projectDirectory + "/cid.yml")
+	loadConfigErr := LoadConfigurationFile(&Config, projectDirectory + "/cid.yml")
+	if loadConfigErr != nil {
+		log.Fatal().Err(loadConfigErr).Msg("failed to parse config")
+	}
+
 	if Config.Dependencies == nil {
 		Config.Dependencies = make(map[string]string)
 	}
