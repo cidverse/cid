@@ -57,6 +57,7 @@ func GetProjectActions(projectDirectory string) []api.ActionStep {
 
 	actions = append(actions, java.RunAction())
 	actions = append(actions, java.BuildAction())
+	actions = append(actions, java.TestAction())
 	actions = append(actions, java.PublishAction())
 
 	actions = append(actions, python.BuildAction())
