@@ -26,7 +26,7 @@ func GetCommandVersion(executable string) (string, error) {
 	}
 
 	// prefer local tools if we find some that match the project version constraints
-	toolData, _, toolErr := tools.FindLocalTool(executable, cmdConstraint)
+	toolData, toolErr := tools.FindLocalTool(executable, cmdConstraint)
 	if toolErr == nil {
 		return toolData.Version, nil
 	}
@@ -55,9 +55,9 @@ func RunCommand(command string, env map[string]string, workDir string) error {
 
 	// local execution
 	cmdBinary := ""
-	_, toolExec, toolErr := tools.FindLocalTool(originalBinary, cmdConstraint)
-	if toolErr == nil {
-		cmdBinary = toolExec
+	localTool, localToolErr := tools.FindLocalTool(originalBinary, cmdConstraint)
+	if localToolErr == nil {
+		cmdBinary = localTool.ExecutableFile
 	}
 
 	// container execution
@@ -85,7 +85,7 @@ func RunCommand(command string, env map[string]string, workDir string) error {
 	}
 
 	// decide how to execute this command
-	log.Debug().Str("commandBinary", originalBinary).Str("commandPayload", cmdPayload).Str("os", runtime.GOOS).Str("workdir", workDir).Str("mode", string(config.Config.Mode)).Msg("running command")
+	log.Debug().Str("executable", originalBinary).Str("args", cmdPayload).Str("os", runtime.GOOS).Str("workdir", workDir).Str("mode", string(config.Config.Mode)).Str("localpath", cmdBinary).Msg("command info")
 	if config.Config.Mode == config.PreferLocal {
 		if len(cmdBinary) > 0 {
 			// run locally
@@ -93,25 +93,32 @@ func RunCommand(command string, env map[string]string, workDir string) error {
 		} else if containerImageErr == nil && len(containerImage.Image) > 0 {
 			// run in container
 			containerCmd := cihelper.ToUnixPathArgs(containerExec.GetRunCommand(containerExec.DetectRuntime()))
-			log.Trace().Msg("container-exec: " + containerCmd)
+			log.Debug().Msg("container-exec: " + containerCmd)
 			containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
 			return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir)
+		} else {
+			log.Fatal().Str("executable", originalBinary).Msg("no method available to execute command")
 		}
 	} else if config.Config.Mode == config.Strict {
 		if containerImageErr == nil && len(containerImage.Image) > 0 {
 			// run in container
 			containerCmd := cihelper.ToUnixPathArgs(containerExec.GetRunCommand(containerExec.DetectRuntime()))
-			log.Trace().Msg("container-exec: " + containerCmd)
+			log.Debug().Msg("container-exec: " + containerCmd)
 			containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
 			return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir)
 		} else if len(cmdBinary) > 0 {
 			// run locally
 			return RunSystemCommandPassThru(cmdBinary, cmdPayload, env, workDir)
+		} else {
+			log.Fatal().Str("executable", originalBinary).Msg("no method available to execute command")
 		}
+	} else {
+		log.Fatal().Str("mode", string(config.Config.Mode)).Msg("execution mode not supported")
 	}
 
 	// can't run cmd
-	return errors.New("no method available to run binary " + originalBinary)
+	log.Fatal().Str("executable", originalBinary).Msg("no method available to execute command")
+	return errors.New("no method available to execute command " + originalBinary)
 }
 
 // RunSystemCommand runs a command and stores the response in a string
@@ -143,7 +150,7 @@ func RunSystemCommand(file string, args string, env map[string]string, workDir s
 
 // RunSystemCommandPassThru runs a command and forwards all output to current console session
 func RunSystemCommandPassThru(file string, args string, env map[string]string, workDir string) error {
-	log.Debug().Str("file", file).Str("args", args).Str("workdir", workDir).Msg("running command")
+	log.Debug().Str("file", file).Str("args", args).Str("workdir", workDir).Msg("command exec")
 
 	// Run Command
 	cmd, cmdErr := GetPlatformSpecificCommand(runtime.GOOS, file, args, workDir)
@@ -159,11 +166,11 @@ func RunSystemCommandPassThru(file string, args string, env map[string]string, w
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {
-		log.Fatal().Str("file", file).Str("args", args).Str("error", err.Error()).Msg("Command Execution Failed")
+		log.Fatal().Str("file", file).Str("args", args).Str("error", err.Error()).Msg("command execution failed")
 		return err
 	}
 
-	log.Debug().Str("file", file).Str("args", args).Msg("Command Execution OK")
+	log.Debug().Str("file", file).Str("args", args).Msg("command execution OK")
 	return nil
 }
 

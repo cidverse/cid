@@ -45,8 +45,8 @@ github.com/bketelsen/crypt v0.0.3-0.20200106085610-5cbc8cc4026c/go.mod h1:MKsuJm
 github.com/blang/semver v3.5.1+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
 github.com/certifi/gocertifi v0.0.0-20200211180108-c7c1fbc02894/go.mod h1:sGbDF6GwGcLpkNXPUTkMRoywsNa/ol15pxFe6ERfguA=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
-github.com/cidverse/cidverseutils v0.0.0-20210529223404-aac629594d33 h1:zn3cyKfFdG242HqGRgUBd+5fbSuDwxWwlm8rqcaauH0=
-github.com/cidverse/cidverseutils v0.0.0-20210529223404-aac629594d33/go.mod h1:Wfcbyfo6NOFqQxBNevyK4vsJ70KAIXM+ELRThcUQFJQ=
+github.com/cidverse/cidverseutils v0.0.0-20210530155512-f7f48fa719c0 h1:8/7S6NImofnJlOM9EZHxICLigl/1/fnkE/0Mf2D1lZg=
+github.com/cidverse/cidverseutils v0.0.0-20210530155512-f7f48fa719c0/go.mod h1:Wfcbyfo6NOFqQxBNevyK4vsJ70KAIXM+ELRThcUQFJQ=
 github.com/cidverse/normalizeci v1.0.1-0.20210527194207-4591f75bd372 h1:sSYD1uvE5y9dtSD+UzbaJNIPTh5lSwl+ZQp3kTMQ0r8=
 github.com/cidverse/normalizeci v1.0.1-0.20210527194207-4591f75bd372/go.mod h1:VuWNv9ywpG83+W+sObyGS/KKfhC3g2aHhv1al5YkPZs=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
@@ -260,6 +260,8 @@ github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
+github.com/thoas/go-funk v0.8.0 h1:JP9tKSvnpFVclYgDM0Is7FD9M4fhPvqA0s0BsXmzSRQ=
+github.com/thoas/go-funk v0.8.0/go.mod h1:+IWnUfUmFO1+WVYQWQtIJHeRRdaIyyYglZN7xzUPe4Q=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/urfave/cli/v2 v2.2.0/go.mod h1:SE9GqnLQmjVa0iPEY0f1w3ygNIYcIJ0OKPMoW2caLfQ=
 github.com/xanzy/ssh-agent v0.3.0 h1:wUMzuKtKilRgBAD1sUb8gOwwRr2FGoBVumcjoOACClI=
