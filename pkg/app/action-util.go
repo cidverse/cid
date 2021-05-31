@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/cidverse/cid/pkg/actions/container"
+	"github.com/cidverse/cid/pkg/actions/gitleaks"
 	"github.com/cidverse/cid/pkg/actions/golang"
 	"github.com/cidverse/cid/pkg/actions/hugo"
 	"github.com/cidverse/cid/pkg/actions/java"
@@ -72,21 +73,54 @@ func GetProjectActions(projectDirectory string) []api.ActionStep {
 
 	actions = append(actions, container.PackageAction())
 
+	actions = append(actions, gitleaks.GitLeaksScanAction())
+
 	actionCache[projectDirectory] = actions
 	return actions
+}
+
+// DiscoverExecutionPlan will generate a automatic execution plan based on the project contents
+func DiscoverExecutionPlan(projectDir string, env map[string]string) []config.WorkflowStage {
+	var executionPlan []config.WorkflowStage
+
+	// iterate over all stages
+	for _, stage := range config.StagesDefault {
+		var stageActions []config.WorkflowAction
+
+		// iterate over all actions
+		for _, action := range GetProjectActions(projectDir) {
+			if action.GetDetails(projectDir, env).Stage == stage {
+				// add relevant actions to final execution plan
+				if action.Check(projectDir, env) {
+					stageActions = append(stageActions, config.WorkflowAction{
+						Name:   action.GetDetails(projectDir, env).Name,
+						Type:   "builtin",
+						Config: nil,
+					})
+				}
+			}
+		}
+
+		executionPlan = append(executionPlan, config.WorkflowStage{
+			Stage:   stage,
+			Actions: stageActions,
+		})
+	}
+
+	return executionPlan
 }
 
 func FindActionsByStage(stage string, projectDirectory string, env map[string]string) []api.ActionStep {
 	var actions []api.ActionStep
 
 	for _, action := range GetProjectActions(projectDirectory) {
-		if stage == action.GetStage() {
-			log.Debug().Str("action", action.GetName()).Msg("checking action conditions")
+		if stage == action.GetDetails(projectDirectory, env).Stage {
+			log.Debug().Str("action", action.GetDetails(projectDirectory, env).Name).Msg("checking action conditions")
 
 			if action.Check(projectDirectory, env) {
 				actions = append(actions, action)
 			} else {
-				log.Debug().Str("action", action.GetName()).Msg("check failed")
+				log.Debug().Str("action", action.GetDetails(projectDirectory, env).Name).Msg("check failed")
 			}
 		}
 	}
@@ -94,9 +128,9 @@ func FindActionsByStage(stage string, projectDirectory string, env map[string]st
 	return actions
 }
 
-func FindActionByName(name string, projectDirectory string) api.ActionStep {
+func FindActionByName(name string, projectDirectory string, env map[string]string) api.ActionStep {
 	for _, action := range GetProjectActions(projectDirectory) {
-		if name == action.GetName() {
+		if name == action.GetDetails(projectDirectory, env).Name {
 			return action
 		}
 	}
@@ -105,6 +139,7 @@ func FindActionByName(name string, projectDirectory string) api.ActionStep {
 }
 
 func RunStageActions(stage string, projectDirectory string, env map[string]string, args []string) {
+	log.Info()
 	// custom workflow
 	if config.Config.Workflow != nil && len(config.Config.Workflow) > 0 {
 		for _, currentStage := range config.Config.Workflow {
@@ -116,10 +151,10 @@ func RunStageActions(stage string, projectDirectory string, env map[string]strin
 
 					return
 				} else {
-					log.Debug().Str("stage",stage).Msg("stage config present but no actions specified")
+					log.Debug().Str("stage", stage).Msg("stage config present but no actions specified")
 				}
 			} else {
-				log.Debug().Str("stage",stage).Msg("no custom workflow configured for this stage")
+				log.Debug().Str("stage", stage).Msg("no custom workflow configured for this stage")
 			}
 		}
 	}
@@ -130,7 +165,7 @@ func RunStageActions(stage string, projectDirectory string, env map[string]strin
 		log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect project type")
 	}
 	for _, action := range actions {
-		action.Execute(projectDirectory, env, args)
+		RunAction(config.WorkflowAction{Name: action.GetDetails(projectDirectory, env).Name}, projectDirectory, env, args)
 	}
 }
 
@@ -144,7 +179,7 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env map[st
 	log.Debug().Str("config", string(configAsYaml)).Msg("action specific config")
 
 	if len(action.Type) == 0 || action.Type == "builtin" {
-		builtinAction := FindActionByName(action.Name, projectDirectory)
+		builtinAction := FindActionByName(action.Name, projectDirectory, env)
 		if builtinAction != nil {
 			// pass config
 			builtinAction.SetConfig(string(configAsYaml))

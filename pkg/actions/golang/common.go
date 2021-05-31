@@ -34,7 +34,7 @@ func GetDependencies(projectDir string) map[string]string {
 			return deps
 		}
 
-		deps["bin/go"] = ">= "+goMod.Go.Version
+		deps["go"] = ">= "+goMod.Go.Version
 	}
 
 	return deps

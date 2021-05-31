@@ -8,14 +8,17 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(lintCmd)
+	rootCmd.AddCommand(stageCmd)
 }
 
-var lintCmd = &cobra.Command{
-	Use:   "lint",
-	Short: "the lint stage analyzes source code to flag programming errors",
+var stageCmd = &cobra.Command{
+	Use:   "stage",
+	Aliases: []string{"s"},
+	Short: "runs the stage specified in the arguments",
+	Long:  `runs the stage specified in the arguments`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debug().Str("command", "lint").Msg("running command")
+		stage := args[0]
+		log.Debug().Str("stage", stage).Msg("running stage")
 
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
@@ -25,6 +28,6 @@ var lintCmd = &cobra.Command{
 		env := api.GetCIDEnvironment(projectDir)
 
 		// actions
-		app.RunStageActions("lint", projectDir, env, args)
+		app.RunStageActions(stage, projectDir, env, args)
 	},
 }

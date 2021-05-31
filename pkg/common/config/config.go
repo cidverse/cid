@@ -43,7 +43,17 @@ type WorkflowStage struct {
 type WorkflowAction struct {
 	Name string `required:"true"`
 	Type string `default:"builtin"`
-	Config interface{}
+	Config interface{} `yaml:"config,omitempty"`
+}
+
+var StagesDefault = []string{
+	"build",
+	"test",
+	"sast",
+	"package",
+	"audit",
+	"qualitygate",
+	"publish",
 }
 
 // ExecutionModeType

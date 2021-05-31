@@ -7,41 +7,31 @@ import (
 )
 
 // Action implementation
-type BuildActionStruct struct {
-	stage   string
-	name    string
-	version string
-}
+type BuildActionStruct struct {}
 
-// GetStage returns the stage
-func (n BuildActionStruct) GetStage() string {
-	return n.stage
-}
-
-// GetName returns the name
-func (n BuildActionStruct) GetName() string {
-	return n.name
-}
-
-// GetVersion returns the name
-func (n BuildActionStruct) GetVersion() string {
-	return n.version
+// GetDetails returns information about this action
+func (action BuildActionStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+	return api.ActionDetails {
+		Stage: "build",
+		Name: "node-build",
+		Version: "0.1.0",
+		UsedTools: []string{"yarn"},
+	}
 }
 
 // SetConfig is used to pass a custom configuration to each action
-func (n BuildActionStruct) SetConfig(config string) {
+func (action BuildActionStruct) SetConfig(config string) {
 
 }
 
 // Check will evaluate if this action can be executed for the specified project
-func (n BuildActionStruct) Check(projectDir string, env map[string]string) bool {
+func (action BuildActionStruct) Check(projectDir string, env map[string]string) bool {
 	loadConfig(projectDir)
 	return DetectNodeProject(projectDir)
 }
 
 // Execute will run the action
-func (n BuildActionStruct) Execute(projectDir string, env map[string]string, args []string) {
-	log.Debug().Str("action", n.name).Msg("running action")
+func (action BuildActionStruct) Execute(projectDir string, env map[string]string, args []string) {
 	loadConfig(projectDir)
 
 	// parse package.json
@@ -68,11 +58,5 @@ func (n BuildActionStruct) Execute(projectDir string, env map[string]string, arg
 
 // BuildAction
 func BuildAction() BuildActionStruct {
-	entity := BuildActionStruct{
-		stage: "build",
-		name: "node-build",
-		version: "0.1.0",
-	}
-
-	return entity
+	return BuildActionStruct{}
 }

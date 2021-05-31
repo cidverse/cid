@@ -21,7 +21,7 @@ import (
 func GetCommandVersion(executable string) (string, error) {
 	// find version constraint from config
 	cmdConstraint := ">= 0.0.0"
-	if value, ok := config.Config.Dependencies["bin/"+executable]; ok {
+	if value, ok := config.Config.Dependencies[executable]; ok {
 		cmdConstraint = value
 	}
 
@@ -57,7 +57,7 @@ func RunOptionalCommand(command string, env map[string]string, workDir string) e
 
 	// find version constraint from config
 	cmdConstraint := ">= 0.0.0"
-	if value, ok := config.Config.Dependencies["bin/"+originalBinary]; ok {
+	if value, ok := config.Config.Dependencies[originalBinary]; ok {
 		cmdConstraint = value
 	}
 

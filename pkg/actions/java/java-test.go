@@ -1,46 +1,36 @@
 package java
 
 import (
+	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/rs/zerolog/log"
 )
 
 // Action implementation
-type TestActionStruct struct {
-	stage   string
-	name    string
-	version string
-}
+type TestActionStruct struct {}
 
-// GetStage returns the stage
-func (n TestActionStruct) GetStage() string {
-	return n.stage
-}
-
-// GetName returns the name
-func (n TestActionStruct) GetName() string {
-	return n.name
-}
-
-// GetVersion returns the name
-func (n TestActionStruct) GetVersion() string {
-	return n.version
+// GetDetails returns information about this action
+func (action TestActionStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+	return api.ActionDetails {
+		Stage: "test",
+		Name: "java-test",
+		Version: "0.1.0",
+		UsedTools: []string{"java"},
+	}
 }
 
 // SetConfig is used to pass a custom configuration to each action
-func (n TestActionStruct) SetConfig(config string) {
+func (action TestActionStruct) SetConfig(config string) {
 
 }
 
 // Check if this package can handle the current environment
-func (n TestActionStruct) Check(projectDir string, env map[string]string) bool {
+func (action TestActionStruct) Check(projectDir string, env map[string]string) bool {
 	loadConfig(projectDir)
 	return DetectJavaProject(projectDir)
 }
 
 // Check if this package can handle the current environment
-func (n TestActionStruct) Execute(projectDirectory string, env map[string]string, args []string) {
-	log.Debug().Str("action", n.name).Msg("running action")
+func (action TestActionStruct) Execute(projectDirectory string, env map[string]string, args []string) {
 	loadConfig(projectDirectory)
 
 	// get release version
@@ -60,11 +50,5 @@ func (n TestActionStruct) Execute(projectDirectory string, env map[string]string
 
 // TestAction
 func TestAction() TestActionStruct {
-	entity := TestActionStruct{
-		stage: "test",
-		name: "java-test",
-		version: "0.1.0",
-	}
-
-	return entity
+	return TestActionStruct{}
 }

@@ -28,7 +28,7 @@ var actionCmd = &cobra.Command{
 
 		// actions
 		actionName := args[0]
-		action := app.FindActionByName(actionName, projectDir)
+		action := app.FindActionByName(actionName, projectDir, env)
 		if action == nil {
 			log.Fatal().Str("projectDirectory", projectDir).Str("action", actionName).Msg("can't find action by name")
 		}
