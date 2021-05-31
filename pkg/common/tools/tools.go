@@ -67,6 +67,8 @@ func init() {
 	// upx
 	// gitleaks
 	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "gitleaks", Image: "zricethezav/gitleaks:v7.5.0", Version: "7.5.0"})
+	// gitguardian ggshield
+	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "ggshield", Image: "gitguardian/ggshield:v1.5.0", Version: "1.5.0"})
 }
 
 // FindLocalTool tries to find a tool/cli fulfilling the specified version constraints in the local environment

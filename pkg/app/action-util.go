@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/cidverse/cid/pkg/actions/container"
+	"github.com/cidverse/cid/pkg/actions/gitguardian"
 	"github.com/cidverse/cid/pkg/actions/gitleaks"
 	"github.com/cidverse/cid/pkg/actions/golang"
 	"github.com/cidverse/cid/pkg/actions/hugo"
@@ -73,7 +74,8 @@ func GetProjectActions(projectDirectory string) []api.ActionStep {
 
 	actions = append(actions, container.PackageAction())
 
-	actions = append(actions, gitleaks.GitLeaksScanAction())
+	actions = append(actions, gitleaks.ScanAction())
+	actions = append(actions, gitguardian.ScanAction())
 
 	actionCache[projectDirectory] = actions
 	return actions

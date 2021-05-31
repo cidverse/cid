@@ -1,0 +1,4 @@
+package gitguardian
+
+const GITGUARDIAN_API_KEY = "GITGUARDIAN_API_KEY"
+const GITGUARDIAN_PREFIX = "GITGUARDIAN_"
