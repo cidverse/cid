@@ -9,6 +9,7 @@ import (
 	"github.com/cidverse/cid/pkg/actions/java"
 	"github.com/cidverse/cid/pkg/actions/node"
 	"github.com/cidverse/cid/pkg/actions/python"
+	"github.com/cidverse/cid/pkg/actions/sonarqube"
 	"github.com/cidverse/cid/pkg/actions/upx"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/config"
@@ -76,6 +77,7 @@ func GetProjectActions(projectDirectory string) []api.ActionStep {
 
 	actions = append(actions, gitleaks.ScanAction())
 	actions = append(actions, gitguardian.ScanAction())
+	actions = append(actions, sonarqube.ScanAction())
 
 	actionCache[projectDirectory] = actions
 	return actions
