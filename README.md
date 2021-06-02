@@ -17,12 +17,23 @@ The workflow `actions` can detect the current project type and build your projec
 
 # Stages
 
+## Main Workflow
+
 | Stage | Description   |
 | ------------- |:-------------:|
-| init | initializes the project (git hooks, gitignore, etc.) |
 | build | builds the project |
 | test | runs the tests |
-| lint | analyzes source code to flag programming errors |
+| sast | analyzes source code to flag programming errors and other issues |
+| package | packages the artifacts for distribution |
+| qualitygate | a final qualitygate to check for any kind of security / quality issues before releasing |
+| publish | publishes the previously packaged artifacts |
+| deploy | runs a deployment onto the runtime environment (microservices, ...) |
+
+## Virtual (Helper)
+
+| Stage | Description   |
+| ------------- |:-------------:|
+| init | helps with the general project setup (git hooks, gitignore, etc.) |
 
 # Configuration
 
