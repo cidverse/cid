@@ -1,0 +1,161 @@
+# local tools
+tools:
+  # golang
+  - executable: go
+    env-name: GOROOT_1_16
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 1.16.0
+  - executable: go
+    env-name: GOROOT_1_15
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 1.15.0
+  - executable: go
+    env-name: GOROOT_1_14
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 1.14.0
+  - executable: go
+    env-name: GOROOT_1_13
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 1.13.0
+  - executable: go
+    env-name: GOROOT_1_12
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 1.12.0
+  # java
+  - executable: java
+    env-name: JAVA_HOME_17
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 17.0.0
+  - executable: java
+    env-name: JAVA_HOME_16
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 16.0.0
+  - executable: java
+    env-name: JAVA_HOME_15
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 15.0.0
+  - executable: java
+    env-name: JAVA_HOME_14
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 14.0.0
+  - executable: java
+    env-name: JAVA_HOME_13
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 13.0.0
+  - executable: java
+    env-name: JAVA_HOME_12
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 12.0.0
+  - executable: java
+    env-name: JAVA_HOME_11
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 11.0.0
+  - executable: java
+    env-name: JAVA_HOME_10
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 10.0.0
+  - executable: java
+    env-name: JAVA_HOME_9
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 9.0.0
+  - executable: java
+    env-name: JAVA_HOME_8
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 8.0.0
+
+# container images
+container-images:
+  # golang
+  - executable: go
+    image: docker.io/golang:1.16.4-alpine
+    version: 1.16.4
+    cache:
+      - id: go-pkg
+        dir: /go/pkg
+  - executable: go
+    image: docker.io/golang:1.16.3-alpine
+    version: 1.16.3
+    cache:
+      - id: go-pkg
+        dir: /go/pkg
+  - executable: go
+    image: docker.io/golang:1.16.2-alpine
+    version: 1.16.2
+    cache:
+      - id: go-pkg
+        dir: /go/pkg
+  - executable: go
+    image: docker.io/golang:1.16.1-alpine
+    version: 1.16.1
+    cache:
+      - id: go-pkg
+        dir: /go/pkg
+  - executable: go
+    image: docker.io/golang:1.16.0-alpine
+    version: 1.16.0
+    cache:
+      - id: go-pkg
+        dir: /go/pkg
+  - executable: go
+    image: docker.io/golang:1.15.12-alpine
+    version: 1.15.12
+    cache:
+      - id: go-pkg
+        dir: /go/pkg
+  # golangci-lint
+  - executable: golangci-lint
+    image: docker.io/golangci/golangci-lint:v1.40.1-alpine
+    version: 1.40.1
+  # java
+  - executable: java
+    image: docker.io/adoptopenjdk/openjdk16:jdk-16.0.1_9
+    version: 16.0.1
+    cache:
+      - id: java-gradle
+        dir: /root/.gradle
+      - id: java-maven
+        dir: /root/.m2
+  - executable: java
+    image: docker.io/adoptopenjdk/openjdk15:jdk-15.0.2_7
+    version: 15.0.2
+    cache:
+      - id: java-gradle
+        dir: /root/.gradle
+      - id: java-maven
+        dir: /root/.m2
+  # upx
+  # gitleaks
+  - executable: gitleaks
+    image: docker.io/zricethezav/gitleaks:v7.5.0
+    version: 7.5.0
+  # gitguardian ggshield
+  - executable: ggshield
+    image: docker.io/gitguardian/ggshield:v1.5.0
+    version: 1.5.0
+  # sonarqube
+  - executable: sonar-scanner
+    image: docker.io/sonarsource/sonar-scanner-cli:4.6
+    version: 4.6.0
+  # shellcheck
+  - executable: shellcheck
+    image: docker.io/koalaman/shellcheck:v0.7.1
+    version: 0.7.1
+  # dependency-check
+  - executable: dependency-check
+    image: docker.io/cidverse/owasp-dependency-check:6.1.6
+    version: 6.1.6

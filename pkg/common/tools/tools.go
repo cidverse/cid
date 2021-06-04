@@ -2,29 +2,34 @@ package tools
 
 import (
 	"bytes"
+	_ "embed"
 	"errors"
 	"github.com/Masterminds/semver/v3"
 	"github.com/cidverse/normalizeci/pkg/common"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
+	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"runtime"
 )
 
+//go:embed tools.yaml
+var configContent string
+
 const PathSeparator = string(os.PathSeparator)
 
 type ToolCacheDir struct {
 	Id string
-	ContainerPath string
+	ContainerPath string `yaml:"dir"`
 }
 
 type ToolExecutableDiscovery struct {
 	Executable string
 	ExecutableFile string
-	EnvironmentName string
-	EnvironmentNameSuffix []string
-	SubPath string
+	EnvironmentName string `yaml:"env-name"`
+	EnvironmentNameSuffix []string `yaml:"env-allowed-suffix"`
+	SubPath string `yaml:"env-path-dir"`
 	Version string
 }
 
@@ -35,6 +40,11 @@ type ToolContainerDiscovery struct {
 	Cache []ToolCacheDir
 }
 
+var Config = struct {
+	Tools []ToolExecutableDiscovery `yaml:"tools"`
+	ContainerImages []ToolContainerDiscovery `yaml:"container-images"`
+}{}
+
 var localToolCache = make(map[string]ToolExecutableDiscovery)
 var imageToolCache = make(map[string]ToolContainerDiscovery)
 
@@ -42,37 +52,14 @@ var toolEnvironmentDiscovery []ToolExecutableDiscovery
 var toolImageDiscovery []ToolContainerDiscovery
 
 func init() {
-	// init tool lookup
-	// golang
-	for _, element := range []string{"16", "15", "14", "13", "12", "11", "10"} {
-		toolEnvironmentDiscovery = append(toolEnvironmentDiscovery, ToolExecutableDiscovery{Executable: "go", EnvironmentName: "GOROOT_1_"+element, EnvironmentNameSuffix: []string{"_X64"}, SubPath: "/bin", Version: "1."+element+".0"})
-		toolEnvironmentDiscovery = append(toolEnvironmentDiscovery, ToolExecutableDiscovery{Executable: "gofmt", EnvironmentName: "GOROOT_1_"+element, EnvironmentNameSuffix: []string{"_X64"}, SubPath: "/bin", Version: "1."+element+".0"})
-	}
-	// java
-	for _, element := range []string{"17", "16", "15", "14", "13", "12", "11", "10", "9", "8"} {
-		toolEnvironmentDiscovery = append(toolEnvironmentDiscovery, ToolExecutableDiscovery{Executable: "java", EnvironmentName: "JAVA_HOME_"+element, EnvironmentNameSuffix: []string{"_X64"}, SubPath: "/bin", Version: element+".0.0"})
+	// load config
+	err := yaml.Unmarshal([]byte(configContent), &Config)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to load embedded tool configuration file")
 	}
 
-	// init image lookup
-	// golang
-	for _, element := range []string{"1.16.4", "1.16.3", "1.16.2", "1.16.1", "1.16.0", "1.15.12", "1.15.11", "1.15.10", "1.15.9", "1.15.8", "1.15.7", "1.15.6", "1.15.5", "1.15.4", "1.15.3", "1.15.2", "1.15.1", "1.15.0"} {
-		toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "go", Image: "docker.io/golang:"+element+"-alpine", Version: element, Cache: []ToolCacheDir{{"go-pkg", "/go/pkg"}}})
-		toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "gofmt", Image: "docker.io/golang:"+element+"-alpine", Version: element, Cache: []ToolCacheDir{{"go-pkg", "/go/pkg"}}})
-	}
-	// golangci-lint
-	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "golangci-lint", Image: "docker.io/golangci/golangci-lint:v1.40.1-alpine", Version: "1.40.1"})
-	// java
-	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "java", Image: "docker.io/adoptopenjdk/openjdk16:jdk-16.0.1_9", Version: "16.0.1", Cache: []ToolCacheDir{{"java-gradle", "/root/.gradle"}, {"java-maven", "/root/.m2"}}})
-	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "java", Image: "docker.io/adoptopenjdk/openjdk15:jdk-15.0.2_7", Version: "15.0.2", Cache: []ToolCacheDir{{"java-gradle", "/root/.gradle"}, {"java-maven", "/root/.m2"}}})
-	// upx
-	// gitleaks
-	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "gitleaks", Image: "docker.io/zricethezav/gitleaks:v7.5.0", Version: "7.5.0"})
-	// gitguardian ggshield
-	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "ggshield", Image: "docker.io/gitguardian/ggshield:v1.5.0", Version: "1.5.0"})
-	// sonarqube
-	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "sonar-scanner", Image: "docker.io/sonarsource/sonar-scanner-cli:4.6", Version: "4.6.0"})
-	// shellcheck
-	toolImageDiscovery = append(toolImageDiscovery, ToolContainerDiscovery{Executable: "shellcheck", Image: "docker.io/koalaman/shellcheck:v0.7.1", Version: "0.7.1"})
+	toolEnvironmentDiscovery = Config.Tools
+	toolImageDiscovery = Config.ContainerImages
 }
 
 // FindLocalTool tries to find a tool/cli fulfilling the specified version constraints in the local environment
