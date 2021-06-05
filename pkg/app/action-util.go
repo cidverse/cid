@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/cidverse/cid/pkg/actions/actgithub"
 	"github.com/cidverse/cid/pkg/actions/container"
 	"github.com/cidverse/cid/pkg/actions/gitguardian"
 	"github.com/cidverse/cid/pkg/actions/gitleaks"
@@ -16,6 +17,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/config"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
+	"time"
 )
 
 func Load(projectDirectory string) {
@@ -72,7 +74,7 @@ func GetProjectActions(projectDirectory string) []api.ActionStep {
 	actions = append(actions, hugo.RunAction())
 	actions = append(actions, hugo.BuildAction())
 
-	actions = append(actions, upx.BuildAction())
+	actions = append(actions, upx.OptimizeAction())
 
 	actions = append(actions, container.PackageAction())
 
@@ -90,12 +92,12 @@ func DiscoverExecutionPlan(projectDir string, env map[string]string) []config.Wo
 	var executionPlan []config.WorkflowStage
 
 	// iterate over all stages
-	for _, stage := range config.StagesDefault {
+	for _, stage := range config.FindWorkflowStages(projectDir, env) {
 		var stageActions []config.WorkflowAction
 
 		// iterate over all actions
 		for _, action := range GetProjectActions(projectDir) {
-			if action.GetDetails(projectDir, env).Stage == stage {
+			if action.GetDetails(projectDir, env).Stage == stage.Name {
 				// add relevant actions to final execution plan
 				if action.Check(projectDir, env) {
 					stageActions = append(stageActions, config.WorkflowAction{
@@ -108,7 +110,7 @@ func DiscoverExecutionPlan(projectDir string, env map[string]string) []config.Wo
 		}
 
 		executionPlan = append(executionPlan, config.WorkflowStage{
-			Stage:   stage,
+			Name:   stage.Name,
 			Actions: stageActions,
 		})
 	}
@@ -145,34 +147,25 @@ func FindActionByName(name string, projectDirectory string, env map[string]strin
 }
 
 func RunStageActions(stage string, projectDirectory string, env map[string]string, args []string) {
-	log.Info()
-	// custom workflow
-	if config.Config.Workflow != nil && len(config.Config.Workflow) > 0 {
-		for _, currentStage := range config.Config.Workflow {
-			if currentStage.Stage == stage {
-				if len(currentStage.Actions) > 0 {
-					for _, currentAction := range currentStage.Actions {
-						RunAction(currentAction, projectDirectory, env, args)
-					}
+	start := time.Now()
 
-					return
-				} else {
-					log.Debug().Str("stage", stage).Msg("stage config present but no actions specified")
-				}
-			} else {
-				log.Debug().Str("stage", stage).Msg("no custom workflow configured for this stage")
-			}
+	if config.Config.Actions != nil && len(config.Config.Actions[stage]) > 0 {
+		// custom actions
+		for _, currentAction := range config.Config.Actions[stage] {
+			RunAction(currentAction, projectDirectory, env, args)
+		}
+	} else {
+		// auto-detected actions
+		actions := FindActionsByStage(stage, projectDirectory, env)
+		if len(actions) == 0 {
+			log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect project type")
+		}
+		for _, action := range actions {
+			RunAction(config.WorkflowAction{Name: action.GetDetails(projectDirectory, env).Name}, projectDirectory, env, args)
 		}
 	}
 
-	// actions
-	actions := FindActionsByStage(stage, projectDirectory, env)
-	if len(actions) == 0 {
-		log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect project type")
-	}
-	for _, action := range actions {
-		RunAction(config.WorkflowAction{Name: action.GetDetails(projectDirectory, env).Name}, projectDirectory, env, args)
-	}
+	log.Info().Str("stage", stage).Str("duration", time.Now().Sub(start).String()).Msg("stage complete")
 }
 
 func RunAction(action config.WorkflowAction, projectDirectory string, env map[string]string, args []string) {
@@ -184,7 +177,8 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env map[st
 	configAsYaml, _ := yaml.Marshal(&action.Config)
 	log.Debug().Str("config", string(configAsYaml)).Msg("action specific config")
 
-	if len(action.Type) == 0 || action.Type == "builtin" {
+	if action.Type == "builtin" {
+		// actionType: builtin
 		builtinAction := FindActionByName(action.Name, projectDirectory, env)
 		if builtinAction != nil {
 			// pass config

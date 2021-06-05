@@ -1,9 +1,14 @@
 package config
 
 import (
+	_ "embed"
 	"github.com/jinzhu/configor"
 	"github.com/rs/zerolog/log"
+	"gopkg.in/yaml.v3"
 )
+
+//go:embed cid-main.yaml
+var embeddedConfig string
 
 func LoadConfigurationFile(config interface{}, file string) (err error) {
 	cfgErr := configor.New(&configor.Config{ENVPrefix: "CID", Silent: true}).Load(config, file)
@@ -18,9 +23,12 @@ func LoadConfigurationFile(config interface{}, file string) (err error) {
 var Config = struct {
 	Paths PathConfig
 	Conventions ProjectConventions
-	Workflow []WorkflowStage
+	Stages []WorkflowStage `yaml:"stages"`
+	Actions map[string][]WorkflowAction  `yaml:"actions"`
 	Mode ExecutionModeType `default:"PREFER_LOCAL"`
 	Dependencies map[string]string
+	Tools []ToolExecutableDiscovery `yaml:"tools"`
+	ContainerImages []ToolContainerDiscovery `yaml:"container-images"`
 }{}
 
 // PathConfig contains the path configuration for build/tmp directories
@@ -29,53 +37,13 @@ type PathConfig struct {
 	Cache string `default:""`
 }
 
-type ProjectConventions struct {
-	Branching BranchingConventionType `default:"GitFlow"`
-	Commit CommitConventionType `default:"ConventionalCommits"`
-	PreReleaseSuffix string `default:"-rc.{NCI_LASTRELEASE_COMMIT_AFTER_COUNT}"`
-}
-
-type WorkflowStage struct {
-	Stage string
-	Actions []WorkflowAction
-}
-
-type WorkflowAction struct {
-	Name string `required:"true"`
-	Type string `default:"builtin"`
-	Config interface{} `yaml:"config,omitempty"`
-}
-
-var StagesDefault = []string{
-	"build",
-	"test",
-	"sast",
-	"package",
-	"audit",
-	"qualitygate",
-	"publish",
-}
-
-// ExecutionModeType
-type ExecutionModeType string
-const(
-	PreferLocal ExecutionModeType = "PREFER_LOCAL"
-	Strict ExecutionModeType      = "STRICT"
-)
-
-// BranchingConventionType
-type BranchingConventionType string
-const(
-	BranchingGitFlow BranchingConventionType = "GitFlow"
-)
-
-// BranchingConventionType
-type CommitConventionType string
-const(
-	ConventionalCommits CommitConventionType = "ConventionalCommits"
-)
-
 func LoadConfig(projectDirectory string) {
+	// parent config
+	err := yaml.Unmarshal([]byte(embeddedConfig), &Config)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to load embedded configuration")
+	}
+
 	// load
 	loadConfigErr := LoadConfigurationFile(&Config, projectDirectory + "/cid.yml")
 	if loadConfigErr != nil {

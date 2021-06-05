@@ -4,11 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"github.com/EnvCLI/EnvCLI/pkg/container_runtime"
+	"github.com/cidverse/cid/pkg/common/config"
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
-	"github.com/cidverse/cid/pkg/common/config"
-	"github.com/cidverse/cid/pkg/common/tools"
 	"github.com/rs/zerolog/log"
 	"os"
 	"os/exec"
@@ -26,13 +25,13 @@ func GetCommandVersion(executable string) (string, error) {
 	}
 
 	// prefer local tools if we find some that match the project version constraints
-	toolData, toolErr := tools.FindLocalTool(executable, cmdConstraint)
+	toolData, toolErr := config.FindLocalTool(executable, cmdConstraint)
 	if toolErr == nil {
 		return toolData.Version, nil
 	}
 
 	// find container image
-	containerImage, containerImageErr := tools.FindContainerImage(executable, cmdConstraint)
+	containerImage, containerImageErr := config.FindContainerImage(executable, cmdConstraint)
 	if containerImageErr == nil {
 		return containerImage.Version, nil
 	}
@@ -63,13 +62,13 @@ func RunOptionalCommand(command string, env map[string]string, workDir string) e
 
 	// local execution
 	cmdBinary := ""
-	localTool, localToolErr := tools.FindLocalTool(originalBinary, cmdConstraint)
+	localTool, localToolErr := config.FindLocalTool(originalBinary, cmdConstraint)
 	if localToolErr == nil {
 		cmdBinary = localTool.ExecutableFile
 	}
 
 	// container execution
-	containerImage, containerImageErr := tools.FindContainerImage(originalBinary, cmdConstraint)
+	containerImage, containerImageErr := config.FindContainerImage(originalBinary, cmdConstraint)
 	containerExec := container_runtime.Container{}
 	if containerImageErr == nil {
 		projectDir := vcsrepository.FindRepositoryDirectory(workDir)

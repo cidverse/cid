@@ -1,10 +1,3 @@
-# paths
-paths:
-  artifact: dist
-
-# mode
-mode: PREFER_LOCAL
-
 # build-tool dependencies
 dependencies:
   go: ">= 1.16.0"
@@ -15,20 +8,15 @@ conventions:
   commit: ConventionalCommits
   prereleasesuffix: "-rc.{NCI_LASTRELEASE_COMMIT_AFTER_COUNT}"
 
-# actions
-workflow:
-- stage: build
-  actions:
-  - name: golang-build
-    config:
-      # cross platform build
-      platform:
-      - goos: windows
-        goarch: amd64
-      - goos: linux
-        goarch: amd64
-      - goos: linux
-        goarch: arm64
-      - goos: darwin
-        goarch: amd64
-  #- name: upx-optimize
+# customize stage actions
+actions:
+  build:
+    - name: golang-build
+      type: builtin
+      config:
+        # cross platform build
+        platform:
+          - goos: windows
+            goarch: amd64
+          - goos: linux
+            goarch: amd64

@@ -11,8 +11,8 @@ type CheckActionStruct struct {}
 // GetDetails returns information about this action
 func (action CheckActionStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
 	return api.ActionDetails {
-		Stage: "check",
-		Name: "python-check",
+		Stage: "sast",
+		Name: "python-lint",
 		Version: "0.1.0",
 		UsedTools: []string{"pipenv", "pip"},
 	}

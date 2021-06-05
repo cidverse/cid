@@ -1,21 +1,16 @@
-package tools
+package config
 
 import (
 	"bytes"
-	_ "embed"
 	"errors"
 	"github.com/Masterminds/semver/v3"
 	"github.com/cidverse/normalizeci/pkg/common"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"runtime"
 )
-
-//go:embed tools.yaml
-var configContent string
 
 const PathSeparator = string(os.PathSeparator)
 
@@ -40,27 +35,8 @@ type ToolContainerDiscovery struct {
 	Cache []ToolCacheDir
 }
 
-var Config = struct {
-	Tools []ToolExecutableDiscovery `yaml:"tools"`
-	ContainerImages []ToolContainerDiscovery `yaml:"container-images"`
-}{}
-
 var localToolCache = make(map[string]ToolExecutableDiscovery)
 var imageToolCache = make(map[string]ToolContainerDiscovery)
-
-var toolEnvironmentDiscovery []ToolExecutableDiscovery
-var toolImageDiscovery []ToolContainerDiscovery
-
-func init() {
-	// load config
-	err := yaml.Unmarshal([]byte(configContent), &Config)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to load embedded tool configuration file")
-	}
-
-	toolEnvironmentDiscovery = Config.Tools
-	toolImageDiscovery = Config.ContainerImages
-}
 
 // FindLocalTool tries to find a tool/cli fulfilling the specified version constraints in the local environment
 func FindLocalTool(executable string, constraint string) (ToolExecutableDiscovery, error) {
@@ -71,7 +47,7 @@ func FindLocalTool(executable string, constraint string) (ToolExecutableDiscover
 
 	// check based on env paths
 	env := common.GetMachineEnvironment()
-	for _, entry := range toolEnvironmentDiscovery {
+	for _, entry := range Config.Tools {
 		if executable == entry.Executable {
 			// check main env name
 			if len(env[entry.EnvironmentName]) > 0 {
@@ -104,7 +80,7 @@ func FindContainerImage(executable string, constraint string) (ToolContainerDisc
 	}
 
 	// check based on env paths
-	for _, entry := range toolImageDiscovery {
+	for _, entry := range Config.ContainerImages {
 		if executable == entry.Executable {
 			if IsVersionFulfillingConstraint(entry.Version, constraint) {
 				imageToolCache[executable+"/"+constraint] = entry

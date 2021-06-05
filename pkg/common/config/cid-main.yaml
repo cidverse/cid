@@ -1,3 +1,80 @@
+###
+# Main Configuration / Global Defaults
+###
+
+# paths
+paths:
+  artifact: dist
+
+# mode
+mode: PREFER_LOCAL
+
+# project conventions
+conventions:
+  branching: GitFlow
+  commit: ConventionalCommits
+  prereleasesuffix: "-rc.{NCI_LASTRELEASE_COMMIT_AFTER_COUNT}"
+
+# stages
+stages:
+  - name: build
+  - name: test
+  - name: sast
+  - name: package
+  - name: qualitygate
+  - name: publish
+
+# actions
+workflow:
+  run:
+    - name: golang-run
+      type: builtin
+    - name: java-run
+      type: builtin
+    - name: python-run
+      type: builtin
+    - name: hugo-run
+      type: builtin
+  build:
+    - name: golang-build
+      type: builtin
+    - name: java-build
+      type: builtin
+    - name: python-build
+      type: builtin
+    - name: node-build
+      type: builtin
+    - name: huge-build
+      type: builtin
+  test:
+    - name: golang-test
+      type: builtin
+    - name: java-test
+      type: builtin
+  package:
+    - name: upx-optimize
+      type: builtin
+    - name: container-package
+      type: builtin
+  sast:
+    # linters
+    - name: golang-lint
+      type: builtin
+    - name: python-lint
+      type: builtin
+    # scanners
+    - name: gitleaks-scan
+      type: builtin
+    - name: gitguardian-scan
+      type: builtin
+    - name: sonarqube-scan
+      type: builtin
+    - name: dependencycheck-scan
+      type: builtin
+  publish:
+    - name: java-publish
+      type: builtin
+
 # local tools
 tools:
   # golang
@@ -159,3 +236,14 @@ container-images:
   - executable: dependency-check
     image: docker.io/cidverse/owasp-dependency-check:6.1.6
     version: 6.1.6
+  # githubcli - gh
+  - executable: gh
+    image: cidverse/githubcli:1.11.0
+    version: 1.11.0
+  # twitch
+  - executable: twitch
+    image: docker.io/cidverse/twitchcli:1.0.2
+    version: 1.0.2
+    cache:
+      - id: twitchcli-config
+        dir: /root/.twitch-cli
