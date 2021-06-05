@@ -22,10 +22,10 @@ func LoadConfigurationFile(config interface{}, file string) (err error) {
 
 var Config = struct {
 	Paths PathConfig
+	Mode ExecutionModeType `default:"PREFER_LOCAL"`
 	Conventions ProjectConventions
 	Stages []WorkflowStage `yaml:"stages"`
 	Actions map[string][]WorkflowAction  `yaml:"actions"`
-	Mode ExecutionModeType `default:"PREFER_LOCAL"`
 	Dependencies map[string]string
 	Tools []ToolExecutableDiscovery `yaml:"tools"`
 	ContainerImages []ToolContainerDiscovery `yaml:"container-images"`

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/cidverse/cid/pkg/actions/actgithub"
 	"github.com/cidverse/cid/pkg/actions/container"
 	"github.com/cidverse/cid/pkg/actions/gitguardian"
 	"github.com/cidverse/cid/pkg/actions/gitleaks"
@@ -148,6 +147,7 @@ func FindActionByName(name string, projectDirectory string, env map[string]strin
 
 func RunStageActions(stage string, projectDirectory string, env map[string]string, args []string) {
 	start := time.Now()
+	log.Info().Str("stage", stage).Msg("running stage")
 
 	if config.Config.Actions != nil && len(config.Config.Actions[stage]) > 0 {
 		// custom actions
@@ -165,14 +165,12 @@ func RunStageActions(stage string, projectDirectory string, env map[string]strin
 		}
 	}
 
-	log.Info().Str("stage", stage).Str("duration", time.Now().Sub(start).String()).Msg("stage complete")
+	log.Info().Str("stage", stage).Str("duration", time.Now().Sub(start).String()).Msg("stage completed")
 }
 
 func RunAction(action config.WorkflowAction, projectDirectory string, env map[string]string, args []string) {
-	if len(action.Type) == 0 {
-		action.Type = "builtin"
-	}
-	log.Info().Str("action", action.Name).Str("actionType", action.Type).Msg("running action")
+	start := time.Now()
+	log.Info().Str("action", action.Type+"/"+action.Name).Msg("running action")
 
 	configAsYaml, _ := yaml.Marshal(&action.Config)
 	log.Debug().Str("config", string(configAsYaml)).Msg("action specific config")
@@ -186,10 +184,14 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env map[st
 
 			// run action
 			builtinAction.Execute(projectDirectory, env, args)
+		} else if action.Type == "github" {
+
 		} else {
 			log.Error().Str("action", action.Name).Msg("skipping action, does not exist")
 		}
 	} else {
-		log.Error().Str("action", action.Name).Str("type", action.Type).Msg("type is not supported")
+		log.Fatal().Str("action", action.Name).Str("type", action.Type).Msg("type is not supported")
 	}
+
+	log.Info().Str("action", action.Type+"/"+action.Name).Str("duration", time.Now().Sub(start).String()).Msg("action completed")
 }

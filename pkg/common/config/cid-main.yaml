@@ -23,6 +23,8 @@ stages:
   - name: package
   - name: qualitygate
   - name: publish
+    rules:
+      - expression: NCI_COMMIT_REF_PATH == "branch/develop" || NCI_COMMIT_REF_PATH == "branch/main" || NCI_COMMIT_REF_PATH == "branch/master"
 
 # actions
 workflow:
