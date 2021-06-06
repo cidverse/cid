@@ -27,7 +27,7 @@ stages:
       - expression: NCI_COMMIT_REF_PATH == "branch/develop" || NCI_COMMIT_REF_PATH == "branch/main" || NCI_COMMIT_REF_PATH == "branch/master"
 
 # actions
-workflow:
+actions:
   run:
     - name: golang-run
       type: builtin
@@ -218,6 +218,9 @@ container-images:
       - id: java-maven
         dir: /root/.m2
   # upx
+  - executable: upx
+    image: envcli/upx:latest
+    version: 3.95.0
   # gitleaks
   - executable: gitleaks
     image: docker.io/zricethezav/gitleaks:v7.5.0

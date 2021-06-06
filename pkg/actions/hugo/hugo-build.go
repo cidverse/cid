@@ -9,7 +9,7 @@ import (
 type BuildActionStruct struct {}
 
 // GetDetails returns information about this action
-func (action BuildActionStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails {
 		Stage: "build",
 		Name: "hugo-build",
@@ -18,22 +18,14 @@ func (action BuildActionStruct) GetDetails(projectDir string, env map[string]str
 	}
 }
 
-// SetConfig is used to pass a custom configuration to each action
-func (action BuildActionStruct) SetConfig(config string) {
-
+// Check if this package can handle the current environment
+func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
+	return DetectHugoProject(ctx.ProjectDir)
 }
 
 // Check if this package can handle the current environment
-func (action BuildActionStruct) Check(projectDir string, env map[string]string) bool {
-	loadConfig(projectDir)
-	return DetectHugoProject(projectDir)
-}
-
-// Check if this package can handle the current environment
-func (action BuildActionStruct) Execute(projectDir string, env map[string]string, args []string) {
-	loadConfig(projectDir)
-
-	command.RunCommand(`hugo --minify --gc --log --verboseLog --source `+projectDir+` --destination `+ projectDir+`/`+Config.Paths.Artifact, env, projectDir)
+func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
+	command.RunCommand(`hugo --minify --gc --log --verboseLog --source `+ctx.ProjectDir+` --destination `+ ctx.ProjectDir+`/`+ctx.Paths.Artifact, ctx.Env, ctx.ProjectDir)
 }
 
 // init registers this action

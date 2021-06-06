@@ -8,7 +8,7 @@ import (
 type LintActionStruct struct {}
 
 // GetDetails returns information about this action
-func (action LintActionStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+func (action LintActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails {
 		Stage: "sast",
 		Name: "golang-lint",
@@ -17,22 +17,14 @@ func (action LintActionStruct) GetDetails(projectDir string, env map[string]stri
 	}
 }
 
-// SetConfig is used to pass a custom configuration to each action
-func (action LintActionStruct) SetConfig(config string) {
-
+// Check if this package can handle the current environment
+func (action LintActionStruct) Check(ctx api.ActionExecutionContext) bool {
+	return DetectGolangProject(ctx.ProjectDir)
 }
 
 // Check if this package can handle the current environment
-func (action LintActionStruct) Check(projectDir string, env map[string]string) bool {
-	loadConfig(projectDir)
-	return DetectGolangProject(projectDir)
-}
-
-// Check if this package can handle the current environment
-func (action LintActionStruct) Execute(projectDir string, env map[string]string, args []string) {
-	loadConfig(projectDir)
-
-	command.RunCommand(`golangci-lint run`, env, projectDir)
+func (action LintActionStruct) Execute(ctx api.ActionExecutionContext) {
+	command.RunCommand(`golangci-lint run`, ctx.Env, ctx.ProjectDir)
 }
 
 // init registers this action

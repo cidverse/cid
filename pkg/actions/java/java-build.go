@@ -14,7 +14,7 @@ import (
 type BuildActionStruct struct {}
 
 // GetDetails returns information about this action
-func (action BuildActionStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails {
 		Stage: "build",
 		Name: "java-build",
@@ -23,40 +23,32 @@ func (action BuildActionStruct) GetDetails(projectDir string, env map[string]str
 	}
 }
 
-// SetConfig is used to pass a custom configuration to each action
-func (action BuildActionStruct) SetConfig(config string) {
-
+// Check if this package can handle the current environment
+func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
+	return DetectJavaProject(ctx.ProjectDir)
 }
 
 // Check if this package can handle the current environment
-func (action BuildActionStruct) Check(projectDir string, env map[string]string) bool {
-	loadConfig(projectDir)
-	return DetectJavaProject(projectDir)
-}
-
-// Check if this package can handle the current environment
-func (action BuildActionStruct) Execute(projectDirectory string, env map[string]string, args []string) {
-	loadConfig(projectDirectory)
-
+func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
 	// get release version
-	releaseVersion := env["NCI_COMMIT_REF_RELEASE"]
+	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
 
 	// run build
-	buildSystem := DetectJavaBuildSystem(projectDirectory)
+	buildSystem := DetectJavaBuildSystem(ctx.ProjectDir)
 	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
-		command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" assemble --no-daemon --warning-mode=all --console=plain`, env, projectDirectory)
+		command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" assemble --no-daemon --warning-mode=all --console=plain`, ctx.Env, ctx.ProjectDir)
 	} else if buildSystem == "maven" {
-		MavenWrapperSetup(projectDirectory)
+		MavenWrapperSetup(ctx.ProjectDir)
 
-		command.RunCommand(getMavenCommandPrefix(projectDirectory)+" versions:set -DnewVersion="+releaseVersion+"--batch-mode", env, projectDirectory)
-		command.RunCommand(getMavenCommandPrefix(projectDirectory)+" package -DskipTests=true --batch-mode", env, projectDirectory)
+		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" versions:set -DnewVersion="+releaseVersion+"--batch-mode", ctx.Env, ctx.ProjectDir)
+		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" package -DskipTests=true --batch-mode", ctx.Env, ctx.ProjectDir)
 	}
 
 	// find artifacts
-	files, _ := filesystem.FindFilesInDirectory(projectDirectory, `.jar`)
+	files, _ := filesystem.FindFilesInDirectory(ctx.ProjectDir, `.jar`)
 	for _, file := range files {
 		if strings.Contains(file, "build"+string(os.PathSeparator)+"libs") && IsJarExecutable(file) {
-			moveErr := filesystem.MoveFile(files[0], projectDirectory+`/dist/`+filepath.Base(files[0]))
+			moveErr := filesystem.MoveFile(files[0], ctx.ProjectDir+`/dist/`+filepath.Base(files[0]))
 			log.Fatal().Err(moveErr).Msg("failed to move artifacts into artifact dir")
 		}
 	}

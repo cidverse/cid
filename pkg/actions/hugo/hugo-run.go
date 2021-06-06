@@ -9,7 +9,7 @@ import (
 type RunActionStruct struct {}
 
 // GetDetails returns information about this action
-func (action RunActionStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails {
 		Stage: "run",
 		Name: "hugo-run",
@@ -18,22 +18,14 @@ func (action RunActionStruct) GetDetails(projectDir string, env map[string]strin
 	}
 }
 
-// SetConfig is used to pass a custom configuration to each action
-func (action RunActionStruct) SetConfig(config string) {
-
+// Check if this package can handle the current environment
+func (action RunActionStruct) Check(ctx api.ActionExecutionContext) bool {
+	return DetectHugoProject(ctx.ProjectDir)
 }
 
 // Check if this package can handle the current environment
-func (action RunActionStruct) Check(projectDir string, env map[string]string) bool {
-	loadConfig(projectDir)
-	return DetectHugoProject(projectDir)
-}
-
-// Check if this package can handle the current environment
-func (action RunActionStruct) Execute(projectDir string, env map[string]string, args []string) {
-	loadConfig(projectDir)
-
-	_ = command.RunOptionalCommand(`hugo server --minify --gc --log --verboseLog --baseUrl "/" --watch --source `+projectDir+``, env, projectDir)
+func (action RunActionStruct) Execute(ctx api.ActionExecutionContext) {
+	_ = command.RunOptionalCommand(`hugo server --minify --gc --log --verboseLog --baseUrl "/" --watch --source `+ctx.ProjectDir+``, ctx.Env, ctx.ProjectDir)
 }
 
 // init registers this action

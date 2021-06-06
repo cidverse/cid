@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/normalizeci/pkg/common"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
@@ -17,6 +19,17 @@ import (
 func DiscoverExecutionPlan(projectDir string, env map[string]string) []config.WorkflowStage {
 	var executionPlan []config.WorkflowStage
 
+	// context
+	ctx := api.ActionExecutionContext{
+		Paths: config.Config.Paths,
+		ProjectDir: projectDir,
+		WorkDir: filesystem.GetWorkingDirectory(),
+		Config: "",
+		Args: nil,
+		Env: env,
+		MachineEnv: common.GetMachineEnvironment(),
+	}
+
 	// iterate over all stages
 	for _, stage := range FindWorkflowStages(projectDir, env) {
 		var stageActions []config.WorkflowAction
@@ -25,7 +38,7 @@ func DiscoverExecutionPlan(projectDir string, env map[string]string) []config.Wo
 		for _, action := range FindWorkflowStageActions(projectDir, env, stage.Name) {
 			// check action activation criteria
 			if action.Type == "builtin" {
-				if api.BuiltinActions[action.Name].Check(projectDir, env) {
+				if api.BuiltinActions[action.Name].Check(ctx) {
 					stageActions = append(stageActions, action)
 				}
 			} else {
@@ -47,20 +60,14 @@ func RunStageActions(stage string, projectDirectory string, env map[string]strin
 	start := time.Now()
 	log.Info().Str("stage", stage).Msg("running stage")
 
-	if config.Config.Actions != nil && len(config.Config.Actions[stage]) > 0 {
-		// custom actions
-		for _, currentAction := range config.Config.Actions[stage] {
-			RunAction(currentAction, projectDirectory, env, args)
-		}
-	} else {
-		// auto-detected actions
-		actions := FindWorkflowStageActions(projectDirectory, env, stage)
-		if len(actions) == 0 {
-			log.Fatal().Str("projectDirectory", projectDirectory).Msg("can't detect project type")
-		}
-		for _, action := range actions {
-			RunAction(action, projectDirectory, env, args)
-		}
+	// find stage actions
+	actions := FindWorkflowStageActions(projectDirectory, env, stage)
+	if len(actions) == 0 {
+		log.Warn().Str("stage", stage).Msg("no actions available for current stage")
+		return
+	}
+	for _, action := range actions {
+		RunAction(action, projectDirectory, env, args)
 	}
 
 	log.Info().Str("stage", stage).Str("duration", time.Now().Sub(start).String()).Msg("stage completed")
@@ -75,16 +82,21 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env map[st
 	log.Debug().Str("config", string(configAsYaml)).Msg("action specific config")
 
 	if action.Type == "builtin" {
+		// context
+		ctx := api.ActionExecutionContext{
+			Paths: config.Config.Paths,
+			ProjectDir: projectDirectory,
+			WorkDir: filesystem.GetWorkingDirectory(),
+			Config: string(configAsYaml),
+			Args: args,
+			Env: env,
+			MachineEnv: common.GetMachineEnvironment(),
+		}
+
 		// actionType: builtin
 		builtinAction := api.BuiltinActions[action.Name]
 		if builtinAction != nil {
-			// pass config
-			builtinAction.SetConfig(string(configAsYaml))
-
-			// run action
-			builtinAction.Execute(projectDirectory, env, args)
-		} else if action.Type == "github" {
-
+			builtinAction.Execute(ctx)
 		} else {
 			log.Error().Str("action", action.Name).Msg("skipping action, does not exist")
 		}
@@ -104,11 +116,19 @@ func GetActionDetails(action config.WorkflowAction, projectDirectory string, env
 		// actionType: builtin
 		builtinAction := api.BuiltinActions[action.Name]
 		if builtinAction != nil {
-			// pass config
-			builtinAction.SetConfig(string(configAsYaml))
+			// context
+			ctx := api.ActionExecutionContext{
+				Paths: config.Config.Paths,
+				ProjectDir: projectDirectory,
+				WorkDir: filesystem.GetWorkingDirectory(),
+				Config: string(configAsYaml),
+				Args: nil,
+				Env: env,
+				MachineEnv: common.GetMachineEnvironment(),
+			}
 
 			// run action
-			return builtinAction.GetDetails(projectDirectory, env)
+			return builtinAction.GetDetails(ctx)
 		} else {
 			log.Error().Str("action", action.Type+"/"+action.Name).Msg("skipping action, does not exist")
 		}
@@ -184,8 +204,31 @@ func FindWorkflowStages(projectDir string, env map[string]string) []config.Workf
 func FindWorkflowStageActions(projectDir string, env map[string]string, stage string) []config.WorkflowAction {
 	var activeActions []config.WorkflowAction
 
-	for _, act := range config.Config.Actions[stage] {
-		activeActions = append(activeActions, act)
+	for _, action := range config.Config.Actions[stage] {
+
+		if action.Type == "builtin" {
+			// actionType: builtin
+			builtinAction := api.BuiltinActions[action.Name]
+			if builtinAction != nil {
+				// context
+				ctx := api.ActionExecutionContext{
+					Paths:      config.Config.Paths,
+					ProjectDir: projectDir,
+					WorkDir:    filesystem.GetWorkingDirectory(),
+					Config:     "",
+					Args:       nil,
+					Env:        env,
+					MachineEnv: common.GetMachineEnvironment(),
+				}
+
+				// add
+				if builtinAction.Check(ctx) {
+					activeActions = append(activeActions, action)
+				}
+			} else {
+				log.Error().Str("action", action.Type+"/"+action.Name).Msg("skipping action, does not exist")
+			}
+		}
 	}
 
 	return activeActions

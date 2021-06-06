@@ -3,7 +3,6 @@ package gitguardian
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/cidverse/normalizeci/pkg/common"
 	"strings"
 )
 
@@ -11,7 +10,7 @@ import (
 type ScanStruct struct {}
 
 // GetDetails returns information about this action
-func (action ScanStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails {
 		Stage: "sast",
 		Name: "gitguardian-scan",
@@ -20,18 +19,13 @@ func (action ScanStruct) GetDetails(projectDir string, env map[string]string) ap
 	}
 }
 
-// SetConfig is used to pass a custom configuration to each action
-func (action ScanStruct) SetConfig(config string) {
-}
-
 // Check if this package can handle the current environment
-func (action ScanStruct) Check(projectDir string, env map[string]string) bool {
-	machineEnv := common.GetMachineEnvironment()
-	enabled := len(machineEnv[GITGUARDIAN_API_KEY]) > 0
+func (action ScanStruct) Check(ctx api.ActionExecutionContext) bool {
+	enabled := len(ctx.MachineEnv[GITGUARDIAN_API_KEY]) > 0
 	if enabled {
-		for key, value := range machineEnv {
+		for key, value := range ctx.MachineEnv {
 			if strings.HasPrefix(key, GITGUARDIAN_PREFIX) {
-				env[key] = value
+				ctx.Env[key] = value
 			}
 		}
 	}
@@ -40,8 +34,8 @@ func (action ScanStruct) Check(projectDir string, env map[string]string) bool {
 }
 
 // Check if this package can handle the current environment
-func (action ScanStruct) Execute(projectDir string, env map[string]string, args []string) {
-	_ = command.RunOptionalCommand(`ggshield scan path -r -y .`, env, projectDir)
+func (action ScanStruct) Execute(ctx api.ActionExecutionContext) {
+	_ = command.RunOptionalCommand(`ggshield scan path -r -y .`, ctx.Env, ctx.ProjectDir)
 }
 
 // init registers this action

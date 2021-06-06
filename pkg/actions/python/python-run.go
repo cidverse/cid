@@ -12,7 +12,7 @@ import (
 type RunActionStruct struct {}
 
 // GetDetails returns information about this action
-func (action RunActionStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails {
 		Stage: "run",
 		Name: "python-run",
@@ -21,28 +21,20 @@ func (action RunActionStruct) GetDetails(projectDir string, env map[string]strin
 	}
 }
 
-// SetConfig is used to pass a custom configuration to each action
-func (action RunActionStruct) SetConfig(config string) {
-
+// Check if this package can handle the current environment
+func (action RunActionStruct) Check(ctx api.ActionExecutionContext) bool {
+	return DetectPythonProject(ctx.ProjectDir)
 }
 
 // Check if this package can handle the current environment
-func (action RunActionStruct) Check(projectDir string, env map[string]string) bool {
-	loadConfig(projectDir)
-	return DetectPythonProject(projectDir)
-}
-
-// Check if this package can handle the current environment
-func (action RunActionStruct) Execute(projectDir string, env map[string]string, args []string) {
-	loadConfig(projectDir)
-
-	files, filesErr := filesystem.FindFilesInDirectory(projectDir, `.py`)
+func (action RunActionStruct) Execute(ctx api.ActionExecutionContext) {
+	files, filesErr := filesystem.FindFilesInDirectory(ctx.ProjectDir, `.py`)
 	if filesErr != nil {
-		log.Fatal().Err(filesErr).Str("path", projectDir).Msg("failed to list files")
+		log.Fatal().Err(filesErr).Str("path", ctx.ProjectDir).Msg("failed to list files")
 	}
 
 	if len(files) == 1 && files[0] != "setup.py" {
-		_ = command.RunOptionalCommand(`python `+files[0]+` `+strings.Join(args, " "), env, projectDir)
+		_ = command.RunOptionalCommand(`python `+files[0]+` `+strings.Join(ctx.Args, " "), ctx.Env, ctx.ProjectDir)
 	} else {
 		log.Warn().Int("count", len(files)).Msg("project directory should only contain a single .py file, which is the main app entrypoint!")
 	}

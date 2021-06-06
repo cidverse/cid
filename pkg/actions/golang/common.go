@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
@@ -40,7 +41,7 @@ func GetDependencies(projectDir string) map[string]string {
 	return deps
 }
 
-func CrossCompile(projectDir string, env map[string]string, goos string, goarch string) {
+func CrossCompile(ctx api.ActionExecutionContext, goos string, goarch string) {
 	buildAt := time.Now().UTC().Format(time.RFC3339)
 	log.Info().Str("goos", goos).Str("goarch", goarch).Msg("running go build")
 
@@ -49,9 +50,10 @@ func CrossCompile(projectDir string, env map[string]string, goos string, goarch 
 		fileExt = ".exe"
 	}
 
+	env := ctx.Env
 	env["CGO_ENABLED"] = "false"
 	env["GOPROXY"] = "https://goproxy.io,direct"
 	env["GOOS"] = goos
 	env["GOARCH"] = goarch
-	command.RunCommand(`go build -o `+projectDir+`/`+Config.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+env["NCI_COMMIT_REF_RELEASE"]+` -X main.CommitHash=`+env["NCI_COMMIT_SHA_SHORT"]+` -X main.BuildAt=`+buildAt+`" .`, env, projectDir)
+	command.RunCommand(`go build -o `+ctx.ProjectDir+`/`+ctx.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+env["NCI_COMMIT_REF_RELEASE"]+` -X main.CommitHash=`+env["NCI_COMMIT_SHA_SHORT"]+` -X main.BuildAt=`+buildAt+`" .`, env, ctx.ProjectDir)
 }

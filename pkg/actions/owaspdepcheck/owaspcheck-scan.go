@@ -9,7 +9,7 @@ import (
 type ScanStruct struct {}
 
 // GetDetails returns information about this action
-func (action ScanStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails {
 		Stage: "sast",
 		Name: "dependencycheck-scan",
@@ -18,18 +18,14 @@ func (action ScanStruct) GetDetails(projectDir string, env map[string]string) ap
 	}
 }
 
-// SetConfig is used to pass a custom configuration to each action
-func (action ScanStruct) SetConfig(config string) {
-}
-
 // Check if this package can handle the current environment
-func (action ScanStruct) Check(projectDir string, env map[string]string) bool {
+func (action ScanStruct) Check(ctx api.ActionExecutionContext) bool {
 	return true
 }
 
 // Check if this package can handle the current environment
-func (action ScanStruct) Execute(projectDir string, env map[string]string, args []string) {
-	_ = command.RunOptionalCommand(`dependency-check --noupdate --scan . --enableExperimental --out dist --exclude .git/** --exclude dist/**`, env, projectDir)
+func (action ScanStruct) Execute(ctx api.ActionExecutionContext) {
+	_ = command.RunOptionalCommand(`dependency-check --noupdate --scan . --enableExperimental --out dist --exclude .git/** --exclude dist/**`, ctx.Env, ctx.ProjectDir)
 }
 
 // init registers this action

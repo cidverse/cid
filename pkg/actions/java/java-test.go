@@ -9,7 +9,7 @@ import (
 type TestActionStruct struct {}
 
 // GetDetails returns information about this action
-func (action TestActionStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails {
 		Stage: "test",
 		Name: "java-test",
@@ -18,33 +18,25 @@ func (action TestActionStruct) GetDetails(projectDir string, env map[string]stri
 	}
 }
 
-// SetConfig is used to pass a custom configuration to each action
-func (action TestActionStruct) SetConfig(config string) {
-
+// Check if this package can handle the current environment
+func (action TestActionStruct) Check(ctx api.ActionExecutionContext) bool {
+	return DetectJavaProject(ctx.ProjectDir)
 }
 
 // Check if this package can handle the current environment
-func (action TestActionStruct) Check(projectDir string, env map[string]string) bool {
-	loadConfig(projectDir)
-	return DetectJavaProject(projectDir)
-}
-
-// Check if this package can handle the current environment
-func (action TestActionStruct) Execute(projectDirectory string, env map[string]string, args []string) {
-	loadConfig(projectDirectory)
-
+func (action TestActionStruct) Execute(ctx api.ActionExecutionContext) {
 	// get release version
-	releaseVersion := env["NCI_COMMIT_REF_RELEASE"]
+	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
 
 	// run test
-	buildSystem := DetectJavaBuildSystem(projectDirectory)
+	buildSystem := DetectJavaBuildSystem(ctx.ProjectDir)
 	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
-		command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" test --no-daemon --warning-mode=all --console=plain`, env, projectDirectory)
+		command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" test --no-daemon --warning-mode=all --console=plain`, ctx.Env, ctx.ProjectDir)
 	} else if buildSystem == "maven" {
-		MavenWrapperSetup(projectDirectory)
+		MavenWrapperSetup(ctx.ProjectDir)
 
-		command.RunCommand(getMavenCommandPrefix(projectDirectory)+" versions:set -DnewVersion="+releaseVersion+"--batch-mode", env, projectDirectory)
-		command.RunCommand(getMavenCommandPrefix(projectDirectory)+" test -DskipTests=true --batch-mode", env, projectDirectory)
+		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" versions:set -DnewVersion="+releaseVersion+"--batch-mode", ctx.Env, ctx.ProjectDir)
+		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" test -DskipTests=true --batch-mode", ctx.Env, ctx.ProjectDir)
 	}
 }
 

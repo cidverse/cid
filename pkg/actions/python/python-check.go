@@ -9,7 +9,7 @@ import (
 type CheckActionStruct struct {}
 
 // GetDetails returns information about this action
-func (action CheckActionStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+func (action CheckActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails {
 		Stage: "sast",
 		Name: "python-lint",
@@ -18,22 +18,14 @@ func (action CheckActionStruct) GetDetails(projectDir string, env map[string]str
 	}
 }
 
-// SetConfig is used to pass a custom configuration to each action
-func (action CheckActionStruct) SetConfig(config string) {
-
+// Check if this package can handle the current environment
+func (action CheckActionStruct) Check(ctx api.ActionExecutionContext) bool {
+	return DetectPythonProject(ctx.ProjectDir)
 }
 
 // Check if this package can handle the current environment
-func (action CheckActionStruct) Check(projectDir string, env map[string]string) bool {
-	loadConfig(projectDir)
-	return DetectPythonProject(projectDir)
-}
-
-// Check if this package can handle the current environment
-func (action CheckActionStruct) Execute(projectDir string, env map[string]string, args []string) {
-	loadConfig(projectDir)
-
-	command.RunCommand(`flake8 .`, env, projectDir)
+func (action CheckActionStruct) Execute(ctx api.ActionExecutionContext) {
+	command.RunCommand(`flake8 .`, ctx.Env, ctx.ProjectDir)
 }
 
 // init registers this action

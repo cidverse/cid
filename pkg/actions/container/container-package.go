@@ -11,7 +11,7 @@ import (
 type PackageActionStruct struct {}
 
 // GetDetails returns information about this action
-func (action PackageActionStruct) GetDetails(projectDir string, env map[string]string) api.ActionDetails {
+func (action PackageActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails {
 		Stage: "package",
 		Name: "container-package",
@@ -20,26 +20,17 @@ func (action PackageActionStruct) GetDetails(projectDir string, env map[string]s
 	}
 }
 
-// SetConfig is used to pass a custom configuration to each action
-func (action PackageActionStruct) SetConfig(config string) {
-
+// Check if this package can handle the current environment
+func (action PackageActionStruct) Check(ctx api.ActionExecutionContext) bool {
+	return len(DetectAppType(ctx.ProjectDir)) > 0
 }
 
 // Check if this package can handle the current environment
-func (action PackageActionStruct) Check(projectDir string, env map[string]string) bool {
-	loadConfig(projectDir)
-
-	return len(DetectAppType(projectDir)) > 0
-}
-
-// Check if this package can handle the current environment
-func (action PackageActionStruct) Execute(projectDir string, env map[string]string, args []string) {
-	loadConfig(projectDir)
-
-	dockerfile := projectDir+`/Dockerfile`
+func (action PackageActionStruct) Execute(ctx api.ActionExecutionContext) {
+	dockerfile := ctx.ProjectDir+`/Dockerfile`
 
 	// auto detect a usable dockerfile
-	appType := DetectAppType(projectDir)
+	appType := DetectAppType(ctx.ProjectDir)
 	if appType == "jar" {
 		dockerfileContent, dockerfileContentErr := GetFileContent(DockerfileFS, "dockerfiles/Java15.Dockerfile")
 		if dockerfileContentErr != nil {
@@ -53,7 +44,7 @@ func (action PackageActionStruct) Execute(projectDir string, env map[string]stri
 	}
 
 	// run build
-	command.RunCommand(`docker build --no-cache -t `+env["NCI_CONTAINERREGISTRY_REPOSITORY"]+":"+env["NCI_COMMIT_REF_RELEASE"]+` `+projectDir, env, projectDir)
+	command.RunCommand(`docker build --no-cache -t `+ctx.Env["NCI_CONTAINERREGISTRY_REPOSITORY"]+":"+ctx.Env["NCI_COMMIT_REF_RELEASE"]+` `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
 
 	// remove dockerfile
 	_ = filesystem.RemoveFile(dockerfile)
