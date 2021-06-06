@@ -44,7 +44,7 @@ func (action ScanStruct) Execute(projectDir string, env map[string]string, args 
 	_ = command.RunOptionalCommand(`sonar-scanner -v`, env, projectDir)
 }
 
-// BuildAction
-func ScanAction() ScanStruct {
-	return ScanStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(ScanStruct{})
 }

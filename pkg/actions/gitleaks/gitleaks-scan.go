@@ -34,7 +34,7 @@ func (action ScanStruct) Execute(projectDir string, env map[string]string, args 
 	_ = command.RunOptionalCommand(`gitleaks --path=. -v --no-git`, env, projectDir)
 }
 
-// BuildAction
-func ScanAction() ScanStruct {
-	return ScanStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(ScanStruct{})
 }

@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/common/workflow"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -28,10 +29,10 @@ var actionCmd = &cobra.Command{
 
 		// actions
 		actionName := args[0]
-		action := app.FindActionByName(actionName, projectDir, env)
-		if action == nil {
-			log.Fatal().Str("projectDirectory", projectDir).Str("action", actionName).Msg("can't find action by name")
+		action, actionErr := workflow.FindWorkflowAction(actionName)
+		if actionErr != nil {
+			log.Fatal().Str("action", actionName).Msg("action not found")
 		}
-		action.Execute(projectDir, env, args)
+		workflow.RunAction(action, projectDir, env, args)
 	},
 }

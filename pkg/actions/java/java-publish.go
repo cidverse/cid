@@ -61,7 +61,7 @@ func (action PublishActionStruct) Execute(projectDirectory string, env map[strin
 	}
 }
 
-// PublishAction
-func PublishAction() PublishActionStruct {
-	return PublishActionStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(PublishActionStruct{})
 }

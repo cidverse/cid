@@ -36,7 +36,7 @@ func (action CheckActionStruct) Execute(projectDir string, env map[string]string
 	command.RunCommand(`flake8 .`, env, projectDir)
 }
 
-// RunAction
-func CheckAction() CheckActionStruct {
-	return CheckActionStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(CheckActionStruct{})
 }

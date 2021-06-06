@@ -6,6 +6,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cid/pkg/common/workflow"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -48,16 +49,16 @@ var infoCmd = &cobra.Command{
 		}
 
 		// execution plan
-		workflow := app.DiscoverExecutionPlan(projectDir, env)
-		response.ExecutionPlan = workflow
+		executionPlan := workflow.DiscoverExecutionPlan(projectDir, env)
+		response.ExecutionPlan = executionPlan
 
 		// tools
 		response.Tools = make(map[string]string)
 		// -> find all used tools
 		for _, actions := range response.ExecutionPlan {
 			for _, action := range actions.Actions {
-				a := app.FindActionByName(action.Name, projectDir, env)
-				for _, tool := range a.GetDetails(projectDir, env).UsedTools {
+				details := workflow.GetActionDetails(action, projectDir, env)
+				for _, tool := range details.UsedTools {
 					response.Tools[tool] = ""
 				}
 			}

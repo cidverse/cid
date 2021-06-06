@@ -6,28 +6,13 @@ import (
 	"github.com/cidverse/cid/pkg/common/commitanalyser"
 	"github.com/cidverse/cid/pkg/common/config"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/normalizeci/pkg/common"
 	ncimain "github.com/cidverse/normalizeci/pkg/normalizeci"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
 	"os"
 	"strings"
 )
-
-// ActionDetails holds details about the action
-type ActionDetails struct {
-	Stage string
-	Name string
-	Version string
-	UsedTools []string
-}
-
-// Normalizer is a common interface to work with all normalizers
-type ActionStep interface {
-	GetDetails(projectDir string, env map[string]string) ActionDetails
-	SetConfig(config string)
-	Check(projectDir string, env map[string]string) bool
-	Execute(projectDir string, env map[string]string, args []string)
-}
 
 // GetCacheDir returns the caching directory for a module
 func GetCacheDir(pathConfig config.PathConfig, module string) string {
@@ -52,11 +37,28 @@ func FindProjectDir() string {
 func GetCIDEnvironment(projectDirectory string) map[string]string {
 	env := ncimain.RunDefaultNormalization()
 
+	// append env from configuration file
+	for key, value := range config.Config.Env {
+		env[key] = value
+	}
+
 	// customization
 	// - suggested release version
 	enrichErr := EnrichEnvironment(projectDirectory, string(config.Config.Conventions.Branching), env)
 	if enrichErr != nil {
 		log.Err(enrichErr).Msg("failed to enrich project context")
+	}
+
+	return env
+}
+
+// GetFullEnvironment returns the entire env, including host + normalized variables
+func GetFullEnvironment(projectDirectory string) map[string]string {
+	env := GetCIDEnvironment(projectDirectory)
+
+	// append env from configuration file
+	for key, value := range common.GetMachineEnvironment() {
+		env[key] = value
 	}
 
 	return env

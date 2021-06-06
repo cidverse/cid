@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/common/workflow"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -38,6 +39,6 @@ var publishCmd = &cobra.Command{
 
 		// actions
 		log.Info().Str(`version`, env["NCI_COMMIT_REF_RELEASE"]).Msg("publishing version")
-		app.RunStageActions("publish", projectDir, env, args)
+		workflow.RunStageActions("publish", projectDir, env, args)
 	},
 }

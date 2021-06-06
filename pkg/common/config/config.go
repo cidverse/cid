@@ -24,6 +24,7 @@ var Config = struct {
 	Paths PathConfig
 	Mode ExecutionModeType `default:"PREFER_LOCAL"`
 	Conventions ProjectConventions
+	Env map[string]string
 	Stages []WorkflowStage `yaml:"stages"`
 	Actions map[string][]WorkflowAction  `yaml:"actions"`
 	Dependencies map[string]string

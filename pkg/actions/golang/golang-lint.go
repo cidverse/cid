@@ -35,7 +35,7 @@ func (action LintActionStruct) Execute(projectDir string, env map[string]string,
 	command.RunCommand(`golangci-lint run`, env, projectDir)
 }
 
-// LintAction
-func LintAction() LintActionStruct {
-	return LintActionStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(LintActionStruct{})
 }

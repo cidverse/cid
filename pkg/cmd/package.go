@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/common/workflow"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -26,6 +27,6 @@ var packageCmd = &cobra.Command{
 		env := api.GetCIDEnvironment(projectDir)
 
 		// actions
-		app.RunStageActions("package", projectDir, env, args)
+		workflow.RunStageActions("package", projectDir, env, args)
 	},
 }

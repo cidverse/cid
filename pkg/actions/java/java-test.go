@@ -48,7 +48,7 @@ func (action TestActionStruct) Execute(projectDirectory string, env map[string]s
 	}
 }
 
-// TestAction
-func TestAction() TestActionStruct {
-	return TestActionStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(TestActionStruct{})
 }

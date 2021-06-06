@@ -37,7 +37,7 @@ func (action RunActionStruct) Execute(projectDir string, env map[string]string, 
 	_ = command.RunOptionalCommand(`go run . `+strings.Join(args, " "), env, projectDir)
 }
 
-// BuildAction
-func RunAction() RunActionStruct {
-	return RunActionStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(RunActionStruct{})
 }

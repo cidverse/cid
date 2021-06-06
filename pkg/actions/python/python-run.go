@@ -48,7 +48,7 @@ func (action RunActionStruct) Execute(projectDir string, env map[string]string, 
 	}
 }
 
-// RunAction
-func RunAction() RunActionStruct {
-	return RunActionStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(RunActionStruct{})
 }

@@ -36,7 +36,7 @@ func (action TestActionStruct) Execute(projectDir string, env map[string]string,
 	command.RunCommand(`go test -cover ./...`, env, projectDir)
 }
 
-// BuildAction
-func TestAction() TestActionStruct {
-	return TestActionStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(TestActionStruct{})
 }

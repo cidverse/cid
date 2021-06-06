@@ -3,7 +3,6 @@ package upx
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/cidverse/normalizeci/pkg/common"
 )
 
 // Action implementation
@@ -28,8 +27,8 @@ func (action OptimizeActionStruct) SetConfig(config string) {
 func (action OptimizeActionStruct) Check(projectDir string, env map[string]string) bool {
 	loadConfig(projectDir)
 
-	machineEnv := common.GetMachineEnvironment()
-	return machineEnv["UPX_ENABLED"] == "true"
+	fullEnv := api.GetFullEnvironment(projectDir)
+	return fullEnv["UPX_ENABLED"] == "true"
 }
 
 // Check if this package can handle the current environment
@@ -39,7 +38,7 @@ func (action OptimizeActionStruct) Execute(projectDir string, env map[string]str
 	command.RunCommand(`upx --lzma `+projectDir+`/`+Config.Paths.Artifact+`/bin/*`, env, projectDir)
 }
 
-// OptimizeAction
-func OptimizeAction() OptimizeActionStruct {
-	return OptimizeActionStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(OptimizeActionStruct{})
 }

@@ -59,7 +59,7 @@ func (action PackageActionStruct) Execute(projectDir string, env map[string]stri
 	_ = filesystem.RemoveFile(dockerfile)
 }
 
-// PackageAction
-func PackageAction() PackageActionStruct {
-	return PackageActionStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(PackageActionStruct{})
 }

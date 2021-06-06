@@ -36,7 +36,7 @@ func (action RunActionStruct) Execute(projectDir string, env map[string]string, 
 	_ = command.RunOptionalCommand(`hugo server --minify --gc --log --verboseLog --baseUrl "/" --watch --source `+projectDir+``, env, projectDir)
 }
 
-// BuildAction
-func RunAction() RunActionStruct {
-	return RunActionStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(RunActionStruct{})
 }

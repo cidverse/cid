@@ -36,7 +36,7 @@ func (action BuildActionStruct) Execute(projectDir string, env map[string]string
 	command.RunCommand(`hugo --minify --gc --log --verboseLog --source `+projectDir+` --destination `+ projectDir+`/`+Config.Paths.Artifact, env, projectDir)
 }
 
-// BuildAction
-func BuildAction() BuildActionStruct {
-	return BuildActionStruct{}
+// init registers this action
+func init() {
+	api.RegisterBuiltinAction(BuildActionStruct{})
 }
