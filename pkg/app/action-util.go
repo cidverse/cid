@@ -10,6 +10,7 @@ import (
 	_ "github.com/cidverse/cid/pkg/actions/node"
 	_ "github.com/cidverse/cid/pkg/actions/owaspdepcheck"
 	_ "github.com/cidverse/cid/pkg/actions/python"
+	_ "github.com/cidverse/cid/pkg/actions/repo"
 	_ "github.com/cidverse/cid/pkg/actions/sonarqube"
 	_ "github.com/cidverse/cid/pkg/actions/upx"
 	"github.com/cidverse/cid/pkg/common/config"

@@ -24,7 +24,7 @@ stages:
   - name: qualitygate
   - name: publish
     rules:
-      - expression: NCI_COMMIT_REF_PATH == "branch/develop" || NCI_COMMIT_REF_PATH == "branch/main" || NCI_COMMIT_REF_PATH == "branch/master"
+      - expression: NCI_COMMIT_REF_PATH == "branch/develop" || NCI_COMMIT_REF_PATH == "branch/main" || NCI_COMMIT_REF_PATH == "branch/master" || NCI_COMMIT_REF_TYPE == "tag"
 
 # actions
 actions:
@@ -74,6 +74,14 @@ actions:
     - name: dependencycheck-scan
       type: builtin
   publish:
+    # tag / release
+    - name: repo-tag-create
+      type: builtin
+    # changelog generator
+    # asset publish
+    - name: repo-asset-publish-github
+      type: builtin
+    # artifact push
     - name: java-publish
       type: builtin
 
@@ -156,6 +164,17 @@ tools:
     env-allowed-suffix: ["_X64"]
     env-path-dir: /bin
     version: 8.0.0
+  # git
+  - executable: git
+    env-name: PATH
+    version: 0.0.0
+  # npm
+  - executable: npm
+    env-name: PATH
+    version: 0.0.0
+  - executable: yarn
+    env-name: PATH
+    version: 0.0.0
 
 # container images
 container-images:

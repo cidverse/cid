@@ -8,6 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 )
@@ -49,6 +50,17 @@ func FindLocalTool(executable string, constraint string) (ToolExecutableDiscover
 	env := common.GetMachineEnvironment()
 	for _, entry := range Config.Tools {
 		if executable == entry.Executable {
+			// special case - PATH
+			if entry.EnvironmentName == "PATH" {
+				file, fileErr := exec.LookPath(executable)
+				if fileErr != nil {
+					return ToolExecutableDiscovery{}, fileErr
+				}
+
+				entry.ExecutableFile = file
+				localToolCache[executable+"/"+constraint] = entry
+				return entry, nil
+			}
 			// check main env name
 			if len(env[entry.EnvironmentName]) > 0 {
 				if IsVersionFulfillingConstraint(entry.Version, constraint) {

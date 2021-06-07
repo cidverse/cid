@@ -145,6 +145,8 @@ func FindWorkflowStages(projectDir string, env map[string]string) []config.Workf
 	celConfig, celConfigErr := cel.NewEnv(
 		cel.Declarations(
 			decls.NewVar("NCI_COMMIT_REF_PATH", decls.String),
+			decls.NewVar("NCI_COMMIT_REF_TYPE", decls.String),
+			decls.NewVar("NCI_COMMIT_REF_NAME", decls.String),
 		),
 	)
 	if celConfigErr != nil {
@@ -153,6 +155,8 @@ func FindWorkflowStages(projectDir string, env map[string]string) []config.Workf
 
 	inputData := map[string]interface{}{
 		"NCI_COMMIT_REF_PATH": env["NCI_COMMIT_REF_PATH"],
+		"NCI_COMMIT_REF_TYPE": env["NCI_COMMIT_REF_TYPE"],
+		"NCI_COMMIT_REF_NAME": env["NCI_COMMIT_REF_NAME"],
 	}
 
 	var activeStages []config.WorkflowStage
