@@ -78,6 +78,29 @@ actions:
     - name: repo-tag-create
       type: builtin
     # changelog generator
+    - name: repo-changelog-generate
+      type: builtin
+      config:
+        # changelog generator configuration
+        templates:
+          - github-release.tmpl
+          - discord-release.tmpl
+        title_maps:
+          build: "Build System"
+          ci: "CI"
+          docs: "Documentation"
+          feat: "Features"
+          fix: "Bug Fixes"
+          perf: "Performance"
+          refactor: "Refactor"
+          style: "Style"
+          test: "Test"
+          chore: "Internal"
+        note_keywords:
+          - keyword: NOTE
+            title: Notes
+          - keyword: BREAKING CHANGE
+            title: Breaking Changes
     # asset publish
     - name: repo-asset-publish-github
       type: builtin

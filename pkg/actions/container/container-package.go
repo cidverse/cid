@@ -32,7 +32,7 @@ func (action PackageActionStruct) Execute(ctx api.ActionExecutionContext) {
 	// auto detect a usable dockerfile
 	appType := DetectAppType(ctx.ProjectDir)
 	if appType == "jar" {
-		dockerfileContent, dockerfileContentErr := GetFileContent(DockerfileFS, "dockerfiles/Java15.Dockerfile")
+		dockerfileContent, dockerfileContentErr := api.GetFileContentFromEmbedFS(DockerfileFS, "dockerfiles/Java15.Dockerfile")
 		if dockerfileContentErr != nil {
 			log.Fatal().Err(dockerfileContentErr).Msg("failed to get dockerfile from resources.")
 		}

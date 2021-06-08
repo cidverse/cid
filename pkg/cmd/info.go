@@ -10,13 +10,14 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
+	"strings"
 )
 
 type InfoCommandResponse struct {
-	Tools map[string]string `yaml:"tool-version"`
+	Tools           map[string]string `yaml:"tool-version"`
 	ToolConstraints map[string]string `yaml:"tool-constraint"`
-	ExecutionPlan []config.WorkflowStage
-	Environment map[string]string
+	ExecutionPlan   []config.WorkflowStage
+	Environment     map[string]string
 }
 
 func init() {
@@ -38,9 +39,6 @@ var infoCmd = &cobra.Command{
 
 		// response
 		var response = InfoCommandResponse{}
-
-		// environment
-		response.Environment = env
 
 		// tool constraints
 		response.ToolConstraints = make(map[string]string)
@@ -70,6 +68,16 @@ var infoCmd = &cobra.Command{
 				log.Warn().Str("executable", key).Msg("failed to determinate version of tool!")
 			} else {
 				response.Tools[key] = commandVer
+			}
+		}
+
+		// environment
+		response.Environment = make(map[string]string)
+		for key, value := range env {
+			if strings.HasSuffix(key, "_TOKEN") || strings.HasSuffix(key, "_KEY") || strings.HasSuffix(key,"_PASSWORD") {
+				response.Environment[key] = api.GetFirstNCharacters(value, 6)+"***"
+			} else {
+				response.Environment[key] = value
 			}
 		}
 

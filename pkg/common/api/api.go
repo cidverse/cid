@@ -37,6 +37,10 @@ func FindProjectDir() string {
 func GetCIDEnvironment(projectDirectory string) map[string]string {
 	env := ncimain.RunDefaultNormalization()
 
+	// append cid vars
+	env["CID_CONVENTION_BRANCHING"] = string(config.Config.Conventions.Branching)
+	env["CID_CONVENTION_COMMIT"] = string(config.Config.Conventions.Commit)
+
 	// append env from configuration file
 	for key, value := range config.Config.Env {
 		env[key] = value
