@@ -6,10 +6,11 @@ import "embed"
 var TemplateFS embed.FS
 
 type Config struct {
-	Templates    []string          `yaml:"templates"`
-	TitleMaps    map[string]string `yaml:"title_maps"`
-	NoteKeywords []NoteKeyword     `yaml:"note_keywords"`
-	IssuePrefix  string            `yaml:"issue_prefix"`
+	Templates     []string          `yaml:"templates"`
+	CommitPattern []string          `yaml:"commit_pattern"`
+	TitleMaps     map[string]string `yaml:"title_maps"`
+	NoteKeywords  []NoteKeyword     `yaml:"note_keywords"`
+	IssuePrefix   string            `yaml:"issue_prefix"`
 }
 
 type NoteKeyword struct {

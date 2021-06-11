@@ -3,7 +3,6 @@ package changelog
 import (
 	"bufio"
 	"bytes"
-	"github.com/cidverse/cid/pkg/common/commitanalyser"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/oriser/regroup"
 	"github.com/thoas/go-funk"
@@ -15,11 +14,10 @@ import (
 
 func PreprocessCommits(config Config, commits []vcsrepository.Commit) []vcsrepository.Commit {
 	var response []vcsrepository.Commit
-	commitPatternList := []string{commitanalyser.ConventionalCommitPattern}
 
 	var commitExpr []*regexp.Regexp
 	var commitGroupExpr []*regroup.ReGroup
-	for _, commitPattern := range commitPatternList {
+	for _, commitPattern := range config.CommitPattern {
 		commitExpr = append(commitExpr, regexp.MustCompile(commitPattern))
 		commitGroupExpr = append(commitGroupExpr, regroup.MustCompile(commitPattern))
 	}
@@ -28,7 +26,7 @@ func PreprocessCommits(config Config, commits []vcsrepository.Commit) []vcsrepos
 	for _, commit := range commits {
 		// parse context info
 		commit.Context = make(map[string]string)
-		for id := range commitPatternList {
+		for id := range config.CommitPattern {
 			// check if commit matches the pattern
 			if commitExpr[id].MatchString(commit.Message) {
 				match, matchErr := commitGroupExpr[id].Groups(commit.Message)

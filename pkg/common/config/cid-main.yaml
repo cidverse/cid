@@ -85,6 +85,8 @@ actions:
         templates:
           - github-release.tmpl
           - discord-release.tmpl
+        commit_pattern:
+          - (?P<type>[A-Za-z]+)((?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?)(:\s?(?P<subject>.*))?
         title_maps:
           build: "Build System"
           ci: "CI"
