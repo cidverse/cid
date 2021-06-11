@@ -6,14 +6,14 @@ import (
 )
 
 // Action implementation
-type BuildActionStruct struct {}
+type BuildActionStruct struct{}
 
 // GetDetails returns information about this action
 func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "build",
-		Name: "python-build",
-		Version: "0.1.0",
+	return api.ActionDetails{
+		Stage:     "build",
+		Name:      "python-build",
+		Version:   "0.1.0",
 		UsedTools: []string{"pipenv", "pip"},
 	}
 }
@@ -31,7 +31,7 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
 	} else if buildSystem == "pipenv" {
 		command.RunCommand(`pipenv install`, ctx.Env, ctx.ProjectDir)
 	} else if buildSystem == "setup.py" {
-		command.RunCommand(`pip install ` + ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
+		command.RunCommand(`pip install `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
 	}
 }
 

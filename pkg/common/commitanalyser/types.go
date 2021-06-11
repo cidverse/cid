@@ -4,6 +4,7 @@ package commitanalyser
 var ConventionalCommitPattern = `(?P<type>[A-Za-z]+)((?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?)(:\s?(?P<subject>.*))?`
 
 type ReleaseType int32
+
 const (
 	ReleaseNone  ReleaseType = 0
 	ReleasePatch ReleaseType = 1
@@ -12,12 +13,12 @@ const (
 )
 
 type CommitVersionRule struct {
-	Type string
-	Scope string
+	Type    string
+	Scope   string
 	Release string // major / minor / patch
 }
 
-var DefaultReleaseVersionRules = []CommitVersionRule {
+var DefaultReleaseVersionRules = []CommitVersionRule{
 	{
 		Type:    `feat`,
 		Release: `minor`,

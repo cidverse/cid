@@ -8,14 +8,14 @@ import (
 )
 
 // Action implementation
-type PackageActionStruct struct {}
+type PackageActionStruct struct{}
 
 // GetDetails returns information about this action
 func (action PackageActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "package",
-		Name: "container-package",
-		Version: "0.1.0",
+	return api.ActionDetails{
+		Stage:     "package",
+		Name:      "container-package",
+		Version:   "0.1.0",
 		UsedTools: []string{"docker"},
 	}
 }
@@ -27,7 +27,7 @@ func (action PackageActionStruct) Check(ctx api.ActionExecutionContext) bool {
 
 // Check if this package can handle the current environment
 func (action PackageActionStruct) Execute(ctx api.ActionExecutionContext) {
-	dockerfile := ctx.ProjectDir+`/Dockerfile`
+	dockerfile := ctx.ProjectDir + `/Dockerfile`
 
 	// auto detect a usable dockerfile
 	appType := DetectAppType(ctx.ProjectDir)

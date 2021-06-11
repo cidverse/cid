@@ -6,14 +6,14 @@ import (
 )
 
 // Action implementation
-type ScanStruct struct {}
+type ScanStruct struct{}
 
 // GetDetails returns information about this action
 func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "sast",
-		Name: "dependencycheck-scan",
-		Version: "0.0.1",
+	return api.ActionDetails{
+		Stage:     "sast",
+		Name:      "dependencycheck-scan",
+		Version:   "0.0.1",
 		UsedTools: []string{"dependency-check"},
 	}
 }

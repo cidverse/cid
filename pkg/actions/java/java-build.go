@@ -2,8 +2,8 @@ package java
 
 import (
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
@@ -11,14 +11,14 @@ import (
 )
 
 // Action implementation
-type BuildActionStruct struct {}
+type BuildActionStruct struct{}
 
 // GetDetails returns information about this action
 func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "build",
-		Name: "java-build",
-		Version: "0.1.0",
+	return api.ActionDetails{
+		Stage:     "build",
+		Name:      "java-build",
+		Version:   "0.1.0",
 		UsedTools: []string{"java"},
 	}
 }

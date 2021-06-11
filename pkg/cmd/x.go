@@ -14,8 +14,8 @@ func init() {
 }
 
 var xCmd = &cobra.Command{
-	Use:   "x",
-	Short: `will execute the command in the current project context.`,
+	Use:     "x",
+	Short:   `will execute the command in the current project context.`,
 	Example: `cid x -- go version`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Debug().Str("command", "x").Str("cmd", strings.Join(args, " ")).Msg("running command")

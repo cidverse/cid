@@ -6,14 +6,14 @@ import (
 )
 
 // Action implementation
-type OptimizeActionStruct struct {}
+type OptimizeActionStruct struct{}
 
 // GetDetails returns information about this action
 func (action OptimizeActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "build",
-		Name: "upx-optimize",
-		Version: "0.1.0",
+	return api.ActionDetails{
+		Stage:     "build",
+		Name:      "upx-optimize",
+		Version:   "0.1.0",
 		UsedTools: []string{"upx"},
 	}
 }

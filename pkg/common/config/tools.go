@@ -16,24 +16,24 @@ import (
 const PathSeparator = string(os.PathSeparator)
 
 type ToolCacheDir struct {
-	Id string
+	Id            string
 	ContainerPath string `yaml:"dir"`
 }
 
 type ToolExecutableDiscovery struct {
-	Executable string
-	ExecutableFile string
-	EnvironmentName string `yaml:"env-name"`
+	Executable            string
+	ExecutableFile        string
+	EnvironmentName       string   `yaml:"env-name"`
 	EnvironmentNameSuffix []string `yaml:"env-allowed-suffix"`
-	SubPath string `yaml:"env-path-dir"`
-	Version string
+	SubPath               string   `yaml:"env-path-dir"`
+	Version               string
 }
 
 type ToolContainerDiscovery struct {
 	Executable string
-	Image string
-	Version string
-	Cache []ToolCacheDir
+	Image      string
+	Version    string
+	Cache      []ToolCacheDir
 }
 
 var localToolCache = make(map[string]ToolExecutableDiscovery)
@@ -150,7 +150,7 @@ func FindExecutable(path string, file string) string {
 	} else {
 		// unix
 		if _, err := os.Stat(filepath.Join(path, file)); err == nil {
-			return path+PathSeparator+file
+			return path + PathSeparator + file
 		}
 	}
 

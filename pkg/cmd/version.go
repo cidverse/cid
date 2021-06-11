@@ -30,6 +30,6 @@ var versionCmd = &cobra.Command{
 			versionPrefix = "v"
 		}
 
-		fmt.Println("cid "+versionPrefix+Version+"-" + CommitHash + " " + runtime.GOOS + "/" + runtime.GOARCH + " BuildDate=" + BuildAt)
+		fmt.Println("cid " + versionPrefix + Version + "-" + CommitHash + " " + runtime.GOOS + "/" + runtime.GOARCH + " BuildDate=" + BuildAt)
 	},
 }

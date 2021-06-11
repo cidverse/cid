@@ -7,14 +7,14 @@ import (
 )
 
 // Action implementation
-type ScanStruct struct {}
+type ScanStruct struct{}
 
 // GetDetails returns information about this action
 func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "sast",
-		Name: "gitguardian-scan",
-		Version: "0.1.0",
+	return api.ActionDetails{
+		Stage:     "sast",
+		Name:      "gitguardian-scan",
+		Version:   "0.1.0",
 		UsedTools: []string{"ggshield"},
 	}
 }

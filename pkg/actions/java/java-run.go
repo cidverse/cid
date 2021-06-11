@@ -2,21 +2,21 @@ package java
 
 import (
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"strings"
 )
 
 // Action implementation
-type RunActionStruct struct {}
+type RunActionStruct struct{}
 
 // GetDetails returns information about this action
 func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "run",
-		Name: "java-run",
-		Version: "0.1.0",
+	return api.ActionDetails{
+		Stage:     "run",
+		Name:      "java-run",
+		Version:   "0.1.0",
 		UsedTools: []string{"java"},
 	}
 }
@@ -41,9 +41,9 @@ func (action RunActionStruct) Execute(ctx api.ActionExecutionContext) {
 		log.Fatal().Msg("can't detect build system")
 	}
 
-	files, filesErr := filesystem.FindFilesInDirectory(ctx.ProjectDir + `/build/libs`, `.jar`)
+	files, filesErr := filesystem.FindFilesInDirectory(ctx.ProjectDir+`/build/libs`, `.jar`)
 	if filesErr != nil {
-		log.Fatal().Err(filesErr).Str("path", ctx.ProjectDir + `/build/libs`).Msg("failed to list files")
+		log.Fatal().Err(filesErr).Str("path", ctx.ProjectDir+`/build/libs`).Msg("failed to list files")
 	}
 	if len(files) == 1 {
 		_ = command.RunOptionalCommand(`java -jar `+files[0]+` `+strings.Join(ctx.Args, " "), ctx.Env, ctx.ProjectDir)

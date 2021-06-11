@@ -190,11 +190,11 @@ func GetPlatformSpecificCommand(platform string, file string, args string, workD
 		// powershell needs .\ prefix for executables in the current directory
 		if filesystem.FileExists(file) {
 			return exec.Command("powershell", `& '`+file+`' `+args), nil
-		} else if filesystem.FileExists(workDir+`/`+file+`.bat`) {
+		} else if filesystem.FileExists(workDir + `/` + file + `.bat`) {
 			return exec.Command("powershell", `.\`+file+`.bat `+args), nil
-		} else if filesystem.FileExists(workDir+`/`+file+`.ps1`) {
+		} else if filesystem.FileExists(workDir + `/` + file + `.ps1`) {
 			return exec.Command("powershell", `.\`+file+`.ps1 `+args), nil
-		} else if filesystem.FileExists(workDir+`/`+file) {
+		} else if filesystem.FileExists(workDir + `/` + file) {
 			return exec.Command("powershell", `.\`+file+` `+args), nil
 		}
 

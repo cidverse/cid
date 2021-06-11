@@ -2,8 +2,8 @@ package golang
 
 import (
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/mod/modfile"
 	"os"
@@ -13,7 +13,7 @@ import (
 // DetectGolangProject checks if the target directory is a go project
 func DetectGolangProject(projectDir string) bool {
 	// go.mod
-	if _, err := os.Stat(projectDir+"/go.mod"); !os.IsNotExist(err) {
+	if _, err := os.Stat(projectDir + "/go.mod"); !os.IsNotExist(err) {
 		log.Debug().Str("file", projectDir+"/go.mod").Msg("found go.mod")
 		return true
 	}
@@ -25,7 +25,7 @@ func GetDependencies(projectDir string) map[string]string {
 	var deps = make(map[string]string)
 
 	if DetectGolangProject(projectDir) {
-		contentBytes, contentReadErr := filesystem.GetFileBytes(projectDir+"/go.mod")
+		contentBytes, contentReadErr := filesystem.GetFileBytes(projectDir + "/go.mod")
 		if contentReadErr != nil {
 			return deps
 		}
@@ -35,7 +35,7 @@ func GetDependencies(projectDir string) map[string]string {
 			return deps
 		}
 
-		deps["go"] = ">= "+goMod.Go.Version
+		deps["go"] = ">= " + goMod.Go.Version
 	}
 
 	return deps

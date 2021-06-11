@@ -20,7 +20,7 @@ func GetFileContent(folder string, fs embed.FS, file string) (string, error) {
 	}
 
 	// look in internal fs
-	content, contentErr := api.GetFileContentFromEmbedFS(fs, "templates/" + file)
+	content, contentErr := api.GetFileContentFromEmbedFS(fs, "templates/"+file)
 	if contentErr == nil {
 		return content, nil
 	}

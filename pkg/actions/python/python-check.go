@@ -6,14 +6,14 @@ import (
 )
 
 // Action implementation
-type CheckActionStruct struct {}
+type CheckActionStruct struct{}
 
 // GetDetails returns information about this action
 func (action CheckActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "sast",
-		Name: "python-lint",
-		Version: "0.1.0",
+	return api.ActionDetails{
+		Stage:     "sast",
+		Name:      "python-lint",
+		Version:   "0.1.0",
 		UsedTools: []string{"pipenv", "pip"},
 	}
 }

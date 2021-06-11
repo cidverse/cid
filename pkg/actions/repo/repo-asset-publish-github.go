@@ -10,14 +10,14 @@ import (
 	"strings"
 )
 
-type AssetPublishGitHubStruct struct {}
+type AssetPublishGitHubStruct struct{}
 
 // GetDetails returns information about this action
 func (action AssetPublishGitHubStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "publish",
-		Name: "repo-asset-publish-github",
-		Version: "0.1.0",
+	return api.ActionDetails{
+		Stage:     "publish",
+		Name:      "repo-asset-publish-github",
+		Version:   "0.1.0",
 		UsedTools: []string{"gh"},
 	}
 }
@@ -27,7 +27,7 @@ func (action AssetPublishGitHubStruct) Check(ctx api.ActionExecutionContext) boo
 	if len(ctx.MachineEnv["GITHUB_TOKEN"]) > 0 && strings.HasPrefix(ctx.Env["NCI_REPOSITORY_REMOTE"], "https://github.com") {
 		ctx.Env["GITHUB_TOKEN"] = ctx.MachineEnv["GITHUB_TOKEN"]
 
-		return ctx.Env["NCI_COMMIT_REF_TYPE"]  == "tag"
+		return ctx.Env["NCI_COMMIT_REF_TYPE"] == "tag"
 	}
 
 	return false

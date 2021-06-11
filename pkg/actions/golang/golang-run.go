@@ -7,15 +7,15 @@ import (
 )
 
 // Action implementation
-type RunActionStruct struct {}
+type RunActionStruct struct{}
 
 // GetDetails returns all binaries used by this action
 func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "run",
-		Name: "golang-run",
-		Version: "0.1.0",
-		UsedTools: []string{"go"},
+	return api.ActionDetails{
+		Stage:            "run",
+		Name:             "golang-run",
+		Version:          "0.1.0",
+		UsedTools:        []string{"go"},
 		ToolDependencies: GetDependencies(ctx.ProjectDir),
 	}
 }

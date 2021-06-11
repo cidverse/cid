@@ -5,14 +5,14 @@ import (
 	"github.com/cidverse/cid/pkg/common/command"
 )
 
-type LintActionStruct struct {}
+type LintActionStruct struct{}
 
 // GetDetails returns information about this action
 func (action LintActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "sast",
-		Name: "golang-lint",
-		Version: "0.1.0",
+	return api.ActionDetails{
+		Stage:     "sast",
+		Name:      "golang-lint",
+		Version:   "0.1.0",
 		UsedTools: []string{"golangci-lint"},
 	}
 }

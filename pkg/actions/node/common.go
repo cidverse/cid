@@ -9,16 +9,16 @@ import (
 )
 
 type PackageStruct struct {
-	Name string
-	Version string
+	Name         string
+	Version      string
 	Dependencies map[string]string
-	Scripts map[string]string
+	Scripts      map[string]string
 }
 
 // DetectNodeProject checks if the target directory is a java project
 func DetectNodeProject(projectDir string) bool {
 	// package.json
-	return filesystem.FileExists(projectDir+"/package.json")
+	return filesystem.FileExists(projectDir + "/package.json")
 }
 
 // ParsePackageJSON will parse the package.json to evaluate its content

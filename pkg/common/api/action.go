@@ -4,10 +4,10 @@ import "github.com/cidverse/cid/pkg/common/config"
 
 // ActionDetails holds details about the action
 type ActionDetails struct {
-	Stage string
-	Name string
-	Version string
-	UsedTools []string
+	Stage            string
+	Name             string
+	Version          string
+	UsedTools        []string
 	ToolDependencies map[string]string
 }
 

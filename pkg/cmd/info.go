@@ -74,8 +74,8 @@ var infoCmd = &cobra.Command{
 		// environment
 		response.Environment = make(map[string]string)
 		for key, value := range env {
-			if strings.HasSuffix(key, "_TOKEN") || strings.HasSuffix(key, "_KEY") || strings.HasSuffix(key,"_PASSWORD") {
-				response.Environment[key] = api.GetFirstNCharacters(value, 6)+"***"
+			if strings.HasSuffix(key, "_TOKEN") || strings.HasSuffix(key, "_KEY") || strings.HasSuffix(key, "_PASSWORD") {
+				response.Environment[key] = api.GetFirstNCharacters(value, 6) + "***"
 			} else {
 				response.Environment[key] = value
 			}

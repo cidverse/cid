@@ -6,14 +6,14 @@ import (
 )
 
 // Action implementation
-type TestActionStruct struct {}
+type TestActionStruct struct{}
 
 // GetDetails returns information about this action
 func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "test",
-		Name: "java-test",
-		Version: "0.1.0",
+	return api.ActionDetails{
+		Stage:     "test",
+		Name:      "java-test",
+		Version:   "0.1.0",
 		UsedTools: []string{"java"},
 	}
 }

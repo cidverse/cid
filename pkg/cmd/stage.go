@@ -13,10 +13,10 @@ func init() {
 }
 
 var stageCmd = &cobra.Command{
-	Use:   "stage",
+	Use:     "stage",
 	Aliases: []string{"s"},
-	Short: "runs the stage specified in the arguments",
-	Long:  `runs the stage specified in the arguments`,
+	Short:   "runs the stage specified in the arguments",
+	Long:    `runs the stage specified in the arguments`,
 	Run: func(cmd *cobra.Command, args []string) {
 		stage := args[0]
 		log.Debug().Str("stage", stage).Msg("running stage")

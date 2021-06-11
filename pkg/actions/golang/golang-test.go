@@ -6,15 +6,15 @@ import (
 )
 
 // Action implementation
-type TestActionStruct struct {}
+type TestActionStruct struct{}
 
 // GetDetails returns information about this action
 func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "test",
-		Name: "golang-test",
-		Version: "0.1.0",
-		UsedTools: []string{"go"},
+	return api.ActionDetails{
+		Stage:            "test",
+		Name:             "golang-test",
+		Version:          "0.1.0",
+		UsedTools:        []string{"go"},
 		ToolDependencies: GetDependencies(ctx.ProjectDir),
 	}
 }

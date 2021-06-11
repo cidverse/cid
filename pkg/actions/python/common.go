@@ -13,19 +13,19 @@ func DetectPythonProject(projectDir string) bool {
 // DetectPythonBuildSystem returns the build system used in the project
 func DetectPythonBuildSystem(projectDir string) string {
 	// requirements.txt
-	if _, err := os.Stat(projectDir+"/requirements.txt"); !os.IsNotExist(err) {
+	if _, err := os.Stat(projectDir + "/requirements.txt"); !os.IsNotExist(err) {
 		log.Debug().Str("file", projectDir+"/requirements.txt").Msg("found requirements.txt project")
 		return "requirements.txt"
 	}
 
 	// pipenv
-	if _, err := os.Stat(projectDir+"/Pipfile"); !os.IsNotExist(err) {
+	if _, err := os.Stat(projectDir + "/Pipfile"); !os.IsNotExist(err) {
 		log.Debug().Str("file", projectDir+"/Pipfile").Msg("found pipenv project")
 		return "pipenv"
 	}
 
 	// setup.py
-	if _, err := os.Stat(projectDir+"/setup.py"); !os.IsNotExist(err) {
+	if _, err := os.Stat(projectDir + "/setup.py"); !os.IsNotExist(err) {
 		log.Debug().Str("file", projectDir+"/setup.py").Msg("found setup.py project")
 		return "setup.py"
 	}

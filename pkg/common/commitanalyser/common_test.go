@@ -7,7 +7,7 @@ import (
 )
 
 func TestDeterminateNextReleaseVersionBreaking(t *testing.T) {
-	var commits = []vcsrepository.Commit {
+	var commits = []vcsrepository.Commit{
 		{
 			Message:     `fix!: resolves a issue`,
 			Description: ``,
@@ -19,7 +19,7 @@ func TestDeterminateNextReleaseVersionBreaking(t *testing.T) {
 }
 
 func TestDeterminateNextReleaseVersionFeature(t *testing.T) {
-	var commits = []vcsrepository.Commit {
+	var commits = []vcsrepository.Commit{
 		{
 			Message:     `feat: adds new feature`,
 			Description: ``,
@@ -35,7 +35,7 @@ func TestDeterminateNextReleaseVersionFeature(t *testing.T) {
 }
 
 func TestDeterminateNextReleaseVersionFix(t *testing.T) {
-	var commits = []vcsrepository.Commit {
+	var commits = []vcsrepository.Commit{
 		{
 			Message:     `fix: resolves a issue`,
 			Description: ``,

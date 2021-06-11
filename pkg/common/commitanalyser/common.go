@@ -2,8 +2,8 @@ package commitanalyser
 
 import (
 	"github.com/Masterminds/semver/v3"
-	"github.com/oriser/regroup"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
+	"github.com/oriser/regroup"
 	"github.com/rs/zerolog/log"
 	"regexp"
 )

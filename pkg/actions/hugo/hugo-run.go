@@ -6,14 +6,14 @@ import (
 )
 
 // Action implementation
-type RunActionStruct struct {}
+type RunActionStruct struct{}
 
 // GetDetails returns information about this action
 func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "run",
-		Name: "hugo-run",
-		Version: "0.1.0",
+	return api.ActionDetails{
+		Stage:     "run",
+		Name:      "hugo-run",
+		Version:   "0.1.0",
 		UsedTools: []string{"hugo"},
 	}
 }

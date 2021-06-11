@@ -1,4 +1,4 @@
-:rocket: {{ .ProjectName }} - ***{{ .Version }}*** :rocket:
+:rocket: {{ .ProjectName }} - ***{{ .Version }}*** - {{ .ReleaseDate.Format "2006-01-02" }} :rocket:
 
 {{if .CommitGroups -}}
 {{ range  $groupName, $commits := .CommitGroups -}}

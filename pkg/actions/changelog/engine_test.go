@@ -11,8 +11,8 @@ import (
 
 var config = Config{
 	TitleMaps: map[string]string{
-		"feat":     "Features",
-		"fix":      "Bug Fixes",
+		"feat": "Features",
+		"fix":  "Bug Fixes",
 	},
 	NoteKeywords: []NoteKeyword{{"NOTE", "Notes"}, {"BREAKING CHANGE", "Breaking Changes"}},
 }
@@ -66,8 +66,9 @@ func TestRenderGitHubReleaseTemplate(t *testing.T) {
 	// analyse / grouping
 	templateData := ProcessCommits(config, commits)
 	templateData.ProjectUrl = "https://github.com/cidverse/cid"
+	templateData.ProjectName = "CID"
 	templateData.Version = "1.0.0"
-	templateData.ReleaseDate = time.Now()
+	templateData.ReleaseDate = time.Unix(int64(1623449882), int64(0))
 	fmt.Printf("%+v\n", templateData)
 
 	// , []config.CommitConventionType{config.ConventionalCommits}
@@ -98,13 +99,13 @@ func TestRenderDiscordTemplate(t *testing.T) {
 	templateData.ProjectUrl = "https://github.com/cidverse/cid"
 	templateData.ProjectName = "CID"
 	templateData.Version = "1.0.0"
-	templateData.ReleaseDate = time.Now()
+	templateData.ReleaseDate = time.Unix(int64(1623449882), int64(0))
 	fmt.Printf("%+v\n", templateData)
 
 	// , []config.CommitConventionType{config.ConventionalCommits}
 	output, outputErr := RenderTemplate(templateData, template)
 	assert.NoError(t, outputErr)
-	assert.Equal(t, `:rocket: CID - ***1.0.0*** :rocket:
+	assert.Equal(t, `:rocket: CID - ***1.0.0*** - 2021-06-12 :rocket:
 
 **Bug Fixes**
 - **core:** resolves a issue

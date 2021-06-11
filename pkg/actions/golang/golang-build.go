@@ -8,15 +8,15 @@ import (
 )
 
 // Action implementation
-type BuildActionStruct struct {}
+type BuildActionStruct struct{}
 
 // GetDetails returns information about this action
 func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
-	return api.ActionDetails {
-		Stage: "build",
-		Name: "golang-build",
-		Version: "0.1.0",
-		UsedTools: []string{"go"},
+	return api.ActionDetails{
+		Stage:            "build",
+		Name:             "golang-build",
+		Version:          "0.1.0",
+		UsedTools:        []string{"go"},
 		ToolDependencies: GetDependencies(ctx.ProjectDir),
 	}
 }

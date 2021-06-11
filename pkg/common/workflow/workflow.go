@@ -21,12 +21,12 @@ func DiscoverExecutionPlan(projectDir string, env map[string]string) []config.Wo
 
 	// context
 	ctx := api.ActionExecutionContext{
-		Paths: config.Config.Paths,
+		Paths:      config.Config.Paths,
 		ProjectDir: projectDir,
-		WorkDir: filesystem.GetWorkingDirectory(),
-		Config: "",
-		Args: nil,
-		Env: env,
+		WorkDir:    filesystem.GetWorkingDirectory(),
+		Config:     "",
+		Args:       nil,
+		Env:        env,
 		MachineEnv: common.GetMachineEnvironment(),
 	}
 
@@ -47,7 +47,7 @@ func DiscoverExecutionPlan(projectDir string, env map[string]string) []config.Wo
 		}
 
 		executionPlan = append(executionPlan, config.WorkflowStage{
-			Name:   stage.Name,
+			Name:    stage.Name,
 			Actions: stageActions,
 		})
 	}
@@ -84,12 +84,12 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env map[st
 	if action.Type == "builtin" {
 		// context
 		ctx := api.ActionExecutionContext{
-			Paths: config.Config.Paths,
+			Paths:      config.Config.Paths,
 			ProjectDir: projectDirectory,
-			WorkDir: filesystem.GetWorkingDirectory(),
-			Config: string(configAsYaml),
-			Args: args,
-			Env: env,
+			WorkDir:    filesystem.GetWorkingDirectory(),
+			Config:     string(configAsYaml),
+			Args:       args,
+			Env:        env,
 			MachineEnv: common.GetMachineEnvironment(),
 		}
 
@@ -118,12 +118,12 @@ func GetActionDetails(action config.WorkflowAction, projectDirectory string, env
 		if builtinAction != nil {
 			// context
 			ctx := api.ActionExecutionContext{
-				Paths: config.Config.Paths,
+				Paths:      config.Config.Paths,
 				ProjectDir: projectDirectory,
-				WorkDir: filesystem.GetWorkingDirectory(),
-				Config: string(configAsYaml),
-				Args: nil,
-				Env: env,
+				WorkDir:    filesystem.GetWorkingDirectory(),
+				Config:     string(configAsYaml),
+				Args:       nil,
+				Env:        env,
 				MachineEnv: common.GetMachineEnvironment(),
 			}
 
