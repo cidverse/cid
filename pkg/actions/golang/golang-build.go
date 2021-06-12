@@ -7,10 +7,8 @@ import (
 	"runtime"
 )
 
-// Action implementation
 type BuildActionStruct struct{}
 
-// GetDetails returns information about this action
 func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:            "build",
@@ -21,22 +19,21 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 	}
 }
 
-// Check if this package can handle the current environment
 func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectGolangProject(ctx.ProjectDir)
 }
 
-// Check if this package can handle the current environment
 func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
-	// load config
-	yamlErr := yaml.Unmarshal([]byte(ctx.Config), &Config.GoLang)
-	if yamlErr != nil {
-		log.Fatal().Err(yamlErr).Str("config", ctx.Config).Msg("failed to parse configuration")
+	var config Config
+	configParseErr := yaml.Unmarshal([]byte(ctx.Config), &config)
+	if configParseErr != nil {
+		log.Error().Err(configParseErr).Str("action", "golang-build").Msg("failed to parse action configuration")
+		return
 	}
 
 	// run build
-	if Config.GoLang.Platform != nil && len(Config.GoLang.Platform) > 0 {
-		for _, crossBuild := range Config.GoLang.Platform {
+	if config.Platform != nil && len(config.Platform) > 0 {
+		for _, crossBuild := range config.Platform {
 			CrossCompile(ctx, crossBuild.Goos, crossBuild.Goarch)
 		}
 	} else {
@@ -44,7 +41,6 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
 	}
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(BuildActionStruct{})
 }

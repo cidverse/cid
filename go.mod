@@ -8,7 +8,7 @@ require (
 	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20210512092938-c05353c2d58c // indirect
 	github.com/cavaliercoder/grab v2.0.0+incompatible
-	github.com/cidverse/cidverseutils v0.0.0-20210606235815-1fd9dfa52eb7
+	github.com/cidverse/cidverseutils v0.0.0-20210611233239-36027a5f0eab
 	github.com/cidverse/normalizeci v1.0.1-0.20210610223024-4dfddd85b7f7
 	github.com/go-git/go-git/v5 v5.4.2 // indirect
 	github.com/google/cel-go v0.7.3
