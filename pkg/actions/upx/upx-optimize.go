@@ -1,6 +1,7 @@
 package upx
 
 import (
+	"errors"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
@@ -33,7 +34,10 @@ func (action OptimizeActionStruct) Execute(ctx api.ActionExecutionContext, state
 	}
 
 	for _, file := range files {
-		command.RunOptionalCommand(`upx --lzma `+file, ctx.Env, ctx.ProjectDir)
+		upxErr := command.RunOptionalCommand(`upx --lzma `+file, ctx.Env, ctx.ProjectDir)
+		if upxErr != nil {
+			return errors.New("upx failed to compress file " + file + ". Cause: " + upxErr.Error())
+		}
 	}
 
 	return nil

@@ -51,7 +51,7 @@ type ActionExecutionContext struct {
 // ActionStateContext holds state information about executed actions / results (ie. generated artifacts)
 type ActionStateContext struct {
 	// Version of the serialized action state
-	Version int `json:version`
+	Version int `json:"version"`
 }
 
 var BuiltinActions = make(map[string]ActionStep)

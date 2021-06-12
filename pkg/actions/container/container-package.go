@@ -21,7 +21,7 @@ func (action PackageActionStruct) GetDetails(ctx api.ActionExecutionContext) api
 
 // Check evaluates if the action should be executed or not
 func (action PackageActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return len(DetectAppType(ctx.ProjectDir)) > 0
+	return len(DetectAppType(ctx)) > 0
 }
 
 // Execute runs the action
@@ -29,7 +29,7 @@ func (action PackageActionStruct) Execute(ctx api.ActionExecutionContext, state 
 	dockerfile := ctx.ProjectDir + `/Dockerfile`
 
 	// auto detect a usable dockerfile
-	appType := DetectAppType(ctx.ProjectDir)
+	appType := DetectAppType(ctx)
 	if appType == "jar" {
 		dockerfileContent, dockerfileContentErr := api.GetFileContentFromEmbedFS(DockerfileFS, "dockerfiles/Java15.Dockerfile")
 		if dockerfileContentErr != nil {

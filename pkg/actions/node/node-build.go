@@ -29,21 +29,21 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 	packageConfig := ParsePackageJSON(ctx.ProjectDir + `/package.json`)
 
 	// dependencies
-	command.RunCommand(`yarn install --frozen-lockfile --cache-folder `+api.GetCacheDir(Config.Paths, "yarn"), ctx.Env, ctx.ProjectDir)
+	command.RunCommand(`yarn install --frozen-lockfile --cache-folder `+api.GetCacheDir(ctx.Paths, "yarn"), ctx.Env, ctx.ProjectDir)
 
 	// dependency specific
 	reactDependencyVersion, reactDependencyPresent := packageConfig.Dependencies[`react`]
 	if reactDependencyPresent {
 		log.Debug().Str("react", reactDependencyVersion).Msg("found library")
-		ctx.Env["BUILD_PATH"] = ctx.ProjectDir + `/` + Config.Paths.Artifact + `/html` // overwrite build dir - react - react-scripts at v4.0.2+
-		ctx.Env["CI"] = "false"                                                        // if ci=true, then react warnings will result in errors - allow warnings // TODO: remove
+		ctx.Env["BUILD_PATH"] = ctx.ProjectDir + `/` + ctx.Paths.Artifact + `/html` // overwrite build dir - react - react-scripts at v4.0.2+
+		ctx.Env["CI"] = "false"                                                     // if ci=true, then react warnings will result in errors - allow warnings // TODO: remove
 	}
 
 	// build script
 	buildScriptLine, buildScriptPresent := packageConfig.Scripts[`build`]
 	if buildScriptPresent {
 		log.Debug().Str("build", buildScriptLine).Msg("found build script")
-		command.RunCommand(`yarn build --cache-folder `+api.GetCacheDir(Config.Paths, "yarn")+` `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
+		command.RunCommand(`yarn build --cache-folder `+api.GetCacheDir(ctx.Paths, "yarn")+` `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
 	}
 
 	return nil

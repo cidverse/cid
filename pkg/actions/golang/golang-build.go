@@ -43,9 +43,12 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 			goos := crossBuild.Goos
 			goarch := crossBuild.Goarch
 
-			group.Add(func() {
+			err := group.Add(func() {
 				CrossCompile(ctx, goos, goarch)
 			})
+			if err != nil {
+				return errors.New("failed to schedule go-build task. Cause: "+err.Error())
+			}
 		}
 
 		err := group.Wait()

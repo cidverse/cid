@@ -75,7 +75,7 @@ func RunStageActions(stage string, projectDirectory string, env map[string]strin
 		RunAction(action, projectDirectory, env, args)
 	}
 
-	log.Info().Str("stage", stage).Str("duration", time.Now().Sub(start).String()).Msg("stage completed")
+	log.Info().Str("stage", stage).Str("duration", time.Since(start).String()).Msg("stage completed")
 }
 
 // RunAction runs a specific workflow action
@@ -143,7 +143,7 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env map[st
 		}
 	}
 
-	log.Info().Str("action", action.Type+"/"+action.Name).Str("duration", time.Now().Sub(start).String()).Msg("action completed")
+	log.Info().Str("action", action.Type+"/"+action.Name).Str("duration", time.Since(start).String()).Msg("action completed")
 }
 
 // GetActionDetails retrieves the details of a WorkflowAction

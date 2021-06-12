@@ -52,7 +52,7 @@ func (action AssetPublishGitHubStruct) Execute(ctx api.ActionExecutionContext, s
 	// use generated changelog
 	ghChangelogFile := filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "changelog", "github-release.tmpl")
 	if filesystem.FileExists(ghChangelogFile) {
-		opts = append(opts, `-F `+ghChangelogFile)
+		opts = append(opts, "-F "+ghChangelogFile)
 	} else {
 		opts = append(opts, `--notes "..."`)
 	}
@@ -69,7 +69,6 @@ func (action AssetPublishGitHubStruct) Execute(ctx api.ActionExecutionContext, s
 			if len(files) > 0 {
 				for _, file := range files {
 					if filesystem.FileExists(file) {
-						opts = append(opts, file)
 						log.Info().Str("file", file).Msg("uploading github release asset ...")
 						command.RunCommand(`gh release upload `+tagName+` `+file, ctx.Env, ctx.ProjectDir)
 					}
