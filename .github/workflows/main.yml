@@ -4,7 +4,7 @@ name: CI
 # workflow triggers
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [ main ]
     paths-ignore:
       - "**.md"
       - ".gitignore"
@@ -16,6 +16,7 @@ jobs:
     # runtime environment
     runs-on: ubuntu-latest
 
+    # steps
     steps:
       # setup
       - uses: cidverse/ghact-cid-setup@main
