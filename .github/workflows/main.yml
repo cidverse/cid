@@ -24,16 +24,19 @@ jobs:
         with:
           fetch-depth: 0
       # print execution plan
-      - name: executionplan
+      - name: CI Execution Plan
         run: |
           cid info
       # build
-      - name: build
+      - name: Build
         run: |
-          cid build
-      - name: test
+          cid stage build
+      - name: Test
         run: |
-          cid test
-      - name: package
+          cid stage test
+      - name: Packaging
         run: |
-          cid package
+          cid stage package
+      - name: Static Application Security Testing
+        run: |
+          cid stage sast
