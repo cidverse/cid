@@ -13,23 +13,20 @@ on:
 jobs:
   # build
   build:
-    # runtime environment
     runs-on: ubuntu-latest
-
-    # steps
     steps:
       # setup
       - uses: cidverse/ghact-cid-setup@main
         name: CID Setup
-      # execution plan
-      - name: executionplan
-        run: |
-          cid info
       # project checkout
       - uses: actions/checkout@v2
         name: Repository Checkout
         with:
           fetch-depth: 0
+      # print execution plan
+      - name: executionplan
+        run: |
+          cid info
       # build
       - name: build
         run: |
