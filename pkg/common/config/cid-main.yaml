@@ -74,14 +74,14 @@ actions:
     - name: python-lint
       type: builtin
     # scanners
-    #- name: gitleaks-scan
-    #  type: builtin
-    #- name: gitguardian-scan
-    #  type: builtin
-    #- name: sonarqube-scan
-    #  type: builtin
-    #- name: dependencycheck-scan
-    #  type: builtin
+    - name: gitleaks-scan
+      type: builtin
+    - name: gitguardian-scan
+      type: builtin
+    - name: sonarqube-scan
+      type: builtin
+    - name: dependencycheck-scan
+      type: builtin
   publish:
     # tag / release
     - name: repo-tag-create

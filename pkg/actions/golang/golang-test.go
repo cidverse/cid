@@ -1,8 +1,10 @@
 package golang
 
 import (
+	"errors"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/rs/zerolog/log"
 )
 
 type TestActionStruct struct{}
@@ -25,7 +27,17 @@ func (action TestActionStruct) Check(ctx api.ActionExecutionContext) bool {
 
 // Execute runs the action
 func (action TestActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
-	command.RunCommand(`go test -cover ./...`, ctx.Env, ctx.ProjectDir)
+	log.Info().Msg("running go unit tests")
+	testResult := command.RunOptionalCommand(`go test -cover ./...`, ctx.Env, ctx.ProjectDir)
+	if testResult != nil {
+		return errors.New("go unit tests failed. Cause: " + testResult.Error())
+	}
+
+	log.Info().Msg("running go race condition detector")
+	testResult = command.RunOptionalCommand(`go test -race -vet off ./...`, ctx.Env, ctx.ProjectDir)
+	if testResult != nil {
+		return errors.New("go race tests failed. Cause: " + testResult.Error())
+	}
 
 	return nil
 }

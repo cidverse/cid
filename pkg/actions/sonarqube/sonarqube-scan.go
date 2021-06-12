@@ -20,20 +20,18 @@ func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDe
 
 // Check evaluates if the action should be executed or not
 func (action ScanStruct) Check(ctx api.ActionExecutionContext) bool {
-	enabled := len(ctx.MachineEnv[SONAR_HOST_URL]) > 0
-	if enabled {
-		for key, value := range ctx.MachineEnv {
-			if strings.HasPrefix(key, SONAR_PREFIX) {
-				ctx.Env[key] = value
-			}
-		}
-	}
-
-	return enabled
+	return len(ctx.MachineEnv[SONAR_HOST_URL]) > 0
 }
 
 // Execute runs the action
 func (action ScanStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+	// env
+	for key, value := range ctx.MachineEnv {
+		if strings.HasPrefix(key, SONAR_PREFIX) {
+			ctx.Env[key] = value
+		}
+	}
+
 	return command.RunOptionalCommand(`sonar-scanner -v`, ctx.Env, ctx.ProjectDir)
 }
 

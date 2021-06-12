@@ -47,7 +47,7 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 				CrossCompile(ctx, goos, goarch)
 			})
 			if err != nil {
-				return errors.New("failed to schedule go-build task. Cause: "+err.Error())
+				return errors.New("failed to schedule go-build task. Cause: " + err.Error())
 			}
 		}
 
