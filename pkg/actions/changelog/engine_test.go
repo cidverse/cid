@@ -69,7 +69,7 @@ func TestRenderGitHubReleaseTemplate(t *testing.T) {
 	templateData.ProjectUrl = "https://github.com/cidverse/cid"
 	templateData.ProjectName = "CID"
 	templateData.Version = "1.0.0"
-	templateData.ReleaseDate = time.Unix(int64(1623449882), int64(0))
+	templateData.ReleaseDate = time.Unix(int64(1609502400), int64(0))
 
 	output, outputErr := RenderTemplate(templateData, template)
 	assert.NoError(t, outputErr)
@@ -98,11 +98,11 @@ func TestRenderDiscordTemplate(t *testing.T) {
 	templateData.ProjectUrl = "https://github.com/cidverse/cid"
 	templateData.ProjectName = "CID"
 	templateData.Version = "1.0.0"
-	templateData.ReleaseDate = time.Unix(int64(1623449882), int64(0))
+	templateData.ReleaseDate = time.Unix(int64(1609502400), int64(0))
 
 	output, outputErr := RenderTemplate(templateData, template)
 	assert.NoError(t, outputErr)
-	assert.Equal(t, `:rocket: CID - ***1.0.0*** - 2021-06-12 :rocket:
+	assert.Equal(t, `:rocket: CID - ***1.0.0*** - 2021-01-01 :rocket:
 
 **Bug Fixes**
 - **core:** resolves a issue
