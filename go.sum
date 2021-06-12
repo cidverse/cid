@@ -74,8 +74,8 @@ github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghf
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
 github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
-github.com/cidverse/cidverseutils v0.0.0-20210611233239-36027a5f0eab h1:6Pqj1s1GYE66AQ4RqTIKhuVkn8bM95AFlFXrxIHI1WI=
-github.com/cidverse/cidverseutils v0.0.0-20210611233239-36027a5f0eab/go.mod h1:Wfcbyfo6NOFqQxBNevyK4vsJ70KAIXM+ELRThcUQFJQ=
+github.com/cidverse/cidverseutils v0.0.0-20210612140003-13c003bba530 h1:gNhiENgOKWpwaqi8tRi3G0yeRu8rJaWajy9p1WNy9sg=
+github.com/cidverse/cidverseutils v0.0.0-20210612140003-13c003bba530/go.mod h1:Wfcbyfo6NOFqQxBNevyK4vsJ70KAIXM+ELRThcUQFJQ=
 github.com/cidverse/normalizeci v1.0.1-0.20210610223024-4dfddd85b7f7 h1:jBVCXTDuBm0ml1PTWoBjJ8T/Xn8Kbnws0to+GjaF5uw=
 github.com/cidverse/normalizeci v1.0.1-0.20210610223024-4dfddd85b7f7/go.mod h1:xoTpS8yuakiAU7kReQwVHqInHr7QV8ZYXAXUEmkdK70=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=

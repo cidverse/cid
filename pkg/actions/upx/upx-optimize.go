@@ -3,6 +3,8 @@ package upx
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"path/filepath"
 )
 
 type OptimizeActionStruct struct{}
@@ -25,7 +27,16 @@ func (action OptimizeActionStruct) Check(ctx api.ActionExecutionContext) bool {
 
 // Execute runs the action
 func (action OptimizeActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
-	return command.RunOptionalCommand(`upx --lzma `+ctx.ProjectDir+`/`+Config.Paths.Artifact+`/bin/*`, ctx.Env, ctx.ProjectDir)
+	files, filesErr := filesystem.FindFilesInDirectory(filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "bin"), "")
+	if filesErr != nil {
+		return filesErr
+	}
+
+	for _, file := range files {
+		command.RunOptionalCommand(`upx --lzma `+file, ctx.Env, ctx.ProjectDir)
+	}
+
+	return nil
 }
 
 func init() {
