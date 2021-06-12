@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sync"
 )
 
 const PathSeparator = string(os.PathSeparator)
@@ -39,10 +40,15 @@ type ToolContainerDiscovery struct {
 var localToolCache = make(map[string]ToolExecutableDiscovery)
 var imageToolCache = make(map[string]ToolContainerDiscovery)
 
+var mutex = &sync.Mutex{}
+
 // FindLocalTool tries to find a tool/cli fulfilling the specified version constraints in the local environment
 func FindLocalTool(executable string, constraint string) (ToolExecutableDiscovery, error) {
+	mutex.Lock()
+
 	// get from cache
 	if funk.Contains(localToolCache, executable+"/"+constraint) {
+		mutex.Unlock()
 		return localToolCache[executable+"/"+constraint], nil
 	}
 
@@ -59,6 +65,7 @@ func FindLocalTool(executable string, constraint string) (ToolExecutableDiscover
 
 				entry.ExecutableFile = file
 				localToolCache[executable+"/"+constraint] = entry
+				mutex.Unlock()
 				return entry, nil
 			}
 			// check main env name
@@ -66,6 +73,7 @@ func FindLocalTool(executable string, constraint string) (ToolExecutableDiscover
 				if IsVersionFulfillingConstraint(entry.Version, constraint) {
 					entry.ExecutableFile = FindExecutable(env[entry.EnvironmentName]+entry.SubPath, entry.Executable)
 					localToolCache[executable+"/"+constraint] = entry
+					mutex.Unlock()
 					return entry, nil
 				}
 			}
@@ -75,6 +83,7 @@ func FindLocalTool(executable string, constraint string) (ToolExecutableDiscover
 					if IsVersionFulfillingConstraint(entry.Version, constraint) {
 						entry.ExecutableFile = FindExecutable(env[entry.EnvironmentName+envSuffix]+entry.SubPath, entry.Executable)
 						localToolCache[executable+"/"+constraint] = entry
+						mutex.Unlock()
 						return entry, nil
 					}
 				}
@@ -82,12 +91,16 @@ func FindLocalTool(executable string, constraint string) (ToolExecutableDiscover
 		}
 	}
 
+	mutex.Unlock()
 	return ToolExecutableDiscovery{}, errors.New("failed to find executable")
 }
 
 func FindContainerImage(executable string, constraint string) (ToolContainerDiscovery, error) {
+	mutex.Lock()
+
 	// get from cache
 	if funk.Contains(imageToolCache, executable+"/"+constraint) {
+		mutex.Unlock()
 		return imageToolCache[executable+"/"+constraint], nil
 	}
 
@@ -96,11 +109,13 @@ func FindContainerImage(executable string, constraint string) (ToolContainerDisc
 		if executable == entry.Executable {
 			if IsVersionFulfillingConstraint(entry.Version, constraint) {
 				imageToolCache[executable+"/"+constraint] = entry
+				mutex.Unlock()
 				return entry, nil
 			}
 		}
 	}
 
+	mutex.Unlock()
 	return ToolContainerDiscovery{}, errors.New("failed to find image")
 }
 

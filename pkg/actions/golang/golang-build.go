@@ -3,6 +3,7 @@ package golang
 import (
 	"errors"
 	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/shomali11/parallelizer"
 	"gopkg.in/yaml.v2"
 	"runtime"
 )
@@ -35,8 +36,21 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 
 	// run build
 	if config.Platform != nil && len(config.Platform) > 0 {
+		group := parallelizer.NewGroup(parallelizer.WithPoolSize(ctx.Parallelization))
+		defer group.Close()
+
 		for _, crossBuild := range config.Platform {
-			CrossCompile(ctx, crossBuild.Goos, crossBuild.Goarch)
+			goos := crossBuild.Goos
+			goarch := crossBuild.Goarch
+
+			group.Add(func() {
+				CrossCompile(ctx, goos, goarch)
+			})
+		}
+
+		err := group.Wait()
+		if err != nil {
+			return err
 		}
 	} else {
 		CrossCompile(ctx, runtime.GOOS, runtime.GOARCH)

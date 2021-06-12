@@ -50,10 +50,14 @@ func CrossCompile(ctx api.ActionExecutionContext, goos string, goarch string) {
 		fileExt = ".exe"
 	}
 
-	env := ctx.Env
-	env["CGO_ENABLED"] = "false"
-	env["GOPROXY"] = "https://goproxy.io,direct"
-	env["GOOS"] = goos
-	env["GOARCH"] = goarch
-	command.RunCommand(`go build -o `+ctx.ProjectDir+`/`+ctx.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+env["NCI_COMMIT_REF_RELEASE"]+` -X main.CommitHash=`+env["NCI_COMMIT_SHA_SHORT"]+` -X main.BuildAt=`+buildAt+`" .`, env, ctx.ProjectDir)
+	compileEnv := make(map[string]string, len(ctx.Env))
+	for key, value := range ctx.Env {
+		compileEnv[key] = value
+	}
+	compileEnv["CGO_ENABLED"] = "false"
+	compileEnv["GOPROXY"] = "https://goproxy.io,direct"
+	compileEnv["GOOS"] = goos
+	compileEnv["GOARCH"] = goarch
+
+	command.RunCommand(`go build -o `+ctx.ProjectDir+`/`+ctx.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+compileEnv["NCI_COMMIT_REF_RELEASE"]+` -X main.CommitHash=`+compileEnv["NCI_COMMIT_SHA_SHORT"]+` -X main.BuildAt=`+buildAt+`" .`, compileEnv, ctx.ProjectDir)
 }

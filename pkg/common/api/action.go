@@ -43,10 +43,15 @@ type ActionExecutionContext struct {
 
 	// MachineEnv contains the full environment
 	MachineEnv map[string]string
+
+	// Parallelization defines how many tasks can be run in parallel inside of a action
+	Parallelization int
 }
 
 // ActionStateContext holds state information about executed actions / results (ie. generated artifacts)
 type ActionStateContext struct {
+	// Version of the serialized action state
+	Version int `json:version`
 }
 
 var BuiltinActions = make(map[string]ActionStep)

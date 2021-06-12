@@ -18,6 +18,7 @@ require (
 	github.com/oriser/regroup v0.0.0-20201024192559-010c434ff8f3
 	github.com/rs/zerolog v1.22.0
 	github.com/sergi/go-diff v1.2.0 // indirect
+	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.0

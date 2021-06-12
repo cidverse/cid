@@ -17,19 +17,22 @@ import (
 	"time"
 )
 
+const DefaultParallelization = 10
+
 // DiscoverExecutionPlan will generate a automatic execution plan based on the project contents
 func DiscoverExecutionPlan(projectDir string, env map[string]string) []config.WorkflowStage {
 	var executionPlan []config.WorkflowStage
 
 	// context
 	ctx := api.ActionExecutionContext{
-		Paths:      config.Config.Paths,
-		ProjectDir: projectDir,
-		WorkDir:    filesystem.GetWorkingDirectory(),
-		Config:     "",
-		Args:       nil,
-		Env:        env,
-		MachineEnv: common.GetMachineEnvironment(),
+		Paths:           config.Config.Paths,
+		ProjectDir:      projectDir,
+		WorkDir:         filesystem.GetWorkingDirectory(),
+		Config:          "",
+		Args:            nil,
+		Env:             env,
+		MachineEnv:      common.GetMachineEnvironment(),
+		Parallelization: DefaultParallelization,
 	}
 
 	// iterate over all stages
@@ -86,18 +89,21 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env map[st
 
 	// action context
 	ctx := api.ActionExecutionContext{
-		Paths:      config.Config.Paths,
-		ProjectDir: projectDirectory,
-		WorkDir:    filesystem.GetWorkingDirectory(),
-		Config:     string(configAsYaml),
-		Args:       args,
-		Env:        env,
-		MachineEnv: common.GetMachineEnvironment(),
+		Paths:           config.Config.Paths,
+		ProjectDir:      projectDirectory,
+		WorkDir:         filesystem.GetWorkingDirectory(),
+		Config:          string(configAsYaml),
+		Args:            args,
+		Env:             env,
+		MachineEnv:      common.GetMachineEnvironment(),
+		Parallelization: DefaultParallelization,
 	}
 
 	// state: retrieve/init
 	stateFile := filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "state.json")
-	state := api.ActionStateContext{}
+	state := api.ActionStateContext{
+		Version: 1,
+	}
 	if filesystem.FileExists(stateFile) {
 		stateContent, stateContentErr := filesystem.GetFileContent(stateFile)
 		if stateContentErr == nil {
@@ -151,13 +157,14 @@ func GetActionDetails(action config.WorkflowAction, projectDirectory string, env
 		if builtinAction != nil {
 			// context
 			ctx := api.ActionExecutionContext{
-				Paths:      config.Config.Paths,
-				ProjectDir: projectDirectory,
-				WorkDir:    filesystem.GetWorkingDirectory(),
-				Config:     string(configAsYaml),
-				Args:       nil,
-				Env:        env,
-				MachineEnv: common.GetMachineEnvironment(),
+				Paths:           config.Config.Paths,
+				ProjectDir:      projectDirectory,
+				WorkDir:         filesystem.GetWorkingDirectory(),
+				Config:          string(configAsYaml),
+				Args:            nil,
+				Env:             env,
+				MachineEnv:      common.GetMachineEnvironment(),
+				Parallelization: DefaultParallelization,
 			}
 
 			// run action
