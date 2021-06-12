@@ -7,16 +7,3 @@ conventions:
   branching: GitFlow
   commit: ConventionalCommits
   prereleasesuffix: "-rc.{NCI_LASTRELEASE_COMMIT_AFTER_COUNT}"
-
-# customize stage actions
-actions:
-  build:
-    - name: golang-build
-      type: builtin
-      config:
-        # cross platform build
-        platform:
-          - goos: windows
-            goarch: amd64
-          - goos: linux
-            goarch: amd64

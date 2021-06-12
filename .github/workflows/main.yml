@@ -1,0 +1,34 @@
+# workflow name
+name: CI
+
+# workflow triggers
+on:
+  push:
+    branches: [ $default-branch ]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - ".editorconfig"
+
+jobs:
+  # stages
+  build:
+    # runtime environment
+    runs-on: ubuntu-latest
+
+    steps:
+      # setup
+      - uses: cidverse/ghact-cid-setup@main
+        name: CID Setup
+      # project checkout
+      - uses: actions/checkout@v2
+        name: Repository Checkout
+        with:
+          fetch-depth: 0
+      # build
+      - name: build
+        run: |
+          cid build
+      - name: test
+        run: |
+          cid test
