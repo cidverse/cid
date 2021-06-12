@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-// Action implementation
 type RunActionStruct struct{}
 
 // GetDetails returns information about this action
@@ -21,13 +20,13 @@ func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Act
 	}
 }
 
-// Check if this package can handle the current environment
+// Check evaluates if the action should be executed or not
 func (action RunActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectJavaProject(ctx.ProjectDir)
 }
 
-// Check if this package can handle the current environment
-func (action RunActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action RunActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	buildSystem := DetectJavaBuildSystem(ctx.ProjectDir)
 	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
 		ctx.Env["GRADLE_OPTS"] = "-XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError -Xmx512m"
@@ -50,9 +49,10 @@ func (action RunActionStruct) Execute(ctx api.ActionExecutionContext) {
 	} else {
 		log.Warn().Int("count", len(files)).Msg("path build/libs should contain a single jar file! If you have a modular project please ensure that the final jar is moved into build/libs.")
 	}
+
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(RunActionStruct{})
 }

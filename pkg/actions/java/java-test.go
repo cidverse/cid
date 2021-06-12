@@ -5,10 +5,9 @@ import (
 	"github.com/cidverse/cid/pkg/common/command"
 )
 
-// Action implementation
 type TestActionStruct struct{}
 
-// GetDetails returns information about this action
+// GetDetails retrieves information about the action
 func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "test",
@@ -18,13 +17,13 @@ func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Ac
 	}
 }
 
-// Check if this package can handle the current environment
+// Check evaluates if the action should be executed or not
 func (action TestActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectJavaProject(ctx.ProjectDir)
 }
 
-// Check if this package can handle the current environment
-func (action TestActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action TestActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// get release version
 	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
 
@@ -38,9 +37,10 @@ func (action TestActionStruct) Execute(ctx api.ActionExecutionContext) {
 		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" versions:set -DnewVersion="+releaseVersion+"--batch-mode", ctx.Env, ctx.ProjectDir)
 		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" test -DskipTests=true --batch-mode", ctx.Env, ctx.ProjectDir)
 	}
+
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(TestActionStruct{})
 }

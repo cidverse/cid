@@ -5,10 +5,9 @@ import (
 	"github.com/cidverse/cid/pkg/common/command"
 )
 
-// Action implementation
 type ScanStruct struct{}
 
-// GetDetails returns information about this action
+// GetDetails retrieves information about the action
 func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "sast",
@@ -18,17 +17,18 @@ func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDe
 	}
 }
 
-// Check if this package can handle the current environment
+// Check evaluates if the action should be executed or not
 func (action ScanStruct) Check(ctx api.ActionExecutionContext) bool {
 	return true
 }
 
-// Check if this package can handle the current environment
-func (action ScanStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action ScanStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	_ = command.RunOptionalCommand(`dependency-check --noupdate --scan . --enableExperimental --out dist --exclude .git/** --exclude dist/**`, ctx.Env, ctx.ProjectDir)
+
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(ScanStruct{})
 }

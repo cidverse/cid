@@ -1,13 +1,13 @@
 package java
 
 import (
+	"errors"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
 	"strings"
 )
 
-// Publish
 type PublishActionStruct struct{}
 
 // GetDetails returns information about this action
@@ -20,13 +20,13 @@ func (action PublishActionStruct) GetDetails(ctx api.ActionExecutionContext) api
 	}
 }
 
-// Check if this package can handle the current environment
+// Check evaluates if the action should be executed or not
 func (action PublishActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectJavaProject(ctx.ProjectDir)
 }
 
-// Check if this package can handle the current environment
-func (action PublishActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action PublishActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// get release version
 	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
 	// isStableRelease := api.IsVersionStable(releaseVersion)
@@ -37,8 +37,7 @@ func (action PublishActionStruct) Execute(ctx api.ActionExecutionContext) {
 		// gradle tasks
 		gradleTasks, gradleTasksErr := command.RunSystemCommand(`gradlew`, `tasks --all`, ctx.Env, ctx.ProjectDir)
 		if gradleTasksErr != nil {
-			log.Warn().Msg("can't list available gradle tasks")
-			return
+			return errors.New("failed to list gradle tasks (gradle tasks --all)")
 		}
 
 		if strings.Contains(gradleTasks, "publish") {
@@ -51,9 +50,10 @@ func (action PublishActionStruct) Execute(ctx api.ActionExecutionContext) {
 
 		//
 	}
+
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(PublishActionStruct{})
 }

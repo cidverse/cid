@@ -5,10 +5,9 @@ import (
 	"github.com/cidverse/cid/pkg/common/command"
 )
 
-// Action implementation
 type OptimizeActionStruct struct{}
 
-// GetDetails returns information about this action
+// GetDetails retrieves information about the action
 func (action OptimizeActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "build",
@@ -18,18 +17,17 @@ func (action OptimizeActionStruct) GetDetails(ctx api.ActionExecutionContext) ap
 	}
 }
 
-// Check if this package can handle the current environment
+// Check evaluates if the action should be executed or not
 func (action OptimizeActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	fullEnv := api.GetFullEnvironment(ctx.ProjectDir)
 	return fullEnv["UPX_ENABLED"] == "true"
 }
 
-// Check if this package can handle the current environment
-func (action OptimizeActionStruct) Execute(ctx api.ActionExecutionContext) {
-	command.RunCommand(`upx --lzma `+ctx.ProjectDir+`/`+Config.Paths.Artifact+`/bin/*`, ctx.Env, ctx.ProjectDir)
+// Execute runs the action
+func (action OptimizeActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+	return command.RunOptionalCommand(`upx --lzma `+ctx.ProjectDir+`/`+Config.Paths.Artifact+`/bin/*`, ctx.Env, ctx.ProjectDir)
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(OptimizeActionStruct{})
 }

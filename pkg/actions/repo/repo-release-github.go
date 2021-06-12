@@ -11,6 +11,7 @@ import (
 
 type AssetPublishGitHubStruct struct{}
 
+// GetDetails retrieves information about the action
 func (action AssetPublishGitHubStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "publish",
@@ -20,17 +21,21 @@ func (action AssetPublishGitHubStruct) GetDetails(ctx api.ActionExecutionContext
 	}
 }
 
+// Check evaluates if the action should be executed or not
 func (action AssetPublishGitHubStruct) Check(ctx api.ActionExecutionContext) bool {
 	if len(ctx.MachineEnv["GITHUB_TOKEN"]) > 0 && strings.HasPrefix(ctx.Env["NCI_REPOSITORY_REMOTE"], "https://github.com") {
-		ctx.Env["GITHUB_TOKEN"] = ctx.MachineEnv["GITHUB_TOKEN"]
-
 		return ctx.Env["NCI_COMMIT_REF_TYPE"] == "tag"
 	}
 
 	return false
 }
 
-func (action AssetPublishGitHubStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action AssetPublishGitHubStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+	// context
+	ctx.Env["GITHUB_TOKEN"] = ctx.MachineEnv["GITHUB_TOKEN"]
+
+	// input
 	tagName := ctx.Env["NCI_COMMIT_REF_NAME"]
 
 	// create github release
@@ -44,7 +49,7 @@ func (action AssetPublishGitHubStruct) Execute(ctx api.ActionExecutionContext) {
 		opts = append(opts, "--prerelease")
 	}
 
-	// TODO: changelog
+	// use generated changelog
 	ghChangelogFile := filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "changelog", "github-release.tmpl")
 	if filesystem.FileExists(ghChangelogFile) {
 		opts = append(opts, `-F `+ghChangelogFile)
@@ -61,7 +66,7 @@ func (action AssetPublishGitHubStruct) Execute(ctx api.ActionExecutionContext) {
 		if filesErr != nil {
 			// err
 		} else {
-			if len(files)  > 0 {
+			if len(files) > 0 {
 				for _, file := range files {
 					if filesystem.FileExists(file) {
 						opts = append(opts, file)
@@ -72,9 +77,10 @@ func (action AssetPublishGitHubStruct) Execute(ctx api.ActionExecutionContext) {
 			}
 		}
 	}
+
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(AssetPublishGitHubStruct{})
 }

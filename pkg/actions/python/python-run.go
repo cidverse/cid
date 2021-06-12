@@ -8,10 +8,9 @@ import (
 	"strings"
 )
 
-// Action implementation
 type RunActionStruct struct{}
 
-// GetDetails returns information about this action
+// GetDetails retrieves information about the action
 func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "run",
@@ -21,13 +20,13 @@ func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Act
 	}
 }
 
-// Check if this package can handle the current environment
+// Check evaluates if the action should be executed or not
 func (action RunActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectPythonProject(ctx.ProjectDir)
 }
 
-// Check if this package can handle the current environment
-func (action RunActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action RunActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	files, filesErr := filesystem.FindFilesInDirectory(ctx.ProjectDir, `.py`)
 	if filesErr != nil {
 		log.Fatal().Err(filesErr).Str("path", ctx.ProjectDir).Msg("failed to list files")
@@ -38,9 +37,10 @@ func (action RunActionStruct) Execute(ctx api.ActionExecutionContext) {
 	} else {
 		log.Warn().Int("count", len(files)).Msg("project directory should only contain a single .py file, which is the main app entrypoint!")
 	}
+
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(RunActionStruct{})
 }

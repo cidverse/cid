@@ -7,6 +7,7 @@ import (
 
 type LintActionStruct struct{}
 
+// GetDetails retrieves information about the action
 func (action LintActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "sast",
@@ -16,12 +17,15 @@ func (action LintActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Ac
 	}
 }
 
+// Check evaluates if the action should be executed or not
 func (action LintActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectGolangProject(ctx.ProjectDir)
 }
 
-func (action LintActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action LintActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	command.RunCommand(`golangci-lint run`, ctx.Env, ctx.ProjectDir)
+	return nil
 }
 
 func init() {

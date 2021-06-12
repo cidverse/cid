@@ -6,10 +6,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Action implementation
 type BuildActionStruct struct{}
 
-// GetDetails returns information about this action
+// GetDetails retrieves information about the action
 func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "build",
@@ -19,13 +18,13 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 	}
 }
 
-// Check will evaluate if this action can be executed for the specified project
+// Check evaluates if the action should be executed or not
 func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectNodeProject(ctx.ProjectDir)
 }
 
-// Execute will run the action
-func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// parse package.json
 	packageConfig := ParsePackageJSON(ctx.ProjectDir + `/package.json`)
 
@@ -46,9 +45,10 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
 		log.Debug().Str("build", buildScriptLine).Msg("found build script")
 		command.RunCommand(`yarn build --cache-folder `+api.GetCacheDir(Config.Paths, "yarn")+` `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
 	}
+
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(BuildActionStruct{})
 }

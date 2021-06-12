@@ -1,6 +1,7 @@
 package workflow
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/cidverse/cid/pkg/common/api"
@@ -12,6 +13,7 @@ import (
 	"github.com/google/cel-go/common/types"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
+	"path/filepath"
 	"time"
 )
 
@@ -73,35 +75,66 @@ func RunStageActions(stage string, projectDirectory string, env map[string]strin
 	log.Info().Str("stage", stage).Str("duration", time.Now().Sub(start).String()).Msg("stage completed")
 }
 
-// RunAction runs a specific stage
+// RunAction runs a specific workflow action
 func RunAction(action config.WorkflowAction, projectDirectory string, env map[string]string, args []string) {
 	start := time.Now()
 	log.Info().Str("action", action.Type+"/"+action.Name).Msg("running action")
 
+	// serialize action config for passthru
 	configAsYaml, _ := yaml.Marshal(&action.Config)
 	log.Debug().Str("config", string(configAsYaml)).Msg("action specific config")
 
-	if action.Type == "builtin" {
-		// context
-		ctx := api.ActionExecutionContext{
-			Paths:      config.Config.Paths,
-			ProjectDir: projectDirectory,
-			WorkDir:    filesystem.GetWorkingDirectory(),
-			Config:     string(configAsYaml),
-			Args:       args,
-			Env:        env,
-			MachineEnv: common.GetMachineEnvironment(),
-		}
+	// action context
+	ctx := api.ActionExecutionContext{
+		Paths:      config.Config.Paths,
+		ProjectDir: projectDirectory,
+		WorkDir:    filesystem.GetWorkingDirectory(),
+		Config:     string(configAsYaml),
+		Args:       args,
+		Env:        env,
+		MachineEnv: common.GetMachineEnvironment(),
+	}
 
+	// state: retrieve/init
+	stateFile := filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "state.json")
+	state := api.ActionStateContext{}
+	if filesystem.FileExists(stateFile) {
+		stateContent, stateContentErr := filesystem.GetFileContent(stateFile)
+		if stateContentErr == nil {
+			err := json.Unmarshal([]byte(stateContent), &state)
+			if err != nil {
+				log.Warn().Err(err).Str("file", stateFile).Msg("failed to restore state")
+			}
+		}
+	}
+
+	// handle action execution
+	if action.Type == "builtin" {
 		// actionType: builtin
 		builtinAction := api.BuiltinActions[action.Name]
 		if builtinAction != nil {
-			builtinAction.Execute(ctx)
+			actErr := builtinAction.Execute(ctx, &state)
+			if actErr != nil {
+				log.Fatal().Err(actErr).Str("action", action.Name).Msg("action execution failed")
+			}
 		} else {
 			log.Error().Str("action", action.Name).Msg("skipping action, does not exist")
 		}
 	} else {
 		log.Fatal().Str("action", action.Name).Str("type", action.Type).Msg("type is not supported")
+	}
+
+	// state: store
+	stateOut, err := json.Marshal(state)
+	if err != nil {
+		log.Warn().Err(err).Str("file", stateFile).Msg("failed to store state")
+	} else {
+		_ = filesystem.RemoveFile(stateFile)
+
+		storeErr := filesystem.SaveFileContent(stateFile, string(stateOut))
+		if storeErr != nil {
+			log.Warn().Err(storeErr).Str("file", stateFile).Msg("failed to store state")
+		}
 	}
 
 	log.Info().Str("action", action.Type+"/"+action.Name).Str("duration", time.Now().Sub(start).String()).Msg("action completed")

@@ -15,7 +15,7 @@ var config = Config{
 		"fix":  "Bug Fixes",
 	},
 	CommitPattern: []string{commitanalyser.ConventionalCommitPattern},
-	NoteKeywords: []NoteKeyword{{"NOTE", "Notes"}, {"BREAKING CHANGE", "Breaking Changes"}},
+	NoteKeywords:  []NoteKeyword{{"NOTE", "Notes"}, {"BREAKING CHANGE", "Breaking Changes"}},
 }
 var commits = []vcsrepository.Commit{
 	{

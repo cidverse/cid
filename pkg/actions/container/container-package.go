@@ -7,10 +7,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Action implementation
 type PackageActionStruct struct{}
 
-// GetDetails returns information about this action
+// GetDetails retrieves information about the action
 func (action PackageActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "package",
@@ -20,13 +19,13 @@ func (action PackageActionStruct) GetDetails(ctx api.ActionExecutionContext) api
 	}
 }
 
-// Check if this package can handle the current environment
+// Check evaluates if the action should be executed or not
 func (action PackageActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return len(DetectAppType(ctx.ProjectDir)) > 0
 }
 
-// Check if this package can handle the current environment
-func (action PackageActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action PackageActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	dockerfile := ctx.ProjectDir + `/Dockerfile`
 
 	// auto detect a usable dockerfile
@@ -48,9 +47,9 @@ func (action PackageActionStruct) Execute(ctx api.ActionExecutionContext) {
 
 	// remove dockerfile
 	_ = filesystem.RemoveFile(dockerfile)
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(PackageActionStruct{})
 }

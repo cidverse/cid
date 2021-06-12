@@ -1,6 +1,7 @@
 package changelog
 
 import (
+	"errors"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
@@ -12,6 +13,7 @@ import (
 
 type ChangelogGenerateStruct struct{}
 
+// GetDetails retrieves information about the action
 func (action ChangelogGenerateStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "publish",
@@ -21,16 +23,17 @@ func (action ChangelogGenerateStruct) GetDetails(ctx api.ActionExecutionContext)
 	}
 }
 
+// Check evaluates if the action should be executed or not
 func (action ChangelogGenerateStruct) Check(ctx api.ActionExecutionContext) bool {
 	return ctx.Env["NCI_COMMIT_REF_TYPE"] == "tag"
 }
 
-func (action ChangelogGenerateStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action ChangelogGenerateStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	var config Config
 	configParseErr := yaml.Unmarshal([]byte(ctx.Config), &config)
 	if configParseErr != nil {
-		log.Error().Err(configParseErr).Str("action", "repo-changelog-generate").Msg("failed to parse action configuration")
-		return
+		return errors.New("failed to parse action configuration")
 	}
 
 	// retrieve commits
@@ -55,15 +58,13 @@ func (action ChangelogGenerateStruct) Execute(ctx api.ActionExecutionContext) {
 
 		content, contentErr := GetFileContent(".cid/templates", TemplateFS, templateFile)
 		if contentErr != nil {
-			log.Error().Err(contentErr).Str("template", templateFile).Msg("failed to get template content")
-			return
+			return errors.New("failed to retrieve template content from file " + templateFile + ". " + contentErr.Error())
 		}
 
 		// render
 		output, outputErr := RenderTemplate(templateData, content)
 		if outputErr != nil {
-			log.Error().Err(outputErr).Str("template", templateFile).Msg("failed to render template")
-			return
+			return errors.New("failed to render template " + templateFile)
 		}
 
 		// save into tmp file
@@ -73,12 +74,13 @@ func (action ChangelogGenerateStruct) Execute(ctx api.ActionExecutionContext) {
 		_ = filesystem.RemoveFile(targetFile)
 		saveErr := filesystem.SaveFileContent(targetFile, output)
 		if saveErr != nil {
-			log.Error().Err(saveErr).Str("template", templateFile).Str("output-file", targetPath).Msg("failed to save file")
-			return
+			return errors.New("failed to save changelog file of " + templateFile + " to " + targetPath)
 		}
 
 		log.Info().Str("template", templateFile).Str("output-file", targetPath).Msg("rendered changelog template successfully")
 	}
+
+	return nil
 }
 
 func init() {

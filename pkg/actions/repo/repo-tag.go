@@ -6,10 +6,9 @@ import (
 	"github.com/cidverse/cid/pkg/common/config"
 )
 
-// Action implementation
 type TagCreateStruct struct{}
 
-// GetDetails returns information about this action
+// GetDetails retrieves information about the action
 func (action TagCreateStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	var usedTools []string
 
@@ -25,7 +24,7 @@ func (action TagCreateStruct) GetDetails(ctx api.ActionExecutionContext) api.Act
 	}
 }
 
-// Check if this package can handle the current environment
+// Check evaluates if the action should be executed or not
 func (action TagCreateStruct) Check(ctx api.ActionExecutionContext) bool {
 	if len(ctx.MachineEnv["GITHUB_TOKEN"]) > 0 {
 		ctx.Env["GITHUB_TOKEN"] = ctx.MachineEnv["GITHUB_TOKEN"]
@@ -36,8 +35,8 @@ func (action TagCreateStruct) Check(ctx api.ActionExecutionContext) bool {
 	return false
 }
 
-// Check if this package can handle the current environment
-func (action TagCreateStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action TagCreateStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	tagName := "v" + ctx.Env["NCI_NEXTRELEASE_NAME"]
 
 	// create tag
@@ -45,9 +44,10 @@ func (action TagCreateStruct) Execute(ctx api.ActionExecutionContext) {
 
 	// push tag
 	command.RunCommand(`git push origin `+tagName, ctx.Env, ctx.ProjectDir)
+
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(TagCreateStruct{})
 }

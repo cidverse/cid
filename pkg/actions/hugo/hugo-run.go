@@ -5,10 +5,9 @@ import (
 	"github.com/cidverse/cid/pkg/common/command"
 )
 
-// Action implementation
 type RunActionStruct struct{}
 
-// GetDetails returns information about this action
+// GetDetails retrieves information about the action
 func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "run",
@@ -18,17 +17,18 @@ func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Act
 	}
 }
 
-// Check if this package can handle the current environment
+// Check evaluates if the action should be executed or not
 func (action RunActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectHugoProject(ctx.ProjectDir)
 }
 
-// Check if this package can handle the current environment
-func (action RunActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action RunActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	_ = command.RunOptionalCommand(`hugo server --minify --gc --log --verboseLog --baseUrl "/" --watch --source `+ctx.ProjectDir+``, ctx.Env, ctx.ProjectDir)
+
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(RunActionStruct{})
 }

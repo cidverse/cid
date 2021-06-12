@@ -5,10 +5,9 @@ import (
 	"github.com/cidverse/cid/pkg/common/command"
 )
 
-// Action implementation
 type BuildActionStruct struct{}
 
-// GetDetails returns information about this action
+// GetDetails retrieves information about the action
 func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "build",
@@ -18,13 +17,13 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 	}
 }
 
-// Check will evaluate if this action can be executed for the specified project
+// Check evaluates if the action should be executed or not
 func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectPythonProject(ctx.ProjectDir)
 }
 
-// Execute will run the action
-func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	buildSystem := DetectPythonBuildSystem(ctx.ProjectDir)
 	if buildSystem == "requirements.txt" {
 		command.RunCommand(`pip install -r requirements.txt`, ctx.Env, ctx.ProjectDir)
@@ -33,9 +32,10 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
 	} else if buildSystem == "setup.py" {
 		command.RunCommand(`pip install `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
 	}
+
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(BuildActionStruct{})
 }

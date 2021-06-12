@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-// Action implementation
 type BuildActionStruct struct{}
 
 // GetDetails returns information about this action
@@ -23,13 +22,13 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 	}
 }
 
-// Check if this package can handle the current environment
+// Check evaluates if the action should be executed or not
 func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectJavaProject(ctx.ProjectDir)
 }
 
-// Check if this package can handle the current environment
-func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// get release version
 	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
 
@@ -52,9 +51,10 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
 			log.Fatal().Err(moveErr).Msg("failed to move artifacts into artifact dir")
 		}
 	}
+
+	return nil
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(BuildActionStruct{})
 }

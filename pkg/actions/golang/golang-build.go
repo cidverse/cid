@@ -1,14 +1,15 @@
 package golang
 
 import (
+	"errors"
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 	"runtime"
 )
 
 type BuildActionStruct struct{}
 
+// GetDetails retrieves information about the action
 func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:            "build",
@@ -19,16 +20,17 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 	}
 }
 
+// Check evaluates if the action should be executed or not
 func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectGolangProject(ctx.ProjectDir)
 }
 
-func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	var config Config
 	configParseErr := yaml.Unmarshal([]byte(ctx.Config), &config)
 	if configParseErr != nil {
-		log.Error().Err(configParseErr).Str("action", "golang-build").Msg("failed to parse action configuration")
-		return
+		return errors.New("failed to parse action configuration")
 	}
 
 	// run build
@@ -39,6 +41,8 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext) {
 	} else {
 		CrossCompile(ctx, runtime.GOOS, runtime.GOARCH)
 	}
+
+	return nil
 }
 
 func init() {

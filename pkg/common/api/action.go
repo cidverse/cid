@@ -11,13 +11,17 @@ type ActionDetails struct {
 	ToolDependencies map[string]string
 }
 
-// Normalizer is a common interface to work with all normalizers
+// ActionStep is the interface that needs to be implemented by all builtin actions
 type ActionStep interface {
+	// GetDetails retrieves information about the action
 	GetDetails(ctx ActionExecutionContext) ActionDetails
+	// Check evaluates if the action should be executed or not
 	Check(ctx ActionExecutionContext) bool
-	Execute(ctx ActionExecutionContext)
+	// Execute runs the action
+	Execute(ctx ActionExecutionContext, state *ActionStateContext) error
 }
 
+// ActionExecutionContext holds runtime information for the actions
 type ActionExecutionContext struct {
 	// Paths holds the path configuration
 	Paths config.PathConfig
@@ -39,6 +43,10 @@ type ActionExecutionContext struct {
 
 	// MachineEnv contains the full environment
 	MachineEnv map[string]string
+}
+
+// ActionStateContext holds state information about executed actions / results (ie. generated artifacts)
+type ActionStateContext struct {
 }
 
 var BuiltinActions = make(map[string]ActionStep)

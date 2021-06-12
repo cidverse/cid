@@ -7,6 +7,7 @@ import (
 
 type TestActionStruct struct{}
 
+// GetDetails retrieves information about the action
 func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:            "test",
@@ -17,12 +18,16 @@ func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Ac
 	}
 }
 
+// Check evaluates if the action should be executed or not
 func (action TestActionStruct) Check(ctx api.ActionExecutionContext) bool {
 	return DetectGolangProject(ctx.ProjectDir)
 }
 
-func (action TestActionStruct) Execute(ctx api.ActionExecutionContext) {
+// Execute runs the action
+func (action TestActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	command.RunCommand(`go test -cover ./...`, ctx.Env, ctx.ProjectDir)
+
+	return nil
 }
 
 func init() {

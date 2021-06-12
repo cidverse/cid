@@ -6,10 +6,9 @@ import (
 	"strings"
 )
 
-// Action implementation
 type ScanStruct struct{}
 
-// GetDetails returns information about this action
+// GetDetails retrieves information about the action
 func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Stage:     "sast",
@@ -19,7 +18,7 @@ func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDe
 	}
 }
 
-// Check if this package can handle the current environment
+// Check evaluates if the action should be executed or not
 func (action ScanStruct) Check(ctx api.ActionExecutionContext) bool {
 	enabled := len(ctx.MachineEnv[SONAR_HOST_URL]) > 0
 	if enabled {
@@ -33,12 +32,11 @@ func (action ScanStruct) Check(ctx api.ActionExecutionContext) bool {
 	return enabled
 }
 
-// Check if this package can handle the current environment
-func (action ScanStruct) Execute(ctx api.ActionExecutionContext) {
-	_ = command.RunOptionalCommand(`sonar-scanner -v`, ctx.Env, ctx.ProjectDir)
+// Execute runs the action
+func (action ScanStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+	return command.RunOptionalCommand(`sonar-scanner -v`, ctx.Env, ctx.ProjectDir)
 }
 
-// init registers this action
 func init() {
 	api.RegisterBuiltinAction(ScanStruct{})
 }
