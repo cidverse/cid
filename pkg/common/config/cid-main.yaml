@@ -58,13 +58,16 @@ actions:
     - name: hugo-build
       type: builtin
   test:
+    # test execution
     - name: golang-test
       type: builtin
     - name: java-test
       type: builtin
   package:
+    # optimization
     - name: upx-optimize
       type: builtin
+    # package
     - name: container-package
       type: builtin
   sast:
@@ -74,6 +77,8 @@ actions:
     - name: python-lint
       type: builtin
     # scanners
+    - name: fossa-scan
+      type: builtin
     - name: gitleaks-scan
       type: builtin
     - name: gitguardian-scan
@@ -198,6 +203,10 @@ tools:
     env-allowed-suffix: ["_X64"]
     env-path-dir: /bin
     version: 8.0.0
+  # docker
+  - executable: docker
+    env-name: PATH
+    version: 0.0.0
   # git
   - executable: git
     env-name: PATH
@@ -305,3 +314,7 @@ container-images:
     cache:
       - id: twitchcli-config
         dir: /root/.twitch-cli
+  # fossa
+  - executable: fossa
+    image: ghcr.io/cidverse/fossacli:2.7.2
+    version: 2.7.2

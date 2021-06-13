@@ -3,6 +3,7 @@ package app
 import (
 	_ "github.com/cidverse/cid/pkg/actions/changelog"
 	_ "github.com/cidverse/cid/pkg/actions/container"
+	_ "github.com/cidverse/cid/pkg/actions/fossa"
 	_ "github.com/cidverse/cid/pkg/actions/gitguardian"
 	_ "github.com/cidverse/cid/pkg/actions/gitleaks"
 	"github.com/cidverse/cid/pkg/actions/golang"
