@@ -9,14 +9,14 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20210512092938-c05353c2d58c // indirect
 	github.com/cavaliercoder/grab v2.0.0+incompatible
 	github.com/cidverse/cidverseutils v0.0.0-20210612162737-6c1f1a44102c
-	github.com/cidverse/normalizeci v1.0.1-0.20210612155227-8e54ef939a5c
+	github.com/cidverse/normalizeci v1.0.1-0.20210613215119-4137dc712560
 	github.com/go-git/go-git/v5 v5.4.2 // indirect
 	github.com/google/cel-go v0.7.3
 	github.com/jinzhu/configor v1.2.1
 	github.com/kevinburke/ssh_config v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.8
 	github.com/oriser/regroup v0.0.0-20201024192559-010c434ff8f3
-	github.com/rs/zerolog v1.22.0
+	github.com/rs/zerolog v1.23.0
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
 	github.com/sirupsen/logrus v1.8.1 // indirect

@@ -5,6 +5,8 @@ import (
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
+	"path/filepath"
+	"strings"
 )
 
 type PackageActionStruct struct{}
@@ -21,12 +23,16 @@ func (action PackageActionStruct) GetDetails(ctx api.ActionExecutionContext) api
 
 // Check evaluates if the action should be executed or not
 func (action PackageActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return len(DetectAppType(ctx)) > 0
+	return filesystem.FileExists(filepath.Join(ctx.ProjectDir, "Dockerfile")) || len(DetectAppType(ctx)) > 0
 }
 
 // Execute runs the action
 func (action PackageActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
-	dockerfile := ctx.ProjectDir + `/Dockerfile`
+	dockerfile := filepath.Join(ctx.ProjectDir, "Dockerfile")
+	image := getFullImage(ctx.Env["NCI_CONTAINERREGISTRY_HOST"], ctx.Env["NCI_CONTAINERREGISTRY_REPOSITORY"], ctx.Env["NCI_CONTAINERREGISTRY_TAG"])
+	createdTmpDockerfile := false
+
+	log.Info().Str("image", image).Msg("building container image")
 
 	// auto detect a usable dockerfile
 	appType := DetectAppType(ctx)
@@ -40,13 +46,29 @@ func (action PackageActionStruct) Execute(ctx api.ActionExecutionContext, state 
 		if createFileErr != nil {
 			log.Fatal().Str("file", dockerfile).Msg("failed to create temporary dockerfile")
 		}
+		createdTmpDockerfile = true
 	}
 
-	// run build
-	command.RunCommand(`docker build --no-cache -t `+ctx.Env["NCI_CONTAINERREGISTRY_REPOSITORY"]+":"+ctx.Env["NCI_COMMIT_REF_RELEASE"]+` `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
+	// build args
+	var buildArgs []string
+	buildArgs = append(buildArgs, `docker build --no-cache`)
+	buildArgs = append(buildArgs, `--label "org.opencontainers.image.source=`+strings.TrimSuffix(ctx.Env["NCI_REPOSITORY_REMOTE"], ".git")+`"`)
+	buildArgs = append(buildArgs, `-t ` + image)
+	buildArgs = append(buildArgs, ctx.ProjectDir)
+
+	// build image
+	command.RunCommand(strings.Join(buildArgs, " "), ctx.Env, ctx.ProjectDir)
+
+	// publish image
+	if len(ctx.Env["NCI_CONTAINERREGISTRY_HOST"]) > 0 {
+		command.RunCommand("docker push "+image, ctx.Env, ctx.ProjectDir)
+	}
 
 	// remove dockerfile
-	_ = filesystem.RemoveFile(dockerfile)
+	if createdTmpDockerfile {
+		_ = filesystem.RemoveFile(dockerfile)
+	}
+
 	return nil
 }
 
