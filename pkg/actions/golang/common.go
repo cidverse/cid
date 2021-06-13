@@ -59,5 +59,5 @@ func CrossCompile(ctx api.ActionExecutionContext, goos string, goarch string) {
 	compileEnv["GOOS"] = goos
 	compileEnv["GOARCH"] = goarch
 
-	command.RunCommand(`go build -o `+ctx.ProjectDir+`/`+ctx.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+compileEnv["NCI_COMMIT_REF_RELEASE"]+` -X main.CommitHash=`+compileEnv["NCI_COMMIT_SHA_SHORT"]+` -X main.BuildAt=`+buildAt+`" .`, compileEnv, ctx.ProjectDir)
+	command.RunCommand(`go build -o `+ctx.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+compileEnv["NCI_COMMIT_REF_RELEASE"]+` -X main.CommitHash=`+compileEnv["NCI_COMMIT_SHA_SHORT"]+` -X main.BuildAt=`+buildAt+`" .`, compileEnv, ctx.ProjectDir)
 }

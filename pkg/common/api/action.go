@@ -54,6 +54,12 @@ type ActionStateContext struct {
 	Version int `json:"version"`
 }
 
+// CoverageReport contains a generic coverage report
+type CoverageReport struct {
+	Language string
+	Percent float64
+}
+
 var BuiltinActions = make(map[string]ActionStep)
 
 // RegisterBuiltinAction registers a builtin action

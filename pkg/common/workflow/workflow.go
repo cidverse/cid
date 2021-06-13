@@ -89,7 +89,11 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env map[st
 
 	// action context
 	ctx := api.ActionExecutionContext{
-		Paths:           config.Config.Paths,
+		Paths: config.PathConfig{
+			Artifact: filepath.Join(projectDirectory, "dist"),
+			Temp:     filepath.Join(projectDirectory, "tmp"),
+			Cache:    "",
+		},
 		ProjectDir:      projectDirectory,
 		WorkDir:         filesystem.GetWorkingDirectory(),
 		Config:          string(configAsYaml),
@@ -99,8 +103,16 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env map[st
 		Parallelization: DefaultParallelization,
 	}
 
+	// ensure that paths exist
+	if !filesystem.DirectoryExists(ctx.Paths.Artifact) {
+		filesystem.CreateDirectory(ctx.Paths.Artifact)
+	}
+	if !filesystem.DirectoryExists(ctx.Paths.Temp) {
+		filesystem.CreateDirectory(ctx.Paths.Temp)
+	}
+
 	// state: retrieve/init
-	stateFile := filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "state.json")
+	stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
 	state := api.ActionStateContext{
 		Version: 1,
 	}

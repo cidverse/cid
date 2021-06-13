@@ -5,6 +5,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/rs/zerolog/log"
+	"path/filepath"
 )
 
 type TestActionStruct struct{}
@@ -27,17 +28,22 @@ func (action TestActionStruct) Check(ctx api.ActionExecutionContext) bool {
 
 // Execute runs the action
 func (action TestActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
-	log.Info().Msg("running go unit tests")
-	testResult := command.RunOptionalCommand(`go test -cover ./...`, ctx.Env, ctx.ProjectDir)
+	coverageFile := filepath.Join(ctx.Paths.Temp, "coverage.txt")
+	testResult := command.RunOptionalCommand(`go test -cover -race -vet off -coverprofile "`+coverageFile+`" ./...`, ctx.Env, ctx.ProjectDir)
 	if testResult != nil {
 		return errors.New("go unit tests failed. Cause: " + testResult.Error())
 	}
 
-	log.Info().Msg("running go race condition detector")
-	testResult = command.RunOptionalCommand(`go test -race -vet off ./...`, ctx.Env, ctx.ProjectDir)
-	if testResult != nil {
-		return errors.New("go race tests failed. Cause: " + testResult.Error())
+	// get report
+	covOut, covOutErr := command.RunSystemCommand("go", "tool cover -func tmp/coverage.txt", ctx.Env, ctx.WorkDir)
+	if covOutErr != nil {
+		return errors.New("failed to retrieve go coverage report. Cause: " + covOutErr.Error())
 	}
+
+	// parse report
+	report := ParseCoverageProfile(covOut)
+
+	log.Info().Float64("coverage", report.Percent).Msg("calculated final code coverage")
 
 	return nil
 }

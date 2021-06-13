@@ -68,7 +68,7 @@ func (action ChangelogGenerateStruct) Execute(ctx api.ActionExecutionContext, st
 		}
 
 		// save into tmp file
-		targetPath := filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "changelog")
+		targetPath := filepath.Join(ctx.Paths.Artifact, "changelog")
 		targetFile := filepath.Join(targetPath, templateFile)
 		filesystem.CreateDirectory(targetPath)
 		_ = filesystem.RemoveFile(targetFile)
