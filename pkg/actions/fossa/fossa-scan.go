@@ -19,7 +19,7 @@ func (action ScanActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Ac
 
 // Check evaluates if the action should be executed or not
 func (action ScanActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return false
+	return len(ctx.MachineEnv["FOSSA_API_KEY"]) > 0
 }
 
 // Execute runs the action
@@ -28,7 +28,7 @@ func (action ScanActionStruct) Execute(ctx api.ActionExecutionContext, state *ap
 	ctx.Env["FOSSA_API_KEY"] = ctx.MachineEnv["FOSSA_API_KEY"]
 
 	// command
-	_ = command.RunOptionalCommand("fossa analyze", ctx.Env, ctx.WorkDir)
+	_ = command.RunOptionalCommand("fossa analyze -o", ctx.Env, ctx.WorkDir)
 
 	return nil
 }
