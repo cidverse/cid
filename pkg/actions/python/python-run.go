@@ -27,7 +27,7 @@ func (action RunActionStruct) Check(ctx api.ActionExecutionContext) bool {
 
 // Execute runs the action
 func (action RunActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
-	files, filesErr := filesystem.FindFilesInDirectory(ctx.ProjectDir, `.py`)
+	files, filesErr := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".py"})
 	if filesErr != nil {
 		log.Fatal().Err(filesErr).Str("path", ctx.ProjectDir).Msg("failed to list files")
 	}

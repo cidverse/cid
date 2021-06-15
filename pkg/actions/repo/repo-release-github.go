@@ -62,10 +62,8 @@ func (action AssetPublishGitHubStruct) Execute(ctx api.ActionExecutionContext, s
 
 	// upload artifacts
 	if filesystem.DirectoryExists(filepath.Join(ctx.ProjectDir, "dist", "bin")) {
-		files, filesErr := filesystem.FindFilesInDirectory(filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "bin"), "")
-		if filesErr != nil {
-			// err
-		} else {
+		files, filesErr := filesystem.FindFilesByExtension(filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "bin"), nil)
+		if filesErr == nil {
 			if len(files) > 0 {
 				for _, file := range files {
 					if filesystem.FileExists(file) {

@@ -40,7 +40,7 @@ func (action RunActionStruct) Execute(ctx api.ActionExecutionContext, state *api
 		log.Fatal().Msg("can't detect build system")
 	}
 
-	files, filesErr := filesystem.FindFilesInDirectory(ctx.ProjectDir+`/build/libs`, `.jar`)
+	files, filesErr := filesystem.FindFilesByExtension(ctx.ProjectDir+`/build/libs`, []string{".jar"})
 	if filesErr != nil {
 		log.Fatal().Err(filesErr).Str("path", ctx.ProjectDir+`/build/libs`).Msg("failed to list files")
 	}

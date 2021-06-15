@@ -76,6 +76,8 @@ github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5P
 github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
 github.com/cidverse/cidverseutils v0.0.0-20210612162737-6c1f1a44102c h1:4/8NvyywlCOuRGGveJrHSERu2rqE4iZaTKM+PjBXG60=
 github.com/cidverse/cidverseutils v0.0.0-20210612162737-6c1f1a44102c/go.mod h1:Wfcbyfo6NOFqQxBNevyK4vsJ70KAIXM+ELRThcUQFJQ=
+github.com/cidverse/cidverseutils v0.0.0-20210614222439-562618314556 h1:HHBwBoIpGmBu0K4MNXx9FdRM3D2JH9IRCxL0ZXCIvPo=
+github.com/cidverse/cidverseutils v0.0.0-20210614222439-562618314556/go.mod h1:Wfcbyfo6NOFqQxBNevyK4vsJ70KAIXM+ELRThcUQFJQ=
 github.com/cidverse/normalizeci v1.0.1-0.20210612155227-8e54ef939a5c h1:tgrS7ZJR04dvtTkbMrI7hYj8xTjntWuhb7wE0tDHC8E=
 github.com/cidverse/normalizeci v1.0.1-0.20210612155227-8e54ef939a5c/go.mod h1:gGdJAAwRfY+ece8UzNa3Y3QoqjmWGn/jvRbqgzq26o4=
 github.com/cidverse/normalizeci v1.0.1-0.20210613215119-4137dc712560 h1:Ygxg5zKOg/Uv61SlUvLZdymvm8zJoO46CYdpWuSPamM=

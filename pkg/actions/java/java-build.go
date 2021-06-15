@@ -44,7 +44,7 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 	}
 
 	// find artifacts
-	files, _ := filesystem.FindFilesInDirectory(ctx.ProjectDir, `.jar`)
+	files, _ := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".jar"})
 	for _, file := range files {
 		if strings.Contains(file, "build"+string(os.PathSeparator)+"libs") && IsJarExecutable(file) {
 			moveErr := filesystem.MoveFile(files[0], ctx.ProjectDir+`/dist/`+filepath.Base(files[0]))

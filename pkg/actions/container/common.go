@@ -13,7 +13,7 @@ var DockerfileFS embed.FS
 // DetectAppType checks what kind of app the project is (via artifacts, should run after build actions)
 func DetectAppType(ctx api.ActionExecutionContext) string {
 	// java | jar
-	files, filesErr := filesystem.FindFilesInDirectory(filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact), ".jar")
+	files, filesErr := filesystem.FindFilesByExtension(filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact), []string{".jar"})
 	if filesErr != nil {
 		return ""
 	}

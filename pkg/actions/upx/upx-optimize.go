@@ -28,7 +28,7 @@ func (action OptimizeActionStruct) Check(ctx api.ActionExecutionContext) bool {
 
 // Execute runs the action
 func (action OptimizeActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
-	files, filesErr := filesystem.FindFilesInDirectory(filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "bin"), "")
+	files, filesErr := filesystem.FindFilesByExtension(filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "bin"), nil)
 	if filesErr != nil {
 		return filesErr
 	}
