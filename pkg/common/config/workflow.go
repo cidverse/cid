@@ -1,5 +1,7 @@
 package config
 
+import "github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+
 type WorkflowStage struct {
 	Name    string
 	Rules   []WorkflowRule
@@ -7,9 +9,17 @@ type WorkflowStage struct {
 }
 
 type WorkflowAction struct {
-	Name   string      `required:"true"`
-	Type   string      `default:"builtin"`
+	// Name of the action
+	Name string `required:"true"`
+
+	// Type of the action, does determinate how a action is executed
+	Type string `default:"builtin"`
+
+	// Config holds custom configuration options for this action
 	Config interface{} `yaml:"config,omitempty"`
+
+	// Module is the module being build, this is set automatically
+	Module *analyzerapi.ProjectModule
 }
 
 type WorkflowRule struct {

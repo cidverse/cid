@@ -22,6 +22,9 @@ type ProjectModule struct {
 	// Name stores the module name
 	Name string
 
+	// Slug contains a url/folder name compatible name of the module
+	Slug string
+
 	// BuildSystem used in this project
 	BuildSystem ProjectBuildSystem
 
@@ -41,18 +44,18 @@ type ProjectModule struct {
 type ProjectLanguage string
 
 const (
-	Golang     ProjectLanguage = "go"
-	Java       ProjectLanguage = "java"
-	Javascript ProjectLanguage = "javascript"
-	Typescript ProjectLanguage = "typescript"
+	LanguageGolang     ProjectLanguage = "go"
+	LanguageJava       ProjectLanguage = "java"
+	LanguageJavascript ProjectLanguage = "javascript"
+	LanguageTypescript ProjectLanguage = "typescript"
 )
 
 type ProjectBuildSystem string
 
 const (
-	Gradle ProjectBuildSystem = "gradle"
-	GoMod  ProjectBuildSystem = "gomod"
-	Npm    ProjectBuildSystem = "npm"
+	BuildSystemGradle ProjectBuildSystem = "gradle"
+	BuildSystemGoMod  ProjectBuildSystem = "gomod"
+	BuildSystemNpm    ProjectBuildSystem = "npm"
 )
 
 type ProjectBuildSystemSyntax string

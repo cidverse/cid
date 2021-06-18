@@ -11,17 +11,17 @@ import (
 
 var analyticCache = make(map[string][]*analyzerapi.ProjectModule)
 
-func AnalyzeProject(projectDir string) []*analyzerapi.ProjectModule {
+// AnalyzeProject will analyze a project and return all modules in path
+func AnalyzeProject(projectDir string, path string) []*analyzerapi.ProjectModule {
 	if funk.Contains(analyticCache, projectDir) {
 		return analyticCache[projectDir]
 	}
 
 	var result []*analyzerapi.ProjectModule
-
 	for _, a := range analyzerapi.Analyzers {
 		modules := a.Analyze(projectDir)
 		for _, module := range modules {
-			if !strings.Contains(module.Directory, "testdata") {
+			if strings.HasPrefix(module.Directory, path) && !strings.Contains(module.Directory, "testdata") {
 				result = append(result, module)
 			}
 		}

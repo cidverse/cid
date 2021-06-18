@@ -3,6 +3,7 @@ package gradle
 import (
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/gosimple/slug"
 	"path/filepath"
 	"sort"
 )
@@ -36,7 +37,7 @@ func (a Analyzer) Analyze(projectDir string) []*analyzerapi.ProjectModule {
 
 			// language
 			language := make(map[analyzerapi.ProjectLanguage]*string)
-			language[analyzerapi.Java] = nil
+			language[analyzerapi.LanguageJava] = nil
 
 			// deps
 			var dependencies []analyzerapi.ProjectDependency
@@ -46,8 +47,9 @@ func (a Analyzer) Analyze(projectDir string) []*analyzerapi.ProjectModule {
 				RootDirectory:     projectDir,
 				Directory:         filepath.Dir(file),
 				Name:              filepath.Base(filepath.Dir(file)),
+				Slug:              slug.Make(filepath.Base(filepath.Dir(file))),
 				Discovery:         "file~" + file,
-				BuildSystem:       analyzerapi.Gradle,
+				BuildSystem:       analyzerapi.BuildSystemGradle,
 				BuildSystemSyntax: &buildSystemSyntax,
 				Language:          language,
 				Dependencies:      dependencies,

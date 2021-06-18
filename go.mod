@@ -12,6 +12,7 @@ require (
 	github.com/cidverse/normalizeci v1.0.1-0.20210613215119-4137dc712560
 	github.com/go-git/go-git/v5 v5.4.2 // indirect
 	github.com/google/cel-go v0.7.3
+	github.com/gosimple/slug v1.9.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/kevinburke/ssh_config v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.8

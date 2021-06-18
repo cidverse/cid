@@ -43,7 +43,6 @@ func GetDependencies(projectDir string) map[string]string {
 
 func CrossCompile(ctx api.ActionExecutionContext, goos string, goarch string) {
 	buildAt := time.Now().UTC().Format(time.RFC3339)
-	log.Info().Str("goos", goos).Str("goarch", goarch).Msg("running go build")
 
 	fileExt := ""
 	if goos == "windows" {
@@ -59,5 +58,5 @@ func CrossCompile(ctx api.ActionExecutionContext, goos string, goarch string) {
 	compileEnv["GOOS"] = goos
 	compileEnv["GOARCH"] = goarch
 
-	command.RunCommand(`go build -o `+ctx.Paths.Artifact+`/bin/`+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+compileEnv["NCI_COMMIT_REF_RELEASE"]+` -X main.CommitHash=`+compileEnv["NCI_COMMIT_SHA_SHORT"]+` -X main.BuildAt=`+buildAt+`" .`, compileEnv, ctx.ProjectDir)
+	command.RunCommand(`go build -o `+api.GetArtifactDir(ctx)+"/"+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+compileEnv["NCI_COMMIT_REF_RELEASE"]+` -X main.CommitHash=`+compileEnv["NCI_COMMIT_SHA_SHORT"]+` -X main.BuildAt=`+buildAt+`" .`, compileEnv, ctx.CurrentModule.Directory)
 }

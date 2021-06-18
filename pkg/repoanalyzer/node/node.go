@@ -3,6 +3,7 @@ package node
 import (
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/gosimple/slug"
 	"github.com/thoas/go-funk"
 	"path/filepath"
 	"sort"
@@ -36,19 +37,19 @@ func (a Analyzer) Analyze(projectDir string) []*analyzerapi.ProjectModule {
 
 				// language
 				language := make(map[analyzerapi.ProjectLanguage]*string)
-				language[analyzerapi.Javascript] = nil
+				language[analyzerapi.LanguageJavascript] = nil
 
 				// - typescript?
 				if funk.Contains(packageData.Dependencies, "typescript") {
 					// semver.MustParse(packageData.Dependencies["typescript"])
-					language[analyzerapi.Typescript] = nil
+					language[analyzerapi.LanguageTypescript] = nil
 				}
 
 				// deps
 				var dependencies []analyzerapi.ProjectDependency
 				for key, value := range packageData.Dependencies {
 					dep := analyzerapi.ProjectDependency{
-						Type:    string(analyzerapi.Npm),
+						Type:    string(analyzerapi.BuildSystemNpm),
 						Id:      key,
 						Version: value,
 					}
@@ -60,8 +61,9 @@ func (a Analyzer) Analyze(projectDir string) []*analyzerapi.ProjectModule {
 					RootDirectory:     projectDir,
 					Directory:         filepath.Dir(file),
 					Name:              packageData.Name,
+					Slug:              slug.Make(packageData.Name),
 					Discovery:         "file~" + file,
-					BuildSystem:       analyzerapi.Npm,
+					BuildSystem:       analyzerapi.BuildSystemNpm,
 					BuildSystemSyntax: nil,
 					Language:          language,
 					Dependencies:      dependencies,

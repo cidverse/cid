@@ -4,6 +4,7 @@ import (
 	"github.com/Masterminds/semver/v3"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/gosimple/slug"
 	"golang.org/x/mod/modfile"
 	"path/filepath"
 	"sort"
@@ -41,13 +42,13 @@ func (a Analyzer) Analyze(projectDir string) []*analyzerapi.ProjectModule {
 				// language
 				language := make(map[analyzerapi.ProjectLanguage]*string)
 				goversion := semver.MustParse(goMod.Go.Version).String()
-				language[analyzerapi.Golang] = &goversion
+				language[analyzerapi.LanguageGolang] = &goversion
 
 				// deps
 				var dependencies []analyzerapi.ProjectDependency
 				for _, req := range goMod.Require {
 					dep := analyzerapi.ProjectDependency{
-						Type:    string(analyzerapi.GoMod),
+						Type:    string(analyzerapi.BuildSystemGoMod),
 						Id:      req.Mod.Path,
 						Version: req.Mod.Version,
 					}
@@ -59,8 +60,9 @@ func (a Analyzer) Analyze(projectDir string) []*analyzerapi.ProjectModule {
 					RootDirectory:     projectDir,
 					Directory:         filepath.Dir(file),
 					Name:              goMod.Module.Mod.Path,
+					Slug:              slug.Make(goMod.Module.Mod.Path),
 					Discovery:         "file~" + file,
-					BuildSystem:       analyzerapi.GoMod,
+					BuildSystem:       analyzerapi.BuildSystemGoMod,
 					BuildSystemSyntax: nil,
 					Language:          language,
 					Dependencies:      dependencies,

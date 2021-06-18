@@ -7,6 +7,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/config"
 	"github.com/cidverse/cid/pkg/repoanalyzer"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/common"
 	"github.com/google/cel-go/cel"
@@ -20,36 +21,40 @@ import (
 
 const DefaultParallelization = 10
 
-// DiscoverExecutionPlan will generate a automatic execution plan based on the project contents
-func DiscoverExecutionPlan(projectDir string, env map[string]string) []config.WorkflowStage {
+// GetExecutionPlan will generate a automatic execution plan based on the project contents
+func GetExecutionPlan(projectDir string, workDir string, env map[string]string, stages []config.WorkflowStage) []config.WorkflowStage {
 	var executionPlan []config.WorkflowStage
 
-	// context
-	ctx := api.ActionExecutionContext{
-		Paths:           config.Config.Paths,
-		ProjectDir:      projectDir,
-		WorkDir:         filesystem.GetWorkingDirectory(),
-		Config:          "",
-		Args:            nil,
-		Env:             env,
-		MachineEnv:      common.GetMachineEnvironment(),
-		Parallelization: DefaultParallelization,
-		Modules:         repoanalyzer.AnalyzeProject(projectDir),
+	if stages == nil {
+		stages = FindWorkflowStages(projectDir, env)
 	}
 
+	// context
+	ctx := GetActionContext(projectDir, env, nil)
+
 	// iterate over all stages
-	for _, stage := range FindWorkflowStages(projectDir, env) {
+	for _, stage := range stages {
 		var stageActions []config.WorkflowAction
 
-		// iterate over all actions
-		for _, action := range FindWorkflowStageActions(projectDir, env, stage.Name) {
-			// check action activation criteria
-			if action.Type == "builtin" {
-				if api.BuiltinActions[action.Name].Check(ctx) {
-					stageActions = append(stageActions, action)
+		// for each module
+		for _, module := range ctx.Modules {
+			// customize context
+			ctx.CurrentModule = module
+
+			// iterate over all actions
+			defaultStageActions := FindWorkflowStageActions(stage.Name, ctx)
+			for _, action := range defaultStageActions {
+				currentAction := action
+
+				// check action activation criteria
+				if currentAction.Type == "builtin" {
+					if api.BuiltinActions[currentAction.Name].Check(ctx) {
+						currentAction.Module = module
+						stageActions = append(stageActions, currentAction)
+					}
+				} else {
+					log.Fatal().Str("action", action.Type+"/"+action.Name).Msg("unsupported action type")
 				}
-			} else {
-				log.Fatal().Str("action", action.Type+"/"+action.Name).Msg("unsupported action type")
 			}
 		}
 
@@ -62,49 +67,46 @@ func DiscoverExecutionPlan(projectDir string, env map[string]string) []config.Wo
 	return executionPlan
 }
 
+func GetExecutionPlanStage(projectDir string, workDir string, env map[string]string, stageName string) *config.WorkflowStage {
+	executionPlan := GetExecutionPlan(projectDir, workDir, env, []config.WorkflowStage{{Name: stageName}})
+
+	if len(executionPlan) == 1 {
+		return &executionPlan[0]
+	}
+	return nil
+}
+
 // RunStageActions runs all actions of a stage
-func RunStageActions(stage string, projectDirectory string, env map[string]string, args []string) {
+func RunStageActions(stageName string, projectDir string, workDir string, env map[string]string, args []string) {
 	start := time.Now()
-	log.Info().Str("stage", stage).Msg("running stage")
+	log.Info().Str("stage", stageName).Msg("running stage")
 
 	// find stage actions
-	actions := FindWorkflowStageActions(projectDirectory, env, stage)
-	if len(actions) == 0 {
-		log.Warn().Str("stage", stage).Msg("no actions available for current stage")
+	stage := GetExecutionPlanStage(projectDir, workDir, env, stageName)
+
+	if len(stage.Actions) == 0 {
+		log.Warn().Str("stage", stageName).Msg("no actions available for current stage")
 		return
 	}
-	for _, action := range actions {
-		RunAction(action, projectDirectory, env, args)
+	for _, action := range stage.Actions {
+		RunAction(action, projectDir, env, args)
 	}
 
-	log.Info().Str("stage", stage).Str("duration", time.Since(start).String()).Msg("stage completed")
+	log.Info().Str("stage", stageName).Str("duration", time.Since(start).String()).Msg("stage completed")
 }
 
 // RunAction runs a specific workflow action
 func RunAction(action config.WorkflowAction, projectDir string, env map[string]string, args []string) {
 	start := time.Now()
-	log.Info().Str("action", action.Type+"/"+action.Name).Msg("running action")
 
 	// serialize action config for passthru
 	configAsYaml, _ := yaml.Marshal(&action.Config)
 	log.Debug().Str("config", string(configAsYaml)).Msg("action specific config")
 
 	// action context
-	ctx := api.ActionExecutionContext{
-		Paths: config.PathConfig{
-			Artifact: filepath.Join(projectDir, "dist"),
-			Temp:     filepath.Join(projectDir, "tmp"),
-			Cache:    "",
-		},
-		ProjectDir:      projectDir,
-		WorkDir:         filesystem.GetWorkingDirectory(),
-		Config:          string(configAsYaml),
-		Args:            args,
-		Env:             env,
-		MachineEnv:      common.GetMachineEnvironment(),
-		Parallelization: DefaultParallelization,
-		Modules:         repoanalyzer.AnalyzeProject(projectDir),
-	}
+	ctx := GetActionContext(projectDir, env, action.Module)
+	ctx.Config = string(configAsYaml)
+	log.Info().Str("action", action.Type+"/"+action.Name).Str("module", ctx.CurrentModule.Slug).Msg("running action")
 
 	// ensure that paths exist
 	if !filesystem.DirectoryExists(ctx.Paths.Artifact) {
@@ -118,6 +120,7 @@ func RunAction(action config.WorkflowAction, projectDir string, env map[string]s
 	stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
 	state := api.ActionStateContext{
 		Version: 1,
+		Modules: ctx.Modules,
 	}
 	if filesystem.FileExists(stateFile) {
 		stateContent, stateContentErr := filesystem.GetFileContent(stateFile)
@@ -171,17 +174,7 @@ func GetActionDetails(action config.WorkflowAction, projectDir string, env map[s
 		builtinAction := api.BuiltinActions[action.Name]
 		if builtinAction != nil {
 			// context
-			ctx := api.ActionExecutionContext{
-				Paths:           config.Config.Paths,
-				ProjectDir:      projectDir,
-				WorkDir:         filesystem.GetWorkingDirectory(),
-				Config:          string(configAsYaml),
-				Args:            nil,
-				Env:             env,
-				MachineEnv:      common.GetMachineEnvironment(),
-				Parallelization: DefaultParallelization,
-				Modules:         repoanalyzer.AnalyzeProject(projectDir),
-			}
+			ctx := GetActionContext(projectDir, env, action.Module)
 
 			// run action
 			return builtinAction.GetDetails(ctx)
@@ -261,27 +254,14 @@ func FindWorkflowStages(projectDir string, env map[string]string) []config.Workf
 	return activeStages
 }
 
-func FindWorkflowStageActions(projectDir string, env map[string]string, stage string) []config.WorkflowAction {
+func FindWorkflowStageActions(stage string, ctx api.ActionExecutionContext) []config.WorkflowAction {
 	var activeActions []config.WorkflowAction
 
 	for _, action := range config.Config.Actions[stage] {
-
 		if action.Type == "builtin" {
 			// actionType: builtin
 			builtinAction := api.BuiltinActions[action.Name]
 			if builtinAction != nil {
-				// context
-				ctx := api.ActionExecutionContext{
-					Paths:      config.Config.Paths,
-					ProjectDir: projectDir,
-					WorkDir:    filesystem.GetWorkingDirectory(),
-					Config:     "",
-					Args:       nil,
-					Env:        env,
-					MachineEnv: common.GetMachineEnvironment(),
-					Modules:    repoanalyzer.AnalyzeProject(projectDir),
-				}
-
 				// add
 				if builtinAction.Check(ctx) {
 					activeActions = append(activeActions, action)
@@ -308,4 +288,24 @@ func FindWorkflowAction(search string) (config.WorkflowAction, error) {
 	}
 
 	return config.WorkflowAction{}, errors.New("no action found with query " + search)
+}
+
+// GetActionContext gets the action context, this operation is expensive and should only be called once per execution
+func GetActionContext(projectDir string, env map[string]string, currentModule *analyzerapi.ProjectModule) api.ActionExecutionContext {
+	return api.ActionExecutionContext{
+		Paths: config.PathConfig{
+			Artifact: filepath.Join(projectDir, "dist"),
+			Temp:     filepath.Join(projectDir, "tmp"),
+			Cache:    "",
+		},
+		ProjectDir:      projectDir,
+		WorkDir:         filesystem.GetWorkingDirectory(),
+		Config:          "",
+		Args:            nil,
+		Env:             env,
+		MachineEnv:      common.GetMachineEnvironment(),
+		Parallelization: DefaultParallelization,
+		Modules:         repoanalyzer.AnalyzeProject(projectDir, filesystem.GetWorkingDirectory()),
+		CurrentModule:   currentModule,
+	}
 }

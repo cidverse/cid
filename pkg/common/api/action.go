@@ -3,6 +3,8 @@ package api
 import (
 	"github.com/cidverse/cid/pkg/common/config"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	"github.com/gosimple/slug"
+	"path/filepath"
 )
 
 // ActionDetails holds details about the action
@@ -52,18 +54,24 @@ type ActionExecutionContext struct {
 
 	// Modules contains the project modules
 	Modules []*analyzerapi.ProjectModule
+
+	// CurrentModule contains the module that is currently being build
+	CurrentModule *analyzerapi.ProjectModule
 }
 
 // ActionStateContext holds state information about executed actions / results (ie. generated artifacts)
 type ActionStateContext struct {
 	// Version of the serialized action state
 	Version int `json:"version"`
+
+	// Modules contains the project modules
+	Modules []*analyzerapi.ProjectModule
 }
 
 // CoverageReport contains a generic coverage report
 type CoverageReport struct {
 	Language string
-	Percent float64
+	Percent  float64
 }
 
 var BuiltinActions = make(map[string]ActionStep)
@@ -72,4 +80,9 @@ var BuiltinActions = make(map[string]ActionStep)
 func RegisterBuiltinAction(action ActionStep) {
 	ctx := ActionExecutionContext{}
 	BuiltinActions[action.GetDetails(ctx).Name] = action
+}
+
+// GetArtifactDir will return the artifact directory
+func GetArtifactDir(ctx ActionExecutionContext) string {
+	return filepath.Join(ctx.Paths.Artifact, slug.Make(ctx.CurrentModule.Name))
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/workflow"
 	"github.com/cidverse/cid/pkg/repoanalyzer"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -44,7 +45,7 @@ var infoCmd = &cobra.Command{
 		var response = InfoCommandResponse{}
 
 		// detect project modules
-		response.Modules = repoanalyzer.AnalyzeProject(projectDir)
+		response.Modules = repoanalyzer.AnalyzeProject(projectDir, projectDir)
 
 		// tool constraints
 		response.ToolConstraints = make(map[string]string)
@@ -52,9 +53,20 @@ var infoCmd = &cobra.Command{
 			response.ToolConstraints[key] = value
 		}
 
-		// execution plan
-		executionPlan := workflow.DiscoverExecutionPlan(projectDir, env)
-		response.ExecutionPlan = executionPlan
+		// execution plan (omit some information
+		originalExecutionPlan := workflow.GetExecutionPlan(projectDir, filesystem.GetWorkingDirectory(), env, nil)
+		var outputExecutionPlan []config.WorkflowStage
+		for _, stage := range originalExecutionPlan {
+			var actions []config.WorkflowAction
+			for _, a := range stage.Actions {
+				a.Module = nil
+				actions = append(actions, a)
+			}
+
+			stage.Actions = actions
+			outputExecutionPlan = append(outputExecutionPlan, stage)
+		}
+		response.ExecutionPlan = outputExecutionPlan
 
 		// tools
 		response.Tools = make(map[string]string)

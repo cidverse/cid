@@ -3,9 +3,10 @@ package golang
 import (
 	"errors"
 	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	"github.com/rs/zerolog/log"
 	"github.com/shomali11/parallelizer"
 	"gopkg.in/yaml.v2"
-	"runtime"
 )
 
 type BuildActionStruct struct{}
@@ -23,7 +24,7 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 
 // Check evaluates if the action should be executed or not
 func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return DetectGolangProject(ctx.ProjectDir)
+	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGoMod
 }
 
 // Execute runs the action
@@ -35,7 +36,7 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 	}
 
 	// run build
-	if config.Platform != nil && len(config.Platform) > 0 {
+	if len(config.Platform) > 0 {
 		group := parallelizer.NewGroup(parallelizer.WithPoolSize(ctx.Parallelization))
 		defer group.Close()
 
@@ -44,6 +45,7 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 			goarch := crossBuild.Goarch
 
 			err := group.Add(func() {
+				log.Info().Str("goos", goos).Str("goarch", goarch).Msg("go build")
 				CrossCompile(ctx, goos, goarch)
 			})
 			if err != nil {
@@ -56,7 +58,7 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 			return err
 		}
 	} else {
-		CrossCompile(ctx, runtime.GOOS, runtime.GOARCH)
+		return errors.New("no build configuration present, aborting")
 	}
 
 	return nil

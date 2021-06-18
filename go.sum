@@ -74,12 +74,8 @@ github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghf
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
 github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
-github.com/cidverse/cidverseutils v0.0.0-20210612162737-6c1f1a44102c h1:4/8NvyywlCOuRGGveJrHSERu2rqE4iZaTKM+PjBXG60=
-github.com/cidverse/cidverseutils v0.0.0-20210612162737-6c1f1a44102c/go.mod h1:Wfcbyfo6NOFqQxBNevyK4vsJ70KAIXM+ELRThcUQFJQ=
 github.com/cidverse/cidverseutils v0.0.0-20210614222439-562618314556 h1:HHBwBoIpGmBu0K4MNXx9FdRM3D2JH9IRCxL0ZXCIvPo=
 github.com/cidverse/cidverseutils v0.0.0-20210614222439-562618314556/go.mod h1:Wfcbyfo6NOFqQxBNevyK4vsJ70KAIXM+ELRThcUQFJQ=
-github.com/cidverse/normalizeci v1.0.1-0.20210612155227-8e54ef939a5c h1:tgrS7ZJR04dvtTkbMrI7hYj8xTjntWuhb7wE0tDHC8E=
-github.com/cidverse/normalizeci v1.0.1-0.20210612155227-8e54ef939a5c/go.mod h1:gGdJAAwRfY+ece8UzNa3Y3QoqjmWGn/jvRbqgzq26o4=
 github.com/cidverse/normalizeci v1.0.1-0.20210613215119-4137dc712560 h1:Ygxg5zKOg/Uv61SlUvLZdymvm8zJoO46CYdpWuSPamM=
 github.com/cidverse/normalizeci v1.0.1-0.20210613215119-4137dc712560/go.mod h1:gGdJAAwRfY+ece8UzNa3Y3QoqjmWGn/jvRbqgzq26o4=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
@@ -317,7 +313,6 @@ github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be/go.mod h1:MIDF
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rs/xid v1.2.1/go.mod h1:+uKXf+4Djp6Md1KODXJxgGQPKngRmWyn10oCKFzNHOQ=
-github.com/rs/zerolog v1.22.0 h1:XrVUjV4K+izZpKXZHlPrYQiDtmdGiCylnT4i43AAWxg=
 github.com/rs/zerolog v1.22.0/go.mod h1:ZPhntP/xmq1nnND05hhpAh2QMhSsA4UN3MGZ6O2J3hM=
 github.com/rs/zerolog v1.23.0 h1:UskrK+saS9P9Y789yNNulYKdARjPZuS35B8gJF2x60g=
 github.com/rs/zerolog v1.23.0/go.mod h1:6c7hFfxPOy7TacJc4Fcdi24/J0NKYGzjG8FWRI916Qo=
