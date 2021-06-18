@@ -1,6 +1,9 @@
 package api
 
-import "github.com/cidverse/cid/pkg/common/config"
+import (
+	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+)
 
 // ActionDetails holds details about the action
 type ActionDetails struct {
@@ -46,6 +49,9 @@ type ActionExecutionContext struct {
 
 	// Parallelization defines how many tasks can be run in parallel inside of a action
 	Parallelization int
+
+	// Modules contains the project modules
+	Modules []*analyzerapi.ProjectModule
 }
 
 // ActionStateContext holds state information about executed actions / results (ie. generated artifacts)

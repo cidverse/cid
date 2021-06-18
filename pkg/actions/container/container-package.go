@@ -53,7 +53,7 @@ func (action PackageActionStruct) Execute(ctx api.ActionExecutionContext, state 
 	var buildArgs []string
 	buildArgs = append(buildArgs, `docker build`)
 	buildArgs = append(buildArgs, `--label "org.opencontainers.image.source=`+strings.TrimSuffix(ctx.Env["NCI_REPOSITORY_REMOTE"], ".git")+`"`)
-	buildArgs = append(buildArgs, `-t ` + image)
+	buildArgs = append(buildArgs, `-t `+image)
 	buildArgs = append(buildArgs, ctx.ProjectDir)
 
 	// build image

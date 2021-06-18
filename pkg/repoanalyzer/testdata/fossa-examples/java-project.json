@@ -1,0 +1,70 @@
+{
+  "projects":[
+    {
+      "graph":{
+        "assocs":[
+          [
+            0,
+            [
+              1
+            ]
+          ]
+        ],
+        "direct":[
+          0
+        ],
+        "deps":[
+          {
+            "version":null,
+            "name":":",
+            "tags":{
+
+            },
+            "locations":[
+
+            ],
+            "type":"SubprojectType"
+          },
+          {
+            "version":{
+              "value":"1.18.18",
+              "type":"EQUAL"
+            },
+            "name":"org.projectlombok:lombok",
+            "tags":{
+
+            },
+            "locations":[
+
+            ],
+            "type":"MavenType"
+          }
+        ]
+      },
+      "type":"gradle",
+      "path":"/H/SourceCodes/Java/credential-manager/"
+    }
+  ],
+  "sourceUnits":[
+    {
+      "Build":{
+        "Dependencies":[
+          {
+            "imports":[
+
+            ],
+            "locator":"mvn+org.projectlombok:lombok$1.18.18"
+          }
+        ],
+        "Imports":[
+
+        ],
+        "Succeeded":true,
+        "Artifact":"default"
+      },
+      "Manifest":"/H/SourceCodes/Java/credential-manager/",
+      "Name":"/H/SourceCodes/Java/credential-manager/",
+      "Type":"gradle"
+    }
+  ]
+}

@@ -7,6 +7,8 @@ import (
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/common/config"
 	"github.com/cidverse/cid/pkg/common/workflow"
+	"github.com/cidverse/cid/pkg/repoanalyzer"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -14,6 +16,7 @@ import (
 )
 
 type InfoCommandResponse struct {
+	Modules         []*analyzerapi.ProjectModule
 	Tools           map[string]string `yaml:"tool-version"`
 	ToolConstraints map[string]string `yaml:"tool-constraint"`
 	ExecutionPlan   []config.WorkflowStage
@@ -39,6 +42,9 @@ var infoCmd = &cobra.Command{
 
 		// response
 		var response = InfoCommandResponse{}
+
+		// detect project modules
+		response.Modules = repoanalyzer.AnalyzeProject(projectDir)
 
 		// tool constraints
 		response.ToolConstraints = make(map[string]string)

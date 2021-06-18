@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cid/pkg/repoanalyzer"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/common"
 	"github.com/google/cel-go/cel"
@@ -33,6 +34,7 @@ func DiscoverExecutionPlan(projectDir string, env map[string]string) []config.Wo
 		Env:             env,
 		MachineEnv:      common.GetMachineEnvironment(),
 		Parallelization: DefaultParallelization,
+		Modules:         repoanalyzer.AnalyzeProject(projectDir),
 	}
 
 	// iterate over all stages
@@ -79,7 +81,7 @@ func RunStageActions(stage string, projectDirectory string, env map[string]strin
 }
 
 // RunAction runs a specific workflow action
-func RunAction(action config.WorkflowAction, projectDirectory string, env map[string]string, args []string) {
+func RunAction(action config.WorkflowAction, projectDir string, env map[string]string, args []string) {
 	start := time.Now()
 	log.Info().Str("action", action.Type+"/"+action.Name).Msg("running action")
 
@@ -90,17 +92,18 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env map[st
 	// action context
 	ctx := api.ActionExecutionContext{
 		Paths: config.PathConfig{
-			Artifact: filepath.Join(projectDirectory, "dist"),
-			Temp:     filepath.Join(projectDirectory, "tmp"),
+			Artifact: filepath.Join(projectDir, "dist"),
+			Temp:     filepath.Join(projectDir, "tmp"),
 			Cache:    "",
 		},
-		ProjectDir:      projectDirectory,
+		ProjectDir:      projectDir,
 		WorkDir:         filesystem.GetWorkingDirectory(),
 		Config:          string(configAsYaml),
 		Args:            args,
 		Env:             env,
 		MachineEnv:      common.GetMachineEnvironment(),
 		Parallelization: DefaultParallelization,
+		Modules:         repoanalyzer.AnalyzeProject(projectDir),
 	}
 
 	// ensure that paths exist
@@ -159,7 +162,7 @@ func RunAction(action config.WorkflowAction, projectDirectory string, env map[st
 }
 
 // GetActionDetails retrieves the details of a WorkflowAction
-func GetActionDetails(action config.WorkflowAction, projectDirectory string, env map[string]string) api.ActionDetails {
+func GetActionDetails(action config.WorkflowAction, projectDir string, env map[string]string) api.ActionDetails {
 	configAsYaml, _ := yaml.Marshal(&action.Config)
 	log.Debug().Str("config", string(configAsYaml)).Msg("action specific config")
 
@@ -170,13 +173,14 @@ func GetActionDetails(action config.WorkflowAction, projectDirectory string, env
 			// context
 			ctx := api.ActionExecutionContext{
 				Paths:           config.Config.Paths,
-				ProjectDir:      projectDirectory,
+				ProjectDir:      projectDir,
 				WorkDir:         filesystem.GetWorkingDirectory(),
 				Config:          string(configAsYaml),
 				Args:            nil,
 				Env:             env,
 				MachineEnv:      common.GetMachineEnvironment(),
 				Parallelization: DefaultParallelization,
+				Modules:         repoanalyzer.AnalyzeProject(projectDir),
 			}
 
 			// run action
@@ -275,6 +279,7 @@ func FindWorkflowStageActions(projectDir string, env map[string]string, stage st
 					Args:       nil,
 					Env:        env,
 					MachineEnv: common.GetMachineEnvironment(),
+					Modules:    repoanalyzer.AnalyzeProject(projectDir),
 				}
 
 				// add

@@ -28,6 +28,6 @@ func ParseCoverageProfile(input string) api.CoverageReport {
 
 	return api.CoverageReport{
 		Language: "go",
-		Percent: totalPercent,
+		Percent:  totalPercent,
 	}
 }

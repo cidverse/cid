@@ -27,8 +27,8 @@ func DetectAppType(ctx api.ActionExecutionContext) string {
 
 func getFullImage(host string, repository string, tag string) string {
 	if len(host) > 0 {
-		return host+"/"+repository+":"+tag
+		return host + "/" + repository + ":" + tag
 	}
 
-	return repository+":"+tag
+	return repository + ":" + tag
 }
