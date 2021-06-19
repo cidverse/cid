@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/mod/modfile"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -48,6 +49,7 @@ func CrossCompile(ctx api.ActionExecutionContext, goos string, goarch string) {
 	if goos == "windows" {
 		fileExt = ".exe"
 	}
+	targetFile := goos + "_" + goarch + fileExt
 
 	compileEnv := make(map[string]string, len(ctx.Env))
 	for key, value := range ctx.Env {
@@ -58,5 +60,5 @@ func CrossCompile(ctx api.ActionExecutionContext, goos string, goarch string) {
 	compileEnv["GOOS"] = goos
 	compileEnv["GOARCH"] = goarch
 
-	command.RunCommand(`go build -o `+api.GetArtifactDir(ctx)+"/"+goos+"_"+goarch+fileExt+` -ldflags "-s -w -X main.Version=`+compileEnv["NCI_COMMIT_REF_RELEASE"]+` -X main.CommitHash=`+compileEnv["NCI_COMMIT_SHA_SHORT"]+` -X main.BuildAt=`+buildAt+`" .`, compileEnv, ctx.CurrentModule.Directory)
+	command.RunCommand(api.ReplacePlaceholders(`go build -o `+filepath.Join(ctx.Paths.Artifact, targetFile)+` -ldflags "-s -w -X main.Version={NCI_COMMIT_REF_RELEASE} -X main.CommitHash={NCI_COMMIT_SHA_SHORT} -X main.BuildAt=`+buildAt+`" .`, compileEnv), compileEnv, ctx.CurrentModule.Directory)
 }

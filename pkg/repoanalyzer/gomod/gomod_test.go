@@ -12,8 +12,9 @@ func TestGoModAnalyzer_Analyze(t *testing.T) {
 	cwd, err := os.Getwd()
 	assert.NoError(t, err)
 
+	ctx := analyzerapi.GetAnalyzerContext(filepath.Join(filepath.Dir(cwd), "testdata", "gomod"))
 	analyzer := Analyzer{}
-	result := analyzer.Analyze(filepath.Join(filepath.Dir(cwd), "testdata", "gomod"))
+	result := analyzer.Analyze(ctx)
 
 	// module
 	assert.Len(t, result, 1)
@@ -21,7 +22,7 @@ func TestGoModAnalyzer_Analyze(t *testing.T) {
 	assert.Equal(t, analyzerapi.BuildSystemGoMod, result[0].BuildSystem)
 	assert.Nil(t, result[0].BuildSystemSyntax)
 	assert.NotNil(t, result[0].Language[analyzerapi.LanguageGolang])
-	assert.Equal(t, "1.16.0", result[0].Language[analyzerapi.LanguageGolang].String())
+	assert.Equal(t, "1.16.0", *result[0].Language[analyzerapi.LanguageGolang])
 	assert.Equal(t, "gomod", result[0].Dependencies[0].Type)
 	assert.Equal(t, "github.com/Masterminds/semver/v3", result[0].Dependencies[0].Id)
 	assert.Equal(t, "v3.1.1", result[0].Dependencies[0].Version)

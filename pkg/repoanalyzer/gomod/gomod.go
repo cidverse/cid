@@ -12,11 +12,11 @@ import (
 
 type Analyzer struct{}
 
-func (a Analyzer) Analyze(projectDir string) []*analyzerapi.ProjectModule {
+func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.ProjectModule {
 	var result []*analyzerapi.ProjectModule
 
 	// groovy
-	files, filesErr := filesystem.FindFilesByExtension(projectDir, []string{".mod"})
+	files, filesErr := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".mod"})
 	if filesErr == nil {
 		// sort by length
 		sort.Slice(files, func(i, j int) bool {
@@ -57,7 +57,7 @@ func (a Analyzer) Analyze(projectDir string) []*analyzerapi.ProjectModule {
 
 				// module
 				module := analyzerapi.ProjectModule{
-					RootDirectory:     projectDir,
+					RootDirectory:     ctx.ProjectDir,
 					Directory:         filepath.Dir(file),
 					Name:              goMod.Module.Mod.Path,
 					Slug:              slug.Make(goMod.Module.Mod.Path),

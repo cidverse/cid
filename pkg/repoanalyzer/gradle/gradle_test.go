@@ -12,8 +12,9 @@ func TestGradleAnalyzer_AnalyzeGroovy(t *testing.T) {
 	cwd, err := os.Getwd()
 	assert.NoError(t, err)
 
+	ctx := analyzerapi.GetAnalyzerContext(filepath.Join(filepath.Dir(cwd), "testdata", "gradle-groovy"))
 	analyzer := Analyzer{}
-	result := analyzer.Analyze(filepath.Join(filepath.Dir(cwd), "testdata", "gradle-groovy"))
+	result := analyzer.Analyze(ctx)
 
 	// module
 	assert.Len(t, result, 1)
@@ -37,8 +38,9 @@ func TestGradleAnalyzer_AnalyzeKotlin(t *testing.T) {
 	cwd, err := os.Getwd()
 	assert.NoError(t, err)
 
+	ctx := analyzerapi.GetAnalyzerContext(filepath.Join(filepath.Dir(cwd), "testdata", "gradle-kotlin"))
 	analyzer := Analyzer{}
-	result := analyzer.Analyze(filepath.Join(filepath.Dir(cwd), "testdata", "gradle-kotlin"))
+	result := analyzer.Analyze(ctx)
 
 	// module
 	assert.Len(t, result, 1)

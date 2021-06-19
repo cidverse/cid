@@ -1,25 +1,18 @@
 package workflow
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/config"
-	"github.com/cidverse/cid/pkg/repoanalyzer"
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
-	"github.com/cidverse/normalizeci/pkg/common"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
-	"path/filepath"
 	"time"
 )
-
-const DefaultParallelization = 10
 
 // GetExecutionPlan will generate a automatic execution plan based on the project contents
 func GetExecutionPlan(projectDir string, workDir string, env map[string]string, stages []config.WorkflowStage) []config.WorkflowStage {
@@ -30,7 +23,7 @@ func GetExecutionPlan(projectDir string, workDir string, env map[string]string, 
 	}
 
 	// context
-	ctx := GetActionContext(projectDir, env, nil)
+	ctx := api.GetActionContext(projectDir, env, nil)
 
 	// iterate over all stages
 	for _, stage := range stages {
@@ -40,6 +33,7 @@ func GetExecutionPlan(projectDir string, workDir string, env map[string]string, 
 		for _, module := range ctx.Modules {
 			// customize context
 			ctx.CurrentModule = module
+			api.UpdateContext(&ctx)
 
 			// iterate over all actions
 			defaultStageActions := FindWorkflowStageActions(stage.Name, ctx)
@@ -99,13 +93,14 @@ func RunStageActions(stageName string, projectDir string, workDir string, env ma
 func RunAction(action config.WorkflowAction, projectDir string, env map[string]string, args []string) {
 	start := time.Now()
 
-	// serialize action config for passthru
+	// serialize action config for pass-thru
 	configAsYaml, _ := yaml.Marshal(&action.Config)
 	log.Debug().Str("config", string(configAsYaml)).Msg("action specific config")
 
 	// action context
-	ctx := GetActionContext(projectDir, env, action.Module)
+	ctx := api.GetActionContext(projectDir, env, action.Module)
 	ctx.Config = string(configAsYaml)
+	api.UpdateContext(&ctx)
 	log.Info().Str("action", action.Type+"/"+action.Name).Str("module", ctx.CurrentModule.Slug).Msg("running action")
 
 	// ensure that paths exist
@@ -117,20 +112,7 @@ func RunAction(action config.WorkflowAction, projectDir string, env map[string]s
 	}
 
 	// state: retrieve/init
-	stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
-	state := api.ActionStateContext{
-		Version: 1,
-		Modules: ctx.Modules,
-	}
-	if filesystem.FileExists(stateFile) {
-		stateContent, stateContentErr := filesystem.GetFileContent(stateFile)
-		if stateContentErr == nil {
-			err := json.Unmarshal([]byte(stateContent), &state)
-			if err != nil {
-				log.Warn().Err(err).Str("file", stateFile).Msg("failed to restore state")
-			}
-		}
-	}
+	state := getState(ctx)
 
 	// handle action execution
 	if action.Type == "builtin" {
@@ -149,17 +131,7 @@ func RunAction(action config.WorkflowAction, projectDir string, env map[string]s
 	}
 
 	// state: store
-	stateOut, err := json.Marshal(state)
-	if err != nil {
-		log.Warn().Err(err).Str("file", stateFile).Msg("failed to store state")
-	} else {
-		_ = filesystem.RemoveFile(stateFile)
-
-		storeErr := filesystem.SaveFileContent(stateFile, string(stateOut))
-		if storeErr != nil {
-			log.Warn().Err(storeErr).Str("file", stateFile).Msg("failed to store state")
-		}
-	}
+	persistState(ctx, state)
 
 	log.Info().Str("action", action.Type+"/"+action.Name).Str("duration", time.Since(start).String()).Msg("action completed")
 }
@@ -174,7 +146,7 @@ func GetActionDetails(action config.WorkflowAction, projectDir string, env map[s
 		builtinAction := api.BuiltinActions[action.Name]
 		if builtinAction != nil {
 			// context
-			ctx := GetActionContext(projectDir, env, action.Module)
+			ctx := api.GetActionContext(projectDir, env, action.Module)
 
 			// run action
 			return builtinAction.GetDetails(ctx)
@@ -288,24 +260,4 @@ func FindWorkflowAction(search string) (config.WorkflowAction, error) {
 	}
 
 	return config.WorkflowAction{}, errors.New("no action found with query " + search)
-}
-
-// GetActionContext gets the action context, this operation is expensive and should only be called once per execution
-func GetActionContext(projectDir string, env map[string]string, currentModule *analyzerapi.ProjectModule) api.ActionExecutionContext {
-	return api.ActionExecutionContext{
-		Paths: config.PathConfig{
-			Artifact: filepath.Join(projectDir, "dist"),
-			Temp:     filepath.Join(projectDir, "tmp"),
-			Cache:    "",
-		},
-		ProjectDir:      projectDir,
-		WorkDir:         filesystem.GetWorkingDirectory(),
-		Config:          "",
-		Args:            nil,
-		Env:             env,
-		MachineEnv:      common.GetMachineEnvironment(),
-		Parallelization: DefaultParallelization,
-		Modules:         repoanalyzer.AnalyzeProject(projectDir, filesystem.GetWorkingDirectory()),
-		CurrentModule:   currentModule,
-	}
 }

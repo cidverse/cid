@@ -94,7 +94,7 @@ func EnrichEnvironment(projectDirectory string, branchingConvention string, env 
 
 				// prerelease suffix
 				if !isStable && len(config.Config.Conventions.PreReleaseSuffix) > 0 {
-					nextRelease = fmt.Sprintf("%v%v", nextRelease, FillEnvPlaceholders(config.Config.Conventions.PreReleaseSuffix, env))
+					nextRelease = fmt.Sprintf("%v%v", nextRelease, ReplacePlaceholders(config.Config.Conventions.PreReleaseSuffix, env))
 				}
 
 				env["NCI_NEXTRELEASE_NAME"] = nextRelease
@@ -111,8 +111,8 @@ func EnrichEnvironment(projectDirectory string, branchingConvention string, env 
 	return nil
 }
 
-// FillEnvPlaceholders replaces all placeholders within the string - ie. {NCI_COMMIT_COUNT}
-func FillEnvPlaceholders(input string, env map[string]string) string {
+// ReplacePlaceholders replaces all placeholders within the string - ie. {NCI_COMMIT_COUNT}
+func ReplacePlaceholders(input string, env map[string]string) string {
 	for k, v := range env {
 		input = strings.ReplaceAll(input, `{`+k+`}`, v)
 	}

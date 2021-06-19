@@ -5,10 +5,10 @@ var Analyzers []Analyzer
 // Analyzer is the interface that needs to be implemented by all analyzers
 type Analyzer interface {
 	// Analyze will retrieve information about the project
-	Analyze(projectDir string) []*ProjectModule
+	Analyze(ctx AnalyzerContext) []*ProjectModule
 }
 
-// ProjectModule
+// ProjectModule contains information about project modules
 type ProjectModule struct {
 	// RootDirectory stores the project root directory
 	RootDirectory string
@@ -42,7 +42,6 @@ type ProjectModule struct {
 }
 
 type ProjectLanguage string
-
 const (
 	LanguageGolang     ProjectLanguage = "go"
 	LanguageJava       ProjectLanguage = "java"
@@ -51,15 +50,14 @@ const (
 )
 
 type ProjectBuildSystem string
-
 const (
 	BuildSystemGradle ProjectBuildSystem = "gradle"
 	BuildSystemGoMod  ProjectBuildSystem = "gomod"
 	BuildSystemNpm    ProjectBuildSystem = "npm"
+	BuildSystemHugo   ProjectBuildSystem = "hugo"
 )
 
 type ProjectBuildSystemSyntax string
-
 const (
 	GradleGroovyDSL ProjectBuildSystemSyntax = "groovy"
 	GradleKotlinDSL ProjectBuildSystemSyntax = "kotlin"
@@ -75,4 +73,16 @@ type ProjectDependency struct {
 
 	// Version is the dep version
 	Version string
+}
+
+// AnalyzerContext holds the context to analyze projects
+type AnalyzerContext struct {
+	// ProjectDir holds the project directory
+	ProjectDir string
+
+	// Files holds all project files
+	Files []string
+
+	// FilesByExtension contains all files by extension
+	FilesByExtension map[string][]string
 }

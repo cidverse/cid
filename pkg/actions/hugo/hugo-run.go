@@ -3,6 +3,7 @@ package hugo
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 )
 
 type RunActionStruct struct{}
@@ -19,7 +20,7 @@ func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Act
 
 // Check evaluates if the action should be executed or not
 func (action RunActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return DetectHugoProject(ctx.ProjectDir)
+	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemHugo
 }
 
 // Execute runs the action

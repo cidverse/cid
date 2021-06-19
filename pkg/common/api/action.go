@@ -2,10 +2,14 @@ package api
 
 import (
 	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cid/pkg/repoanalyzer"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
-	"github.com/gosimple/slug"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/normalizeci/pkg/common"
 	"path/filepath"
 )
+
+const DefaultParallelization = 10
 
 // ActionDetails holds details about the action
 type ActionDetails struct {
@@ -59,6 +63,15 @@ type ActionExecutionContext struct {
 	CurrentModule *analyzerapi.ProjectModule
 }
 
+// UpdateContext will update the context
+func UpdateContext(ctx *ActionExecutionContext) {
+	ctx.Paths = config.PathConfig{
+		Artifact: filepath.Join(ctx.ProjectDir, "dist", ctx.CurrentModule.Slug),
+		Temp:     filepath.Join(ctx.ProjectDir, "tmp"),
+		Cache:    "",
+	}
+}
+
 // ActionStateContext holds state information about executed actions / results (ie. generated artifacts)
 type ActionStateContext struct {
 	// Version of the serialized action state
@@ -82,7 +95,22 @@ func RegisterBuiltinAction(action ActionStep) {
 	BuiltinActions[action.GetDetails(ctx).Name] = action
 }
 
-// GetArtifactDir will return the artifact directory
-func GetArtifactDir(ctx ActionExecutionContext) string {
-	return filepath.Join(ctx.Paths.Artifact, slug.Make(ctx.CurrentModule.Name))
+// GetActionContext gets the action context, this operation is expensive and should only be called once per execution
+func GetActionContext(projectDir string, env map[string]string, currentModule *analyzerapi.ProjectModule) ActionExecutionContext {
+	return ActionExecutionContext{
+		Paths: config.PathConfig{
+			Artifact: filepath.Join(projectDir, "dist"),
+			Temp:     filepath.Join(projectDir, "tmp"),
+			Cache:    "",
+		},
+		ProjectDir:      projectDir,
+		WorkDir:         filesystem.GetWorkingDirectory(),
+		Config:          "",
+		Args:            nil,
+		Env:             env,
+		MachineEnv:      common.GetMachineEnvironment(),
+		Parallelization: DefaultParallelization,
+		Modules:         repoanalyzer.AnalyzeProject(projectDir, filesystem.GetWorkingDirectory()),
+		CurrentModule:   currentModule,
+	}
 }
