@@ -5,12 +5,9 @@ import (
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"path/filepath"
-	"time"
 )
 
 func CrossCompile(ctx api.ActionExecutionContext, goos string, goarch string) {
-	buildAt := time.Now().UTC().Format(time.RFC3339)
-
 	fileExt := ""
 	if goos == "windows" {
 		fileExt = ".exe"
@@ -26,7 +23,7 @@ func CrossCompile(ctx api.ActionExecutionContext, goos string, goarch string) {
 	compileEnv["GOOS"] = goos
 	compileEnv["GOARCH"] = goarch
 
-	command.RunCommand(api.ReplacePlaceholders(`go build -o `+filepath.Join(ctx.Paths.Artifact, targetFile)+` -ldflags "-s -w -X main.Version={NCI_COMMIT_REF_RELEASE} -X main.CommitHash={NCI_COMMIT_SHA_SHORT} -X main.BuildAt=`+buildAt+`" .`, compileEnv), compileEnv, ctx.CurrentModule.Directory)
+	command.RunCommand(api.ReplacePlaceholders(`go build -o `+filepath.Join(ctx.Paths.Artifact, targetFile)+` -ldflags "-s -w -X main.Version={NCI_COMMIT_REF_RELEASE} -X main.CommitHash={NCI_COMMIT_SHA_SHORT} -X main.BuildAt={NOW_RFC3339}" .`, compileEnv), compileEnv, ctx.CurrentModule.Directory)
 }
 
 func GetToolDependencies(ctx api.ActionExecutionContext) map[string]string {

@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"os"
 	"strings"
+	"time"
 )
 
 // GetCacheDir returns the caching directory for a module
@@ -113,6 +114,10 @@ func EnrichEnvironment(projectDirectory string, branchingConvention string, env 
 
 // ReplacePlaceholders replaces all placeholders within the string - ie. {NCI_COMMIT_COUNT}
 func ReplacePlaceholders(input string, env map[string]string) string {
+	// static
+	input = strings.ReplaceAll(input, `{NOW_RFC3339}`, time.Now().UTC().Format(time.RFC3339))
+
+	// dynamic
 	for k, v := range env {
 		input = strings.ReplaceAll(input, `{`+k+`}`, v)
 	}
