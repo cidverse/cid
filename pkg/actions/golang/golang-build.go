@@ -18,7 +18,7 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 		Name:             "golang-build",
 		Version:          "0.1.0",
 		UsedTools:        []string{"go"},
-		ToolDependencies: GetDependencies(ctx.ProjectDir),
+		ToolDependencies: GetToolDependencies(ctx),
 	}
 }
 

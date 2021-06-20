@@ -35,15 +35,32 @@ func GetExecutionPlan(projectDir string, workDir string, env map[string]string, 
 			ctx.CurrentModule = module
 			api.UpdateContext(&ctx)
 
-			// iterate over all actions
-			defaultStageActions := FindWorkflowStageActions(stage.Name, ctx)
-			for _, action := range defaultStageActions {
+			// iterate over module-scoped actions
+			for _, action := range FindWorkflowStageActions(stage.Name, ctx) {
+				if action.Scope == "module" {
+					currentAction := action
+
+					// check action activation criteria
+					if currentAction.Type == "builtin" {
+						if api.BuiltinActions[currentAction.Name].Check(ctx) {
+							currentAction.Module = module
+							stageActions = append(stageActions, currentAction)
+						}
+					} else {
+						log.Fatal().Str("action", action.Type+"/"+action.Name).Msg("unsupported action type")
+					}
+				}
+			}
+		}
+
+		// iterate over project-scoped actions
+		for _, action := range FindWorkflowStageActions(stage.Name, ctx) {
+			if action.Scope == "project" {
 				currentAction := action
 
 				// check action activation criteria
 				if currentAction.Type == "builtin" {
 					if api.BuiltinActions[currentAction.Name].Check(ctx) {
-						currentAction.Module = module
 						stageActions = append(stageActions, currentAction)
 					}
 				} else {

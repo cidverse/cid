@@ -15,6 +15,9 @@ type WorkflowAction struct {
 	// Type of the action, does determinate how a action is executed
 	Type string `default:"builtin"`
 
+	// Scope of the action (module or project)
+	Scope string `default:"project"`
+
 	// Config holds custom configuration options for this action
 	Config interface{} `yaml:"config,omitempty"`
 

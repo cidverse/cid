@@ -3,6 +3,7 @@ package java
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 )
 
 type TestActionStruct struct{}
@@ -19,7 +20,7 @@ func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Ac
 
 // Check evaluates if the action should be executed or not
 func (action TestActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return DetectJavaProject(ctx.ProjectDir)
+	return ctx.CurrentModule != nil && (ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle || ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven)
 }
 
 // Execute runs the action
@@ -28,10 +29,9 @@ func (action TestActionStruct) Execute(ctx api.ActionExecutionContext, state *ap
 	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
 
 	// run test
-	buildSystem := DetectJavaBuildSystem(ctx.ProjectDir)
-	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
+	if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle {
 		command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" test --no-daemon --warning-mode=all --console=plain`, ctx.Env, ctx.ProjectDir)
-	} else if buildSystem == "maven" {
+	} else if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven {
 		MavenWrapperSetup(ctx.ProjectDir)
 
 		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" versions:set -DnewVersion="+releaseVersion+"--batch-mode", ctx.Env, ctx.ProjectDir)

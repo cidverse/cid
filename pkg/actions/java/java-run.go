@@ -3,6 +3,7 @@ package java
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"strings"
@@ -22,17 +23,16 @@ func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Act
 
 // Check evaluates if the action should be executed or not
 func (action RunActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return DetectJavaProject(ctx.ProjectDir)
+	return ctx.CurrentModule != nil && (ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle || ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven)
 }
 
 // Execute runs the action
 func (action RunActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
-	buildSystem := DetectJavaBuildSystem(ctx.ProjectDir)
-	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
+	if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle {
 		ctx.Env["GRADLE_OPTS"] = "-XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError -Xmx512m"
 
 		command.RunCommand(GradleCommandPrefix+` build --no-daemon --warning-mode=all --console=plain`, ctx.Env, ctx.ProjectDir)
-	} else if buildSystem == "maven" {
+	} else if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven {
 		MavenWrapperSetup(ctx.ProjectDir)
 
 		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" package -DskipTests=true --batch-mode", ctx.Env, ctx.ProjectDir)

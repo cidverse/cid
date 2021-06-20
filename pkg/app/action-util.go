@@ -6,7 +6,7 @@ import (
 	_ "github.com/cidverse/cid/pkg/actions/fossa"
 	_ "github.com/cidverse/cid/pkg/actions/gitguardian"
 	_ "github.com/cidverse/cid/pkg/actions/gitleaks"
-	"github.com/cidverse/cid/pkg/actions/golang"
+	_ "github.com/cidverse/cid/pkg/actions/golang"
 	_ "github.com/cidverse/cid/pkg/actions/hugo"
 	_ "github.com/cidverse/cid/pkg/actions/java"
 	_ "github.com/cidverse/cid/pkg/actions/node"
@@ -21,19 +21,4 @@ import (
 func Load(projectDirectory string) {
 	// load configuration for the current project
 	config.LoadConfig(projectDirectory)
-
-	// dependency detection
-	// this will try to discover version constraints from the projects automatically
-	dependencyDetectors := [...]map[string]string{
-		golang.GetDependencies(projectDirectory),
-	}
-
-	for _, dep := range dependencyDetectors {
-		for key, version := range dep {
-			_, present := config.Config.Dependencies[key]
-			if !present {
-				config.Config.Dependencies[key] = version
-			}
-		}
-	}
 }

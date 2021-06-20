@@ -3,6 +3,7 @@ package golang
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"strings"
 )
 
@@ -15,13 +16,13 @@ func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Act
 		Name:             "golang-run",
 		Version:          "0.1.0",
 		UsedTools:        []string{"go"},
-		ToolDependencies: GetDependencies(ctx.ProjectDir),
+		ToolDependencies: GetToolDependencies(ctx),
 	}
 }
 
 // Check evaluates if the action should be executed or not
 func (action RunActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return DetectGolangProject(ctx.ProjectDir)
+	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGoMod
 }
 
 // Execute runs the action

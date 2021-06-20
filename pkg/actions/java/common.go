@@ -6,41 +6,10 @@ import (
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"io"
-	"os"
 	"strings"
 )
 
 const GradleCommandPrefix = `java "-Dorg.gradle.appname=gradlew" "-classpath" "gradle/wrapper/gradle-wrapper.jar" "org.gradle.wrapper.GradleWrapperMain"`
-
-// DetectJavaProject checks if the target directory is a java project
-func DetectJavaProject(projectDir string) bool {
-	buildSystem := DetectJavaBuildSystem(projectDir)
-
-	return len(buildSystem) > 0
-}
-
-// DetectJavaBuildSystem returns the build system used in the project
-func DetectJavaBuildSystem(projectDirectory string) string {
-	// gradle - groovy
-	if _, err := os.Stat(projectDirectory + "/build.gradle"); !os.IsNotExist(err) {
-		log.Debug().Str("file", projectDirectory+"/build.gradle").Msg("found gradle project")
-		return "gradle-groovy"
-	}
-
-	// gradle - kotlin dsl
-	if _, err := os.Stat(projectDirectory + "/build.gradle.kts"); !os.IsNotExist(err) {
-		log.Debug().Str("file", projectDirectory+"/build.gradle.kts").Msg("found gradle project")
-		return "gradle-kotlin"
-	}
-
-	// maven
-	if _, err := os.Stat(projectDirectory + "/pom.xml"); !os.IsNotExist(err) {
-		log.Debug().Str("file", projectDirectory+"/pom.xml").Msg("found maven project")
-		return "maven"
-	}
-
-	return ""
-}
 
 // MavenWrapperSetup makes sure that the maven wrapper is setup correctly for a maven project
 func MavenWrapperSetup(projectDirectory string) {

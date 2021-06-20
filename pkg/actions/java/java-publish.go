@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 	"strings"
 )
@@ -22,7 +23,7 @@ func (action PublishActionStruct) GetDetails(ctx api.ActionExecutionContext) api
 
 // Check evaluates if the action should be executed or not
 func (action PublishActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return DetectJavaProject(ctx.ProjectDir)
+	return ctx.CurrentModule != nil && (ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle || ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven)
 }
 
 // Execute runs the action
@@ -32,8 +33,7 @@ func (action PublishActionStruct) Execute(ctx api.ActionExecutionContext, state 
 	// isStableRelease := api.IsVersionStable(releaseVersion)
 
 	// publish
-	buildSystem := DetectJavaBuildSystem(ctx.ProjectDir)
-	if buildSystem == "gradle-groovy" || buildSystem == "gradle-kotlin" {
+	if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle {
 		// gradle tasks
 		gradleTasks, gradleTasksErr := command.RunSystemCommand(`gradlew`, `tasks --all`, ctx.Env, ctx.ProjectDir)
 		if gradleTasksErr != nil {
@@ -45,7 +45,7 @@ func (action PublishActionStruct) Execute(ctx api.ActionExecutionContext, state 
 		} else {
 			log.Warn().Msg("no supported gradle release plugin found")
 		}
-	} else if buildSystem == "maven" {
+	} else if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven {
 		MavenWrapperSetup(ctx.ProjectDir)
 
 		//

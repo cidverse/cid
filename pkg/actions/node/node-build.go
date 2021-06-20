@@ -3,6 +3,7 @@ package node
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,7 +21,7 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 
 // Check evaluates if the action should be executed or not
 func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return DetectNodeProject(ctx.ProjectDir)
+	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemNpm
 }
 
 // Execute runs the action

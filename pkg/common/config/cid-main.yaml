@@ -31,15 +31,20 @@ actions:
   run:
     - name: golang-run
       type: builtin
+      scope: module
     - name: java-run
       type: builtin
+      scope: module
     - name: python-run
       type: builtin
+      scope: module
     - name: hugo-run
       type: builtin
+      scope: module
   build:
     - name: golang-build
       type: builtin
+      scope: module
       config:
         # cross platform build
         platform:
@@ -51,49 +56,66 @@ actions:
             goarch: amd64
     - name: java-build
       type: builtin
+      scope: module
     - name: python-build
       type: builtin
+      scope: module
     - name: node-build
       type: builtin
+      scope: module
     - name: hugo-build
       type: builtin
+      scope: module
   test:
     # test execution
     - name: golang-test
       type: builtin
+      scope: module
     - name: java-test
       type: builtin
+      scope: module
   package:
     # optimization
     - name: upx-optimize
       type: builtin
+      scope: module
     # package
     - name: container-package
       type: builtin
+      scope: module
   sast:
     # linters
     - name: golang-lint
       type: builtin
+      scope: module
     - name: python-lint
       type: builtin
+      scope: module
     # scanners
     - name: fossa-scan
       type: builtin
+      scope: project
     - name: gitleaks-scan
       type: builtin
+      scope: project
     - name: gitguardian-scan
       type: builtin
+      scope: project
     - name: sonarqube-scan
       type: builtin
+      scope: project
     - name: dependencycheck-scan
       type: builtin
+      scope: project
   publish:
     # tag / release
     - name: repo-tag-create
       type: builtin
+      scope: project
     # changelog generator
     - name: repo-changelog-generate
       type: builtin
+      scope: project
       config:
         # changelog generator configuration
         templates:
@@ -120,9 +142,11 @@ actions:
     # publish release / assets
     - name: repo-release-github
       type: builtin
+      scope: project
     # artifact push
     - name: java-publish
       type: builtin
+      scope: project
 
 # local tools
 tools:

@@ -42,6 +42,7 @@ type ProjectModule struct {
 }
 
 type ProjectLanguage string
+
 const (
 	LanguageGolang     ProjectLanguage = "go"
 	LanguageJava       ProjectLanguage = "java"
@@ -50,14 +51,17 @@ const (
 )
 
 type ProjectBuildSystem string
+
 const (
 	BuildSystemGradle ProjectBuildSystem = "gradle"
+	BuildSystemMaven  ProjectBuildSystem = "maven"
 	BuildSystemGoMod  ProjectBuildSystem = "gomod"
 	BuildSystemNpm    ProjectBuildSystem = "npm"
 	BuildSystemHugo   ProjectBuildSystem = "hugo"
 )
 
 type ProjectBuildSystemSyntax string
+
 const (
 	GradleGroovyDSL ProjectBuildSystemSyntax = "groovy"
 	GradleKotlinDSL ProjectBuildSystemSyntax = "kotlin"

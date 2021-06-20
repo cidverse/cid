@@ -3,6 +3,7 @@ package golang
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 )
 
 type LintActionStruct struct{}
@@ -19,7 +20,7 @@ func (action LintActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Ac
 
 // Check evaluates if the action should be executed or not
 func (action LintActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return DetectGolangProject(ctx.ProjectDir)
+	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGoMod
 }
 
 // Execute runs the action
