@@ -25,7 +25,7 @@ func TestGradleAnalyzer_AnalyzeGroovy(t *testing.T) {
 
 	// submodule
 	assert.Len(t, result[0].Submodules, 1)
-	assert.Equal(t, "api", result[0].Submodules[0].Name)
+	assert.Equal(t, "gradle-groovy-api", result[0].Submodules[0].Name)
 	assert.Equal(t, analyzerapi.BuildSystemGradle, result[0].Submodules[0].BuildSystem)
 	assert.Equal(t, string(analyzerapi.GradleGroovyDSL), string(*result[0].Submodules[0].BuildSystemSyntax))
 	assert.Nil(t, result[0].Submodules[0].Language[analyzerapi.LanguageJava])
@@ -51,7 +51,7 @@ func TestGradleAnalyzer_AnalyzeKotlin(t *testing.T) {
 
 	// submodule
 	assert.Len(t, result[0].Submodules, 1)
-	assert.Equal(t, "api", result[0].Submodules[0].Name)
+	assert.Equal(t, "gradle-kotlin-api", result[0].Submodules[0].Name)
 	assert.Equal(t, analyzerapi.BuildSystemGradle, result[0].Submodules[0].BuildSystem)
 	assert.Equal(t, string(analyzerapi.GradleKotlinDSL), string(*result[0].Submodules[0].BuildSystemSyntax))
 	assert.Nil(t, result[0].Submodules[0].Language[analyzerapi.LanguageJava])

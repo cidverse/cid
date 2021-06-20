@@ -58,6 +58,8 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 
 			parent := analyzerapi.FindParentModule(result, &module)
 			if parent != nil {
+				module.Name = parent.Name + "-" + module.Name
+				module.Slug = parent.Slug + "-" + module.Slug
 				parent.Submodules = append(parent.Submodules, &module)
 			} else {
 				result = append(result, &module)
