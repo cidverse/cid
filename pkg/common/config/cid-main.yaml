@@ -146,7 +146,7 @@ actions:
     # artifact push
     - name: java-publish
       type: builtin
-      scope: project
+      scope: module
 
 # local tools
 tools:
