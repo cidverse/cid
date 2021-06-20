@@ -65,10 +65,18 @@ type ActionExecutionContext struct {
 
 // UpdateContext will update the context
 func UpdateContext(ctx *ActionExecutionContext) {
-	ctx.Paths = config.PathConfig{
-		Artifact: filepath.Join(ctx.ProjectDir, "dist", ctx.CurrentModule.Slug),
-		Temp:     filepath.Join(ctx.ProjectDir, "tmp"),
-		Cache:    "",
+	if ctx.CurrentModule != nil {
+		ctx.Paths = config.PathConfig{
+			Artifact: filepath.Join(ctx.ProjectDir, "dist", ctx.CurrentModule.Slug),
+			Temp:     filepath.Join(ctx.ProjectDir, "tmp"),
+			Cache:    "",
+		}
+	} else {
+		ctx.Paths = config.PathConfig{
+			Artifact: filepath.Join(ctx.ProjectDir, "dist"),
+			Temp:     filepath.Join(ctx.ProjectDir, "tmp"),
+			Cache:    "",
+		}
 	}
 }
 

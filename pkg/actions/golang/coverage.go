@@ -21,8 +21,6 @@ func ParseCoverageProfile(input string) api.CoverageReport {
 			if p, err := strconv.ParseFloat(strings.TrimSuffix(val[2], "%"), 64); err == nil {
 				totalPercent = p
 			}
-		} else {
-			// pkg or func coverage to store into report
 		}
 	}
 

@@ -118,7 +118,11 @@ func RunAction(action config.WorkflowAction, projectDir string, env map[string]s
 	ctx := api.GetActionContext(projectDir, env, action.Module)
 	ctx.Config = string(configAsYaml)
 	api.UpdateContext(&ctx)
-	log.Info().Str("action", action.Type+"/"+action.Name).Str("module", ctx.CurrentModule.Slug).Msg("running action")
+	moduleName := ""
+	if ctx.CurrentModule != nil {
+		moduleName = ctx.CurrentModule.Slug
+	}
+	log.Info().Str("action", action.Type+"/"+action.Name).Str("module", moduleName).Msg("running action")
 
 	// ensure that paths exist
 	if !filesystem.DirectoryExists(ctx.Paths.Artifact) {
