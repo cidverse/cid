@@ -35,7 +35,7 @@ func (action PublishActionStruct) Execute(ctx api.ActionExecutionContext, state 
 	// publish
 	if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle {
 		// gradle tasks
-		gradleTasks, gradleTasksErr := command.RunSystemCommand(`gradlew`, `tasks --all`, ctx.Env, ctx.ProjectDir)
+		gradleTasks, gradleTasksErr := command.RunSystemCommand(GradleCommandPrefix+` tasks --all`, ctx.Env, ctx.ProjectDir)
 		if gradleTasksErr != nil {
 			return errors.New("failed to list gradle tasks (gradle tasks --all)")
 		}

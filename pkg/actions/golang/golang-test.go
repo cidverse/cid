@@ -36,7 +36,7 @@ func (action TestActionStruct) Execute(ctx api.ActionExecutionContext, state *ap
 	}
 
 	// get report
-	covOut, covOutErr := command.RunSystemCommand("go", "tool cover -func tmp/coverage.txt", ctx.Env, ctx.WorkDir)
+	covOut, covOutErr := command.RunSystemCommand("go tool cover -func tmp/coverage.txt", ctx.Env, ctx.WorkDir)
 	if covOutErr != nil {
 		return errors.New("failed to retrieve go coverage report. Cause: " + covOutErr.Error())
 	}

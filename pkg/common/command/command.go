@@ -129,7 +129,11 @@ func RunOptionalCommand(command string, env map[string]string, workDir string) e
 }
 
 // RunSystemCommand runs a command and stores the response in a string
-func RunSystemCommand(file string, args string, env map[string]string, workDir string) (string, error) {
+func RunSystemCommand(command string, env map[string]string, workDir string) (string, error) {
+	cmdArgs := strings.SplitN(command, " ", 2)
+	file := cmdArgs[0]
+	args := cmdArgs[1]
+
 	var resultBuff bytes.Buffer
 	log.Debug().Str("file", file).Str("args", args).Str("workdir", workDir).Msg("running command")
 
