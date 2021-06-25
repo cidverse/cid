@@ -9,6 +9,7 @@ import (
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
+	"io"
 	"os"
 	"os/exec"
 	"path"
@@ -40,9 +41,9 @@ func GetCommandVersion(executable string) (string, error) {
 	return "", errors.New("can't determinate version of " + executable)
 }
 
-// RunCommand runs a command and forwards all output to console, but will panic/exit if the command fails
+// RunCommand runs a required command and forwards all output to console, but will panic/exit if the command fails
 func RunCommand(command string, env map[string]string, workDir string) {
-	err := RunOptionalCommand(command, env, workDir)
+	err := runCommand(command, env, workDir, NewFileProxyWriter(os.Stdout), NewFileProxyWriter(os.Stderr))
 	if err != nil {
 		log.Fatal().Err(err).Str("command", command).Msg("failed to execute command")
 	}
@@ -50,6 +51,22 @@ func RunCommand(command string, env map[string]string, workDir string) {
 
 // RunOptionalCommand runs a command and forwards all output to console
 func RunOptionalCommand(command string, env map[string]string, workDir string) error {
+	return runCommand(command, env, workDir, NewFileProxyWriter(os.Stdout), NewFileProxyWriter(os.Stderr))
+}
+
+// RunCommandAndGetOutput runs a command and returns the full response / command output
+func RunCommandAndGetOutput(command string, env map[string]string, workDir string) (string, error) {
+	var resultBuff bytes.Buffer
+
+	err := runCommand(command, env, workDir, &resultBuff, &resultBuff)
+	if err != nil {
+		return "", err
+	}
+
+	return resultBuff.String(), nil
+}
+
+func runCommand(command string, env map[string]string, workDir string, stdout io.Writer, stderr io.Writer) error {
 	cmdArgs := strings.SplitN(command, " ", 2)
 	originalBinary := cmdArgs[0]
 	cmdPayload := cmdArgs[1]
@@ -96,13 +113,13 @@ func RunOptionalCommand(command string, env map[string]string, workDir string) e
 	if config.Config.Mode == config.PreferLocal {
 		if len(cmdBinary) > 0 {
 			// run locally
-			return RunSystemCommandPassThru(cmdBinary, cmdPayload, env, workDir)
+			return RunSystemCommandPassThru(cmdBinary, cmdPayload, env, workDir, stdout, stderr)
 		} else if containerImageErr == nil && len(containerImage.Image) > 0 {
 			// run in container
 			containerCmd := cihelper.ToUnixPathArgs(containerExec.GetRunCommand(containerExec.DetectRuntime()))
 			log.Debug().Msg("container-exec: " + containerCmd)
 			containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
-			return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir)
+			return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdout, stderr)
 		} else {
 			log.Fatal().Str("executable", originalBinary).Msg("no method available to execute command")
 		}
@@ -112,10 +129,10 @@ func RunOptionalCommand(command string, env map[string]string, workDir string) e
 			containerCmd := cihelper.ToUnixPathArgs(containerExec.GetRunCommand(containerExec.DetectRuntime()))
 			log.Debug().Msg("container-exec: " + containerCmd)
 			containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
-			return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir)
+			return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdout, stderr)
 		} else if len(cmdBinary) > 0 {
 			// run locally
-			return RunSystemCommandPassThru(cmdBinary, cmdPayload, env, workDir)
+			return RunSystemCommandPassThru(cmdBinary, cmdPayload, env, workDir, stdout, stderr)
 		} else {
 			log.Fatal().Str("executable", originalBinary).Msg("no method available to execute command")
 		}
@@ -128,39 +145,8 @@ func RunOptionalCommand(command string, env map[string]string, workDir string) e
 	return errors.New("no method available to execute command " + originalBinary)
 }
 
-// RunSystemCommand runs a command and stores the response in a string
-func RunSystemCommand(command string, env map[string]string, workDir string) (string, error) {
-	cmdArgs := strings.SplitN(command, " ", 2)
-	file := cmdArgs[0]
-	args := cmdArgs[1]
-
-	var resultBuff bytes.Buffer
-	log.Debug().Str("file", file).Str("args", args).Str("workdir", workDir).Msg("running command")
-
-	// Run Command
-	cmd, cmdErr := GetPlatformSpecificCommand(runtime.GOOS, file, args, workDir)
-	if cmdErr != nil {
-		log.Err(cmdErr).Msg("failed to execute command")
-		return "", cmdErr
-	}
-
-	cmd.Env = getFullEnvFromMap(env)
-	cmd.Dir = workDir
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = &resultBuff
-	cmd.Stderr = &resultBuff
-	err := cmd.Run()
-	if err != nil {
-		log.Fatal().Str("file", file).Str("args", args).Str("error", err.Error()).Msg("Command Execution Failed")
-		return "", err
-	}
-
-	log.Debug().Str("file", file).Str("args", args).Msg("Command Execution OK")
-	return resultBuff.String(), nil
-}
-
 // RunSystemCommandPassThru runs a command and forwards all output to current console session
-func RunSystemCommandPassThru(file string, args string, env map[string]string, workDir string) error {
+func RunSystemCommandPassThru(file string, args string, env map[string]string, workDir string, stdout io.Writer, stderr io.Writer) error {
 	log.Debug().Str("file", file).Str("args", args).Str("workdir", workDir).Msg("command exec")
 
 	// Run Command
@@ -173,8 +159,8 @@ func RunSystemCommandPassThru(file string, args string, env map[string]string, w
 	cmd.Env = getFullEnvFromMap(env)
 	cmd.Dir = workDir
 	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
 	err := cmd.Run()
 	if err != nil {
 		log.Fatal().Str("file", file).Str("args", args).Str("error", err.Error()).Msg("command execution failed")
@@ -208,25 +194,4 @@ func GetPlatformSpecificCommand(platform string, file string, args string, workD
 	}
 
 	return nil, errors.New("command.GetPlatformSpecificCommand failed, platform " + platform + " is not supported!")
-}
-
-func getFullEnvFromMap(env map[string]string) []string {
-	// full environment
-	fullEnv := make(map[string]string)
-	for _, line := range os.Environ() {
-		z := strings.SplitN(line, "=", 2)
-		fullEnv[z[0]] = z[1]
-	}
-	// custom env parameters
-	for k, v := range env {
-		fullEnv[k] = v
-	}
-
-	// turn into a slice
-	var envLines []string
-	for k, v := range fullEnv {
-		envLines = append(envLines, k+"="+v)
-	}
-
-	return envLines
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/cidverse/cid/pkg/common/commitanalyser"
@@ -10,7 +11,9 @@ import (
 	ncimain "github.com/cidverse/normalizeci/pkg/normalizeci"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
+	"github.com/thoas/go-funk"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -45,6 +48,11 @@ func GetCIDEnvironment(projectDirectory string) map[string]string {
 	// append env from configuration file
 	for key, value := range config.Config.Env {
 		env[key] = value
+	}
+
+	// decode all values
+	for key, value := range env {
+		env[key] = DecodeEnvValue(value)
 	}
 
 	// customization
@@ -123,4 +131,50 @@ func ReplacePlaceholders(input string, env map[string]string) string {
 	}
 
 	return input
+}
+
+func DecodeEnvValue(value string) string {
+	// Base64
+	if strings.HasPrefix(value, "base64/") {
+		dec, decErr := base64.StdEncoding.DecodeString(strings.TrimLeft(value, "base64/"))
+		if decErr == nil {
+			return string(dec)
+		}
+	}
+
+	return value
+}
+
+func GetEnvValue(ctx ActionExecutionContext, name string) string {
+	// check secret storage TODO: cache this somewhere
+	secretFile := filepath.Join(ctx.ProjectDir, ".cid-secrets")
+	if filesystem.FileExists(secretFile) {
+		content, contentErr := filesystem.GetFileContent(secretFile)
+		if contentErr != nil {
+			log.Fatal().Err(contentErr).Str("file", secretFile).Msg("failed to read config file")
+		}
+
+		content = strings.ReplaceAll(content, "\r\n", "\n")
+		lines := strings.Split(content,"\n")
+		for _, line := range lines {
+			lineData := strings.SplitN(line, `=`, 2)
+			if len(lineData) == 2 && !strings.HasPrefix(line, "#") {
+				secretKey := lineData[0]
+				secretValue := lineData[1]
+
+				if name == secretKey {
+					return DecodeEnvValue(secretValue)
+				}
+			}
+		}
+	}
+
+	// check env
+	if funk.Contains(ctx.Env, name) {
+		return ctx.Env[name]
+	} else if funk.Contains(ctx.MachineEnv, name) {
+		return ctx.MachineEnv[name]
+	}
+
+	return ""
 }

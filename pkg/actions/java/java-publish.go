@@ -28,20 +28,27 @@ func (action PublishActionStruct) Check(ctx api.ActionExecutionContext) bool {
 
 // Execute runs the action
 func (action PublishActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
-	// get release version
-	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
-	// isStableRelease := api.IsVersionStable(releaseVersion)
+	// release env
+	releaseEnv := ctx.Env
+	// - gpg signing
+	releaseEnv["ORG_GRADLE_PROJECT_signingKeyId"] = api.GetEnvValue(ctx, "GPG_SIGN_KEYID")
+	releaseEnv["ORG_GRADLE_PROJECT_signingKey"] = api.GetEnvValue(ctx, "GPG_SIGN_PRIVATEKEY")
+	releaseEnv["ORG_GRADLE_PROJECT_signingPassword"] = api.GetEnvValue(ctx, "GPG_SIGN_PASSWORD")
+	// - repo
+	releaseEnv["MAVEN_REPO_URL"] = api.GetEnvValue(ctx, "MAVEN_REPO_URL")
+	releaseEnv["MAVEN_REPO_USERNAME"] = api.GetEnvValue(ctx, "MAVEN_REPO_USERNAME")
+	releaseEnv["MAVEN_REPO_PASSWORD"] = api.GetEnvValue(ctx, "MAVEN_REPO_PASSWORD")
 
 	// publish
 	if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle {
 		// gradle tasks
-		gradleTasks, gradleTasksErr := command.RunSystemCommand(GradleCommandPrefix+` tasks --all`, ctx.Env, ctx.ProjectDir)
+		gradleTasks, gradleTasksErr := command.RunCommandAndGetOutput(GradleCommandPrefix+` tasks --all`, ctx.Env, ctx.ProjectDir)
 		if gradleTasksErr != nil {
 			return errors.New("failed to list gradle tasks (gradle tasks --all)")
 		}
 
 		if strings.Contains(gradleTasks, "publish") {
-			command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" publish --no-daemon --warning-mode=all --console=plain`, ctx.Env, ctx.ProjectDir)
+			command.RunCommand(api.ReplacePlaceholders(GradleCommandPrefix+` -Pversion="{NCI_COMMIT_REF_RELEASE}" publish --no-daemon --warning-mode=all --console=plain --stacktrace`, ctx.Env), releaseEnv, ctx.ProjectDir)
 		} else {
 			log.Warn().Msg("no supported gradle release plugin found")
 		}

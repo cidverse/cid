@@ -20,19 +20,22 @@ func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDe
 
 // Check evaluates if the action should be executed or not
 func (action ScanStruct) Check(ctx api.ActionExecutionContext) bool {
-	return len(ctx.MachineEnv[GITGUARDIAN_API_KEY]) > 0
+	return len(api.GetEnvValue(ctx, GITGUARDIAN_API_KEY)) > 0
 }
 
 // Execute runs the action
 func (action ScanStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// env
+	execEnv := ctx.Env
+	execEnv[GITGUARDIAN_API_KEY] = api.GetEnvValue(ctx, GITGUARDIAN_API_KEY)
+	// gitguardian env  properties
 	for key, value := range ctx.MachineEnv {
 		if strings.HasPrefix(key, GITGUARDIAN_PREFIX) {
-			ctx.Env[key] = value
+			execEnv[key] = value
 		}
 	}
 
-	_ = command.RunOptionalCommand(`ggshield scan path -r -y .`, ctx.Env, ctx.ProjectDir)
+	_ = command.RunOptionalCommand(`ggshield scan path -r -y .`, execEnv, ctx.ProjectDir)
 	return nil
 }
 
