@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/mattn/go-colorable"
 	"github.com/rs/zerolog/log"
 	"os"
@@ -24,7 +25,7 @@ var BuildAt string
 func init() {
 	// Initialize Global Logger
 	colorableOutput := colorable.NewColorableStdout()
-	log.Logger = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: colorableOutput}).With().Timestamp().Logger()
+	log.Logger = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: protectoutput.NewProtectedWriter(nil, colorableOutput)}).With().Timestamp().Logger()
 
 	// Timestamp Format
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
@@ -41,7 +42,7 @@ func init() {
 	// show calling files
 	_, showCalls := os.LookupEnv("CID_SHOW_CALL")
 	if showCalls {
-		log.Logger = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: colorableOutput}).With().Timestamp().Caller().Logger()
+		log.Logger = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: protectoutput.NewProtectedWriter(nil, colorableOutput)}).With().Timestamp().Caller().Logger()
 	}
 
 	// Set Version Information

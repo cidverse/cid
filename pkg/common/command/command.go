@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/EnvCLI/EnvCLI/pkg/container_runtime"
 	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
@@ -43,7 +44,7 @@ func GetCommandVersion(executable string) (string, error) {
 
 // RunCommand runs a required command and forwards all output to console, but will panic/exit if the command fails
 func RunCommand(command string, env map[string]string, workDir string) {
-	err := runCommand(command, env, workDir, NewFileProxyWriter(os.Stdout), NewFileProxyWriter(os.Stderr))
+	err := runCommand(command, env, workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
 	if err != nil {
 		log.Fatal().Err(err).Str("command", command).Msg("failed to execute command")
 	}
@@ -51,7 +52,7 @@ func RunCommand(command string, env map[string]string, workDir string) {
 
 // RunOptionalCommand runs a command and forwards all output to console
 func RunOptionalCommand(command string, env map[string]string, workDir string) error {
-	return runCommand(command, env, workDir, NewFileProxyWriter(os.Stdout), NewFileProxyWriter(os.Stderr))
+	return runCommand(command, env, workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
 }
 
 // RunCommandAndGetOutput runs a command and returns the full response / command output
