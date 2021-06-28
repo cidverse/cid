@@ -54,9 +54,15 @@ func DecryptOpenPGP(privateKey string, privateKeyPassword string, encString stri
 	// Get the passphrase and read the private key.
 	// Have not touched the encrypted string yet
 	passphraseByte := []byte(privateKeyPassword)
-	entity.PrivateKey.Decrypt(passphraseByte)
+	err = entity.PrivateKey.Decrypt(passphraseByte)
+	if err != nil {
+		return "", err
+	}
 	for _, subKey := range entity.Subkeys {
-		subKey.PrivateKey.Decrypt(passphraseByte)
+		err = subKey.PrivateKey.Decrypt(passphraseByte)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	// Decode the base64 string

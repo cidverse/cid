@@ -138,7 +138,7 @@ func DecodeEnvValue(value string) string {
 
 	// Base64
 	if strings.HasPrefix(value, "base64~") {
-		dec, decErr := base64.StdEncoding.DecodeString(strings.TrimLeft(value, "base64~"))
+		dec, decErr := base64.StdEncoding.DecodeString(strings.TrimPrefix(value, "base64~"))
 		if decErr == nil {
 			return string(dec)
 		}
@@ -148,7 +148,7 @@ func DecodeEnvValue(value string) string {
 		privateKey := machineEnv["CID_MASTER_GPG_PRIVATEKEY"]
 		privateKeyPassphrase := machineEnv["CID_MASTER_GPG_PASSWORD"]
 
-		dec, decErr := DecryptOpenPGP(privateKey, privateKeyPassphrase, strings.TrimLeft(value, "openpgp~"))
+		dec, decErr := DecryptOpenPGP(privateKey, privateKeyPassphrase, strings.TrimPrefix(value, "openpgp~"))
 		if decErr == nil {
 			return string(dec)
 		}

@@ -26,9 +26,15 @@ func (w *FileProxyWriter) Write(p []byte) (int, error) {
 
 	// write data
 	if w.file != nil {
-		w.file.Write([]byte(output))
+		_, err := w.file.Write([]byte(output))
+		if err != nil {
+			return 0, err
+		}
 	} else if w.writer != nil {
-		w.writer.Write([]byte(output))
+		_, err := w.writer.Write([]byte(output))
+		if err != nil {
+			return 0, err
+		}
 	} else {
 		lastProxyWrite = output
 	}
