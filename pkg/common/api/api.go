@@ -134,9 +134,21 @@ func ReplacePlaceholders(input string, env map[string]string) string {
 }
 
 func DecodeEnvValue(value string) string {
+	machineEnv := common.GetMachineEnvironment()
+
 	// Base64
-	if strings.HasPrefix(value, "base64/") {
-		dec, decErr := base64.StdEncoding.DecodeString(strings.TrimLeft(value, "base64/"))
+	if strings.HasPrefix(value, "base64~") {
+		dec, decErr := base64.StdEncoding.DecodeString(strings.TrimLeft(value, "base64~"))
+		if decErr == nil {
+			return string(dec)
+		}
+	}
+	// OpenPGP
+	if strings.HasPrefix(value, "openpgp~") {
+		privateKey := machineEnv["CID_MASTER_GPG_PRIVATEKEY"]
+		privateKeyPassphrase := machineEnv["CID_MASTER_GPG_PASSWORD"]
+
+		dec, decErr := DecryptOpenPGP(privateKey, privateKeyPassphrase, strings.TrimLeft(value, "openpgp~"))
 		if decErr == nil {
 			return string(dec)
 		}
