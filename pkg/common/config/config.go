@@ -34,9 +34,10 @@ var Config = struct {
 
 // PathConfig contains the path configuration for build/tmp directories
 type PathConfig struct {
-	Artifact string `default:"dist"`
-	Temp     string `default:"tmp"`
-	Cache    string `default:""`
+	Artifact       string `default:"dist"`
+	ModuleArtifact string `default:"dist"`
+	Temp           string `default:"tmp"`
+	Cache          string `default:""`
 }
 
 func LoadConfig(projectDirectory string) {

@@ -167,7 +167,7 @@ func GetEnvValue(ctx ActionExecutionContext, name string) string {
 		}
 
 		content = strings.ReplaceAll(content, "\r\n", "\n")
-		lines := strings.Split(content,"\n")
+		lines := strings.Split(content, "\n")
 		for _, line := range lines {
 			lineData := strings.SplitN(line, `=`, 2)
 			if len(lineData) == 2 && !strings.HasPrefix(line, "#") {

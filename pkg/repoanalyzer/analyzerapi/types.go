@@ -58,6 +58,7 @@ const (
 	BuildSystemGoMod  ProjectBuildSystem = "gomod"
 	BuildSystemNpm    ProjectBuildSystem = "npm"
 	BuildSystemHugo   ProjectBuildSystem = "hugo"
+	BuildSystemHelm   ProjectBuildSystem = "helm"
 )
 
 type ProjectBuildSystemSyntax string

@@ -128,6 +128,9 @@ func RunAction(action config.WorkflowAction, projectDir string, env map[string]s
 	if !filesystem.DirectoryExists(ctx.Paths.Artifact) {
 		filesystem.CreateDirectory(ctx.Paths.Artifact)
 	}
+	if !filesystem.DirectoryExists(ctx.Paths.ModuleArtifact) {
+		filesystem.CreateDirectory(ctx.Paths.ModuleArtifact)
+	}
 	if !filesystem.DirectoryExists(ctx.Paths.Temp) {
 		filesystem.CreateDirectory(ctx.Paths.Temp)
 	}

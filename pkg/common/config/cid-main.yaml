@@ -66,6 +66,9 @@ actions:
     - name: hugo-build
       type: builtin
       scope: module
+    - name: helm-build
+      type: builtin
+      scope: module
   test:
     # test execution
     - name: golang-test
@@ -303,6 +306,10 @@ container-images:
         dir: /root/.gradle
       - id: java-maven
         dir: /root/.m2
+  # helm
+  - executable: helm
+    image: lachlanevenson/k8s-helm:v3.6.2
+    version: 3.6.2
   # upx
   - executable: upx
     image: envcli/upx:latest

@@ -67,7 +67,8 @@ type ActionExecutionContext struct {
 func UpdateContext(ctx *ActionExecutionContext) {
 	if ctx.CurrentModule != nil {
 		ctx.Paths = config.PathConfig{
-			Artifact: filepath.Join(ctx.ProjectDir, "dist", ctx.CurrentModule.Slug),
+			Artifact: filepath.Join(ctx.ProjectDir, "dist"),
+			ModuleArtifact: filepath.Join(ctx.ProjectDir, "dist", ctx.CurrentModule.Slug),
 			Temp:     filepath.Join(ctx.ProjectDir, "tmp"),
 			Cache:    "",
 		}
@@ -107,9 +108,10 @@ func RegisterBuiltinAction(action ActionStep) {
 func GetActionContext(projectDir string, env map[string]string, currentModule *analyzerapi.ProjectModule) ActionExecutionContext {
 	return ActionExecutionContext{
 		Paths: config.PathConfig{
-			Artifact: filepath.Join(projectDir, "dist"),
-			Temp:     filepath.Join(projectDir, "tmp"),
-			Cache:    "",
+			Artifact:       filepath.Join(projectDir, "dist"),
+			ModuleArtifact: filepath.Join(projectDir, "dist"),
+			Temp:           filepath.Join(projectDir, "tmp"),
+			Cache:          "",
 		},
 		ProjectDir:      projectDir,
 		WorkDir:         filesystem.GetWorkingDirectory(),

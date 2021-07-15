@@ -4,6 +4,7 @@ import (
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	_ "github.com/cidverse/cid/pkg/repoanalyzer/gomod"
 	_ "github.com/cidverse/cid/pkg/repoanalyzer/gradle"
+	_ "github.com/cidverse/cid/pkg/repoanalyzer/helm"
 	_ "github.com/cidverse/cid/pkg/repoanalyzer/hugo"
 	_ "github.com/cidverse/cid/pkg/repoanalyzer/node"
 	"github.com/rs/zerolog/log"

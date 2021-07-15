@@ -7,6 +7,7 @@ import (
 	_ "github.com/cidverse/cid/pkg/actions/gitguardian"
 	_ "github.com/cidverse/cid/pkg/actions/gitleaks"
 	_ "github.com/cidverse/cid/pkg/actions/golang"
+	_ "github.com/cidverse/cid/pkg/actions/helm"
 	_ "github.com/cidverse/cid/pkg/actions/hugo"
 	_ "github.com/cidverse/cid/pkg/actions/java"
 	_ "github.com/cidverse/cid/pkg/actions/node"

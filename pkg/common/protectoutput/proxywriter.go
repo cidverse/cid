@@ -8,14 +8,14 @@ import (
 var lastProxyWrite string
 
 type FileProxyWriter struct {
-	file *os.File
+	file   *os.File
 	writer io.Writer
 }
 
 // NewProtectedWriter proxies all output to stdout/stderr to omit/remove any kind of credentials from all logs
 func NewProtectedWriter(file *os.File, writer io.Writer) *FileProxyWriter {
 	return &FileProxyWriter{
-		file: file,
+		file:   file,
 		writer: writer,
 	}
 }
