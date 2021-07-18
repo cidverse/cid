@@ -95,6 +95,9 @@ actions:
       type: builtin
       scope: module
     # scanners
+    - name: trivy-fs-scan
+      type: builtin
+      scope: project
     - name: fossa-scan
       type: builtin
       scope: project
@@ -326,6 +329,13 @@ container-images:
   - executable: sonar-scanner
     image: docker.io/sonarsource/sonar-scanner-cli:4.6
     version: 4.6.0
+  # trivy security scanner
+  - executable: trivy
+    image: aquasec/trivy:0.19.1
+    version: 0.19.1
+    cache:
+      - id: trivy-cache
+        dir: /root/.cache/trivy
   # shellcheck
   - executable: shellcheck
     image: docker.io/koalaman/shellcheck:v0.7.1
