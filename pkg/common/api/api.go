@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/cidverse/cid/pkg/common/commitanalyser"
 	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/common"
 	ncimain "github.com/cidverse/normalizeci/pkg/normalizeci"
@@ -134,8 +135,6 @@ func ReplacePlaceholders(input string, env map[string]string) string {
 }
 
 func DecodeEnvValue(value string) string {
-	machineEnv := common.GetMachineEnvironment()
-
 	// Base64
 	if strings.HasPrefix(value, "base64~") {
 		dec, decErr := base64.StdEncoding.DecodeString(strings.TrimPrefix(value, "base64~"))
@@ -145,12 +144,14 @@ func DecodeEnvValue(value string) string {
 	}
 	// OpenPGP
 	if strings.HasPrefix(value, "openpgp~") {
+		// todo: cache
+		machineEnv := common.GetMachineEnvironment()
 		privateKey := machineEnv["CID_MASTER_GPG_PRIVATEKEY"]
 		privateKeyPassphrase := machineEnv["CID_MASTER_GPG_PASSWORD"]
 
 		dec, decErr := DecryptOpenPGP(privateKey, privateKeyPassphrase, strings.TrimPrefix(value, "openpgp~"))
 		if decErr == nil {
-			return string(dec)
+			return dec
 		}
 	}
 
@@ -175,7 +176,9 @@ func GetEnvValue(ctx ActionExecutionContext, name string) string {
 				secretValue := lineData[1]
 
 				if name == secretKey {
-					return DecodeEnvValue(secretValue)
+					decoded := DecodeEnvValue(secretValue)
+					AutoProtectValues(secretKey, secretValue, decoded)
+					return decoded
 				}
 			}
 		}
@@ -183,10 +186,22 @@ func GetEnvValue(ctx ActionExecutionContext, name string) string {
 
 	// check env
 	if funk.Contains(ctx.Env, name) {
-		return ctx.Env[name]
+		decoded := DecodeEnvValue(ctx.Env[name])
+		AutoProtectValues(name, ctx.Env[name], decoded)
+		return decoded
 	} else if funk.Contains(ctx.MachineEnv, name) {
-		return ctx.MachineEnv[name]
+		decoded := DecodeEnvValue(ctx.MachineEnv[name])
+		AutoProtectValues(name, ctx.MachineEnv[name], decoded)
+		return decoded
 	}
 
 	return ""
+}
+
+func AutoProtectValues(key string, original string, decoded string) {
+	upperKey := strings.ToUpper(key)
+	if strings.Contains(upperKey, "KEY") || strings.Contains(upperKey, "USER") || strings.Contains(upperKey, "PASS") || strings.Contains(upperKey, "PRIVATE") {
+		protectoutput.ProtectPhrase(original)
+		protectoutput.ProtectPhrase(decoded)
+	}
 }
