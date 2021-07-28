@@ -18,10 +18,10 @@ func ProtectPhrase(phrase string) {
 	}
 }
 
-// RedactProtectedPhrases redacts all protected phrases in the input string (replace with **redacted**)
+// RedactProtectedPhrases redacts all protected phrases in the input string (replace with ***)
 func RedactProtectedPhrases(input string) string {
 	for _, phrase := range protectedPhrases {
-		input = strings.ReplaceAll(input, phrase, "**redacted**")
+		input = strings.ReplaceAll(input, phrase, "***")
 	}
 
 	return input

@@ -23,7 +23,7 @@ func TestRedaction(t *testing.T) {
 
 	// check redacted
 	out := RedactProtectedPhrases("abc mysecret def")
-	assert.Equal(t, "abc **redacted** def", out)
+	assert.Equal(t, "abc *** def", out)
 }
 
 func TestRedactionBase64(t *testing.T) {
@@ -34,5 +34,5 @@ func TestRedactionBase64(t *testing.T) {
 
 	// check redacted
 	out := RedactProtectedPhrases("abc bXlzZWNyZXQ= def")
-	assert.Equal(t, "abc **redacted** def", out)
+	assert.Equal(t, "abc *** def", out)
 }
