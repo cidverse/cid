@@ -23,7 +23,11 @@ func (action PublishActionStruct) GetDetails(ctx api.ActionExecutionContext) api
 
 // Check evaluates if the action should be executed or not
 func (action PublishActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return ctx.CurrentModule != nil && (ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle || ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven)
+	if ctx.CurrentModule != nil && (ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle || ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven) {
+		return ctx.Env["NCI_COMMIT_REF_TYPE"] == "tag"
+	}
+
+	return false
 }
 
 // Execute runs the action

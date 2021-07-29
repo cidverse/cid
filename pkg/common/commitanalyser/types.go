@@ -55,4 +55,8 @@ var DefaultReleaseVersionRules = []CommitVersionRule{
 		Type:    `style`,
 		Release: `patch`,
 	},
+	{
+		Type:    `chore`,
+		Release: `patch`,
+	},
 }

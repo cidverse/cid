@@ -63,7 +63,7 @@ func DeterminateNextReleaseVersion(commits []vcsrepository.Commit, commitPattern
 		nextVersion = previousVersion.IncMajor()
 	} else if releaseType == ReleaseMinor {
 		nextVersion = previousVersion.IncMinor()
-	} else if releaseType == ReleasePatch {
+	} else if releaseType == ReleasePatch || releaseType == ReleaseNone {
 		nextVersion = previousVersion.IncPatch()
 	}
 
