@@ -253,6 +253,18 @@ tools:
 container-images:
   # golang
   - executable: go
+    image: docker.io/golang:1.16.6-alpine
+    version: 1.16.6
+    cache:
+      - id: go-pkg
+        dir: /go/pkg
+  - executable: go
+    image: docker.io/golang:1.16.5-alpine
+    version: 1.16.5
+    cache:
+      - id: go-pkg
+        dir: /go/pkg
+  - executable: go
     image: docker.io/golang:1.16.4-alpine
     version: 1.16.4
     cache:
