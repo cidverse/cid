@@ -158,6 +158,11 @@ actions:
 tools:
   # golang
   - executable: go
+    env-name: GOROOT_1_17
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 1.17.0
+  - executable: go
     env-name: GOROOT_1_16
     env-allowed-suffix: ["_X64"]
     env-path-dir: /bin
@@ -253,50 +258,20 @@ tools:
 container-images:
   # golang
   - executable: go
-    image: docker.io/golang:1.16.6-alpine
-    version: 1.16.6
+    image: docker.io/golang:1.17.6-alpine
+    version: 1.17.6
     cache:
       - id: go-pkg
         dir: /go/pkg
   - executable: go
-    image: docker.io/golang:1.16.5-alpine
-    version: 1.16.5
+    image: docker.io/golang:1.16.13-alpine
+    version: 1.16.13
     cache:
       - id: go-pkg
         dir: /go/pkg
   - executable: go
-    image: docker.io/golang:1.16.4-alpine
-    version: 1.16.4
-    cache:
-      - id: go-pkg
-        dir: /go/pkg
-  - executable: go
-    image: docker.io/golang:1.16.3-alpine
-    version: 1.16.3
-    cache:
-      - id: go-pkg
-        dir: /go/pkg
-  - executable: go
-    image: docker.io/golang:1.16.2-alpine
-    version: 1.16.2
-    cache:
-      - id: go-pkg
-        dir: /go/pkg
-  - executable: go
-    image: docker.io/golang:1.16.1-alpine
-    version: 1.16.1
-    cache:
-      - id: go-pkg
-        dir: /go/pkg
-  - executable: go
-    image: docker.io/golang:1.16.0-alpine
-    version: 1.16.0
-    cache:
-      - id: go-pkg
-        dir: /go/pkg
-  - executable: go
-    image: docker.io/golang:1.15.12-alpine
-    version: 1.15.12
+    image: docker.io/golang:1.15.15-alpine
+    version: 1.15.15
     cache:
       - id: go-pkg
         dir: /go/pkg
@@ -323,19 +298,19 @@ container-images:
         dir: /root/.m2
   # helm
   - executable: helm
-    image: lachlanevenson/k8s-helm:v3.6.2
-    version: 3.6.2
+    image: lachlanevenson/k8s-helm:v3.7.2
+    version: 3.7.2
   # upx
   - executable: upx
     image: envcli/upx:latest
     version: 3.95.0
   # gitleaks
   - executable: gitleaks
-    image: docker.io/zricethezav/gitleaks:v7.5.0
-    version: 7.5.0
+    image: docker.io/zricethezav/gitleaks:v8.2.7
+    version: 8.2.7
   # gitguardian ggshield
   - executable: ggshield
-    image: docker.io/gitguardian/ggshield:v1.5.0
+    image: docker.io/gitguardian/ggshield:v1.10.7
     version: 1.5.0
   # sonarqube
   - executable: sonar-scanner

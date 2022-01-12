@@ -1,6 +1,6 @@
 # build-tool dependencies
 dependencies:
-  go: ">= 1.16.0"
+  go: ">= 1.17.0"
 
 # project conventions
 conventions:
