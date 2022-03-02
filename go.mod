@@ -5,10 +5,10 @@ go 1.17
 require (
 	github.com/EnvCLI/EnvCLI v0.7.1
 	github.com/Masterminds/semver/v3 v3.1.1
-	github.com/ProtonMail/gopenpgp/v2 v2.4.1
-	github.com/cavaliercoder/grab v2.0.0+incompatible
+	github.com/ProtonMail/gopenpgp/v2 v2.4.5
+	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/cidverse/cidverseutils v0.0.0-20210614222439-562618314556
-	github.com/cidverse/normalizeci v1.0.1-0.20210613215119-4137dc712560
+	github.com/cidverse/normalizeci v1.0.1-0.20220118211804-89cb1cbba7cb
 	github.com/google/cel-go v0.9.0
 	github.com/gosimple/slug v1.12.0
 	github.com/jinzhu/configor v1.2.1
@@ -27,7 +27,7 @@ require (
 require (
 	github.com/BurntSushi/toml v1.0.0 // indirect
 	github.com/Microsoft/go-winio v0.5.1 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20211221144345-a4f6767435ab // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20220113124808-70ae35bab23f // indirect
 	github.com/ProtonMail/go-mime v0.0.0-20190923161245-9b5a4261663a // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20220111164937-1b144fa7b40f // indirect
@@ -57,9 +57,9 @@ require (
 	github.com/xanzy/go-gitlab v0.54.3 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce // indirect
-	golang.org/x/net v0.0.0-20220111093109-d55c255bac03 // indirect
+	golang.org/x/net v0.0.0-20220114011407-0dd24b26b47d // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
-	golang.org/x/sys v0.0.0-20220111092808-5a964db01320 // indirect
+	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
