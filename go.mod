@@ -3,11 +3,10 @@ module github.com/cidverse/cid
 go 1.17
 
 require (
-	github.com/EnvCLI/EnvCLI v0.7.1
 	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/ProtonMail/gopenpgp/v2 v2.4.5
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/cidverse/cidverseutils v0.0.0-20210614222439-562618314556
+	github.com/cidverse/cidverseutils v0.0.0-20220309223829-1e959eed0bf3
 	github.com/cidverse/normalizeci v1.0.1-0.20220118211804-89cb1cbba7cb
 	github.com/google/cel-go v0.9.0
 	github.com/gosimple/slug v1.12.0
@@ -46,10 +45,12 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.1.0 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
