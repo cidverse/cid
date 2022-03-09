@@ -39,6 +39,12 @@ type ProjectModule struct {
 
 	// Submodules contains information about submodules
 	Submodules []*ProjectModule
+
+	// Files holds all project files
+	Files []string
+
+	// FilesByExtension contains all files by extension
+	FilesByExtension map[string][]string
 }
 
 type ProjectLanguage string

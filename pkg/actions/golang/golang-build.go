@@ -8,6 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/shomali11/parallelizer"
 	"gopkg.in/yaml.v2"
+	"os"
 	"strings"
 )
 
@@ -42,10 +43,16 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 		group := parallelizer.NewGroup(parallelizer.WithPoolSize(ctx.Parallelization))
 		defer group.Close()
 
+		// install and build only works for projects that generate binaries, not for library modules
+		if !hasGoFilesInDirectory(ctx.CurrentModule.FilesByExtension["go"], ctx.CurrentModule.RootDirectory) {
+			log.Info().Msg("no go files found in main directory, assuming go library, skipping local installation and binary build.")
+			return nil
+		}
+
 		// install locally
 		if !strings.EqualFold(ctx.MachineEnv["CI"], "true") {
 			err := group.Add(func() {
-				log.Info().Msg("local build detected, installing binary locally")
+				log.Info().Msg("installing binary on local system")
 				command.RunCommand(api.ReplacePlaceholders(`go install -ldflags "-s -w -X main.Version={NCI_COMMIT_REF_RELEASE} -X main.CommitHash={NCI_COMMIT_SHA_SHORT} -X main.BuildAt={NOW_RFC3339}" .`, ctx.Env), ctx.Env, ctx.CurrentModule.Directory)
 			})
 			if err != nil {
@@ -80,4 +87,15 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 
 func init() {
 	api.RegisterBuiltinAction(BuildActionStruct{})
+}
+
+// hasGoFilesInDirectory checks of the file list contains go files in the root directory
+func hasGoFilesInDirectory(files []string, directory string) bool {
+	for _, file := range files {
+		fileRelative := strings.TrimPrefix(file, directory+string(os.PathSeparator))
+		if !strings.ContainsRune(fileRelative, os.PathSeparator) {
+			return true
+		}
+	}
+	return false
 }

@@ -54,6 +54,8 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 				Language:          language,
 				Dependencies:      dependencies,
 				Submodules:        nil,
+				Files:             ctx.Files,
+				FilesByExtension:  ctx.FilesByExtension,
 			}
 
 			parent := analyzerapi.FindParentModule(result, &module)
