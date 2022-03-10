@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var rootCmd = &cobra.Command{
@@ -9,7 +10,8 @@ var rootCmd = &cobra.Command{
 	Short: `cid is a cli to run pipeline actions locally and as part of your ci/cd process`,
 	Long:  `cid is a cli to run pipeline actions locally and as part of your ci/cd process`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Do Stuff Here
+		cmd.Help()
+		os.Exit(0)
 	},
 }
 

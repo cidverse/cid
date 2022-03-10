@@ -52,7 +52,7 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 		// install locally
 		if !strings.EqualFold(ctx.MachineEnv["CI"], "true") {
 			err := group.Add(func() {
-				log.Info().Msg("installing binary on local system")
+				log.Info().Msg("go install")
 				command.RunCommand(api.ReplacePlaceholders(`go install -ldflags "-s -w -X main.Version={NCI_COMMIT_REF_RELEASE} -X main.CommitHash={NCI_COMMIT_SHA_SHORT} -X main.BuildAt={NOW_RFC3339}" .`, ctx.Env), ctx.Env, ctx.CurrentModule.Directory)
 			})
 			if err != nil {
