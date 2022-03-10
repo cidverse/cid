@@ -4,6 +4,7 @@ import (
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/workflow"
+	"github.com/cidverse/cid/pkg/repoanalyzer"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -33,6 +34,14 @@ var actionCmd = &cobra.Command{
 		if actionErr != nil {
 			log.Fatal().Str("action", actionName).Msg("action not found")
 		}
+
+		// module-scoped actions require module information
+		if action.Scope == "module" && action.Module == nil {
+			log.Warn().Msg("running analyzer because of missing module info in action ...")
+			modules := repoanalyzer.AnalyzeProject(projectDir, projectDir)
+			action.Module = modules[0]
+		}
+
 		workflow.RunAction(action, projectDir, env, args)
 	},
 }
