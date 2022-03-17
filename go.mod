@@ -1,13 +1,13 @@
 module github.com/cidverse/cid
 
-go 1.17
+go 1.18
 
 require (
 	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/ProtonMail/gopenpgp/v2 v2.4.5
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/cidverse/cidverseutils v0.0.0-20220309223829-1e959eed0bf3
-	github.com/cidverse/normalizeci v1.0.1-0.20220310002234-af51f13335e8
+	github.com/cidverse/normalizeci v1.1.0
 	github.com/google/cel-go v0.9.0
 	github.com/gosimple/slug v1.12.0
 	github.com/jinzhu/configor v1.2.1
@@ -15,7 +15,7 @@ require (
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/rs/zerolog v1.26.1
 	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
-	github.com/spf13/cobra v1.3.0
+	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.0
 	github.com/thoas/go-funk v0.9.1
 	golang.org/x/mod v0.5.1
@@ -59,10 +59,10 @@ require (
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/xanzy/go-gitlab v0.59.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
-	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70 // indirect
+	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a // indirect
-	golang.org/x/sys v0.0.0-20220307203707-22a9840ba4d7 // indirect
+	golang.org/x/sys v0.0.0-20220317061510-51cd9980dadf // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
