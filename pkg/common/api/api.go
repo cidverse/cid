@@ -200,8 +200,12 @@ func GetEnvValue(ctx ActionExecutionContext, name string) string {
 
 func AutoProtectValues(key string, original string, decoded string) {
 	upperKey := strings.ToUpper(key)
-	if strings.Contains(upperKey, "KEY") || strings.Contains(upperKey, "USER") || strings.Contains(upperKey, "PASS") || strings.Contains(upperKey, "PRIVATE") {
-		protectoutput.ProtectPhrase(original)
-		protectoutput.ProtectPhrase(decoded)
+	if strings.Contains(upperKey, "KEY") || strings.Contains(upperKey, "USER") || strings.Contains(upperKey, "PASS") || strings.Contains(upperKey, "PRIVATE") || strings.Contains(upperKey, "TOKEN") {
+		if original != "" {
+			protectoutput.ProtectPhrase(original)
+		}
+		if decoded != "" {
+			protectoutput.ProtectPhrase(decoded)
+		}
 	}
 }

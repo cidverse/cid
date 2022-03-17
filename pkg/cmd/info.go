@@ -6,12 +6,14 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/common/workflow"
 	"github.com/cidverse/cid/pkg/repoanalyzer"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v3"
 	"strings"
 )
@@ -26,13 +28,15 @@ type InfoCommandResponse struct {
 
 func init() {
 	rootCmd.AddCommand(infoCmd)
+	infoCmd.PersistentFlags().StringArrayP("exclude", "e", []string{"dep", "hostenv", "files"}, "Excludes the specified information, supports: dep, hostenv, files, plan (default: dep, hostenv, files)")
 }
 
 var infoCmd = &cobra.Command{
 	Use:   "info",
 	Short: `prints all available project information`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debug().Str("command", "info").Msg("running command")
+		excludes, _ := cmd.Flags().GetStringArray("exclude")
+		log.Debug().Str("command", "info").Strs("excludes", excludes).Msg("running command")
 
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
@@ -45,7 +49,16 @@ var infoCmd = &cobra.Command{
 		var response = InfoCommandResponse{}
 
 		// detect project modules
-		response.Modules = repoanalyzer.AnalyzeProject(projectDir, projectDir)
+		for _, module := range repoanalyzer.AnalyzeProject(projectDir, projectDir) {
+			if funk.Contains(excludes, "dep") {
+				module.Dependencies = nil
+			}
+			if funk.Contains(excludes, "files") {
+				module.Files = nil
+				module.FilesByExtension = nil
+			}
+			response.Modules = append(response.Modules, module)
+		}
 
 		// tool constraints
 		response.ToolConstraints = make(map[string]string)
@@ -67,6 +80,9 @@ var infoCmd = &cobra.Command{
 			outputExecutionPlan = append(outputExecutionPlan, stage)
 		}
 		response.ExecutionPlan = outputExecutionPlan
+		if funk.Contains(excludes, "plan") {
+			response.ExecutionPlan = nil
+		}
 
 		// tools
 		response.Tools = make(map[string]string)
@@ -92,10 +108,14 @@ var infoCmd = &cobra.Command{
 		// environment
 		response.Environment = make(map[string]string)
 		for key, value := range env {
-			if strings.HasSuffix(key, "_TOKEN") || strings.HasSuffix(key, "_KEY") || strings.HasSuffix(key, "_PASSWORD") {
-				response.Environment[key] = api.GetFirstNCharacters(value, 6) + "***"
-			} else {
-				response.Environment[key] = value
+			api.AutoProtectValues(key, value, value)
+			response.Environment[key] = value
+		}
+		if funk.Contains(excludes, "hostenv") {
+			for key := range env {
+				if !strings.HasPrefix(key, "NCI") {
+					delete(response.Environment, key)
+				}
 			}
 		}
 
@@ -104,6 +124,6 @@ var infoCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed to serialize yaml response")
 		}
-		fmt.Print(string(responseText))
+		fmt.Print(protectoutput.RedactProtectedPhrases(string(responseText)))
 	},
 }
