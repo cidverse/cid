@@ -13,7 +13,6 @@ type OptimizeActionStruct struct{}
 // GetDetails retrieves information about the action
 func (action OptimizeActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
-		Stage:     "build",
 		Name:      "upx-optimize",
 		Version:   "0.1.0",
 		UsedTools: []string{"upx"},

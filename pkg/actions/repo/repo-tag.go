@@ -17,7 +17,6 @@ func (action TagCreateStruct) GetDetails(ctx api.ActionExecutionContext) api.Act
 	}
 
 	return api.ActionDetails{
-		Stage:     "publish",
 		Name:      "repo-tag-create",
 		Version:   "0.1.0",
 		UsedTools: usedTools,

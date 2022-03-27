@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/ProtonMail/gopenpgp/v2 v2.4.5
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/cidverse/cidverseutils v0.0.0-20220309223829-1e959eed0bf3
+	github.com/cidverse/cidverseutils v0.0.0-20220318153543-78db8e6a36bd
 	github.com/cidverse/normalizeci v1.1.0
 	github.com/google/cel-go v0.9.0
 	github.com/gosimple/slug v1.12.0

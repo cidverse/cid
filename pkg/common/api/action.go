@@ -13,7 +13,6 @@ const DefaultParallelization = 10
 
 // ActionDetails holds details about the action
 type ActionDetails struct {
-	Stage            string
 	Name             string
 	Version          string
 	UsedTools        []string
@@ -67,10 +66,10 @@ type ActionExecutionContext struct {
 func UpdateContext(ctx *ActionExecutionContext) {
 	if ctx.CurrentModule != nil {
 		ctx.Paths = config.PathConfig{
-			Artifact: filepath.Join(ctx.ProjectDir, "dist"),
+			Artifact:       filepath.Join(ctx.ProjectDir, "dist"),
 			ModuleArtifact: filepath.Join(ctx.ProjectDir, "dist", ctx.CurrentModule.Slug),
-			Temp:     filepath.Join(ctx.ProjectDir, "tmp"),
-			Cache:    "",
+			Temp:           filepath.Join(ctx.ProjectDir, "tmp"),
+			Cache:          "",
 		}
 	} else {
 		ctx.Paths = config.PathConfig{

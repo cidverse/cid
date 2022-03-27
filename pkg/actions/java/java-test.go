@@ -11,7 +11,6 @@ type TestActionStruct struct{}
 // GetDetails retrieves information about the action
 func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
-		Stage:     "test",
 		Name:      "java-test",
 		Version:   "0.1.0",
 		UsedTools: []string{"java"},

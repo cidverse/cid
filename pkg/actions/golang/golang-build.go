@@ -17,7 +17,6 @@ type BuildActionStruct struct{}
 // GetDetails retrieves information about the action
 func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
-		Stage:            "build",
 		Name:             "golang-build",
 		Version:          "0.1.0",
 		UsedTools:        []string{"go"},

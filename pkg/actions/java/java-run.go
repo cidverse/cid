@@ -14,7 +14,6 @@ type RunActionStruct struct{}
 // GetDetails returns information about this action
 func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
-		Stage:     "run",
 		Name:      "java-run",
 		Version:   "0.1.0",
 		UsedTools: []string{"java"},

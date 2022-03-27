@@ -14,7 +14,6 @@ type PackageActionStruct struct{}
 // GetDetails retrieves information about the action
 func (action PackageActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
-		Stage:     "package",
 		Name:      "container-package",
 		Version:   "0.1.0",
 		UsedTools: []string{"docker"},

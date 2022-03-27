@@ -11,7 +11,6 @@ type ScanStruct struct{}
 // GetDetails retrieves information about the action
 func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
-		Stage:     "sast",
 		Name:      "gitguardian-scan",
 		Version:   "0.1.0",
 		UsedTools: []string{"ggshield"},

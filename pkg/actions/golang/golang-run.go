@@ -12,7 +12,6 @@ type RunActionStruct struct{}
 // GetDetails retrieves information about the action
 func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
-		Stage:            "run",
 		Name:             "golang-run",
 		Version:          "0.1.0",
 		UsedTools:        []string{"go"},

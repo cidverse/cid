@@ -14,7 +14,6 @@ type AssetPublishGitHubStruct struct{}
 // GetDetails retrieves information about the action
 func (action AssetPublishGitHubStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
-		Stage:     "publish",
 		Name:      "repo-release-github",
 		Version:   "0.1.0",
 		UsedTools: []string{"gh"},

@@ -16,7 +16,6 @@ type ChangelogGenerateStruct struct{}
 // GetDetails retrieves information about the action
 func (action ChangelogGenerateStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
-		Stage:     "publish",
 		Name:      "repo-changelog-generate",
 		Version:   "0.1.0",
 		UsedTools: []string{},

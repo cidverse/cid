@@ -28,6 +28,7 @@ stages:
 
 # actions
 actions:
+  # run locally (dev)
   run:
     - name: golang-run
       type: builtin
@@ -41,6 +42,7 @@ actions:
     - name: hugo-run
       type: builtin
       scope: module
+  # build artifacts
   build:
     - name: golang-build
       type: builtin
@@ -69,14 +71,15 @@ actions:
     - name: helm-build
       type: builtin
       scope: module
+  # test execution
   test:
-    # test execution
     - name: golang-test
       type: builtin
       scope: module
     - name: java-test
       type: builtin
       scope: module
+  # package
   package:
     # optimization
     - name: upx-optimize
@@ -86,12 +89,27 @@ actions:
     - name: container-package
       type: builtin
       scope: module
+  # linting
+  lint:
+    - name: golang-lint
+      type: builtin
+      scope: module
+    - name: python-lint
+      type: builtin
+      scope: module
+    - name: helm-lint
+      type: builtin
+      scope: module
+  # static application security testing (embeds lint)
   sast:
     # linters
     - name: golang-lint
       type: builtin
       scope: module
     - name: python-lint
+      type: builtin
+      scope: module
+    - name: helm-lint
       type: builtin
       scope: module
     # scanners
@@ -306,8 +324,17 @@ container-images:
         dir: /root/.m2
   # helm
   - executable: helm
-    image: lachlanevenson/k8s-helm:v3.8.0
-    version: 3.8.0
+    image: lachlanevenson/k8s-helm:v3.8.1
+    version: 3.8.1
+    cache:
+      - id: helm-config
+        dir: /root/.config/helm
+      - id: helm-cache
+        dir: /root/.cache/helm/cache
+      - id: helm-plugins
+        dir: /root/.cache/helm/plugins
+      - id: helm-repository
+        dir: /root/.cache/helm/repository
   # upx
   - executable: upx
     image: envcli/upx:latest

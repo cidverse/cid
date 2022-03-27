@@ -11,7 +11,6 @@ type ScanStruct struct{}
 // GetDetails retrieves information about the action
 func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
-		Stage:     "sast",
 		Name:      "sonarqube-scan",
 		Version:   "0.0.1",
 		UsedTools: []string{"sonar-scanner"},
