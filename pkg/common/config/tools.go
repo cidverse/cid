@@ -19,6 +19,7 @@ const PathSeparator = string(os.PathSeparator)
 type ToolCacheDir struct {
 	Id            string
 	ContainerPath string `yaml:"dir"`
+	MountType     string `yaml:"type"`
 }
 
 type ToolExecutableDiscovery struct {

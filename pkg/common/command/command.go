@@ -105,7 +105,12 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 			cacheDir := path.Join(os.TempDir(), "cid", c.Id)
 			_ = os.MkdirAll(cacheDir, os.ModePerm)
 
-			containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: cihelper.ToUnixPath(cacheDir), Target: c.ContainerPath})
+			// support mounting volumes (auto created if not present) or directories
+			if c.MountType == "volume" {
+				containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: c.Id, Target: c.ContainerPath})
+			} else {
+				containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: cihelper.ToUnixPath(cacheDir), Target: c.ContainerPath})
+			}
 		}
 	}
 
