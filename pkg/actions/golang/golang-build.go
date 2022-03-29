@@ -52,7 +52,7 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 		if !strings.EqualFold(ctx.MachineEnv["CI"], "true") {
 			err := group.Add(func() {
 				log.Info().Msg("go install")
-				command.RunCommand(api.ReplacePlaceholders(`go install -ldflags "-s -w -X main.Version={NCI_COMMIT_REF_RELEASE} -X main.CommitHash={NCI_COMMIT_SHA_SHORT} -X main.BuildAt={NOW_RFC3339}" .`, ctx.Env), ctx.Env, ctx.CurrentModule.Directory)
+				command.RunCommand(api.ReplacePlaceholders(`go install -ldflags "`+GetLdFlags(config)+`-X main.Version={NCI_COMMIT_REF_RELEASE} -X main.CommitHash={NCI_COMMIT_SHA_SHORT} -X main.BuildAt={NOW_RFC3339}" .`, ctx.Env), ctx.Env, ctx.CurrentModule.Directory)
 			})
 			if err != nil {
 				return errors.New("failed to schedule go-install task. Cause: " + err.Error())
@@ -66,7 +66,7 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 
 			err := group.Add(func() {
 				log.Info().Str("goos", goos).Str("goarch", goarch).Msg("go build")
-				CrossCompile(ctx, goos, goarch)
+				CrossCompile(ctx, config, goos, goarch)
 			})
 			if err != nil {
 				return errors.New("failed to schedule go-build task. Cause: " + err.Error())

@@ -48,6 +48,8 @@ actions:
       type: builtin
       scope: module
       config:
+        # debug information?
+        debug: false
         # cross platform build
         platform:
           - goos: windows
