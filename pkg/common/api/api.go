@@ -7,6 +7,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/commitanalyser"
 	"github.com/cidverse/cid/pkg/common/config"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
+	"github.com/cidverse/cid/pkg/core/secret"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/common"
 	ncimain "github.com/cidverse/normalizeci/pkg/normalizeci"
@@ -149,7 +150,7 @@ func DecodeEnvValue(value string) string {
 		privateKey := machineEnv["CID_MASTER_GPG_PRIVATEKEY"]
 		privateKeyPassphrase := machineEnv["CID_MASTER_GPG_PASSWORD"]
 
-		dec, decErr := DecryptOpenPGP(privateKey, privateKeyPassphrase, strings.TrimPrefix(value, "openpgp~"))
+		dec, decErr := secret.DecryptOpenPGP(privateKey, privateKeyPassphrase, strings.TrimPrefix(value, "openpgp~"))
 		if decErr == nil {
 			return dec
 		}

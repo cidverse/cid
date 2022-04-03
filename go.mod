@@ -3,13 +3,13 @@ module github.com/cidverse/cid
 go 1.18
 
 require (
-	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/ProtonMail/gopenpgp/v2 v2.4.5
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/cidverse/cidverseutils v0.0.0-20220318153543-78db8e6a36bd
 	github.com/cidverse/normalizeci v1.1.0
 	github.com/google/cel-go v0.9.0
 	github.com/gosimple/slug v1.12.0
+	github.com/hashicorp/go-version v1.4.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/mattn/go-colorable v0.1.12
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
@@ -25,6 +25,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.0.0 // indirect
+	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/Microsoft/go-winio v0.5.2 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20220113124808-70ae35bab23f // indirect
 	github.com/ProtonMail/go-mime v0.0.0-20190923161245-9b5a4261663a // indirect

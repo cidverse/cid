@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/core/version"
 	"github.com/spf13/cobra"
 	"runtime"
 )
@@ -26,7 +26,7 @@ var versionCmd = &cobra.Command{
 	Long:  `All software has versions. This is cid's`,
 	Run: func(cmd *cobra.Command, args []string) {
 		versionPrefix := ""
-		if api.IsVersionStable(Version) {
+		if version.IsStable(Version) {
 			versionPrefix = "v"
 		}
 

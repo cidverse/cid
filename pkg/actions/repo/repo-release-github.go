@@ -3,6 +3,7 @@ package repo
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/core/version"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"path/filepath"
@@ -44,7 +45,7 @@ func (action AssetPublishGitHubStruct) Execute(ctx api.ActionExecutionContext, s
 	opts = append(opts, `--title "`+tagName+`"`)
 
 	// prerelease?
-	if !api.IsVersionStable(tagName) {
+	if !version.IsStable(tagName) {
 		opts = append(opts, "--prerelease")
 	}
 

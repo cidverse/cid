@@ -3,15 +3,6 @@ package commitanalyser
 // Conventional Commits - https://www.conventionalcommits.org/en/v1.0.0/
 var ConventionalCommitPattern = `(?P<type>[A-Za-z]+)((?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?)(:\s?(?P<subject>.*))?`
 
-type ReleaseType int32
-
-const (
-	ReleaseNone  ReleaseType = 0
-	ReleasePatch ReleaseType = 1
-	ReleaseMinor ReleaseType = 2
-	ReleaseMajor ReleaseType = 3
-)
-
 type CommitVersionRule struct {
 	Type    string
 	Scope   string

@@ -1,7 +1,7 @@
 package commitanalyser
 
 import (
-	"github.com/Masterminds/semver/v3"
+	"github.com/cidverse/cid/pkg/core/version"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/oriser/regroup"
 	"github.com/rs/zerolog/log"
@@ -9,13 +9,7 @@ import (
 )
 
 func DeterminateNextReleaseVersion(commits []vcsrepository.Commit, commitPatternList []string, rules []CommitVersionRule, previousVersionStr string) (string, error) {
-	previousVersion, previousVersionErr := semver.NewVersion(previousVersionStr)
-	if previousVersionErr != nil {
-		log.Err(previousVersionErr).Str("version", previousVersionStr).Msg("invalid version")
-		return "", previousVersionErr
-	}
-	var nextVersion semver.Version
-	releaseType := ReleaseNone
+	var releaseTypes = []version.ReleaseType{version.ReleaseNone}
 
 	var commitExpr []*regexp.Regexp
 	var commitGroupExpr []*regroup.ReGroup
@@ -38,20 +32,20 @@ func DeterminateNextReleaseVersion(commits []vcsrepository.Commit, commitPattern
 				var commitScope = match["scope"]
 				var isBreaking = len(match["breaking"]) > 0
 				var subject = match["subject"]
-				log.Debug().Str("commit-type", commitType).Str("commit-scope", commitScope).Bool("is-breaking-change", isBreaking).Str("commit-message", subject).Msg("analysing commit ...")
+				log.Trace().Str("commit-type", commitType).Str("commit-scope", commitScope).Bool("is-breaking-change", isBreaking).Str("commit-message", subject).Msg("analysing commit ...")
 
 				if isBreaking {
-					releaseType = ReleaseMajor
+					releaseTypes = append(releaseTypes, version.ReleaseMajor)
 				}
 
 				for _, rule := range rules {
 					if commitType == rule.Type && commitScope == rule.Scope {
 						if rule.Release == "patch" {
-							releaseType = getHighestReleaseType([]ReleaseType{releaseType, ReleasePatch})
+							releaseTypes = append(releaseTypes, version.ReleasePatch)
 						} else if rule.Release == "minor" {
-							releaseType = getHighestReleaseType([]ReleaseType{releaseType, ReleaseMinor})
+							releaseTypes = append(releaseTypes, version.ReleaseMinor)
 						} else if rule.Release == "major" {
-							releaseType = getHighestReleaseType([]ReleaseType{releaseType, ReleaseMajor})
+							releaseTypes = append(releaseTypes, version.ReleaseMajor)
 						}
 					}
 				}
@@ -59,23 +53,11 @@ func DeterminateNextReleaseVersion(commits []vcsrepository.Commit, commitPattern
 		}
 	}
 
-	if releaseType == ReleaseMajor {
-		nextVersion = previousVersion.IncMajor()
-	} else if releaseType == ReleaseMinor {
-		nextVersion = previousVersion.IncMinor()
-	} else if releaseType == ReleasePatch || releaseType == ReleaseNone {
-		nextVersion = previousVersion.IncPatch()
+	// bump version
+	highestReleaseType := version.HighestReleaseType(releaseTypes)
+	nextVersion, nextVersionErr := version.Bump(previousVersionStr, highestReleaseType)
+	if nextVersionErr != nil {
+		return "", nextVersionErr
 	}
-
-	return nextVersion.String(), nil
-}
-
-func getHighestReleaseType(numbers []ReleaseType) ReleaseType {
-	max := numbers[0]
-	for _, value := range numbers {
-		if value > max {
-			max = value
-		}
-	}
-	return max
+	return nextVersion, nil
 }

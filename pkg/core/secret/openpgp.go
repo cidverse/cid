@@ -1,4 +1,4 @@
-package api
+package secret
 
 import (
 	"github.com/ProtonMail/gopenpgp/v2/helper"

@@ -1,7 +1,7 @@
 package gomod
 
 import (
-	"github.com/Masterminds/semver/v3"
+	"github.com/cidverse/cid/pkg/core/version"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/gosimple/slug"
@@ -41,7 +41,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 
 				// language
 				language := make(map[analyzerapi.ProjectLanguage]*string)
-				goversion := semver.MustParse(goMod.Go.Version).String()
+				goversion := version.Format(goMod.Go.Version)
 				language[analyzerapi.LanguageGolang] = &goversion
 
 				// deps

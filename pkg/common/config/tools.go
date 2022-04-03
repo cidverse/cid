@@ -1,11 +1,9 @@
 package config
 
 import (
-	"bytes"
 	"errors"
-	"github.com/Masterminds/semver/v3"
+	"github.com/cidverse/cid/pkg/core/version"
 	"github.com/cidverse/normalizeci/pkg/common"
-	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
 	"os"
 	"os/exec"
@@ -71,7 +69,7 @@ func FindLocalTool(executable string, constraint string) (ToolExecutableDiscover
 			}
 			// check main env name
 			if len(env[entry.EnvironmentName]) > 0 {
-				if IsVersionFulfillingConstraint(entry.Version, constraint) {
+				if version.FulfillsConstraint(entry.Version, constraint) {
 					entry.ExecutableFile = FindExecutable(env[entry.EnvironmentName]+entry.SubPath, entry.Executable)
 					localToolCache[executable+"/"+constraint] = entry
 					mutex.Unlock()
@@ -81,7 +79,7 @@ func FindLocalTool(executable string, constraint string) (ToolExecutableDiscover
 			// check with all possible suffixes
 			for _, envSuffix := range entry.EnvironmentNameSuffix {
 				if len(env[entry.EnvironmentName+envSuffix]) > 0 {
-					if IsVersionFulfillingConstraint(entry.Version, constraint) {
+					if version.FulfillsConstraint(entry.Version, constraint) {
 						entry.ExecutableFile = FindExecutable(env[entry.EnvironmentName+envSuffix]+entry.SubPath, entry.Executable)
 						localToolCache[executable+"/"+constraint] = entry
 						mutex.Unlock()
@@ -108,7 +106,7 @@ func FindContainerImage(executable string, constraint string) (ToolContainerDisc
 	// check based on env paths
 	for _, entry := range Config.ContainerImages {
 		if executable == entry.Executable {
-			if IsVersionFulfillingConstraint(entry.Version, constraint) {
+			if version.FulfillsConstraint(entry.Version, constraint) {
 				imageToolCache[executable+"/"+constraint] = entry
 				mutex.Unlock()
 				return entry, nil
@@ -118,37 +116,6 @@ func FindContainerImage(executable string, constraint string) (ToolContainerDisc
 
 	mutex.Unlock()
 	return ToolContainerDiscovery{}, errors.New("failed to find image")
-}
-
-func IsVersionFulfillingConstraint(version string, constraint string) bool {
-	// constraint
-	c, err := semver.NewConstraint(constraint)
-	if err != nil {
-		log.Debug().Err(err).Str("constraint", version).Msg("version constraint is unparsable")
-		return false
-	}
-
-	// version
-	v, err := semver.NewVersion(version)
-	if err != nil {
-		log.Debug().Err(err).Str("version", version).Msg("version is unparsable")
-		return false
-	}
-
-	// check
-	ok, validateErr := c.Validate(v)
-	if !ok {
-		var allErrors bytes.Buffer
-
-		for _, err := range validateErr {
-			allErrors.WriteString(err.Error())
-		}
-
-		log.Debug().Str("version", version).Str("constraint", constraint).Str("error", allErrors.String()).Msg("version does not fulfill constraint")
-		return false
-	}
-
-	return true
 }
 
 func FindExecutable(path string, file string) string {
