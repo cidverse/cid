@@ -4,6 +4,9 @@ var Analyzers []Analyzer
 
 // Analyzer is the interface that needs to be implemented by all analyzers
 type Analyzer interface {
+	// GetName returns the name of the analyzer
+	GetName() string
+	
 	// Analyze will retrieve information about the project
 	Analyze(ctx AnalyzerContext) []*ProjectModule
 }
@@ -54,17 +57,19 @@ const (
 	LanguageJava       ProjectLanguage = "java"
 	LanguageJavascript ProjectLanguage = "javascript"
 	LanguageTypescript ProjectLanguage = "typescript"
+	LanguageDockerfile ProjectLanguage = "dockerfile"
 )
 
 type ProjectBuildSystem string
 
 const (
-	BuildSystemGradle ProjectBuildSystem = "gradle"
-	BuildSystemMaven  ProjectBuildSystem = "maven"
-	BuildSystemGoMod  ProjectBuildSystem = "gomod"
-	BuildSystemNpm    ProjectBuildSystem = "npm"
-	BuildSystemHugo   ProjectBuildSystem = "hugo"
-	BuildSystemHelm   ProjectBuildSystem = "helm"
+	BuildSystemGradle    ProjectBuildSystem = "gradle"
+	BuildSystemMaven     ProjectBuildSystem = "maven"
+	BuildSystemGoMod     ProjectBuildSystem = "gomod"
+	BuildSystemNpm       ProjectBuildSystem = "npm"
+	BuildSystemHugo      ProjectBuildSystem = "hugo"
+	BuildSystemHelm      ProjectBuildSystem = "helm"
+	BuildSystemContainer ProjectBuildSystem = "container"
 )
 
 type ProjectBuildSystemSyntax string

@@ -2,6 +2,7 @@ package repoanalyzer
 
 import (
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	_ "github.com/cidverse/cid/pkg/repoanalyzer/container"
 	_ "github.com/cidverse/cid/pkg/repoanalyzer/gomod"
 	_ "github.com/cidverse/cid/pkg/repoanalyzer/gradle"
 	_ "github.com/cidverse/cid/pkg/repoanalyzer/helm"
@@ -22,7 +23,7 @@ func AnalyzeProject(projectDir string, path string) []*analyzerapi.ProjectModule
 	}
 
 	start := time.Now()
-	log.Info().Str("path", path).Msg("running repo analyzer")
+	log.Info().Str("path", path).Int("scanners", len(analyzerapi.Analyzers)).Msg("repo analyzer start")
 
 	// prepare context
 	ctx := analyzerapi.GetAnalyzerContext(projectDir)
@@ -30,6 +31,7 @@ func AnalyzeProject(projectDir string, path string) []*analyzerapi.ProjectModule
 	// run
 	var result []*analyzerapi.ProjectModule
 	for _, a := range analyzerapi.Analyzers {
+		log.Debug().Str("name", a.GetName()).Msg("repo analyzer run")
 		modules := a.Analyze(ctx)
 		for _, module := range modules {
 			if strings.HasPrefix(module.Directory, path) && !strings.Contains(module.Directory, "testdata") {
@@ -38,7 +40,7 @@ func AnalyzeProject(projectDir string, path string) []*analyzerapi.ProjectModule
 		}
 	}
 
-	log.Info().Str("duration", time.Since(start).String()).Int("file_count", len(ctx.Files)).Msg("completed repo analyzer")
+	log.Info().Str("duration", time.Since(start).String()).Int("file_count", len(ctx.Files)).Msg("repo analyzer complete")
 
 	analyticCache[projectDir] = result
 	return result

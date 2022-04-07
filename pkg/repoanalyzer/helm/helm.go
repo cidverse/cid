@@ -8,6 +8,10 @@ import (
 
 type Analyzer struct{}
 
+func (a Analyzer) GetName() string {
+	return "helm"
+}
+
 func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.ProjectModule {
 	var result []*analyzerapi.ProjectModule
 

@@ -10,6 +10,10 @@ import (
 
 type Analyzer struct{}
 
+func (a Analyzer) GetName() string {
+	return "gradle"
+}
+
 func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.ProjectModule {
 	var result []*analyzerapi.ProjectModule
 
