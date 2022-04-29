@@ -173,6 +173,9 @@ actions:
     - name: java-publish
       type: builtin
       scope: module
+    - name: helm-publish-nexus
+      type: builtin
+      scope: module
 
 # local tools
 tools:
@@ -324,6 +327,43 @@ container-images:
         dir: /root/.gradle
       - id: java-maven
         dir: /root/.m2
+  # node (npm, yarn, npx)
+  - executable: node
+    image: node:17.8.0-slim
+    version: 17.8.0
+    cache:
+      - id: node-npm
+        dir: /root/.npm
+        type: volume
+      - id: node-yarn-cache
+        dir: /usr/local/share/.cache/yarn/v6
+        type: volume
+      - id: node-yarn-config
+        dir: /root/.config/yarn
+  - executable: yarn
+    image: node:17.8.0-slim
+    version: 1.22.18
+    cache:
+      - id: node-npm
+        dir: /root/.npm
+        type: volume
+      - id: node-yarn-cache
+        dir: /usr/local/share/.cache/yarn/v6
+        type: volume
+      - id: node-yarn-config
+        dir: /root/.config/yarn
+  - executable: npx
+    image: node:17.8.0-slim
+    version: 1.22.18
+    cache:
+      - id: node-npm
+        dir: /root/.npm
+        type: volume
+      - id: node-yarn-cache
+        dir: /usr/local/share/.cache/yarn/v6
+        type: volume
+      - id: node-yarn-config
+        dir: /root/.config/yarn
   # helm
   - executable: helm
     image: lachlanevenson/k8s-helm:v3.8.1
