@@ -181,6 +181,11 @@ actions:
 tools:
   # golang
   - executable: go
+    env-name: GOROOT_1_18
+    env-allowed-suffix: ["_X64"]
+    env-path-dir: /bin
+    version: 1.18.0
+  - executable: go
     env-name: GOROOT_1_17
     env-allowed-suffix: ["_X64"]
     env-path-dir: /bin
@@ -281,23 +286,33 @@ tools:
 container-images:
   # golang
   - executable: go
+    image: docker.io/golang:1.18.1-bullseye
+    version: 1.18.1
+    cache:
+      - id: go-pkg
+        dir: /go/pkg
+        type: volume
+  - executable: go
     image: docker.io/golang:1.17.8-alpine
     version: 1.17.8
     cache:
       - id: go-pkg
         dir: /go/pkg
+        type: volume
   - executable: go
     image: docker.io/golang:1.16.15-alpine
     version: 1.16.15
     cache:
       - id: go-pkg
         dir: /go/pkg
+        type: volume
   - executable: go
     image: docker.io/golang:1.15.15-alpine
     version: 1.15.15
     cache:
       - id: go-pkg
         dir: /go/pkg
+        type: volume
   # golangci-lint
   - executable: golangci-lint
     image: docker.io/golangci/golangci-lint:v1.44.2-alpine
