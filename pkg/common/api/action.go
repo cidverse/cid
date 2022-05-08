@@ -123,3 +123,8 @@ func GetActionContext(projectDir string, env map[string]string, currentModule *a
 		CurrentModule:   currentModule,
 	}
 }
+
+// MissingRequirement contains a record about a missing requirement for a action
+type MissingRequirement struct {
+	Message string
+}
