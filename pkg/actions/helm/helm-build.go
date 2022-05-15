@@ -31,12 +31,7 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 	chartDir := filepath.Join(ctx.Paths.Artifact, "helm-charts")
 
 	// version
-	ver := ctx.Env["NCI_COMMIT_REF_RELEASE"]
-
-	// use nextrelease name as prerelease, if not valid ref is present
-	if !version.IsValidSemver(ver) && len(ctx.Env["NCI_NEXTRELEASE_NAME"]) > 0 {
-		ver = ctx.Env["NCI_NEXTRELEASE_NAME"]
-	}
+	ver := ""
 
 	// helm repo add for all used repositories - https://github.com/helm/helm/issues/8036 and https://github.com/helm/helm/issues/9903
 	chartFile := filepath.Join(ctx.CurrentModule.Directory, "Chart.yaml")
@@ -47,6 +42,18 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 		// collect repos
 		for _, dep := range chart.Dependencies {
 			repos[dep.Repository] = true
+		}
+
+		// keep version
+		ver = chart.Version
+
+		if chart.Annotations["cid.version"] == "auto" {
+			ver = ctx.Env["NCI_COMMIT_REF_RELEASE"]
+
+			// use nextrelease name as prerelease, if not valid ref is present
+			if !version.IsValidSemver(ver) && len(ctx.Env["NCI_NEXTRELEASE_NAME"]) > 0 {
+				ver = ctx.Env["NCI_NEXTRELEASE_NAME"]
+			}
 		}
 
 		// add repos

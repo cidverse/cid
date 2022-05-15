@@ -1,17 +1,18 @@
 package helm
 
 import (
+	"bytes"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
-	"net/http"
-	"mime/multipart"
-	"os"
 	"io"
-	"bytes"
+	"io/ioutil"
+	"mime/multipart"
+	"net/http"
+	"os"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
-	"strconv"
 )
 
 var netClient = &http.Client{
@@ -19,16 +20,16 @@ var netClient = &http.Client{
 }
 
 type ChartConfig struct {
-	ApiVersion  string `yaml:"apiVersion"`
-	AppVersion  string `yaml:"appVersion"`
-	KubeVersion string `yaml:"kubeVersion"`
-	Version     string `yaml:"version"`
-	Description string `yaml:"description"`
-	Name        string `yaml:"name"`
-	Deprecated  bool   `yaml:"deprecated"`
-	Keywords    []string `yaml:"keywords"`
-	Home string `yaml:"home"`
-	Icon string `yaml:"icon"`
+	ApiVersion  string            `yaml:"apiVersion"`
+	AppVersion  string            `yaml:"appVersion"`
+	KubeVersion string            `yaml:"kubeVersion"`
+	Version     string            `yaml:"version"`
+	Description string            `yaml:"description"`
+	Name        string            `yaml:"name"`
+	Deprecated  bool              `yaml:"deprecated"`
+	Keywords    []string          `yaml:"keywords"`
+	Home        string            `yaml:"home"`
+	Icon        string            `yaml:"icon"`
 	Annotations map[string]string `yaml:"annotations"`
 	Maintainers []struct {
 		Name  string `yaml:"name"`
@@ -44,7 +45,7 @@ type ChartConfig struct {
 
 func UploadChart(url string, username string, password string, file string) (int, []byte) {
 	// prepare
-	contentType, body, err := createForm(map[string]string{"file": "@"+file})
+	contentType, body, err := createForm(map[string]string{"file": "@" + file})
 	if err != nil {
 		log.Err(err).Msg("failed to prepare request body")
 	}
@@ -69,7 +70,7 @@ func UploadChart(url string, username string, password string, file string) (int
 	}
 
 	// resp code
-	responseCodeInt, _ := strconv.Atoi(resp.Status)
+	responseCodeInt, _ := strconv.Atoi(extractNumbers(resp.Status))
 
 	return responseCodeInt, content
 }
@@ -96,17 +97,26 @@ func createForm(form map[string]string) (string, io.Reader, error) {
 	mp := multipart.NewWriter(body)
 	defer mp.Close()
 	for key, val := range form {
-	   if strings.HasPrefix(val, "@") {
-		  val = val[1:]
-		  file, err := os.Open(val)
-		  if err != nil { return "", nil, err }
-		  defer file.Close()
-		  part, err := mp.CreateFormFile(key, val)
-		  if err != nil { return "", nil, err }
-		  io.Copy(part, file)
-	   } else {
-		  mp.WriteField(key, val)
-	   }
+		if strings.HasPrefix(val, "@") {
+			val = val[1:]
+			file, err := os.Open(val)
+			if err != nil {
+				return "", nil, err
+			}
+			defer file.Close()
+			part, err := mp.CreateFormFile(key, val)
+			if err != nil {
+				return "", nil, err
+			}
+			io.Copy(part, file)
+		} else {
+			mp.WriteField(key, val)
+		}
 	}
 	return mp.FormDataContentType(), body, nil
+}
+
+func extractNumbers(input string) string {
+	reg, _ := regexp.Compile("\\D+")
+	return reg.ReplaceAllString(input, "")
 }
