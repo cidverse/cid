@@ -6,7 +6,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.4.5
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/cidverse/cidverseutils v0.0.0-20220318153543-78db8e6a36bd
-	github.com/cidverse/normalizeci v1.1.1-0.20220511214955-c8967514553e
+	github.com/cidverse/normalizeci v1.1.1-0.20220511222032-c021e3301e69
 	github.com/google/cel-go v0.9.0
 	github.com/gosimple/slug v1.12.0
 	github.com/hashicorp/go-version v1.4.0
@@ -16,7 +16,7 @@ require (
 	github.com/rs/zerolog v1.26.1
 	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
 	github.com/spf13/cobra v1.4.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	github.com/thoas/go-funk v0.9.1
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
 	gopkg.in/yaml.v2 v2.4.0

@@ -10,6 +10,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/secret"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/common"
+	"github.com/cidverse/normalizeci/pkg/ncispec"
 	ncimain "github.com/cidverse/normalizeci/pkg/normalizeci"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
@@ -82,7 +83,7 @@ func GetFullEnvironment(projectDirectory string) map[string]string {
 // EnrichEnvironment enriches the environment with CID variables / release information
 func EnrichEnvironment(projectDirectory string, branchingConvention string, env map[string]string) error {
 	// determinate release version
-	commits, commitsErr := vcsrepository.FindCommitsBetweenRefs(projectDirectory, env["NCI_COMMIT_REF_VCS"], env["NCI_LASTRELEASE_REF_VCS"])
+	commits, commitsErr := vcsrepository.FindCommitsBetweenRefs(projectDirectory, env[ncispec.NCI_COMMIT_SHA], env["NCI_LASTRELEASE_REF_VCS"])
 	if commitsErr != nil {
 		return commitsErr
 	}

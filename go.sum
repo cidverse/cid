@@ -70,8 +70,8 @@ github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5P
 github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
 github.com/cidverse/cidverseutils v0.0.0-20220318153543-78db8e6a36bd h1:fJXgy1fZgc6bGOeZi6QDblsM70MNIj64Yi+Q75swHCg=
 github.com/cidverse/cidverseutils v0.0.0-20220318153543-78db8e6a36bd/go.mod h1:GfN3pPkWDFVj8ObIuPZz2Exyb2rUm+kQuMVLhwmrL2Q=
-github.com/cidverse/normalizeci v1.1.1-0.20220511214955-c8967514553e h1:thyxRbaJhOm2QK3Yqi32cxoMZVTrG8PbJ/kjVov9gPI=
-github.com/cidverse/normalizeci v1.1.1-0.20220511214955-c8967514553e/go.mod h1:vcC583SXbyEdx4HHTGmZ/bX8WGO76e/xoez1tU4/tqc=
+github.com/cidverse/normalizeci v1.1.1-0.20220511222032-c021e3301e69 h1:vMNwq/H3RE0L2mtwz6r/xOi4uEoNKH7n+HC0ht7sgB0=
+github.com/cidverse/normalizeci v1.1.1-0.20220511222032-c021e3301e69/go.mod h1:uN8wQsqey9cUJDBRWBBv0nyPW0usvWcfUABPCm8+9lg=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
@@ -273,8 +273,9 @@ github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXf
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
+github.com/stretchr/testify v1.7.1 h1:5TQK59W5E3v0r2duFAb7P95B6hEeOyEnHRa8MjYSMTY=
+github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/thoas/go-funk v0.9.1 h1:O549iLZqPpTUQ10ykd26sZhzD+rmR5pWhuElrhbC20M=
 github.com/thoas/go-funk v0.9.1/go.mod h1:+IWnUfUmFO1+WVYQWQtIJHeRRdaIyyYglZN7xzUPe4Q=
 github.com/xanzy/go-gitlab v0.65.0 h1:9xSA9cRVhz3Z54JacIHdvWnNmNAoSz/BDnyMGOf3yIg=
