@@ -120,7 +120,7 @@ func RunAction(action config.WorkflowAction, projectDir string, env map[string]s
 	api.UpdateContext(&ctx)
 	moduleName := ""
 	if ctx.CurrentModule != nil {
-		moduleName = ctx.CurrentModule.Slug
+		moduleName = ctx.CurrentModule.Name
 	}
 	log.Info().Str("action", action.Type+"/"+action.Name).Str("module", moduleName).Msg("running action")
 
