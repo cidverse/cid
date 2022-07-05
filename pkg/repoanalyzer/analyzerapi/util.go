@@ -55,6 +55,23 @@ func FindParentModule(modules []*ProjectModule, module *ProjectModule) *ProjectM
 	return nil
 }
 
+func GetSingleLanguageMap(language ProjectLanguage, version *string) map[ProjectLanguage]*string {
+	languageMap := make(map[ProjectLanguage]*string)
+	languageMap[language] = version
+	return languageMap
+}
+
+func AddModuleToResult(result *[]*ProjectModule, module *ProjectModule) {
+	parent := FindParentModule(*result, module)
+	if parent != nil {
+		module.Name = parent.Name + "-" + module.Name
+		module.Slug = parent.Slug + "-" + module.Slug
+		parent.Submodules = append(parent.Submodules, module)
+	} else {
+		*result = append(*result, module)
+	}
+}
+
 func PrintStruct(t *testing.T, result interface{}) {
 	jsonByteArray, jsonErr := json.MarshalIndent(result, "", "\t")
 	assert.NoError(t, jsonErr)

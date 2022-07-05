@@ -6,7 +6,7 @@ var Analyzers []Analyzer
 type Analyzer interface {
 	// GetName returns the name of the analyzer
 	GetName() string
-	
+
 	// Analyze will retrieve information about the project
 	Analyze(ctx AnalyzerContext) []*ProjectModule
 }
@@ -53,11 +53,12 @@ type ProjectModule struct {
 type ProjectLanguage string
 
 const (
-	LanguageGolang     ProjectLanguage = "go"
-	LanguageJava       ProjectLanguage = "java"
-	LanguageJavascript ProjectLanguage = "javascript"
-	LanguageTypescript ProjectLanguage = "typescript"
-	LanguageDockerfile ProjectLanguage = "dockerfile"
+	LanguageGolang        ProjectLanguage = "go"
+	LanguageJava          ProjectLanguage = "java"
+	LanguageJavascript    ProjectLanguage = "javascript"
+	LanguageTypescript    ProjectLanguage = "typescript"
+	LanguageDockerfile    ProjectLanguage = "dockerfile"
+	LanguageBuildahScript ProjectLanguage = "buildah-script"
 )
 
 type ProjectBuildSystem string

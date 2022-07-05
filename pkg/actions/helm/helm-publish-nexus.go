@@ -2,10 +2,10 @@ package helm
 
 import (
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/core/actioncommon"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
+	"github.com/thoas/go-funk"
 	"path/filepath"
 )
 
@@ -28,7 +28,7 @@ func (action PublishActionStruct) Check(ctx api.ActionExecutionContext) bool {
 		if ctx.CurrentModule.BuildSystem != analyzerapi.BuildSystemHelm {
 			missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "module build system is not helm"})
 		} else {
-			if !actioncommon.MapContainsKey(ctx.MachineEnv, "HELM_NEXUS_URL") {
+			if !funk.Contains(ctx.MachineEnv, "HELM_NEXUS_URL") {
 				missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "HELM_NEXUS_URL is not set"})
 			}
 		}

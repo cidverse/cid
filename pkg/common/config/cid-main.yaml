@@ -88,9 +88,16 @@ actions:
       type: builtin
       scope: module
     # package
-    - name: container-package
+    - name: container-package-buildah
       type: builtin
       scope: module
+      config:
+        no-cache: true
+        squash: true
+        rebuild: true
+    #- name: container-package-docker
+    #  type: builtin
+    #  scope: module
   # linting
   lint:
     - name: golang-lint
@@ -268,6 +275,10 @@ tools:
     version: 8.0.0
   # docker
   - executable: docker
+    env-name: PATH
+    version: 0.0.0
+  # buildah
+  - executable: buildah
     env-name: PATH
     version: 0.0.0
   # git

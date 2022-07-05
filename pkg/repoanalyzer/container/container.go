@@ -4,8 +4,10 @@ import (
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/gosimple/slug"
+	"github.com/rs/zerolog/log"
 	"path/filepath"
 	"sort"
+	"strings"
 )
 
 type Analyzer struct{}
@@ -30,11 +32,6 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 			filename := filepath.Base(file)
 
 			if filename == "Dockerfile" {
-				// language
-				language := make(map[analyzerapi.ProjectLanguage]*string)
-				language[analyzerapi.LanguageDockerfile] = nil
-
-				// module
 				module := analyzerapi.ProjectModule{
 					RootDirectory:     ctx.ProjectDir,
 					Directory:         filepath.Dir(file),
@@ -43,20 +40,33 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 					Discovery:         "file~" + file,
 					BuildSystem:       analyzerapi.BuildSystemContainer,
 					BuildSystemSyntax: nil,
-					Language:          language,
+					Language:          analyzerapi.GetSingleLanguageMap(analyzerapi.LanguageDockerfile, nil),
 					Dependencies:      nil,
 					Submodules:        nil,
 					Files:             ctx.Files,
 					FilesByExtension:  ctx.FilesByExtension,
 				}
-
-				parent := analyzerapi.FindParentModule(result, &module)
-				if parent != nil {
-					module.Name = parent.Name + "-" + module.Name
-					module.Slug = parent.Slug + "-" + module.Slug
-					parent.Submodules = append(parent.Submodules, &module)
-				} else {
-					result = append(result, &module)
+				analyzerapi.AddModuleToResult(&result, &module)
+			} else if strings.HasSuffix(filename, ".sh") {
+				content, contentErr := filesystem.GetFileContent(file)
+				if contentErr == nil && strings.Contains(content, "buildah from") {
+					module := analyzerapi.ProjectModule{
+						RootDirectory:     ctx.ProjectDir,
+						Directory:         filepath.Dir(file),
+						Name:              filepath.Base(filepath.Dir(file)),
+						Slug:              slug.Make(filepath.Base(filepath.Dir(file))),
+						Discovery:         "file~" + file,
+						BuildSystem:       analyzerapi.BuildSystemContainer,
+						BuildSystemSyntax: nil,
+						Language:          analyzerapi.GetSingleLanguageMap(analyzerapi.LanguageBuildahScript, nil),
+						Dependencies:      nil,
+						Submodules:        nil,
+						Files:             ctx.Files,
+						FilesByExtension:  ctx.FilesByExtension,
+					}
+					analyzerapi.AddModuleToResult(&result, &module)
+				} else if contentErr != nil {
+					log.Warn().Str("file", file).Msg("failed to read file content")
 				}
 			}
 		}
