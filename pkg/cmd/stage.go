@@ -12,6 +12,7 @@ import (
 func init() {
 	rootCmd.AddCommand(stageCmd)
 	stageCmd.Flags().StringP("version", "v", "", "specified a custom project version")
+	stageCmd.Flags().StringArrayP("module", "m", []string{}, "limit execution to the specified module(s)")
 }
 
 var stageCmd = &cobra.Command{
@@ -20,8 +21,10 @@ var stageCmd = &cobra.Command{
 	Short:   "runs the stage specified in the arguments",
 	Long:    `runs the stage specified in the arguments`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// arguments
 		stage := args[0]
-		log.Debug().Str("stage", stage).Msg("running stage")
+		modules, _ := cmd.Flags().GetStringArray("module")
+		log.Debug().Str("stage", stage).Strs("modules", modules).Msg("stageCmd: execute")
 
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
@@ -41,6 +44,6 @@ var stageCmd = &cobra.Command{
 		}
 
 		// actions
-		workflow.RunStageActions(stage, projectDir, filesystem.GetWorkingDirectory(), env, args)
+		workflow.RunStageActions(stage, modules, projectDir, filesystem.GetWorkingDirectory(), env, args)
 	},
 }

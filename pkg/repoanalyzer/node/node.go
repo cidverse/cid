@@ -56,7 +56,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 				Slug:              slug.Make(packageData.Name),
 				Discovery:         "file~" + file,
 				BuildSystem:       analyzerapi.BuildSystemNpm,
-				BuildSystemSyntax: nil,
+				BuildSystemSyntax: analyzerapi.BuildSystemSyntaxDefault,
 				Language:          language,
 				Dependencies:      dependencies,
 				Submodules:        nil,

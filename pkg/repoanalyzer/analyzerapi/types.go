@@ -32,7 +32,7 @@ type ProjectModule struct {
 	BuildSystem ProjectBuildSystem
 
 	// BuildSystemSyntax used in this project
-	BuildSystemSyntax *ProjectBuildSystemSyntax
+	BuildSystemSyntax ProjectBuildSystemSyntax
 
 	// Language of the project
 	Language map[ProjectLanguage]*string
@@ -53,12 +53,10 @@ type ProjectModule struct {
 type ProjectLanguage string
 
 const (
-	LanguageGolang        ProjectLanguage = "go"
-	LanguageJava          ProjectLanguage = "java"
-	LanguageJavascript    ProjectLanguage = "javascript"
-	LanguageTypescript    ProjectLanguage = "typescript"
-	LanguageDockerfile    ProjectLanguage = "dockerfile"
-	LanguageBuildahScript ProjectLanguage = "buildah-script"
+	LanguageGolang     ProjectLanguage = "go"
+	LanguageJava       ProjectLanguage = "java"
+	LanguageJavascript ProjectLanguage = "javascript"
+	LanguageTypescript ProjectLanguage = "typescript"
 )
 
 type ProjectBuildSystem string
@@ -76,8 +74,11 @@ const (
 type ProjectBuildSystemSyntax string
 
 const (
-	GradleGroovyDSL ProjectBuildSystemSyntax = "groovy"
-	GradleKotlinDSL ProjectBuildSystemSyntax = "kotlin"
+	BuildSystemSyntaxDefault ProjectBuildSystemSyntax = "default"
+	GradleGroovyDSL          ProjectBuildSystemSyntax = "groovy"
+	GradleKotlinDSL          ProjectBuildSystemSyntax = "kotlin"
+	ContainerDockerfile      ProjectBuildSystemSyntax = "dockerfile"
+	ContainerBuildahScript   ProjectBuildSystemSyntax = "buildah-script"
 )
 
 // ProjectDependency contains dependency information
@@ -102,4 +103,7 @@ type AnalyzerContext struct {
 
 	// FilesByExtension contains all files by extension
 	FilesByExtension map[string][]string
+
+	// FilesWithoutExtension contains all files without an extension
+	FilesWithoutExtension []string
 }

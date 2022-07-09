@@ -26,7 +26,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 				Slug:              slug.Make(filepath.Base(filepath.Dir(file))),
 				Discovery:         "file~" + file,
 				BuildSystem:       analyzerapi.BuildSystemHelm,
-				BuildSystemSyntax: nil,
+				BuildSystemSyntax: analyzerapi.BuildSystemSyntaxDefault,
 				Language:          nil,
 				Dependencies:      nil,
 				Submodules:        nil,

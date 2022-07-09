@@ -7,7 +7,6 @@ import (
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
-	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v3"
 	"strings"
 	"time"
@@ -36,8 +35,8 @@ func (action BuildahPackageActionStruct) Check(ctx api.ActionExecutionContext) b
 	var missingRequirements []api.MissingRequirement
 
 	if ctx.CurrentModule != nil {
-		if !funk.Contains(ctx.CurrentModule.Language, analyzerapi.LanguageDockerfile) && !funk.Contains(ctx.CurrentModule.Language, analyzerapi.LanguageBuildahScript) {
-			missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "module is not of language " + string(analyzerapi.LanguageDockerfile) + " or " + string(analyzerapi.LanguageDockerfile)})
+		if (ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerDockerfile || ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript) == false {
+			missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "module is not of syntax " + string(analyzerapi.ContainerDockerfile) + " or " + string(analyzerapi.ContainerBuildahScript)})
 		}
 	} else {
 		missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "no module context present"})
@@ -57,7 +56,7 @@ func (action BuildahPackageActionStruct) Execute(ctx api.ActionExecutionContext,
 	containerFile := strings.TrimPrefix(ctx.CurrentModule.Discovery, "file~")
 	image := getFullImage(ctx.Env["NCI_CONTAINERREGISTRY_HOST"], ctx.Env["NCI_CONTAINERREGISTRY_REPOSITORY"], ctx.Env["NCI_CONTAINERREGISTRY_TAG"])
 
-	if funk.Contains(ctx.CurrentModule.Language, analyzerapi.LanguageDockerfile) {
+	if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerDockerfile {
 		dockerfileContent, _ := filesystem.GetFileContent(containerFile)
 		syntax := getDockerfileSyntax(dockerfileContent)
 		platforms := getDockerfileTargetPlatforms(dockerfileContent)
@@ -101,7 +100,7 @@ func (action BuildahPackageActionStruct) Execute(ctx api.ActionExecutionContext,
 				buildArgs = append(buildArgs, `-t `+image)
 			}
 
-			// labels
+			// labels (oci annotations: https://github.com/opencontainers/image-spec/blob/main/annotations.md)
 			buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.source=`+strings.TrimSuffix(ctx.Env["NCI_REPOSITORY_REMOTE"], ".git")+`"`)
 			buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.created=`+time.Now().Format(time.RFC3339)+`"`)
 			buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.authors="`)
@@ -133,7 +132,7 @@ func (action BuildahPackageActionStruct) Execute(ctx api.ActionExecutionContext,
 		}
 		pushArgs = append(pushArgs, image)
 		command.RunCommand(strings.Join(pushArgs, " "), ctx.Env, ctx.ProjectDir)
-	} else if funk.Contains(ctx.CurrentModule.Language, analyzerapi.LanguageBuildahScript) {
+	} else if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript {
 		log.Info().Str("image", image).Str("script", containerFile).Msg("building container image")
 	}
 

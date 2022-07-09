@@ -67,7 +67,7 @@ var infoCmd = &cobra.Command{
 		}
 
 		// execution plan (omit some information
-		originalExecutionPlan := workflow.GetExecutionPlan(projectDir, filesystem.GetWorkingDirectory(), env, nil)
+		originalExecutionPlan := workflow.GetExecutionPlan(projectDir, []string{}, filesystem.GetWorkingDirectory(), env, nil)
 		var outputExecutionPlan []config.WorkflowStage
 		for _, stage := range originalExecutionPlan {
 			var actions []config.WorkflowAction

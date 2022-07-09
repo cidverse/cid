@@ -15,6 +15,7 @@ func GetAnalyzerContext(projectDir string) AnalyzerContext {
 	// files
 	var files []string
 	filesByExtension := make(map[string][]string)
+	var filesWithoutExtension []string
 
 	err := filepath.WalkDir(projectDir, func(path string, d fs.DirEntry, err error) error {
 		// check for directory skip
@@ -28,6 +29,8 @@ func GetAnalyzerContext(projectDir string) AnalyzerContext {
 			splitByExt := strings.SplitN(d.Name(), ".", 2)
 			if len(splitByExt) == 2 {
 				filesByExtension[splitByExt[1]] = append(filesByExtension[splitByExt[1]], path)
+			} else {
+				filesWithoutExtension = append(filesWithoutExtension, path)
 			}
 		}
 
@@ -39,9 +42,10 @@ func GetAnalyzerContext(projectDir string) AnalyzerContext {
 
 	// result
 	return AnalyzerContext{
-		ProjectDir:       projectDir,
-		Files:            files,
-		FilesByExtension: filesByExtension,
+		ProjectDir:            projectDir,
+		Files:                 files,
+		FilesByExtension:      filesByExtension,
+		FilesWithoutExtension: filesWithoutExtension,
 	}
 }
 

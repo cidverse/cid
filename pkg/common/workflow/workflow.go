@@ -10,12 +10,13 @@ import (
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/rs/zerolog/log"
+	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v3"
 	"time"
 )
 
 // GetExecutionPlan will generate a automatic execution plan based on the project contents
-func GetExecutionPlan(projectDir string, workDir string, env map[string]string, stages []config.WorkflowStage) []config.WorkflowStage {
+func GetExecutionPlan(projectDir string, modulesFilter []string, workDir string, env map[string]string, stages []config.WorkflowStage) []config.WorkflowStage {
 	var executionPlan []config.WorkflowStage
 
 	if stages == nil {
@@ -31,9 +32,16 @@ func GetExecutionPlan(projectDir string, workDir string, env map[string]string, 
 
 		// for each module
 		for _, module := range ctx.Modules {
+			moduleRef := *module
+
 			// customize context
 			ctx.CurrentModule = module
 			api.UpdateContext(&ctx)
+
+			// check module filter
+			if len(modulesFilter) > 0 && !funk.Contains(modulesFilter, module.Name) {
+				continue
+			}
 
 			// iterate over module-scoped actions
 			for _, action := range FindWorkflowStageActions(stage.Name, ctx) {
@@ -42,8 +50,9 @@ func GetExecutionPlan(projectDir string, workDir string, env map[string]string, 
 
 					// check action activation criteria
 					if currentAction.Type == "builtin" {
+						log.Debug().Str("action", currentAction.Name).Msg("checking action requirements")
 						if api.BuiltinActions[currentAction.Name].Check(ctx) {
-							currentAction.Module = module
+							currentAction.Module = &moduleRef
 							stageActions = append(stageActions, currentAction)
 						}
 					} else {
@@ -78,9 +87,11 @@ func GetExecutionPlan(projectDir string, workDir string, env map[string]string, 
 	return executionPlan
 }
 
-func GetExecutionPlanStage(projectDir string, workDir string, env map[string]string, stageName string) *config.WorkflowStage {
-	executionPlan := GetExecutionPlan(projectDir, workDir, env, []config.WorkflowStage{{Name: stageName}})
+// GetExecutionPlanStage retrieves all actions of a specified stage
+func GetExecutionPlanStage(projectDir string, modulesFilter []string, workDir string, env map[string]string, stageName string) *config.WorkflowStage {
+	executionPlan := GetExecutionPlan(projectDir, modulesFilter, workDir, env, []config.WorkflowStage{{Name: stageName}})
 
+	// should get one result as we only query actions of one stage
 	if len(executionPlan) == 1 {
 		return &executionPlan[0]
 	}
@@ -88,17 +99,18 @@ func GetExecutionPlanStage(projectDir string, workDir string, env map[string]str
 }
 
 // RunStageActions runs all actions of a stage
-func RunStageActions(stageName string, projectDir string, workDir string, env map[string]string, args []string) {
+//
+func RunStageActions(stageName string, modules []string, projectDir string, workDir string, env map[string]string, args []string) {
 	start := time.Now()
-	log.Info().Str("stage", stageName).Msg("running stage")
+	log.Info().Str("stage", stageName).Strs("modules", modules).Msg("running stage")
 
 	// find stage actions
-	stage := GetExecutionPlanStage(projectDir, workDir, env, stageName)
-
+	stage := GetExecutionPlanStage(projectDir, modules, workDir, env, stageName)
 	if len(stage.Actions) == 0 {
 		log.Warn().Str("stage", stageName).Msg("no actions available for current stage")
 		return
 	}
+
 	for _, action := range stage.Actions {
 		RunAction(action, projectDir, env, args)
 	}

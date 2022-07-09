@@ -11,6 +11,7 @@ import (
 
 func init() {
 	rootCmd.AddCommand(runCmd)
+	runCmd.Flags().StringArrayP("module", "m", []string{}, "limit execution to the specified module(s)")
 }
 
 var runCmd = &cobra.Command{
@@ -18,7 +19,8 @@ var runCmd = &cobra.Command{
 	Short: `runs the current project`,
 	Long:  `runs the current project`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debug().Str("command", "run").Msg("running command")
+		modules, _ := cmd.Flags().GetStringArray("module")
+		log.Debug().Str("command", "run").Strs("modules", modules).Msg("runCmd: execute")
 
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
@@ -28,6 +30,6 @@ var runCmd = &cobra.Command{
 		env := api.GetCIDEnvironment(projectDir)
 
 		// actions
-		workflow.RunStageActions("run", projectDir, filesystem.GetWorkingDirectory(), env, args)
+		workflow.RunStageActions("run", modules, projectDir, filesystem.GetWorkingDirectory(), env, args)
 	},
 }

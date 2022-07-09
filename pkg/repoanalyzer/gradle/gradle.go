@@ -54,7 +54,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 				Slug:              slug.Make(filepath.Base(filepath.Dir(file))),
 				Discovery:         "file~" + file,
 				BuildSystem:       analyzerapi.BuildSystemGradle,
-				BuildSystemSyntax: &buildSystemSyntax,
+				BuildSystemSyntax: buildSystemSyntax,
 				Language:          language,
 				Dependencies:      dependencies,
 				Submodules:        nil,
