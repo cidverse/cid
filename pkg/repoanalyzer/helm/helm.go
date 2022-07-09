@@ -17,6 +17,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 
 	for _, file := range ctx.FilesByExtension["yaml"] {
 		filename := filepath.Base(file)
+
 		if filename == "Chart.yaml" {
 			// module
 			module := analyzerapi.ProjectModule{
