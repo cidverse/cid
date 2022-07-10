@@ -3,7 +3,7 @@ package repo
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cid/pkg/core/config"
 )
 
 type TagCreateStruct struct{}

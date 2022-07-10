@@ -81,6 +81,9 @@ actions:
     - name: java-test
       type: builtin
       scope: module
+    - name: helm-test
+      type: builtin
+      scope: module
   # package
   package:
     # optimization
@@ -286,12 +289,20 @@ tools:
     env-name: PATH
     version: 0.0.0
   # npm
-  - executable: npm
+  #- executable: npm
+  #  env-name: PATH
+  #  version: 0.0.0
+  #- executable: yarn
+  #  env-name: PATH
+  #  version: 0.0.0
+  # helm
+  - executable: helm
     env-name: PATH
     version: 0.0.0
-  - executable: yarn
+  # go
+  - executable: go
     env-name: PATH
-    version: 0.0.0
+    version: 20.0.0
 
 # container images
 container-images:
@@ -405,9 +416,9 @@ container-images:
         dir: /root/.cache/helm/repository
   # upx
   - executable: upx
-    image: envcli/upx:latest
-    version: 3.95.0
-  # buildah
+    image: quay.io/cidverse/upx:3.96
+    version: 3.96.0
+  # buildah (privilegied for CLONE_NEWUSER)
   - executable: buildah
     image: quay.io/cidverse/buildah:1.26.2
     version: 1.26.2
@@ -432,7 +443,7 @@ container-images:
     version: 1.10.8
   # sonarqube
   - executable: sonar-scanner
-    image: docker.io/sonarsource/sonar-scanner-cli:4.7.0
+    image: quay.io/cidverse/sonarscannercli:4.7.0.2747
     version: 4.7.0
   # trivy security scanner
   - executable: trivy

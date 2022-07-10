@@ -17,7 +17,7 @@ import (
 	_ "github.com/cidverse/cid/pkg/actions/sonarqube"
 	_ "github.com/cidverse/cid/pkg/actions/trivy"
 	_ "github.com/cidverse/cid/pkg/actions/upx"
-	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cid/pkg/core/config"
 )
 
 func Load(projectDirectory string) {

@@ -3,8 +3,8 @@ package command
 import (
 	"bytes"
 	"errors"
-	"github.com/cidverse/cid/pkg/common/config"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
+	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
 	"github.com/cidverse/cidverseutils/pkg/container_runtime"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"

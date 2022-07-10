@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"

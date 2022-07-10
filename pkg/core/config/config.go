@@ -11,6 +11,7 @@ import (
 var embeddedConfig string
 
 func LoadConfigurationFile(config interface{}, file string) (err error) {
+	log.Debug().Str("file", file).Msg("loading configuration file ...")
 	cfgErr := configor.New(&configor.Config{ENVPrefix: "CID", Silent: true}).Load(config, file)
 
 	if cfgErr != nil {
@@ -47,10 +48,10 @@ func LoadConfig(projectDirectory string) {
 		log.Fatal().Err(err).Msg("failed to load embedded configuration")
 	}
 
-	// load
+	// load project config
 	loadConfigErr := LoadConfigurationFile(&Config, projectDirectory+"/cid.yml")
 	if loadConfigErr != nil {
-		log.Fatal().Err(loadConfigErr).Msg("failed to parse config")
+		log.Err(loadConfigErr).Msg("failed to parse config")
 	}
 
 	if Config.Dependencies == nil {

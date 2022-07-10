@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/cidverse/cid/pkg/common/config"
+	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/repoanalyzer"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
