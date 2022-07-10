@@ -22,7 +22,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 	for _, file := range ctx.FilesWithoutExtension {
 		filename := filepath.Base(file)
 
-		if filename == "Dockerfile" {
+		if filename == "Dockerfile" || filename == "Containerfile" {
 			module := analyzerapi.ProjectModule{
 				RootDirectory:     ctx.ProjectDir,
 				Directory:         filepath.Dir(file),
@@ -30,7 +30,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 				Slug:              slug.Make(filepath.Base(filepath.Dir(file))),
 				Discovery:         "file~" + file,
 				BuildSystem:       analyzerapi.BuildSystemContainer,
-				BuildSystemSyntax: analyzerapi.ContainerDockerfile,
+				BuildSystemSyntax: analyzerapi.ContainerFile,
 				Language:          nil,
 				Dependencies:      nil,
 				Submodules:        nil,

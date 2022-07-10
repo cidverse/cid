@@ -35,8 +35,8 @@ func (action BuildahPackageActionStruct) Check(ctx api.ActionExecutionContext) b
 	var missingRequirements []api.MissingRequirement
 
 	if ctx.CurrentModule != nil {
-		if (ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerDockerfile || ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript) == false {
-			missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "module is not of syntax " + string(analyzerapi.ContainerDockerfile) + " or " + string(analyzerapi.ContainerBuildahScript)})
+		if (ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerFile || ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript) == false {
+			missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "module is not of syntax " + string(analyzerapi.ContainerFile) + " or " + string(analyzerapi.ContainerBuildahScript)})
 		}
 	} else {
 		missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "no module context present"})
@@ -56,7 +56,7 @@ func (action BuildahPackageActionStruct) Execute(ctx api.ActionExecutionContext,
 	containerFile := strings.TrimPrefix(ctx.CurrentModule.Discovery, "file~")
 	image := getFullImage(ctx.Env["NCI_CONTAINERREGISTRY_HOST"], ctx.Env["NCI_CONTAINERREGISTRY_REPOSITORY"], ctx.Env["NCI_CONTAINERREGISTRY_TAG"])
 
-	if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerDockerfile {
+	if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerFile {
 		dockerfileContent, _ := filesystem.GetFileContent(containerFile)
 		syntax := getDockerfileSyntax(dockerfileContent)
 		platforms := getDockerfileTargetPlatforms(dockerfileContent)

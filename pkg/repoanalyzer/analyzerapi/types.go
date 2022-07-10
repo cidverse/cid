@@ -77,7 +77,7 @@ const (
 	BuildSystemSyntaxDefault ProjectBuildSystemSyntax = "default"
 	GradleGroovyDSL          ProjectBuildSystemSyntax = "groovy"
 	GradleKotlinDSL          ProjectBuildSystemSyntax = "kotlin"
-	ContainerDockerfile      ProjectBuildSystemSyntax = "dockerfile"
+	ContainerFile            ProjectBuildSystemSyntax = "containerfile"
 	ContainerBuildahScript   ProjectBuildSystemSyntax = "buildah-script"
 )
 
