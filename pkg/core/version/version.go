@@ -44,9 +44,26 @@ func Format(input string) string {
 	return ver.String()
 }
 
+// Compare compares two versions
+func Compare(left string, right string) int {
+	leftVer, leftVerErr := hashicorpVersion.NewSemver(left)
+	if leftVerErr != nil {
+		log.Err(leftVerErr).Str("left", left).Str("right", right).Msg("failed to compare versions. left version is invalid")
+		return 0
+	}
+
+	rightVer, rightVerErr := hashicorpVersion.NewSemver(right)
+	if rightVerErr != nil {
+		log.Err(rightVerErr).Str("left", left).Str("right", right).Msg("failed to compare versions. right version is invalid")
+		return 0
+	}
+
+	return leftVer.Compare(rightVer)
+}
+
 // FulfillsConstraint checks if the given version fulfills the constraint
 func FulfillsConstraint(version string, constraint string) bool {
-	log.Debug().Str("version", version).Str("constraint", constraint).Msg("checking version constraint")
+	log.Trace().Str("version", version).Str("constraint", constraint).Msg("checking version constraint")
 
 	ver, vErr := hashicorpVersion.NewVersion(version)
 	if vErr != nil {

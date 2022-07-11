@@ -18,28 +18,33 @@ import (
 	"strings"
 )
 
-// GetCommandVersion returns the version of a executable
-func GetCommandVersion(executable string) (string, error) {
+// GetCommandVersion returns the version of an executable
+func GetCommandVersion(binary string) (string, error) {
 	// find version constraint from config
-	cmdConstraint := ">= 0.0.0"
-	if value, ok := config.Config.Dependencies[executable]; ok {
-		cmdConstraint = value
+	binaryVersionConstraint := ">= 0.0.0"
+	if value, ok := config.Config.Dependencies[binary]; ok {
+		binaryVersionConstraint = value
 	}
 
 	// prefer local tools if we find some that match the project version constraints
-	toolData, toolErr := config.FindLocalTool(executable, cmdConstraint)
-	if toolErr == nil {
-		return toolData.Version, nil
+	toolData := config.Config.FindPathOfBinary(binary, binaryVersionConstraint)
+	if toolData != nil {
+		// TODO: return toolData.Version, nil
+		return "0.0.0", nil
 	}
 
 	// find container image
-	containerImage, containerImageErr := config.FindContainerImage(executable, cmdConstraint)
-	if containerImageErr == nil {
-		return containerImage.Version, nil
+	containerImage := config.Config.FindImageOfBinary(binary, binaryVersionConstraint)
+	if containerImage != nil {
+		for _, provides := range containerImage.Provides {
+			if binary == provides.Binary {
+				return provides.Version, nil
+			}
+		}
 	}
 
 	// can't run cmd
-	return "", errors.New("can't determinate version of " + executable)
+	return "", errors.New("can't determinate version of " + binary)
 }
 
 // RunCommand runs a required command and forwards all output to console, but will panic/exit if the command fails
@@ -78,30 +83,38 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 		cmdConstraint = value
 	}
 
-	// local execution
-	cmdBinary := ""
-	localTool, localToolErr := config.FindLocalTool(originalBinary, cmdConstraint)
-	if localToolErr == nil {
-		cmdBinary = localTool.ExecutableFile
+	// lookup execution options
+	candidates := config.Config.FindExecutionCandidates(originalBinary, cmdConstraint, config.ExecutionExec, config.PreferHighest)
+	log.Trace().Interface("candidates", candidates).Str("binary", originalBinary).Msg("identified all available execution candidates")
+
+	// no ways to execute command
+	if len(candidates) == 0 {
+		return errors.New("no method available to execute command " + originalBinary)
 	}
 
-	// container execution
-	containerImage, containerImageErr := config.FindContainerImage(originalBinary, cmdConstraint)
-	containerExec := container_runtime.Container{}
-	if containerImageErr == nil {
+	candidate := candidates[0]
+	switch candidate.Type {
+	case config.ExecutionExec:
+		return RunSystemCommandPassThru(candidate.File, cmdPayload, env, workDir, stdout, stderr)
+	case config.ExecutionContainer:
+		containerExec := container_runtime.Container{}
+
 		projectDir := vcsrepository.FindRepositoryDirectory(workDir)
 
-		containerExec.SetImage(containerImage.Image)
+		containerExec.SetImage(candidate.Image)
 		containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: cihelper.ToUnixPath(projectDir), Target: cihelper.ToUnixPath(projectDir)})
 		containerExec.SetWorkingDirectory(cihelper.ToUnixPath(workDir))
 		containerExec.SetEntrypoint("unset")
 		containerExec.SetCommand(strings.Join(cmdArgs, " "))
 		for key, value := range env {
-			containerExec.AddEnvironmentVariable(key, value)
+			// only add uppercase env vars
+			if strings.ToUpper(key) == key {
+				containerExec.AddEnvironmentVariable(key, value)
+			}
 		}
 
 		// cache
-		for _, c := range containerImage.Cache {
+		for _, c := range candidate.ImageCache {
 			cacheDir := path.Join(os.TempDir(), "cid", c.Id)
 			_ = os.MkdirAll(cacheDir, os.ModePerm)
 
@@ -112,43 +125,16 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 				containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: cihelper.ToUnixPath(cacheDir), Target: c.ContainerPath})
 			}
 		}
+
+		containerCmd := cihelper.ToUnixPathArgs(containerExec.GetRunCommand(containerExec.DetectRuntime()))
+		log.Debug().Msg("container-exec: " + containerCmd)
+		containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
+		return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdout, stderr)
+	default:
+		log.Fatal().Interface("type", candidate.Type).Msg("execution type is not supported!")
 	}
 
-	// decide how to execute this command
-	log.Debug().Str("executable", originalBinary).Str("args", cmdPayload).Str("os", runtime.GOOS).Str("workdir", workDir).Str("mode", string(config.Config.Mode)).Str("localpath", cmdBinary).Msg("command info")
-	if config.Config.Mode == config.PreferLocal {
-		if len(cmdBinary) > 0 {
-			// run locally
-			return RunSystemCommandPassThru(cmdBinary, cmdPayload, env, workDir, stdout, stderr)
-		} else if containerImageErr == nil && len(containerImage.Image) > 0 {
-			// run in container
-			containerCmd := cihelper.ToUnixPathArgs(containerExec.GetRunCommand(containerExec.DetectRuntime()))
-			log.Debug().Msg("container-exec: " + containerCmd)
-			containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
-			return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdout, stderr)
-		} else {
-			log.Fatal().Str("executable", originalBinary).Msg("no method available to execute command")
-		}
-	} else if config.Config.Mode == config.Strict {
-		if containerImageErr == nil && len(containerImage.Image) > 0 {
-			// run in container
-			containerCmd := cihelper.ToUnixPathArgs(containerExec.GetRunCommand(containerExec.DetectRuntime()))
-			log.Debug().Msg("container-exec: " + containerCmd)
-			containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
-			return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdout, stderr)
-		} else if len(cmdBinary) > 0 {
-			// run locally
-			return RunSystemCommandPassThru(cmdBinary, cmdPayload, env, workDir, stdout, stderr)
-		} else {
-			log.Fatal().Str("executable", originalBinary).Msg("no method available to execute command")
-		}
-	} else {
-		log.Fatal().Str("mode", string(config.Config.Mode)).Msg("execution mode not supported")
-	}
-
-	// can't run cmd
-	log.Fatal().Str("executable", originalBinary).Msg("no method available to execute command")
-	return errors.New("no method available to execute command " + originalBinary)
+	return nil
 }
 
 // RunSystemCommandPassThru runs a command and forwards all output to current console session

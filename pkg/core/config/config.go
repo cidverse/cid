@@ -1,14 +1,18 @@
 package config
 
 import (
+	"embed"
 	_ "embed"
 	"github.com/jinzhu/configor"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
 
-//go:embed cid-main.yaml
+//go:embed files/cid-main.yaml
 var embeddedConfig string
+
+//go:embed files
+var embeddedConfigFS embed.FS
 
 func LoadConfigurationFile(config interface{}, file string) (err error) {
 	log.Debug().Str("file", file).Msg("loading configuration file ...")
@@ -21,32 +25,13 @@ func LoadConfigurationFile(config interface{}, file string) (err error) {
 	return cfgErr
 }
 
-var Config = struct {
-	Paths           PathConfig
-	Mode            ExecutionModeType `default:"PREFER_LOCAL"`
-	Conventions     ProjectConventions
-	Env             map[string]string
-	Stages          []WorkflowStage             `yaml:"stages"`
-	Actions         map[string][]WorkflowAction `yaml:"actions"`
-	Dependencies    map[string]string
-	Tools           []ToolExecutableDiscovery `yaml:"tools"`
-	ContainerImages []ToolContainerDiscovery  `yaml:"container-images"`
-}{}
-
-// PathConfig contains the path configuration for build/tmp directories
-type PathConfig struct {
-	Artifact       string `default:"dist"`
-	ModuleArtifact string `default:"dist"`
-	Temp           string `default:"tmp"`
-	Cache          string `default:""`
-}
+var Config = CIDConfig{}
 
 func LoadConfig(projectDirectory string) {
-	// parent config
-	err := yaml.Unmarshal([]byte(embeddedConfig), &Config)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to load embedded configuration")
-	}
+	// internal config
+	yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-main.yaml")), &Config)
+	yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-tools.yaml")), &Config)
+	yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-container.yaml")), &Config)
 
 	// load project config
 	loadConfigErr := LoadConfigurationFile(&Config, projectDirectory+"/cid.yml")
@@ -57,4 +42,9 @@ func LoadConfig(projectDirectory string) {
 	if Config.Dependencies == nil {
 		Config.Dependencies = make(map[string]string)
 	}
+}
+
+func getEmbeddedConfig(name string) string {
+	var content, _ = embeddedConfigFS.ReadFile(name)
+	return string(content)
 }

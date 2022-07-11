@@ -1,0 +1,188 @@
+###
+# Main Configuration / Global Defaults
+###
+
+# paths
+paths:
+  artifact: dist
+
+# mode
+mode: exec
+
+# project conventions
+conventions:
+  branching: GitFlow
+  commit: ConventionalCommits
+  prereleasesuffix: "-rc.{NCI_LASTRELEASE_COMMIT_AFTER_COUNT}"
+
+# stages
+stages:
+  - name: build
+  - name: test
+  - name: sast
+  - name: package
+  - name: qualitygate
+  - name: publish
+    rules:
+      - expression: NCI_COMMIT_REF_PATH == "branch/develop" || NCI_COMMIT_REF_PATH == "branch/main" || NCI_COMMIT_REF_PATH == "branch/master" || NCI_COMMIT_REF_TYPE == "tag"
+
+# actions
+actions:
+  # run locally (dev)
+  run:
+    - name: golang-run
+      type: builtin
+      scope: module
+    - name: java-run
+      type: builtin
+      scope: module
+    - name: python-run
+      type: builtin
+      scope: module
+    - name: hugo-run
+      type: builtin
+      scope: module
+  # build artifacts
+  build:
+    - name: golang-build
+      type: builtin
+      scope: module
+      config:
+        # debug information?
+        debug: false
+        # cross platform build
+        platform:
+          - goos: windows
+            goarch: amd64
+          - goos: linux
+            goarch: amd64
+          - goos: darwin
+            goarch: amd64
+    - name: java-build
+      type: builtin
+      scope: module
+    - name: python-build
+      type: builtin
+      scope: module
+    - name: node-build
+      type: builtin
+      scope: module
+    - name: hugo-build
+      type: builtin
+      scope: module
+    - name: helm-build
+      type: builtin
+      scope: module
+  # test execution
+  test:
+    - name: golang-test
+      type: builtin
+      scope: module
+    - name: java-test
+      type: builtin
+      scope: module
+    - name: helm-test
+      type: builtin
+      scope: module
+  # package
+  package:
+    # optimization
+    - name: upx-optimize
+      type: builtin
+      scope: module
+    # package
+    - name: container-package-buildah
+      type: builtin
+      scope: module
+      config:
+        no-cache: true
+        squash: true
+        rebuild: true
+    #- name: container-package-docker
+    #  type: builtin
+    #  scope: module
+  # linting
+  lint:
+    - name: golang-lint
+      type: builtin
+      scope: module
+    - name: python-lint
+      type: builtin
+      scope: module
+    - name: helm-lint
+      type: builtin
+      scope: module
+  # static application security testing (embeds lint)
+  sast:
+    # linters
+    - name: golang-lint
+      type: builtin
+      scope: module
+    - name: python-lint
+      type: builtin
+      scope: module
+    - name: helm-lint
+      type: builtin
+      scope: module
+    # scanners
+    - name: trivy-fs-scan
+      type: builtin
+      scope: project
+    - name: fossa-scan
+      type: builtin
+      scope: project
+    - name: gitleaks-scan
+      type: builtin
+      scope: project
+    - name: gitguardian-scan
+      type: builtin
+      scope: project
+    - name: sonarqube-scan
+      type: builtin
+      scope: project
+    - name: dependencycheck-scan
+      type: builtin
+      scope: project
+  publish:
+    # tag / release
+    - name: repo-tag-create
+      type: builtin
+      scope: project
+    # changelog generator
+    - name: repo-changelog-generate
+      type: builtin
+      scope: project
+      config:
+        # changelog generator configuration
+        templates:
+          - github-release.tmpl
+          - discord-release.tmpl
+        commit_pattern:
+          - (?P<type>[A-Za-z]+)((?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?)(:\s?(?P<subject>.*))?
+        title_maps:
+          build: "Build System"
+          ci: "CI"
+          docs: "Documentation"
+          feat: "Features"
+          fix: "Bug Fixes"
+          perf: "Performance"
+          refactor: "Refactor"
+          style: "Style"
+          test: "Test"
+          chore: "Internal"
+        note_keywords:
+          - keyword: NOTE
+            title: Notes
+          - keyword: BREAKING CHANGE
+            title: Breaking Changes
+    # publish release / assets
+    - name: repo-release-github
+      type: builtin
+      scope: project
+    # artifact push
+    - name: java-publish
+      type: builtin
+      scope: module
+    - name: helm-publish-nexus
+      type: builtin
+      scope: module
