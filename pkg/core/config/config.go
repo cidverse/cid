@@ -8,9 +8,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-//go:embed files/cid-main.yaml
-var embeddedConfig string
-
 //go:embed files
 var embeddedConfigFS embed.FS
 

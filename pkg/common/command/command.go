@@ -106,12 +106,9 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 		containerExec.SetWorkingDirectory(cihelper.ToUnixPath(workDir))
 		containerExec.SetEntrypoint("unset")
 		containerExec.SetCommand(strings.Join(cmdArgs, " "))
-		for key, value := range env {
-			// only add uppercase env vars
-			if strings.ToUpper(key) == key {
-				containerExec.AddEnvironmentVariable(key, value)
-			}
-		}
+
+		// TODO: add whitelisted env vars
+		// containerExec.AddEnvironmentVariable(key, value)
 
 		// cache
 		for _, c := range candidate.ImageCache {

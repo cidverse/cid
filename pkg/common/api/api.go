@@ -15,20 +15,10 @@ import (
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 )
-
-// GetCacheDir returns the caching directory for a module
-func GetCacheDir(pathConfig config.PathConfig, module string) string {
-	if len(pathConfig.Cache) > 0 {
-		return pathConfig.Cache + `/` + module
-	}
-
-	return os.TempDir() + `/.cid/` + module
-}
 
 // FindProjectDir finds the project directory from the current dir
 func FindProjectDir() string {

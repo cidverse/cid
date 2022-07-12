@@ -100,6 +100,11 @@ func (action BuildahPackageActionStruct) Execute(ctx api.ActionExecutionContext,
 				buildArgs = append(buildArgs, `-t `+image)
 			}
 
+			// download cache
+			downloadCache := ctx.Paths.NamedCache("buildah-download/" + platform.OS + "-" + platform.Arch)
+			log.Debug().Str("source", downloadCache).Msg("mounting external cache for /cache")
+			buildArgs = append(buildArgs, `-v `+downloadCache+`:/cache`)
+
 			// labels (oci annotations: https://github.com/opencontainers/image-spec/blob/main/annotations.md)
 			buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.source=`+strings.TrimSuffix(ctx.Env["NCI_REPOSITORY_REMOTE"], ".git")+`"`)
 			buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.created=`+time.Now().Format(time.RFC3339)+`"`)
@@ -108,7 +113,7 @@ func (action BuildahPackageActionStruct) Execute(ctx api.ActionExecutionContext,
 
 			// dynamic build-args
 			if strings.Contains(dockerfileContent, "ARG TARGETPLATFORM") {
-				buildArgs = append(buildArgs, `--build-arg TARGETPLATFORM=`+platform.OS+`/`+platform.OS)
+				buildArgs = append(buildArgs, `--build-arg TARGETPLATFORM=`+platform.OS+`/`+platform.Arch)
 			}
 			if strings.Contains(dockerfileContent, "ARG TARGETOS") {
 				buildArgs = append(buildArgs, `--build-arg TARGETOS=`+platform.OS)
@@ -134,11 +139,6 @@ func (action BuildahPackageActionStruct) Execute(ctx api.ActionExecutionContext,
 		command.RunCommand(strings.Join(pushArgs, " "), ctx.Env, ctx.ProjectDir)
 	} else if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript {
 		log.Info().Str("image", image).Str("script", containerFile).Msg("building container image")
-	}
-
-	// publish image
-	if len(ctx.Env["NCI_CONTAINERREGISTRY_HOST"]) > 0 {
-		// command.RunCommand("docker push "+image, ctx.Env, ctx.ProjectDir)
 	}
 
 	return nil

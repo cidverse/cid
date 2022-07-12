@@ -32,14 +32,6 @@ type ToolCacheDir struct {
 	MountType     string `yaml:"type"`
 }
 
-// PathConfig contains the path configuration for build/tmp directories
-type PathConfig struct {
-	Artifact       string `default:"dist"`
-	ModuleArtifact string `default:"dist"`
-	Temp           string `default:"tmp"`
-	Cache          string `default:""`
-}
-
 // CIDConfig is the full stuct of the configuration file
 type CIDConfig struct {
 	Catalog      Catalog `yaml:"catalog,omitempty"`
