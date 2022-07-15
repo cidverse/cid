@@ -22,19 +22,19 @@ import (
 func GetCommandVersion(binary string) (string, error) {
 	// find version constraint from config
 	binaryVersionConstraint := ">= 0.0.0"
-	if value, ok := config.Config.Dependencies[binary]; ok {
+	if value, ok := config.Current.Dependencies[binary]; ok {
 		binaryVersionConstraint = value
 	}
 
 	// prefer local tools if we find some that match the project version constraints
-	toolData := config.Config.FindPathOfBinary(binary, binaryVersionConstraint)
+	toolData := config.Current.FindPathOfBinary(binary, binaryVersionConstraint)
 	if toolData != nil {
 		// TODO: return toolData.Version, nil
 		return "0.0.0", nil
 	}
 
 	// find container image
-	containerImage := config.Config.FindImageOfBinary(binary, binaryVersionConstraint)
+	containerImage := config.Current.FindImageOfBinary(binary, binaryVersionConstraint)
 	if containerImage != nil {
 		for _, provides := range containerImage.Provides {
 			if binary == provides.Binary {
@@ -79,12 +79,12 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 
 	// find version constraint from config
 	cmdConstraint := ">= 0.0.0"
-	if value, ok := config.Config.Dependencies[originalBinary]; ok {
+	if value, ok := config.Current.Dependencies[originalBinary]; ok {
 		cmdConstraint = value
 	}
 
 	// lookup execution options
-	candidates := config.Config.FindExecutionCandidates(originalBinary, cmdConstraint, config.ExecutionExec, config.PreferHighest)
+	candidates := config.Current.FindExecutionCandidates(originalBinary, cmdConstraint, config.ExecutionExec, config.PreferHighest)
 	log.Trace().Interface("candidates", candidates).Str("binary", originalBinary).Msg("identified all available execution candidates")
 
 	// no ways to execute command

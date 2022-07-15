@@ -14,12 +14,12 @@ import (
 	"time"
 )
 
-var analyticCache = make(map[string][]*analyzerapi.ProjectModule)
+var analyzerCache = make(map[string][]*analyzerapi.ProjectModule)
 
 // AnalyzeProject will analyze a project and return all modules in path
 func AnalyzeProject(projectDir string, path string) []*analyzerapi.ProjectModule {
-	if funk.Contains(analyticCache, path) {
-		return analyticCache[path]
+	if funk.Contains(analyzerCache, path) {
+		return analyzerCache[path]
 	}
 
 	start := time.Now()
@@ -40,8 +40,8 @@ func AnalyzeProject(projectDir string, path string) []*analyzerapi.ProjectModule
 		}
 	}
 
-	log.Info().Str("duration", time.Since(start).String()).Int("file_count", len(ctx.Files)).Msg("repo analyzer complete")
+	log.Info().Int("module_count", len(result)).Str("duration", time.Since(start).String()).Int("file_count", len(ctx.Files)).Msg("repo analyzer complete")
 
-	analyticCache[projectDir] = result
+	analyzerCache[projectDir] = result
 	return result
 }

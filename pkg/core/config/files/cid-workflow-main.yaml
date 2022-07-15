@@ -1,0 +1,79 @@
+# all workflows
+workflows:
+  - name: main
+    rules: []
+    stages:
+      - name: build
+        actions:
+          - id: central/golang-build
+            config:
+              # cross-platform build
+              platform:
+                - goos: windows
+                  goarch: amd64
+                - goos: linux
+                  goarch: amd64
+                - goos: darwin
+                  goarch: amd64
+          - id: central/java-build
+          - id: central/python-build
+          - id: central/node-build
+          - id: central/hugo-build
+          - id: central/helm-build
+      - name: test
+        actions:
+          - id: central/golang-test
+          - id: central/java-test
+          - id: central/helm-test
+      - name: package
+        actions:
+          - id: central/upx-optimize
+          - id: central/container-package-buildah
+            config:
+              no-cache: true
+              squash: true
+              rebuild: true
+          #- id: builtin/container-package-docker
+      - name: lint
+        actions:
+          - id: central/golang-lint
+          - id: central/python-lint
+          - id: central/helm-lint
+      - name: scan
+        actions:
+          - id: central/trivy-fs-scan
+          - id: central/fossa-scan
+          - id: central/gitleaks-scan
+          - id: central/gitguardian-scan
+          - id: central/sonarqube-scan
+          - id: central/dependencycheck-scan
+      - name: publish
+        actions:
+          - id: central/repo-tag-create
+          - id: central/repo-changelog-generate
+            config:
+              # changelog generator configuration
+              templates:
+                - github-release.tmpl
+                - discord-release.tmpl
+              commit_pattern:
+                - (?P<type>[A-Za-z]+)((?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?)(:\s?(?P<subject>.*))?
+              title_maps:
+                build: "Build System"
+                ci: "CI"
+                docs: "Documentation"
+                feat: "Features"
+                fix: "Bug Fixes"
+                perf: "Performance"
+                refactor: "Refactor"
+                style: "Style"
+                test: "Test"
+                chore: "Internal"
+              note_keywords:
+                - keyword: NOTE
+                  title: Notes
+                - keyword: BREAKING CHANGE
+                  title: Breaking Changes
+          - id: central/repo-release-github
+          - id: central/java-publish
+          - id: central/helm-publish-nexus

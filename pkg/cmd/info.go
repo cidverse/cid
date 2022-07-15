@@ -6,11 +6,9 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
-	"github.com/cidverse/cid/pkg/common/workflow"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/repoanalyzer"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/thoas/go-funk"
@@ -19,11 +17,13 @@ import (
 )
 
 type InfoCommandResponse struct {
-	Modules         []*analyzerapi.ProjectModule
-	Tools           map[string]string `yaml:"tool-version"`
-	ToolConstraints map[string]string `yaml:"tool-constraint"`
-	ExecutionPlan   []config.WorkflowStage
-	Environment     map[string]string
+	Version           string `yaml:"version"`
+	VersionCommitHash string `yaml:"version_commit_hash"`
+	VersionBuildAt    string `yaml:"version_build_at"`
+	Modules           []*analyzerapi.ProjectModule
+	Tools             map[string]string `yaml:"tool-version"`
+	ToolConstraints   map[string]string `yaml:"tool-constraint"`
+	Environment       map[string]string
 }
 
 func init() {
@@ -46,7 +46,11 @@ var infoCmd = &cobra.Command{
 		env := api.GetCIDEnvironment(projectDir)
 
 		// response
-		var response = InfoCommandResponse{}
+		var response = InfoCommandResponse{
+			Version:           Version,
+			VersionCommitHash: CommitHash,
+			VersionBuildAt:    BuildAt,
+		}
 
 		// detect project modules
 		for _, module := range repoanalyzer.AnalyzeProject(projectDir, projectDir) {
@@ -62,39 +66,18 @@ var infoCmd = &cobra.Command{
 
 		// tool constraints
 		response.ToolConstraints = make(map[string]string)
-		for key, value := range config.Config.Dependencies {
+		for key, value := range config.Current.Dependencies {
 			response.ToolConstraints[key] = value
 		}
 
-		// execution plan (omit some information
-		originalExecutionPlan := workflow.GetExecutionPlan(projectDir, []string{}, filesystem.GetWorkingDirectory(), env, nil)
-		var outputExecutionPlan []config.WorkflowStage
-		for _, stage := range originalExecutionPlan {
-			var actions []config.WorkflowAction
-			for _, a := range stage.Actions {
-				a.Module = nil
-				actions = append(actions, a)
-			}
-
-			stage.Actions = actions
-			outputExecutionPlan = append(outputExecutionPlan, stage)
-		}
-		response.ExecutionPlan = outputExecutionPlan
+		// workflow (omit some information
 		if funk.Contains(excludes, "plan") {
-			response.ExecutionPlan = nil
+
 		}
 
 		// tools
 		response.Tools = make(map[string]string)
 		// -> find all used tools
-		for _, actions := range response.ExecutionPlan {
-			for _, action := range actions.Actions {
-				details := workflow.GetActionDetails(action, projectDir, env)
-				for _, tool := range details.UsedTools {
-					response.Tools[tool] = ""
-				}
-			}
-		}
 		// -> determinate versions
 		for key := range response.Tools {
 			commandVer, commandVerErr := command.GetCommandVersion(key)

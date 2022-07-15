@@ -34,18 +34,23 @@ type ToolCacheDir struct {
 
 // CIDConfig is the full stuct of the configuration file
 type CIDConfig struct {
-	Catalog      Catalog `yaml:"catalog,omitempty"`
-	Paths        PathConfig
-	Mode         ExecutionType `default:"PREFER_LOCAL"`
-	Conventions  ProjectConventions
-	Env          map[string]string
-	Stages       []WorkflowStage             `yaml:"stages"`
-	Actions      map[string][]WorkflowAction `yaml:"actions"`
-	Dependencies map[string]string
+	Paths       PathConfig
+	Mode        ExecutionType `default:"PREFER_LOCAL"`
+	Conventions ProjectConventions
+	Env         map[string]string
+
+	// Catalog holds all currently known actions
+	Catalog Catalog `yaml:"catalog,omitempty"`
+
+	// Workflows holds all available workflows
+	Workflows []Workflow `yaml:"workflows,omitempty"`
+
+	// Dependencies holds a key value map of required versions
+	Dependencies map[string]string `yaml:"dependencies,omitempty"`
 
 	// LocalTools holds a list to lookup locally installed tools for command execution
 	LocalTools []ToolLocal `yaml:"localtools,omitempty"`
 
 	// ContainerImages holds a list of images that provide tools for command execution
-	ContainerImages []ToolContainerImage `yaml:"containerimages"`
+	ContainerImages []ToolContainerImage `yaml:"containerimages,omitempty"`
 }

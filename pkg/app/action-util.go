@@ -20,7 +20,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/config"
 )
 
-func Load(projectDirectory string) {
+func Load(projectDirectory string) *config.CIDConfig {
 	// load configuration for the current project
-	config.LoadConfig(projectDirectory)
+	return config.LoadConfig(projectDirectory)
 }

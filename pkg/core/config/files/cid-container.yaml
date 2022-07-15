@@ -109,6 +109,7 @@ containerimages:
         version: 1.10.8
   # sonarqube
   - image: docker.io/sonarsource/sonar-scanner-cli:4.7.0
+    # quay.io/cidverse/sonarscannercli:4.7.0.2747
     provides:
       - binary: sonar-scanner
         version: 4.7.0

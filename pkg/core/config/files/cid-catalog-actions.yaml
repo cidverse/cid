@@ -1,0 +1,140 @@
+# catalog
+catalog:
+  actions:
+    # golang
+    - repository: central
+      name: golang-run
+      type: builtin-golang
+      description: |
+        Start your project locally.
+      version: 1.0
+      scope: module
+    - repository: central
+      name: golang-build
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: golang-test
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: golang-lint
+      type: builtin-golang
+      scope: module
+    # java
+    - repository: central
+      name: java-run
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: java-build
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: java-test
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: java-publish
+      type: builtin-golang
+      scope: module
+    # python
+    - repository: central
+      name: python-run
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: python-build
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: python-lint
+      type: builtin-golang
+      scope: module
+    # node
+    - repository: central
+      name: node-build
+      type: builtin-golang
+      scope: module
+    # helm
+    - repository: central
+      name: helm-build
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: helm-test
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: helm-lint
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: helm-publish-nexus
+      type: builtin-golang
+      scope: module
+    # hugo
+    - repository: central
+      name: hugo-run
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: hugo-build
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: hugo-test
+      type: builtin-golang
+      scope: module
+    # optimization
+    - repository: central
+      name: upx-optimize
+      type: builtin-golang
+      scope: module
+    # container
+    - repository: central
+      name: container-package-buildah
+      type: builtin-golang
+      scope: module
+    - repository: central
+      name: container-package-docker
+      type: builtin-golang
+      scope: module
+    # scanner
+    - repository: central
+      name: trivy-fs-scan
+      type: builtin-golang
+      scope: project
+    - repository: central
+      name: fossa-scan
+      type: builtin-golang
+      scope: project
+    - repository: central
+      name: gitleaks-scan
+      type: builtin-golang
+      scope: project
+    - repository: central
+      name: gitguardian-scan
+      type: builtin-golang
+      scope: project
+    - repository: central
+      name: sonarqube-scan
+      type: builtin-golang
+      scope: project
+    - repository: central
+      name: dependencycheck-scan
+      type: builtin-golang
+      scope: project
+    # publish
+    - repository: central
+      name: repo-tag-create
+      type: builtin-golang
+      scope: project
+    - repository: central
+      name: repo-changelog-generate
+      type: builtin-golang
+      scope: project
+    - repository: central
+      name: repo-release-github
+      type: builtin-golang
+      scope: project

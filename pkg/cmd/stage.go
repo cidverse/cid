@@ -1,49 +1,56 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/common/workflow"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
-	"github.com/rs/zerolog/log"
+	"github.com/cidverse/cid/pkg/common/protectoutput"
+	"github.com/cidverse/cid/pkg/core/cliutil"
+	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/spf13/cobra"
+	"os"
+	"strconv"
+	"text/tabwriter"
 )
 
 func init() {
-	rootCmd.AddCommand(stageCmd)
-	stageCmd.Flags().StringP("version", "v", "", "specified a custom project version")
-	stageCmd.Flags().StringArrayP("module", "m", []string{}, "limit execution to the specified module(s)")
+	rootCmd.AddCommand(stageRootCmd)
+	stageRootCmd.AddCommand(stageListCmd)
 }
 
-var stageCmd = &cobra.Command{
+var stageRootCmd = &cobra.Command{
 	Use:     "stage",
 	Aliases: []string{"s"},
-	Short:   "runs the stage specified in the arguments",
-	Long:    `runs the stage specified in the arguments`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// arguments
-		stage := args[0]
-		modules, _ := cmd.Flags().GetStringArray("module")
-		log.Debug().Str("stage", stage).Strs("modules", modules).Msg("stageCmd: execute")
+		_ = cmd.Help()
+		os.Exit(0)
+	},
+}
 
+var stageListCmd = &cobra.Command{
+	Use:     "list",
+	Aliases: []string{"ls"},
+	Short:   "lists all stages",
+	Run: func(cmd *cobra.Command, args []string) {
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
-		app.Load(projectDir)
+		cfg := app.Load(projectDir)
 
-		// normalize environment
+		// environment
 		env := api.GetCIDEnvironment(projectDir)
 
-		// allow to overwrite NCI_COMMIT_REF_RELEASE with a custom version
-		version := cmd.Flag("version").Value.String()
-		if len(version) > 0 {
-			// manually overwrite version
-			env["NCI_COMMIT_REF_RELEASE"] = version
-		} else if len(env["NCI_NEXTRELEASE_NAME"]) > 0 {
-			// take suggested release version
-			env["NCI_COMMIT_REF_RELEASE"] = env["NCI_NEXTRELEASE_NAME"]
+		// print list
+		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
+		_, _ = fmt.Fprintln(w, "WORKFLOW\tSTAGE\tRULES\tACTIONS\tENABLED")
+		for _, wf := range cfg.Workflows {
+			for _, stage := range wf.Stages {
+				_, _ = fmt.Fprintln(w, wf.Name+"\t"+
+					stage.Name+"\t"+
+					rules.EvaluateRulesAsText(stage.Rules, rules.GetRuleContext(env))+"\t"+
+					strconv.Itoa(len(stage.Actions))+"\t"+
+					cliutil.BoolToChar(wf.Enabled))
+			}
 		}
-
-		// actions
-		workflow.RunStageActions(stage, modules, projectDir, filesystem.GetWorkingDirectory(), env, args)
+		_ = w.Flush()
 	},
 }

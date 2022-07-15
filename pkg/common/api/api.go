@@ -35,11 +35,11 @@ func GetCIDEnvironment(projectDirectory string) map[string]string {
 	env := ncimain.RunDefaultNormalization()
 
 	// append cid vars
-	env["CID_CONVENTION_BRANCHING"] = string(config.Config.Conventions.Branching)
-	env["CID_CONVENTION_COMMIT"] = string(config.Config.Conventions.Commit)
+	env["CID_CONVENTION_BRANCHING"] = string(config.Current.Conventions.Branching)
+	env["CID_CONVENTION_COMMIT"] = string(config.Current.Conventions.Commit)
 
 	// append env from configuration file
-	for key, value := range config.Config.Env {
+	for key, value := range config.Current.Env {
 		env[key] = value
 	}
 
@@ -50,7 +50,7 @@ func GetCIDEnvironment(projectDirectory string) map[string]string {
 
 	// customization
 	// - suggested release version
-	enrichErr := EnrichEnvironment(projectDirectory, string(config.Config.Conventions.Branching), env)
+	enrichErr := EnrichEnvironment(projectDirectory, string(config.Current.Conventions.Branching), env)
 	if enrichErr != nil {
 		log.Err(enrichErr).Msg("failed to enrich project context")
 	}
@@ -88,22 +88,22 @@ func EnrichEnvironment(projectDirectory string, branchingConvention string, env 
 				isStable = true
 			}
 
-			if strings.EqualFold(string(config.Config.Conventions.Commit), string(config.ConventionalCommits)) {
+			if strings.EqualFold(string(config.Current.Conventions.Commit), string(config.ConventionalCommits)) {
 				nextRelease, nextReleaseErr := commitanalyser.DeterminateNextReleaseVersion(commits, []string{commitanalyser.ConventionalCommitPattern}, commitanalyser.DefaultReleaseVersionRules, env["NCI_LASTRELEASE_REF_NAME"])
 				if nextReleaseErr != nil {
 					return nextReleaseErr
 				}
 
 				// prerelease suffix
-				if !isStable && len(config.Config.Conventions.PreReleaseSuffix) > 0 {
-					nextRelease = fmt.Sprintf("%v%v", nextRelease, ReplacePlaceholders(config.Config.Conventions.PreReleaseSuffix, env))
+				if !isStable && len(config.Current.Conventions.PreReleaseSuffix) > 0 {
+					nextRelease = fmt.Sprintf("%v%v", nextRelease, ReplacePlaceholders(config.Current.Conventions.PreReleaseSuffix, env))
 				}
 
 				env["NCI_NEXTRELEASE_NAME"] = nextRelease
 
 				return nil
 			} else {
-				return errors.New("commit convention " + string(config.Config.Conventions.Commit) + " is not supported")
+				return errors.New("commit convention " + string(config.Current.Conventions.Commit) + " is not supported")
 			}
 		} else {
 			return errors.New("unsupported branching naming convention: " + branchingConvention)
