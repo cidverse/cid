@@ -11,8 +11,8 @@ const (
 )
 
 type WorkflowRule struct {
-	Type       WorkflowExpressionType
-	Expression string
+	Type       WorkflowExpressionType `default:"cel" yaml:"type,omitempty"`
+	Expression string                 `yaml:"expression,omitempty"`
 }
 
 type WorkflowAction struct {

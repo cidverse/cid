@@ -10,6 +10,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/spf13/cobra"
 	"os"
+	"strconv"
 	"strings"
 	"text/tabwriter"
 )
@@ -48,11 +49,16 @@ var actionListCmd = &cobra.Command{
 		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
 		_, _ = fmt.Fprintln(w, "REPOSITORY\tACTION\tTYPE\tSCOPE\tRULES\tDESCRIPTION")
 		for _, action := range cfg.Catalog.Actions {
+			ruleEvaluation := "?/" + strconv.Itoa(len(action.Rules))
+			if action.Scope == config.ActionScopeProject {
+				ruleEvaluation = rules.EvaluateRulesAsText(action.Rules, rules.GetRuleContext(env))
+			}
+
 			_, _ = fmt.Fprintln(w, action.Repository+"\t"+
 				action.Name+"\t"+
 				string(action.Type)+"\t"+
 				string(action.Scope)+"\t"+
-				rules.EvaluateRulesAsText(action.Rules, rules.GetRuleContext(env))+"\t"+
+				ruleEvaluation+"\t"+
 				strings.Replace(action.Description, "\n", "", -1))
 		}
 		_ = w.Flush()
@@ -69,8 +75,6 @@ var actionRunCmd = &cobra.Command{
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
 		cfg := app.Load(projectDir)
-
-		// environment
 		env := api.GetCIDEnvironment(projectDir)
 
 		// actions

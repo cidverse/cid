@@ -137,7 +137,7 @@ func (c CIDConfig) FindExecutionCandidates(binary string, constraint string, pre
 	})
 
 	for optIndex, opt := range options {
-		log.Debug().Str("binary", binary).Int("index", optIndex).Interface("option", opt).Msg("identified candidate")
+		log.Trace().Str("binary", binary).Int("index", optIndex).Interface("option", opt).Msg("identified candidate")
 	}
 
 	return options

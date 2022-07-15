@@ -63,7 +63,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 				FilesByExtension:  ctx.FilesByExtension,
 			}
 
-			result = append(result, &module)
+			analyzerapi.AddModuleToResult(&result, &module)
 		}
 	}
 

@@ -20,7 +20,7 @@ func TestGradleAnalyzer_AnalyzeGroovy(t *testing.T) {
 	assert.Len(t, result, 1)
 	assert.Equal(t, "gradle-groovy", result[0].Name)
 	assert.Equal(t, analyzerapi.BuildSystemGradle, result[0].BuildSystem)
-	assert.Equal(t, string(analyzerapi.GradleGroovyDSL), string(result[0].BuildSystemSyntax))
+	assert.Equal(t, analyzerapi.GradleGroovyDSL, result[0].BuildSystemSyntax)
 	assert.Nil(t, result[0].Language[analyzerapi.LanguageJava])
 
 	// submodule

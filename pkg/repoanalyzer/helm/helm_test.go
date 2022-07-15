@@ -20,7 +20,7 @@ func TestAnalyzer_AnalyzeHugo(t *testing.T) {
 	assert.Len(t, result, 1)
 	assert.Equal(t, "mychart", result[0].Name)
 	assert.Equal(t, analyzerapi.BuildSystemHelm, result[0].BuildSystem)
-	assert.Nil(t, result[0].BuildSystemSyntax)
+	assert.Equal(t, analyzerapi.BuildSystemSyntaxDefault, result[0].BuildSystemSyntax)
 	assert.Nil(t, result[0].Language)
 
 	// print result

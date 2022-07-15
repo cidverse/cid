@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io/fs"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -39,6 +40,11 @@ func GetAnalyzerContext(projectDir string) AnalyzerContext {
 	if err != nil {
 		log.Fatal().Err(err).Str("path", projectDir).Msg("failed to retrieve directory contents")
 	}
+
+	// sorting
+	sort.Slice(files, func(i, j int) bool {
+		return len(files[i]) < len(files[j])
+	})
 
 	// result
 	return AnalyzerContext{

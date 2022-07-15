@@ -3,6 +3,8 @@ package rules
 import (
 	"fmt"
 	"github.com/cidverse/cid/pkg/core/config"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	"github.com/cidverse/normalizeci/pkg/ncispec"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
@@ -10,6 +12,11 @@ import (
 	exprpb "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
 	"strconv"
 )
+
+const MODULE_NAME = "MODULE_NAME"
+const MODULE_SLUG = "MODULE_SLUG"
+const MODULE_BUILD_SYSTEM = "MODULE_BUILD_SYSTEM"
+const MODULE_BUILD_SYSTEM_SYNTAX = "MODULE_BUILD_SYSTEM_SYNTAX"
 
 // AnyRuleMatches will return true if at least one rule matches, if no rules are provided this always returns true
 func AnyRuleMatches(rules []config.WorkflowRule, evalContext map[string]interface{}) bool {
@@ -62,10 +69,21 @@ func EvaluateRule(rule config.WorkflowRule, evalContext map[string]interface{}) 
 
 func GetRuleContext(env map[string]string) map[string]interface{} {
 	return map[string]interface{}{
-		"NCI_COMMIT_REF_PATH": env["NCI_COMMIT_REF_PATH"],
-		"NCI_COMMIT_REF_TYPE": env["NCI_COMMIT_REF_TYPE"],
-		"NCI_COMMIT_REF_NAME": env["NCI_COMMIT_REF_NAME"],
+		ncispec.NCI_COMMIT_REF_PATH: env[ncispec.NCI_COMMIT_REF_PATH],
+		ncispec.NCI_COMMIT_REF_TYPE: env[ncispec.NCI_COMMIT_REF_TYPE],
+		ncispec.NCI_COMMIT_REF_NAME: env[ncispec.NCI_COMMIT_REF_NAME],
 	}
+}
+
+func GetModuleRuleContext(env map[string]string, module analyzerapi.ProjectModule) map[string]interface{} {
+	ctx := GetRuleContext(env)
+
+	ctx[MODULE_NAME] = module.Name
+	ctx[MODULE_SLUG] = module.Slug
+	ctx[MODULE_BUILD_SYSTEM] = string(module.BuildSystem)
+	ctx[MODULE_BUILD_SYSTEM_SYNTAX] = string(module.BuildSystemSyntax)
+
+	return ctx
 }
 
 func evalRuleCEL(rule config.WorkflowRule, evalContext map[string]interface{}) bool {

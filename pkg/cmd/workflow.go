@@ -43,8 +43,6 @@ var workflowListCmd = &cobra.Command{
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
 		cfg := app.Load(projectDir)
-
-		// environment
 		env := api.GetCIDEnvironment(projectDir)
 
 		// print list

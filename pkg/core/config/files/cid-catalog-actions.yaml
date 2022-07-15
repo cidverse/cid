@@ -9,35 +9,67 @@ catalog:
         Start your project locally.
       version: 1.0
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "gomod"
     - repository: central
       name: golang-build
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "gomod"
     - repository: central
       name: golang-test
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "gomod"
     - repository: central
       name: golang-lint
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "gomod"
     # java
     - repository: central
       name: java-run
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "gradle"
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "maven"
     - repository: central
       name: java-build
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "gradle"
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "maven"
     - repository: central
       name: java-test
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "gradle"
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "maven"
     - repository: central
       name: java-publish
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "gradle"
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "maven"
     # python
     - repository: central
       name: python-run
@@ -56,36 +88,60 @@ catalog:
       name: node-build
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "npm"
     # helm
     - repository: central
       name: helm-build
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "helm"
     - repository: central
       name: helm-test
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "helm"
     - repository: central
       name: helm-lint
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "helm"
     - repository: central
       name: helm-publish-nexus
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "helm"
     # hugo
     - repository: central
       name: hugo-run
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "hugo"
     - repository: central
       name: hugo-build
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "hugo"
     - repository: central
       name: hugo-test
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "hugo"
     # optimization
     - repository: central
       name: upx-optimize
@@ -96,10 +152,16 @@ catalog:
       name: container-package-buildah
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "container" && (MODULE_BUILD_SYSTEM_SYNTAX == "buildah-script" || MODULE_BUILD_SYSTEM_SYNTAX == "containerfile")
     - repository: central
       name: container-package-docker
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "container" && MODULE_BUILD_SYSTEM_SYNTAX == "containerfile"
     # scanner
     - repository: central
       name: trivy-fs-scan

@@ -4,7 +4,6 @@ import (
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"strings"
 )
@@ -18,13 +17,9 @@ var xCmd = &cobra.Command{
 	Short:   `will execute the command in the current project context.`,
 	Example: `cid x -- go version`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debug().Str("command", "x").Str("cmd", strings.Join(args, " ")).Msg("running command")
-
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
 		app.Load(projectDir)
-
-		// normalize environment
 		env := api.GetCIDEnvironment(projectDir)
 
 		// print environment

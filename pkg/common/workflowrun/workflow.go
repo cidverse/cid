@@ -118,7 +118,12 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 
 	// project-scoped actions
 	if catalogAction.Scope == config.ActionScopeProject {
-		runWorkflowAction(catalogAction, action, ctx)
+		ruleContext := rules.GetRuleContext(env)
+		ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
+		log.Debug().Str("action", action.Id).Bool("rules_match", ruleMatch).Msg("check action rules")
+		if ruleMatch {
+			runWorkflowAction(catalogAction, action, ctx)
+		}
 	}
 
 	// module-scoped actions
@@ -126,6 +131,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 		// for each module
 		for _, module := range ctx.Modules {
 			moduleRef := *module
+			log.Trace().Str("action", action.Id).Msg("action start")
 
 			// customize context
 			ctx.CurrentModule = &moduleRef
@@ -136,7 +142,12 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 				continue
 			}
 
-			runWorkflowAction(catalogAction, action, ctx)
+			ruleContext := rules.GetModuleRuleContext(env, moduleRef)
+			ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
+			log.Debug().Str("action", action.Id).Str("module", moduleRef.Name).Bool("rules_match", ruleMatch).Msg("check action rules")
+			if ruleMatch {
+				runWorkflowAction(catalogAction, action, ctx)
+			}
 		}
 	}
 }
