@@ -7,6 +7,7 @@ import (
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 	"path/filepath"
+	"strings"
 )
 
 type TestActionStruct struct{}
@@ -28,14 +29,24 @@ func (action TestActionStruct) Check(ctx api.ActionExecutionContext) bool {
 
 // Execute runs the action
 func (action TestActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+	// config
 	coverageFile := filepath.Join(ctx.Paths.Temp, "coverage.txt")
-	testResult := command.RunOptionalCommand(`go test -cover -race -vet off -coverprofile "`+coverageFile+`" ./...`, ctx.Env, ctx.ProjectDir)
+
+	// test
+	var testArgs []string
+	testArgs = append(testArgs, `go test`)
+	testArgs = append(testArgs, `-cover`)
+	// testArgs = append(testArgs, `-race`)
+	testArgs = append(testArgs, `-vet off`)
+	testArgs = append(testArgs, `-coverprofile `+coverageFile)
+	testArgs = append(testArgs, `./...`)
+	testResult := command.RunOptionalCommand(strings.Join(testArgs, " "), ctx.Env, ctx.ProjectDir)
 	if testResult != nil {
 		return errors.New("go unit tests failed. Cause: " + testResult.Error())
 	}
 
 	// get report
-	covOut, covOutErr := command.RunCommandAndGetOutput("go tool cover -func tmp/coverage.txt", ctx.Env, ctx.WorkDir)
+	covOut, covOutErr := command.RunCommandAndGetOutput("go tool cover -func "+coverageFile, ctx.Env, ctx.WorkDir)
 	if covOutErr != nil {
 		return errors.New("failed to retrieve go coverage report. Cause: " + covOutErr.Error())
 	}

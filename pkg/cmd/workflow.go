@@ -6,8 +6,6 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/common/workflowrun"
-	"github.com/cidverse/cid/pkg/core/cliutil"
-	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -47,13 +45,12 @@ var workflowListCmd = &cobra.Command{
 
 		// print list
 		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
-		_, _ = fmt.Fprintln(w, "WORKFLOW\tRULES\tSTAGES\tACTIONS\tENABLED")
+		_, _ = fmt.Fprintln(w, "WORKFLOW\tRULES\tSTAGES\tACTIONS")
 		for _, workflow := range cfg.Workflows {
 			_, _ = fmt.Fprintln(w, workflow.Name+"\t"+
 				rules.EvaluateRulesAsText(workflow.Rules, rules.GetRuleContext(env))+"\t"+
 				strconv.Itoa(len(workflow.Stages))+"\t"+
-				strconv.Itoa(workflow.ActionCount())+"\t"+
-				cliutil.BoolToChar(workflow.Enabled))
+				strconv.Itoa(workflow.ActionCount()))
 		}
 		_ = w.Flush()
 	},
@@ -72,24 +69,32 @@ var workflowRunCmd = &cobra.Command{
 		cfg := app.Load(projectDir)
 		env := api.GetCIDEnvironment(projectDir)
 
-		var wf *config.Workflow
-		if len(args) == 0 {
-			// evaluate rules to pick workflow
-			wf = workflowrun.FirstWorkflowMatchingRules(cfg.Workflows, env)
-		} else if len(args) == 1 {
-			// find workflow
-			wf = cfg.FindWorkflow(args[0])
-			if wf == nil {
-				log.Fatal().Str("workflow", args[0]).Msg("workflow does not exist")
-			}
-		} else {
+		if len(args) > 1 {
 			// error
 			_ = cmd.Help()
 			os.Exit(0)
 		}
 
-		// run
-		log.Info().Str("workflow", wf.Name).Msg("running workflow")
-		workflowrun.RunWorkflow(cfg, wf, env, projectDir, stages, modules)
+		if len(args) == 0 {
+			// evaluate rules to pick workflow
+			wf := workflowrun.FirstWorkflowMatchingRules(cfg.Workflows, env)
+			if wf == nil {
+				log.Fatal().Msg("no workflow with matching rules found")
+			}
+
+			// run
+			log.Info().Str("workflow", wf.Name).Msg("running workflow")
+			workflowrun.RunWorkflow(cfg, wf, env, projectDir, stages, modules)
+		} else if len(args) == 1 {
+			// find workflow
+			wf := cfg.FindWorkflow(args[0])
+			if wf == nil {
+				log.Fatal().Str("workflow", args[0]).Msg("workflow does not exist")
+			}
+
+			// run
+			log.Info().Str("workflow", wf.Name).Msg("running workflow")
+			workflowrun.RunWorkflow(cfg, wf, env, projectDir, stages, modules)
+		}
 	},
 }

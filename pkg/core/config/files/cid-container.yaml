@@ -1,17 +1,17 @@
 # container image catalog
 containerimages:
   # golang
-  - image: docker.io/golang:1.18.0-alpine
+  - image: docker.io/golang:1.18.4-alpine
     provides:
       - binary: go
-        version: 1.18.0
+        version: 1.18.4
     cache:
       go-pkg:
         dir: /go/pkg
-  - image: docker.io/golang:1.17.8-alpine
+  - image: docker.io/golang:1.17.12-alpine
     provides:
       - binary: go
-        version: 1.17.8
+        version: 1.17.12
     cache:
       go-pkg:
         dir: /go/pkg
@@ -30,10 +30,22 @@ containerimages:
       go-pkg:
         dir: /go/pkg
   # golangci-lint
-  - image: docker.io/golangci/golangci-lint:v1.44.2-alpine
+  - image: docker.io/golangci/golangci-lint:v1.46.2-alpine
     provides:
       - binary: golangci-lint
-        version: 1.44.2
+        version: 1.46.2
+  - image: docker.io/golangci/golangci-lint:v1.46.1-alpine
+    provides:
+      - binary: golangci-lint
+        version: 1.46.1
+  - image: docker.io/golangci/golangci-lint:v1.46.0-alpine
+    provides:
+      - binary: golangci-lint
+        version: 1.46.0
+  - image: docker.io/golangci/golangci-lint:v1.45.2-alpine
+    provides:
+      - binary: golangci-lint
+        version: 1.45.2
   # java
   - image: docker.io/eclipse-temurin:17.0.2_8-jdk
     provides:

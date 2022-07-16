@@ -4,6 +4,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/rules"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v3"
@@ -14,7 +15,7 @@ import (
 func IsWorkflowExecutable(w config.Workflow, env map[string]string) bool {
 	matchingRules := rules.EvaluateRules(w.Rules, rules.GetRuleContext(env))
 
-	if w.Enabled == true && (len(w.Rules) == 0 || matchingRules > 0) {
+	if len(w.Rules) == 0 || matchingRules > 0 {
 		return true
 	}
 
@@ -25,7 +26,7 @@ func IsWorkflowExecutable(w config.Workflow, env map[string]string) bool {
 func IsStageExecutable(s config.WorkflowStage, env map[string]string) bool {
 	matchingRules := rules.EvaluateRules(s.Rules, rules.GetRuleContext(env))
 
-	if s.Enabled == true && (len(s.Rules) == 0 || matchingRules > 0) {
+	if len(s.Rules) == 0 || matchingRules > 0 {
 		return true
 	}
 
@@ -36,7 +37,7 @@ func IsStageExecutable(s config.WorkflowStage, env map[string]string) bool {
 func IsActionExecutable(a config.Action, env map[string]string) bool {
 	matchingRules := rules.EvaluateRules(a.Rules, rules.GetRuleContext(env))
 
-	if a.Enabled == true && (len(a.Rules) == 0 || matchingRules > 0) {
+	if len(a.Rules) == 0 || matchingRules > 0 {
 		return true
 	}
 
@@ -48,10 +49,6 @@ func FirstWorkflowMatchingRules(workflows []config.Workflow, env map[string]stri
 	// select workflow
 	log.Info().Msg("evaluating all workflows")
 	for _, wf := range workflows {
-		if wf.Enabled != true {
-			log.Debug().Str("workflow", wf.Name).Msg("workflow is disabled, skipping")
-			continue
-		}
 		log.Debug().Str("workflow", wf.Name).Msg("evaluating workflow rules")
 
 		if len(wf.Rules) > 0 {
@@ -162,6 +159,10 @@ func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowActi
 		// serialize action config for pass-thru
 		actConfig, _ := yaml.Marshal(&action.Config)
 		log.Trace().Str("action", action.Id).Str("type", string(catalogAction.Type)).Str("config", string(actConfig)).Msg("action configuration")
+
+		// paths
+		filesystem.CreateDirectory(ctx.Paths.Temp)
+		filesystem.CreateDirectory(ctx.Paths.Artifact)
 
 		// execute
 		if catalogAction.Type == config.ActionTypeBuiltinGolang {

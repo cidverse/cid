@@ -5,7 +5,6 @@ import (
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
-	"github.com/cidverse/cid/pkg/core/cliutil"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/spf13/cobra"
 	"os"
@@ -39,14 +38,13 @@ var stageListCmd = &cobra.Command{
 
 		// print list
 		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
-		_, _ = fmt.Fprintln(w, "WORKFLOW\tSTAGE\tRULES\tACTIONS\tENABLED")
+		_, _ = fmt.Fprintln(w, "WORKFLOW\tSTAGE\tRULES\tACTIONS")
 		for _, wf := range cfg.Workflows {
 			for _, stage := range wf.Stages {
 				_, _ = fmt.Fprintln(w, wf.Name+"\t"+
 					stage.Name+"\t"+
 					rules.EvaluateRulesAsText(stage.Rules, rules.GetRuleContext(env))+"\t"+
-					strconv.Itoa(len(stage.Actions))+"\t"+
-					cliutil.BoolToChar(wf.Enabled))
+					strconv.Itoa(len(stage.Actions)))
 			}
 		}
 		_ = w.Flush()

@@ -1,7 +1,7 @@
 # local tools
 localtools:
   # golang
-  - binary: ["go"]
+  - binary: ["go", "gofmt"]
     lookup:
       - key: GOROOT_1_18
         version: 1.18.0
@@ -61,13 +61,3 @@ localtools:
     lookup:
       - key: PATH
         version: 0.0.0
-  # helm
-  - binary: ["helm"]
-    lookup:
-      - key: PATH
-        version: 0.0.0
-  # go
-  - binary: ["go"]
-    lookup:
-      - key: PATH
-        version: 20.0.0

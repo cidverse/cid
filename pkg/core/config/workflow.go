@@ -24,16 +24,14 @@ type WorkflowAction struct {
 
 type WorkflowStage struct {
 	Name    string           `required:"true" yaml:"name,omitempty"`
-	Enabled bool             `default:"true" yaml:"enabled,omitempty"`
 	Rules   []WorkflowRule   `yaml:"rules,omitempty"`
 	Actions []WorkflowAction `yaml:"actions,omitempty"`
 }
 
 type Workflow struct {
-	Name    string          `required:"true" yaml:"name,omitempty"`
-	Enabled bool            `default:"true" yaml:"enabled,omitempty"`
-	Rules   []WorkflowRule  `yaml:"rules,omitempty"`
-	Stages  []WorkflowStage `yaml:"stages,omitempty"`
+	Name   string          `required:"true" yaml:"name,omitempty"`
+	Rules  []WorkflowRule  `yaml:"rules,omitempty"`
+	Stages []WorkflowStage `yaml:"stages,omitempty"`
 }
 
 // FindWorkflow finds a workflow by name

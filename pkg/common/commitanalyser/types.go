@@ -1,6 +1,6 @@
 package commitanalyser
 
-// Conventional Commits - https://www.conventionalcommits.org/en/v1.0.0/
+// ConventionalCommitPattern is a regex pattern of the Conventional Commits spec - https://www.conventionalcommits.org/en/v1.0.0/
 var ConventionalCommitPattern = `(?P<type>[A-Za-z]+)((?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?)(:\s?(?P<subject>.*))?`
 
 type CommitVersionRule struct {
