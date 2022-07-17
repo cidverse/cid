@@ -27,7 +27,7 @@ func (action ScanStruct) Check(ctx *api.ActionExecutionContext) bool {
 // Execute runs the action
 func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	var opts []string
-	if ctx.MachineEnv["CI"] == "true" {
+	if ctx.Env["CI"] == "true" {
 		opts = append(opts, "--redact")
 	}
 

@@ -3,11 +3,13 @@ package command
 import (
 	"bytes"
 	"errors"
+	"github.com/samber/lo"
 	"io"
 	"os"
 	"os/exec"
 	"path"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/cidverse/cid/pkg/common/protectoutput"
@@ -108,8 +110,12 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 		containerExec.SetEntrypoint("unset")
 		containerExec.SetCommand(strings.Join(cmdArgs, " "))
 
-		// TODO: add whitelisted env vars
-		// containerExec.AddEnvironmentVariable(key, value)
+		// add env + sort by key
+		sortedEnvKeys := lo.Keys(env)
+		sort.Sort(sort.StringSlice(sortedEnvKeys))
+		for _, key := range sortedEnvKeys {
+			containerExec.AddEnvironmentVariable(key, env[key])
+		}
 
 		// cache
 		for _, c := range candidate.ImageCache {

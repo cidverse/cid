@@ -6,28 +6,28 @@ containerimages:
       - binary: go
         version: 1.18.4
     cache:
-      go-pkg:
+      - id: go-pkg
         dir: /go/pkg
   - image: docker.io/golang:1.17.12-alpine
     provides:
       - binary: go
         version: 1.17.12
     cache:
-      go-pkg:
+      - id: go-pkg
         dir: /go/pkg
   - image: docker.io/golang:1.16.15-alpine
     provides:
       - binary: go
         version: 1.16.15
     cache:
-      go-pkg:
+      - id: go-pkg
         dir: /go/pkg
   - image: docker.io/golang:1.15.15-alpine
     provides:
       - binary: go
         version: 1.15.15
     cache:
-      go-pkg:
+      - id: go-pkg
         dir: /go/pkg
   # golangci-lint
   - image: docker.io/golangci/golangci-lint:v1.46.2-alpine
@@ -52,27 +52,27 @@ containerimages:
       - binary: java
         version: 17.0.2
     cache:
-      java-gradle:
+      - id: java-gradle
         dir: /root/.gradle
-      java-maven:
+      - id: java-maven
         dir: /root/.m2
   - image: docker.io/eclipse-temurin:11.0.14.1_1-jdk
     provides:
       - binary: java
         version: 11.0.14
     cache:
-      java-gradle:
+      - id: java-gradle
         dir: /root/.gradle
-      java-maven:
+      - id: java-maven
         dir: /root/.m2
   - image: docker.io/eclipse-temurin:8u322-b06-jdk
     provides:
       - binary: java
         version: 8.0.0
     cache:
-      java-gradle:
+      - id: java-gradle
         dir: /root/.gradle
-      java-maven:
+      - id: java-maven
         dir: /root/.m2
   # node (npm, yarn, npx)
   - image: node:17.8.0-slim
@@ -84,11 +84,11 @@ containerimages:
       - binary: npx
         version: 17.8.0
     cache:
-      node-npm:
+      - id: node-npm
         dir: /root/.npm
-      node-yarn-cache-v6:
+      - id: node-yarn-cache-v6
         dir: /usr/local/share/.cache/yarn/v6
-      node-yarn-config:
+      - id: node-yarn-config
         dir: /root/.config/yarn
   # helm
   - image: lachlanevenson/k8s-helm:v3.8.1
@@ -96,13 +96,13 @@ containerimages:
       - binary: helm
         version: 3.8.1
     cache:
-      helm-config:
+      - id: helm-config
         dir: /root/.config/helm
-      helm-cache:
+      - id: helm-cache
         dir: /root/.cache/helm/cache
-      helm-plugins:
+      - id: helm-plugins
         dir: /root/.cache/helm/plugins
-      helm-repository:
+      - id: helm-repository
         dir: /root/.cache/helm/repository
   # upx
   - image: envcli/upx:latest
@@ -125,13 +125,16 @@ containerimages:
     provides:
       - binary: sonar-scanner
         version: 4.7.0
+    cache:
+      - id: sonarscanner-cache
+        dir: /opt/sonar-scanner/.sonar
   # trivy security scanner
   - image: aquasec/trivy:0.25.4
     provides:
       - binary: trivy
         version: 0.25.4
     cache:
-      trivy-cache:
+      - id: trivy-cache
         dir: /root/.cache/trivy
   # shellcheck
   - image: docker.io/koalaman/shellcheck:v0.8.0
@@ -149,7 +152,7 @@ containerimages:
       - binary: twitch
         version: 1.0.2
     cache:
-      twitchcli-config:
+      - id: twitchcli-config
         dir: /root/.twitch-cli
   # fossa
   - image: ghcr.io/cidverse/fossacli:2.7.2

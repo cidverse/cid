@@ -108,7 +108,7 @@ func RunWorkflowStage(cfg *config.CIDConfig, stage *config.WorkflowStage, env ma
 func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env map[string]string, projectDir string, modulesFilter []string) {
 	log.Debug().Str("action", action.ID).Msg("action start")
 	catalogAction := cfg.FindAction(action.ID)
-	ctx := api.GetActionContext(projectDir, env, nil)
+	ctx := api.GetActionContext(projectDir, env, nil, &catalogAction.Access)
 
 	// serialize action config for pass-thru
 	configAsYaml, _ := yaml.Marshal(&action.Config)
@@ -116,7 +116,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 
 	// project-scoped actions
 	if catalogAction.Scope == config.ActionScopeProject {
-		ruleContext := rules.GetRuleContext(env)
+		ruleContext := rules.GetRuleContext(ctx.Env)
 		ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
 		log.Debug().Str("action", action.ID).Bool("rules_match", ruleMatch).Msg("check action rules")
 		if ruleMatch {
@@ -140,7 +140,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 				continue
 			}
 
-			ruleContext := rules.GetModuleRuleContext(env, &moduleRef)
+			ruleContext := rules.GetModuleRuleContext(ctx.Env, &moduleRef)
 			ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
 			log.Debug().Str("action", action.ID).Str("module", moduleRef.Name).Bool("rules_match", ruleMatch).Msg("check action rules")
 			if ruleMatch {

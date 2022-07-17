@@ -40,7 +40,7 @@ type BinaryExecutionCandidate struct {
 	Image string
 
 	// ImageCache holds information about caching for containers
-	ImageCache map[string]ToolCacheDir
+	ImageCache []ToolCacheDir
 }
 
 // FindExecutionCandidates returns a full list of all available execution options for the specified binary

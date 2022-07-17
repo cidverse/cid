@@ -32,7 +32,7 @@ func FindProjectDir() string {
 }
 
 // GetCIDEnvironment returns the normalized ci variables
-func GetCIDEnvironment(projectDirectory string) map[string]string {
+func GetCIDEnvironment(configEnv map[string]string, projectDirectory string) map[string]string {
 	env := ncimain.RunDefaultNormalization()
 
 	// append cid vars
@@ -40,7 +40,7 @@ func GetCIDEnvironment(projectDirectory string) map[string]string {
 	env["CID_CONVENTION_COMMIT"] = string(config.Current.Conventions.Commit)
 
 	// append env from configuration file
-	for key, value := range config.Current.Env {
+	for key, value := range configEnv {
 		env[key] = value
 	}
 
@@ -60,8 +60,8 @@ func GetCIDEnvironment(projectDirectory string) map[string]string {
 }
 
 // GetFullEnvironment returns the entire env, including host + normalized variables
-func GetFullEnvironment(projectDirectory string) map[string]string {
-	env := GetCIDEnvironment(projectDirectory)
+func GetFullEnvironment(configEnv map[string]string, projectDirectory string) map[string]string {
+	env := GetCIDEnvironment(configEnv, projectDirectory)
 
 	// append env from configuration file
 	for key, value := range common.GetMachineEnvironment() {
@@ -181,10 +181,6 @@ func GetEnvValue(ctx *ActionExecutionContext, name string) string {
 	if funk.Contains(ctx.Env, name) {
 		decoded := DecodeEnvValue(ctx.Env[name])
 		AutoProtectValues(name, ctx.Env[name], decoded)
-		return decoded
-	} else if funk.Contains(ctx.MachineEnv, name) {
-		decoded := DecodeEnvValue(ctx.MachineEnv[name])
-		AutoProtectValues(name, ctx.MachineEnv[name], decoded)
 		return decoded
 	}
 

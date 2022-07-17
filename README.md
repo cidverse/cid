@@ -1,4 +1,4 @@
-# Continuous Integration and Deployment Workflow CLI - `cid`
+# Continuous Integration and Deployment CLI - `cid`
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/cidverse/cid.svg)](https://pkg.go.dev/github.com/cidverse/cid)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cidverse/cid)](https://goreportcard.com/report/github.com/cidverse/cid)

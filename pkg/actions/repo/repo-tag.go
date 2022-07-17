@@ -25,8 +25,8 @@ func (action TagCreateStruct) GetDetails(ctx *api.ActionExecutionContext) api.Ac
 
 // Check evaluates if the action should be executed or not
 func (action TagCreateStruct) Check(ctx *api.ActionExecutionContext) bool {
-	if len(ctx.MachineEnv["GITHUB_TOKEN"]) > 0 {
-		ctx.Env["GITHUB_TOKEN"] = ctx.MachineEnv["GITHUB_TOKEN"]
+	if len(ctx.Env["GITHUB_TOKEN"]) > 0 {
+		ctx.Env["GITHUB_TOKEN"] = ctx.Env["GITHUB_TOKEN"]
 
 		return len(ctx.Env["NCI_NEXTRELEASE_NAME"]) > 0 && (ctx.Env["NCI_COMMIT_REF_PATH"] == "branch/develop" || ctx.Env["NCI_COMMIT_REF_PATH"] == "branch/master" || ctx.Env["NCI_COMMIT_REF_PATH"] == "branch/main") && ctx.Env["CID_CONVENTION_BRANCHING"] == string(config.BranchingGitFlow)
 	}

@@ -1,7 +1,10 @@
 package api
 
 import (
+	"github.com/samber/lo"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/repoanalyzer"
@@ -47,11 +50,8 @@ type ActionExecutionContext struct {
 	// Args holds the arguments passed to the action
 	Args []string
 
-	// Env contains the normalized environment
+	// Env contains the environment that is visible to the action
 	Env map[string]string
-
-	// MachineEnv contains the full environment
-	MachineEnv map[string]string
 
 	// Parallelization defines how many tasks can be run in parallel inside an action
 	Parallelization int
@@ -105,20 +105,38 @@ func RegisterBuiltinAction(action ActionStep) {
 }
 
 // GetActionContext gets the action context, this operation is expensive and should only be called once per execution
-func GetActionContext(projectDir string, env map[string]string, currentModule *analyzerapi.ProjectModule) ActionExecutionContext {
+func GetActionContext(projectDir string, env map[string]string, currentModule *analyzerapi.ProjectModule, access *config.ActionAccess) ActionExecutionContext {
+	finalEnv := make(map[string]string)
+	fullEnv := lo.Assign(env, common.GetMachineEnvironment())
+
+	// evaluate access
+	for k, v := range fullEnv {
+		if strings.HasPrefix(k, "NCI_") {
+			finalEnv[k] = v
+			continue
+		}
+
+		if access != nil && len(access.Env) > 0 {
+			for _, pattern := range access.Env {
+				if regexp.MustCompile(pattern).MatchString(k) {
+					finalEnv[k] = v
+				}
+			}
+		}
+	}
+
 	return ActionExecutionContext{
 		Paths: config.PathConfig{
-			Artifact:       filepath.Join(projectDir, "dist"),
-			ModuleArtifact: filepath.Join(projectDir, "dist"),
-			Temp:           filepath.Join(projectDir, "tmp"),
+			Artifact:       filepath.Join(projectDir, ".dist"),
+			ModuleArtifact: filepath.Join(projectDir, ".dist"),
+			Temp:           filepath.Join(projectDir, ".tmp"),
 			Cache:          "",
 		},
 		ProjectDir:      projectDir,
 		WorkDir:         filesystem.GetWorkingDirectory(),
 		Config:          "",
 		Args:            nil,
-		Env:             env,
-		MachineEnv:      common.GetMachineEnvironment(),
+		Env:             finalEnv,
 		Parallelization: DefaultParallelization,
 		Modules:         repoanalyzer.AnalyzeProject(projectDir, filesystem.GetWorkingDirectory()),
 		CurrentModule:   currentModule,

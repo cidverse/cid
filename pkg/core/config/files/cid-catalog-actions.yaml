@@ -168,6 +168,9 @@ catalog:
       name: upx-optimize
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: ENV["UPX_ENABLED"] == "true"
     # container
     - repository: central
       name: container-package-buildah
@@ -204,6 +207,12 @@ catalog:
       name: sonarqube-scan
       type: builtin-golang
       scope: project
+      rules:
+        - type: cel
+          expression: ENV["SONAR_TOKEN"] != ""
+      access:
+        env:
+          - SONAR_.*
     - repository: central
       name: dependencycheck-scan
       type: builtin-golang

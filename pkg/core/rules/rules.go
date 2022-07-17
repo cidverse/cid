@@ -73,6 +73,7 @@ func GetRuleContext(env map[string]string) map[string]interface{} {
 		ncispec.NCI_COMMIT_REF_PATH: env[ncispec.NCI_COMMIT_REF_PATH],
 		ncispec.NCI_COMMIT_REF_TYPE: env[ncispec.NCI_COMMIT_REF_TYPE],
 		ncispec.NCI_COMMIT_REF_NAME: env[ncispec.NCI_COMMIT_REF_NAME],
+		"ENV":                       env,
 	}
 }
 
@@ -100,6 +101,8 @@ func evalRuleCEL(rule config.WorkflowRule, evalContext map[string]interface{}) b
 			exprDecl = append(exprDecl, decls.NewVar(key, decls.Int))
 		case string:
 			exprDecl = append(exprDecl, decls.NewVar(key, decls.String))
+		case map[string]string:
+			exprDecl = append(exprDecl, decls.NewVar(key, decls.NewMapType(decls.String, decls.String)))
 		default:
 			log.Fatal().Str("type", string(rule.Type)).Str("key", key).Interface("value", value).Msg("unsupported evalContext value type")
 		}

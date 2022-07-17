@@ -24,7 +24,7 @@ func (action AssetPublishGitHubStruct) GetDetails(ctx *api.ActionExecutionContex
 
 // Check evaluates if the action should be executed or not
 func (action AssetPublishGitHubStruct) Check(ctx *api.ActionExecutionContext) bool {
-	if len(ctx.MachineEnv["GITHUB_TOKEN"]) > 0 && strings.HasPrefix(ctx.Env["NCI_REPOSITORY_REMOTE"], "https://github.com") {
+	if len(ctx.Env["GITHUB_TOKEN"]) > 0 && strings.HasPrefix(ctx.Env["NCI_REPOSITORY_REMOTE"], "https://github.com") {
 		return ctx.Env["NCI_COMMIT_REF_TYPE"] == "tag"
 	}
 
@@ -34,7 +34,7 @@ func (action AssetPublishGitHubStruct) Check(ctx *api.ActionExecutionContext) bo
 // Execute runs the action
 func (action AssetPublishGitHubStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// context
-	ctx.Env["GITHUB_TOKEN"] = ctx.MachineEnv["GITHUB_TOKEN"]
+	ctx.Env["GITHUB_TOKEN"] = ctx.Env["GITHUB_TOKEN"]
 
 	// input
 	tagName := ctx.Env["NCI_COMMIT_REF_NAME"]

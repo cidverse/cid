@@ -44,7 +44,7 @@ var workflowListCmd = &cobra.Command{
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
 		cfg := app.Load(projectDir)
-		env := api.GetCIDEnvironment(projectDir)
+		env := api.GetCIDEnvironment(cfg.Env, projectDir)
 
 		// print list
 		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
@@ -70,7 +70,7 @@ var workflowRunCmd = &cobra.Command{
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
 		cfg := app.Load(projectDir)
-		env := api.GetCIDEnvironment(projectDir)
+		env := api.GetCIDEnvironment(cfg.Env, projectDir)
 
 		if len(args) > 1 {
 			// error

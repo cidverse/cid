@@ -17,6 +17,10 @@ const (
 	ActionTypeBuiltinGolang ActionType = "builtin-golang"
 )
 
+type ActionAccess struct {
+	Env []string `yaml:"env"`
+}
+
 type Action struct {
 	Repository  string         `required:"true" yaml:"repository"`
 	Name        string         `required:"true" yaml:"name"`
@@ -26,4 +30,5 @@ type Action struct {
 	Version     string         `yaml:"version"`
 	Scope       ActionScope    `required:"true" yaml:"scope"`
 	Rules       []WorkflowRule `yaml:"rules,omitempty"`
+	Access      ActionAccess   `yaml:"access"`
 }

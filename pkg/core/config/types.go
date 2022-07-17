@@ -6,10 +6,10 @@ type ToolBinary struct {
 }
 
 type ToolContainerImage struct {
-	Provides []ToolBinary            `yaml:"provides"`
-	Image    string                  `yaml:"image"`
-	Cache    map[string]ToolCacheDir `yaml:"cache"`
-	User     string                  `yaml:"user"`
+	Provides []ToolBinary   `yaml:"provides"`
+	Image    string         `yaml:"image"`
+	Cache    []ToolCacheDir `yaml:"cache"`
+	User     string         `yaml:"user"`
 }
 
 type ToolLocal struct {

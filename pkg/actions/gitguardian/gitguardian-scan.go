@@ -30,7 +30,7 @@ func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, state *api.Act
 	execEnv[GitguardianAPIKey] = api.GetEnvValue(ctx, GitguardianAPIKey)
 
 	// GitGuardian env properties
-	for key, value := range ctx.MachineEnv {
+	for key, value := range ctx.Env {
 		if strings.HasPrefix(key, GitguardianPrefix) {
 			execEnv[key] = value
 		}

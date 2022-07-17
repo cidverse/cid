@@ -8,7 +8,6 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
-	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/repoanalyzer"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
@@ -41,10 +40,8 @@ var infoCmd = &cobra.Command{
 
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
-		app.Load(projectDir)
-
-		// normalize environment
-		env := api.GetCIDEnvironment(projectDir)
+		cfg := app.Load(projectDir)
+		env := api.GetCIDEnvironment(cfg.Env, projectDir)
 
 		// response
 		var response = InfoCommandResponse{
@@ -67,7 +64,7 @@ var infoCmd = &cobra.Command{
 
 		// tool constraints
 		response.ToolConstraints = make(map[string]string)
-		for key, value := range config.Current.Dependencies {
+		for key, value := range cfg.Dependencies {
 			response.ToolConstraints[key] = value
 		}
 

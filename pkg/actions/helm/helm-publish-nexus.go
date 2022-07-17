@@ -28,7 +28,7 @@ func (action PublishActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 	if ctx.CurrentModule != nil {
 		if ctx.CurrentModule.BuildSystem != analyzerapi.BuildSystemHelm {
 			missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "module build system is not helm"})
-		} else if !funk.Contains(ctx.MachineEnv, "HELM_NEXUS_URL") {
+		} else if !funk.Contains(ctx.Env, "HELM_NEXUS_URL") {
 			missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "HELM_NEXUS_URL is not set"})
 		}
 	} else {

@@ -22,8 +22,7 @@ func (action OptimizeActionStruct) GetDetails(ctx *api.ActionExecutionContext) a
 
 // Check evaluates if the action should be executed or not
 func (action OptimizeActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	fullEnv := api.GetFullEnvironment(ctx.ProjectDir)
-	return fullEnv["UPX_ENABLED"] == "true"
+	return true
 }
 
 // Execute runs the action

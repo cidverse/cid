@@ -20,8 +20,8 @@ var xCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
-		app.Load(projectDir)
-		env := api.GetCIDEnvironment(projectDir)
+		cfg := app.Load(projectDir)
+		env := api.GetCIDEnvironment(cfg.Env, projectDir)
 
 		// print environment
 		command.RunCommand(strings.Join(args, " "), env, projectDir)
