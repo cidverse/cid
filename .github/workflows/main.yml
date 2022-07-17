@@ -1,8 +1,9 @@
-# workflow name
+# name
 name: CI
 
-# workflow triggers
+# triggers
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
     paths-ignore:
@@ -10,33 +11,47 @@ on:
       - ".gitignore"
       - ".editorconfig"
 
+# jobs
 jobs:
   # build
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      # setup
-      - uses: cidverse/ghact-cid-setup@main
-        name: CID Setup
-      # project checkout
-      - uses: actions/checkout@v2
-        name: Repository Checkout
+      - name: prepare environment
+        uses: cidverse/ghact-cid-setup@main
+      - name: checkout
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      # print execution plan
-      - name: CI Execution Plan
+      - name: build
         run: |
-          cid info
-      # build
-      - name: Build
+          cid workflow run --stage build
+  # test
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: prepare environment
+        uses: cidverse/ghact-cid-setup@main
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: test
         run: |
-          cid stage build
-      - name: Test
+          cid workflow run --stage test
+  # lint
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: prepare environment
+        uses: cidverse/ghact-cid-setup@main
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: lint
         run: |
-          cid stage test
-      - name: Packaging
-        run: |
-          cid stage package
-      - name: Static Application Security Testing
-        run: |
-          cid stage sast
+          cid workflow run --stage lint
