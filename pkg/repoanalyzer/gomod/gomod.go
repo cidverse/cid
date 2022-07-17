@@ -1,12 +1,13 @@
 package gomod
 
 import (
+	"path/filepath"
+
 	"github.com/cidverse/cid/pkg/core/version"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/gosimple/slug"
 	"golang.org/x/mod/modfile"
-	"path/filepath"
 )
 
 type Analyzer struct{}
@@ -41,7 +42,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 			for _, req := range goMod.Require {
 				dep := analyzerapi.ProjectDependency{
 					Type:    string(analyzerapi.BuildSystemGoMod),
-					Id:      req.Mod.Path,
+					ID:      req.Mod.Path,
 					Version: req.Mod.Version,
 				}
 				dependencies = append(dependencies, dep)
@@ -68,8 +69,4 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 	}
 
 	return result
-}
-
-func init() {
-	analyzerapi.Analyzers = append(analyzerapi.Analyzers, Analyzer{})
 }

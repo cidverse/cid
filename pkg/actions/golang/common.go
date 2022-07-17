@@ -1,13 +1,18 @@
 package golang
 
 import (
+	"embed"
+	"path/filepath"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
-	"path/filepath"
 )
 
-func CrossCompile(ctx api.ActionExecutionContext, config Config, goos string, goarch string) {
+//go:embed files
+var embeddedConfigFS embed.FS
+
+func CrossCompile(ctx *api.ActionExecutionContext, config Config, goos string, goarch string) {
 	fileExt := ""
 	if goos == "windows" {
 		fileExt = ".exe"
@@ -27,7 +32,7 @@ func CrossCompile(ctx api.ActionExecutionContext, config Config, goos string, go
 }
 
 func GetLdFlags(config Config) string {
-	if config.Debug == false {
+	if !config.Debug {
 		// trim debugging information
 		return "-s -w "
 	}
@@ -35,7 +40,7 @@ func GetLdFlags(config Config) string {
 	return ""
 }
 
-func GetToolDependencies(ctx api.ActionExecutionContext) map[string]string {
+func GetToolDependencies(ctx *api.ActionExecutionContext) map[string]string {
 	var deps map[string]string
 	if ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGoMod {
 		deps = map[string]string{

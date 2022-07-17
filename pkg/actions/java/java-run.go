@@ -1,18 +1,19 @@
 package java
 
 import (
+	"strings"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
-	"strings"
 )
 
 type RunActionStruct struct{}
 
 // GetDetails returns information about this action
-func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action RunActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "java-run",
 		Version:   "0.1.0",
@@ -21,12 +22,12 @@ func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Act
 }
 
 // Check evaluates if the action should be executed or not
-func (action RunActionStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action RunActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 	return ctx.CurrentModule != nil && (ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle || ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven)
 }
 
 // Execute runs the action
-func (action RunActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action RunActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle {
 		ctx.Env["GRADLE_OPTS"] = "-XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError -Xmx512m"
 

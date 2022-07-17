@@ -2,6 +2,8 @@ package rules
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/normalizeci/pkg/ncispec"
@@ -10,13 +12,12 @@ import (
 	"github.com/google/cel-go/common/types"
 	"github.com/rs/zerolog/log"
 	exprpb "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
-	"strconv"
 )
 
-const MODULE_NAME = "MODULE_NAME"
-const MODULE_SLUG = "MODULE_SLUG"
-const MODULE_BUILD_SYSTEM = "MODULE_BUILD_SYSTEM"
-const MODULE_BUILD_SYSTEM_SYNTAX = "MODULE_BUILD_SYSTEM_SYNTAX"
+const ModuleName = "MODULE_NAME"
+const ModuleSlug = "MODULE_SLUG"
+const ModuleBuildSystem = "MODULE_BUILD_SYSTEM"
+const ModuleBuildSystemSyntax = "MODULE_BUILD_SYSTEM_SYNTAX"
 
 // AnyRuleMatches will return true if at least one rule matches, if no rules are provided this always returns true
 func AnyRuleMatches(rules []config.WorkflowRule, evalContext map[string]interface{}) bool {
@@ -28,7 +29,7 @@ func AnyRuleMatches(rules []config.WorkflowRule, evalContext map[string]interfac
 
 	for _, rule := range rules {
 		if EvaluateRule(rule, evalContext) {
-			result = result + 1
+			result++
 		}
 	}
 
@@ -48,7 +49,7 @@ func EvaluateRules(rules []config.WorkflowRule, evalContext map[string]interface
 
 	for _, rule := range rules {
 		if EvaluateRule(rule, evalContext) {
-			result = result + 1
+			result++
 		}
 	}
 
@@ -75,19 +76,19 @@ func GetRuleContext(env map[string]string) map[string]interface{} {
 	}
 }
 
-func GetModuleRuleContext(env map[string]string, module analyzerapi.ProjectModule) map[string]interface{} {
+func GetModuleRuleContext(env map[string]string, module *analyzerapi.ProjectModule) map[string]interface{} {
 	ctx := GetRuleContext(env)
 
-	ctx[MODULE_NAME] = module.Name
-	ctx[MODULE_SLUG] = module.Slug
-	ctx[MODULE_BUILD_SYSTEM] = string(module.BuildSystem)
-	ctx[MODULE_BUILD_SYSTEM_SYNTAX] = string(module.BuildSystemSyntax)
+	ctx[ModuleName] = module.Name
+	ctx[ModuleSlug] = module.Slug
+	ctx[ModuleBuildSystem] = string(module.BuildSystem)
+	ctx[ModuleBuildSystemSyntax] = string(module.BuildSystemSyntax)
 
 	return ctx
 }
 
 func evalRuleCEL(rule config.WorkflowRule, evalContext map[string]interface{}) bool {
-	if len(rule.Expression) == 0 {
+	if rule.Expression == "" {
 		return false
 	}
 

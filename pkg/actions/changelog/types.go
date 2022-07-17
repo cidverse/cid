@@ -1,13 +1,14 @@
 package changelog
 
 import (
-	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"time"
+
+	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 )
 
 type TemplateData struct {
 	ProjectName  string
-	ProjectUrl   string
+	ProjectURL   string
 	Version      string
 	ReleaseDate  time.Time
 	Commits      []vcsrepository.Commit

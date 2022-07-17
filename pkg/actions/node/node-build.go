@@ -1,6 +1,8 @@
 package node
 
 import (
+	"path/filepath"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
@@ -10,7 +12,7 @@ import (
 type BuildActionStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action BuildActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "node-build",
 		Version:   "0.1.0",
@@ -19,14 +21,14 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 }
 
 // Check evaluates if the action should be executed or not
-func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemNpm
 }
 
 // Execute runs the action
-func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// parse package.json
-	packageConfig := ParsePackageJSON(ctx.ProjectDir + `/package.json`)
+	packageConfig := ParsePackageJSON(filepath.Join(ctx.ProjectDir, `package.json`))
 
 	// dependencies
 	command.RunCommand(`yarn install --frozen-lockfile --cache-folder `+api.GetCacheDir(ctx.Paths, "yarn"), ctx.Env, ctx.ProjectDir)
@@ -35,8 +37,8 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 	reactDependencyVersion, reactDependencyPresent := packageConfig.Dependencies[`react`]
 	if reactDependencyPresent {
 		log.Debug().Str("react", reactDependencyVersion).Msg("found library")
-		ctx.Env["BUILD_PATH"] = ctx.ProjectDir + `/` + ctx.Paths.Artifact + `/html` // overwrite build dir - react - react-scripts at v4.0.2+
-		ctx.Env["CI"] = "false"                                                     // if ci=true, then react warnings will result in errors - allow warnings // TODO: remove
+		ctx.Env["BUILD_PATH"] = filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, `html`) // overwrite build dir - react - react-scripts at v4.0.2+
+		ctx.Env["CI"] = "false"                                                           // if ci=true, then react warnings will result in errors - allow warnings // TODO: remove
 	}
 
 	// build script

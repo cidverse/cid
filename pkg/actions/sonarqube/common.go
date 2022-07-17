@@ -1,4 +1,4 @@
 package sonarqube
 
-const SONAR_HOST_URL = "SONAR_HOST_URL"
-const SONAR_PREFIX = "SONAR_"
+const SonarHostURL = "SONAR_HOST_URL"
+const SonarPrefix = "SONAR_"

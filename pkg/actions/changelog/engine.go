@@ -3,16 +3,18 @@ package changelog
 import (
 	"bufio"
 	"bytes"
-	"github.com/cidverse/normalizeci/pkg/vcsrepository"
-	"github.com/oriser/regroup"
-	"github.com/thoas/go-funk"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"text/template"
+
+	"github.com/cidverse/normalizeci/pkg/vcsrepository"
+	"github.com/oriser/regroup"
+	"github.com/thoas/go-funk"
 )
 
-func PreprocessCommits(config Config, commits []vcsrepository.Commit) []vcsrepository.Commit {
+func PreprocessCommits(config *Config, commits []vcsrepository.Commit) []vcsrepository.Commit {
 	var response []vcsrepository.Commit
 
 	var commitExpr []*regexp.Regexp
@@ -23,41 +25,50 @@ func PreprocessCommits(config Config, commits []vcsrepository.Commit) []vcsrepos
 	}
 
 	// process commits
-	for _, commit := range commits {
+	for _, commit := range commits { //nolint:gocritic
 		// parse context info
 		commit.Context = make(map[string]string)
 		for id := range config.CommitPattern {
 			// check if commit matches the pattern
-			if commitExpr[id].MatchString(commit.Message) {
-				match, matchErr := commitGroupExpr[id].Groups(commit.Message)
-				if matchErr != nil {
-					continue
-				}
-
-				commit.Context["type"] = match["type"]
-				commit.Context["scope"] = match["scope"]
-				commit.Context["breaking"] = strconv.FormatBool(len(match["breaking"]) > 0)
-				commit.Context["subject"] = match["subject"]
-				break
+			if !commitExpr[id].MatchString(commit.Message) {
+				continue
 			}
+
+			match, matchErr := commitGroupExpr[id].Groups(commit.Message)
+			if matchErr != nil {
+				continue
+			}
+
+			commit.Context["type"] = match["type"]
+			commit.Context["scope"] = match["scope"]
+			commit.Context["breaking"] = strconv.FormatBool(len(match["breaking"]) > 0)
+			commit.Context["subject"] = match["subject"]
+			break
 		}
 
 		response = append(response, commit)
 	}
 
-	// TODO: support custom commit sorting
+	// sort commit messages
+	sort.SliceStable(response, func(i, j int) bool {
+		if len(response[i].Context["scope"]) > 0 && len(response[j].Context["scope"]) > 0 && response[i].Context["scope"] != response[j].Context["scope"] {
+			return response[i].Context["scope"] < response[j].Context["scope"]
+		}
+
+		return response[i].Context["subject"] < response[j].Context["subject"]
+	})
 
 	return response
 }
 
-func ProcessCommits(config Config, commits []vcsrepository.Commit) TemplateData {
+func ProcessCommits(config *Config, commits []vcsrepository.Commit) TemplateData {
 	// init
 	commitGroups := make(map[string][]vcsrepository.Commit)
 	noteGroups := make(map[string][]string)
 	contributors := make(map[string]ContributorData)
 
 	// process commits
-	for _, commit := range commits {
+	for _, commit := range commits { //nolint:gocritic
 		// issue linking
 		commit.Message = AddLinks(commit.Message)
 		commit.Description = AddLinks(commit.Description)
@@ -104,7 +115,7 @@ func ProcessCommits(config Config, commits []vcsrepository.Commit) TemplateData 
 	}
 }
 
-func RenderTemplate(data TemplateData, templateRaw string) (string, error) {
+func RenderTemplate(data *TemplateData, templateRaw string) (string, error) {
 	// debug
 	tmpl, err := template.New("inmemory").Parse(templateRaw)
 	if err != nil {

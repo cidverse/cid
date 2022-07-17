@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"strconv"
+	"text/tabwriter"
+
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/spf13/cobra"
-	"os"
-	"strconv"
-	"text/tabwriter"
 )
 
 func init() {

@@ -1,12 +1,13 @@
 package api
 
 import (
+	"path/filepath"
+
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/repoanalyzer"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/common"
-	"path/filepath"
 )
 
 const DefaultParallelization = 10
@@ -22,11 +23,11 @@ type ActionDetails struct {
 // ActionStep is the interface that needs to be implemented by all builtin actions
 type ActionStep interface {
 	// GetDetails retrieves information about the action
-	GetDetails(ctx ActionExecutionContext) ActionDetails
+	GetDetails(ctx *ActionExecutionContext) ActionDetails
 	// Check evaluates if the action should be executed or not
-	Check(ctx ActionExecutionContext) bool
+	Check(ctx *ActionExecutionContext) bool
 	// Execute runs the action
-	Execute(ctx ActionExecutionContext, state *ActionStateContext) error
+	Execute(ctx *ActionExecutionContext, state *ActionStateContext) error
 }
 
 // ActionExecutionContext holds runtime information for the actions
@@ -52,7 +53,7 @@ type ActionExecutionContext struct {
 	// MachineEnv contains the full environment
 	MachineEnv map[string]string
 
-	// Parallelization defines how many tasks can be run in parallel inside of a action
+	// Parallelization defines how many tasks can be run in parallel inside an action
 	Parallelization int
 
 	// Modules contains the project modules
@@ -100,7 +101,7 @@ var BuiltinActions = make(map[string]ActionStep)
 // RegisterBuiltinAction registers a builtin action
 func RegisterBuiltinAction(action ActionStep) {
 	ctx := ActionExecutionContext{}
-	BuiltinActions[action.GetDetails(ctx).Name] = action
+	BuiltinActions[action.GetDetails(&ctx).Name] = action
 }
 
 // GetActionContext gets the action context, this operation is expensive and should only be called once per execution

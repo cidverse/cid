@@ -1,11 +1,12 @@
 package gomod
 
 import (
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGoModAnalyzer_Analyze(t *testing.T) {
@@ -24,7 +25,7 @@ func TestGoModAnalyzer_Analyze(t *testing.T) {
 	assert.NotNil(t, result[0].Language[analyzerapi.LanguageGolang])
 	assert.Equal(t, "1.16.0", *result[0].Language[analyzerapi.LanguageGolang])
 	assert.Equal(t, "gomod", result[0].Dependencies[0].Type)
-	assert.Equal(t, "github.com/Masterminds/semver/v3", result[0].Dependencies[0].Id)
+	assert.Equal(t, "github.com/Masterminds/semver/v3", result[0].Dependencies[0].ID)
 	assert.Equal(t, "v3.1.1", result[0].Dependencies[0].Version)
 
 	// submodule

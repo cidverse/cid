@@ -1,17 +1,19 @@
 package repoanalyzer
 
 import (
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
-	_ "github.com/cidverse/cid/pkg/repoanalyzer/container"
-	_ "github.com/cidverse/cid/pkg/repoanalyzer/gomod"
-	_ "github.com/cidverse/cid/pkg/repoanalyzer/gradle"
-	_ "github.com/cidverse/cid/pkg/repoanalyzer/helm"
-	_ "github.com/cidverse/cid/pkg/repoanalyzer/hugo"
-	_ "github.com/cidverse/cid/pkg/repoanalyzer/node"
-	"github.com/rs/zerolog/log"
-	"github.com/thoas/go-funk"
 	"strings"
 	"time"
+
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	"github.com/cidverse/cid/pkg/repoanalyzer/container"
+	"github.com/cidverse/cid/pkg/repoanalyzer/gomod"
+	"github.com/cidverse/cid/pkg/repoanalyzer/gradle"
+	"github.com/cidverse/cid/pkg/repoanalyzer/helm"
+	"github.com/cidverse/cid/pkg/repoanalyzer/hugo"
+	"github.com/cidverse/cid/pkg/repoanalyzer/node"
+	"github.com/cidverse/cid/pkg/repoanalyzer/python"
+	"github.com/rs/zerolog/log"
+	"github.com/thoas/go-funk"
 )
 
 var analyzerCache = make(map[string][]*analyzerapi.ProjectModule)
@@ -20,6 +22,10 @@ var analyzerCache = make(map[string][]*analyzerapi.ProjectModule)
 func AnalyzeProject(projectDir string, path string) []*analyzerapi.ProjectModule {
 	if funk.Contains(analyzerCache, path) {
 		return analyzerCache[path]
+	}
+
+	if len(analyzerapi.Analyzers) == 0 {
+		initAnalyzers()
 	}
 
 	start := time.Now()
@@ -44,4 +50,14 @@ func AnalyzeProject(projectDir string, path string) []*analyzerapi.ProjectModule
 
 	analyzerCache[projectDir] = result
 	return result
+}
+
+func initAnalyzers() {
+	analyzerapi.Analyzers = append(analyzerapi.Analyzers, container.Analyzer{})
+	analyzerapi.Analyzers = append(analyzerapi.Analyzers, gomod.Analyzer{})
+	analyzerapi.Analyzers = append(analyzerapi.Analyzers, gradle.Analyzer{})
+	analyzerapi.Analyzers = append(analyzerapi.Analyzers, helm.Analyzer{})
+	analyzerapi.Analyzers = append(analyzerapi.Analyzers, hugo.Analyzer{})
+	analyzerapi.Analyzers = append(analyzerapi.Analyzers, node.Analyzer{})
+	analyzerapi.Analyzers = append(analyzerapi.Analyzers, python.Analyzer{})
 }

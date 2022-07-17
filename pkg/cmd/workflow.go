@@ -2,6 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"strconv"
+	"text/tabwriter"
+
+	"github.com/cidverse/cid/pkg/core/config"
+
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
@@ -9,9 +15,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"os"
-	"strconv"
-	"text/tabwriter"
 )
 
 func init() {
@@ -75,26 +78,22 @@ var workflowRunCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
+		var wf *config.Workflow
 		if len(args) == 0 {
 			// evaluate rules to pick workflow
-			wf := workflowrun.FirstWorkflowMatchingRules(cfg.Workflows, env)
-			if wf == nil {
-				log.Fatal().Msg("no workflow with matching rules found")
-			}
-
-			// run
-			log.Info().Str("workflow", wf.Name).Msg("running workflow")
-			workflowrun.RunWorkflow(cfg, wf, env, projectDir, stages, modules)
+			wf = workflowrun.FirstWorkflowMatchingRules(cfg.Workflows, env)
 		} else if len(args) == 1 {
 			// find workflow
-			wf := cfg.FindWorkflow(args[0])
-			if wf == nil {
-				log.Fatal().Str("workflow", args[0]).Msg("workflow does not exist")
-			}
-
-			// run
-			log.Info().Str("workflow", wf.Name).Msg("running workflow")
-			workflowrun.RunWorkflow(cfg, wf, env, projectDir, stages, modules)
+			wf = cfg.FindWorkflow(args[0])
 		}
+
+		if wf == nil {
+			log.Error().Str("workflow", args[0]).Msg("workflow does not exist")
+			return
+		}
+
+		// run
+		log.Info().Str("workflow", wf.Name).Msg("running workflow")
+		workflowrun.RunWorkflow(cfg, wf, env, projectDir, stages, modules)
 	},
 }

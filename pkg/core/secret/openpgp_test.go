@@ -1,8 +1,9 @@
 package secret
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const PublicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----

@@ -1,20 +1,20 @@
 package java
 
 import (
+	"path/filepath"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 type BuildActionStruct struct{}
 
 // GetDetails returns information about this action
-func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action BuildActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "java-build",
 		Version:   "0.1.0",
@@ -23,12 +23,12 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 }
 
 // Check evaluates if the action should be executed or not
-func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 	return ctx.CurrentModule != nil && (ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle || ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven)
 }
 
 // Execute runs the action
-func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// get release version
 	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
 
@@ -45,7 +45,7 @@ func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *a
 	// find artifacts
 	files, _ := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".jar"})
 	for _, file := range files {
-		if strings.Contains(file, "build"+string(os.PathSeparator)+"libs") && IsJarExecutable(file) {
+		if strings.Contains(file, filepath.Join("build", "libs")) && IsJarExecutable(file) {
 			moveErr := filesystem.MoveFile(files[0], ctx.ProjectDir+`/dist/`+filepath.Base(files[0]))
 			log.Fatal().Err(moveErr).Msg("failed to move artifacts into artifact dir")
 		}

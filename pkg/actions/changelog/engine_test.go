@@ -1,12 +1,13 @@
 package changelog
 
 import (
+	"testing"
+	"time"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/commitanalyser"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 var config = Config{
@@ -46,10 +47,10 @@ var commits = []vcsrepository.Commit{
 
 func TestContributorData(t *testing.T) {
 	// preprocess
-	commits = PreprocessCommits(config, commits)
+	commits = PreprocessCommits(&config, commits)
 
-	// analyse / grouping
-	templateData := ProcessCommits(config, commits)
+	// analyze / grouping
+	templateData := ProcessCommits(&config, commits)
 
 	assert.Equal(t, "Philipp Heuer", templateData.Contributors["contact@example.com"].Name)
 	assert.Equal(t, "contact@example.com", templateData.Contributors["contact@example.com"].Email)
@@ -62,16 +63,16 @@ func TestRenderGitHubReleaseTemplate(t *testing.T) {
 	assert.NoError(t, templateErr)
 
 	// preprocess
-	commits = PreprocessCommits(config, commits)
+	commits = PreprocessCommits(&config, commits)
 
-	// analyse / grouping
-	templateData := ProcessCommits(config, commits)
-	templateData.ProjectUrl = "https://github.com/cidverse/cid"
+	// analyze / grouping
+	templateData := ProcessCommits(&config, commits)
+	templateData.ProjectURL = "https://github.com/cidverse/cid"
 	templateData.ProjectName = "CID"
 	templateData.Version = "1.0.0"
 	templateData.ReleaseDate = time.Unix(int64(1609502400), int64(0))
 
-	output, outputErr := RenderTemplate(templateData, template)
+	output, outputErr := RenderTemplate(&templateData, template)
 	assert.NoError(t, outputErr)
 	assert.Equal(t, `## Bug Fixes
 - **core:** resolves a issue
@@ -91,16 +92,16 @@ func TestRenderDiscordTemplate(t *testing.T) {
 	assert.NoError(t, templateErr)
 
 	// preprocess
-	commits = PreprocessCommits(config, commits)
+	commits = PreprocessCommits(&config, commits)
 
-	// analyse / grouping
-	templateData := ProcessCommits(config, commits)
-	templateData.ProjectUrl = "https://github.com/cidverse/cid"
+	// analyze / grouping
+	templateData := ProcessCommits(&config, commits)
+	templateData.ProjectURL = "https://github.com/cidverse/cid"
 	templateData.ProjectName = "CID"
 	templateData.Version = "1.0.0"
 	templateData.ReleaseDate = time.Unix(int64(1609502400), int64(0))
 
-	output, outputErr := RenderTemplate(templateData, template)
+	output, outputErr := RenderTemplate(&templateData, template)
 	assert.NoError(t, outputErr)
 	assert.Equal(t, `:rocket: CID - ***1.0.0*** - 2021-01-01 :rocket:
 

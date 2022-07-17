@@ -1,8 +1,9 @@
 package container
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetDockerfileSyntax(t *testing.T) {

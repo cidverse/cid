@@ -9,7 +9,7 @@ import (
 type BuildActionStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action BuildActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "hugo-build",
 		Version:   "0.1.0",
@@ -18,12 +18,12 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 }
 
 // Check evaluates if the action should be executed or not
-func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemHugo
 }
 
 // Execute runs the action
-func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	command.RunCommand(`hugo --minify --gc --log --verboseLog --source `+ctx.ProjectDir+` --destination `+ctx.ProjectDir+`/`+ctx.Paths.Artifact, ctx.Env, ctx.ProjectDir)
 
 	return nil

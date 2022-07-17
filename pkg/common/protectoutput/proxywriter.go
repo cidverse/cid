@@ -26,7 +26,7 @@ func (w *FileProxyWriter) Write(p []byte) (int, error) {
 
 	// write data
 	if w.file != nil {
-		_, err := w.file.Write([]byte(output))
+		_, err := w.file.WriteString(output)
 		if err != nil {
 			return 0, err
 		}

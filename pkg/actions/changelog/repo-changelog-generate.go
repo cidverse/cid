@@ -2,19 +2,20 @@ package changelog
 
 import (
 	"errors"
+	"path/filepath"
+	"time"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
-	"path/filepath"
-	"time"
 )
 
 type ChangelogGenerateStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action ChangelogGenerateStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action ChangelogGenerateStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "repo-changelog-generate",
 		Version:   "0.1.0",
@@ -23,12 +24,12 @@ func (action ChangelogGenerateStruct) GetDetails(ctx api.ActionExecutionContext)
 }
 
 // Check evaluates if the action should be executed or not
-func (action ChangelogGenerateStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action ChangelogGenerateStruct) Check(ctx *api.ActionExecutionContext) bool {
 	return ctx.Env["NCI_COMMIT_REF_TYPE"] == "tag"
 }
 
 // Execute runs the action
-func (action ChangelogGenerateStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action ChangelogGenerateStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	var config Config
 	configParseErr := yaml.Unmarshal([]byte(ctx.Config), &config)
 	if configParseErr != nil {
@@ -42,12 +43,12 @@ func (action ChangelogGenerateStruct) Execute(ctx api.ActionExecutionContext, st
 	}
 
 	// preprocess
-	commits = PreprocessCommits(config, commits)
+	commits = PreprocessCommits(&config, commits)
 
-	// analyse / grouping
-	templateData := ProcessCommits(config, commits)
+	// analyze / grouping
+	templateData := ProcessCommits(&config, commits)
 	templateData.ProjectName = ctx.Env["NCI_PROJECT_NAME"]
-	templateData.ProjectUrl = ctx.Env["NCI_REPOSITORY_PROJECT_URL"]
+	templateData.ProjectURL = ctx.Env["NCI_REPOSITORY_PROJECT_URL"]
 	templateData.ReleaseDate = time.Now()
 	templateData.Version = ctx.Env["NCI_COMMIT_REF_NAME"]
 
@@ -61,7 +62,7 @@ func (action ChangelogGenerateStruct) Execute(ctx api.ActionExecutionContext, st
 		}
 
 		// render
-		output, outputErr := RenderTemplate(templateData, content)
+		output, outputErr := RenderTemplate(&templateData, content)
 		if outputErr != nil {
 			return errors.New("failed to render template " + templateFile)
 		}

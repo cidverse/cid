@@ -1,11 +1,12 @@
 package gradle
 
 import (
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGradleAnalyzer_AnalyzeGroovy(t *testing.T) {

@@ -1,6 +1,8 @@
 package workflowrun
 
 import (
+	"time"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/rules"
@@ -8,11 +10,10 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v3"
-	"time"
 )
 
 // IsWorkflowExecutable returns true if the workflow is executable (enabled + at least one rule matches)
-func IsWorkflowExecutable(w config.Workflow, env map[string]string) bool {
+func IsWorkflowExecutable(w *config.Workflow, env map[string]string) bool {
 	matchingRules := rules.EvaluateRules(w.Rules, rules.GetRuleContext(env))
 
 	if len(w.Rules) == 0 || matchingRules > 0 {
@@ -23,7 +24,7 @@ func IsWorkflowExecutable(w config.Workflow, env map[string]string) bool {
 }
 
 // IsStageExecutable returns true if the stage is executable (enabled + at least one rule matches)
-func IsStageExecutable(s config.WorkflowStage, env map[string]string) bool {
+func IsStageExecutable(s *config.WorkflowStage, env map[string]string) bool {
 	matchingRules := rules.EvaluateRules(s.Rules, rules.GetRuleContext(env))
 
 	if len(s.Rules) == 0 || matchingRules > 0 {
@@ -34,7 +35,7 @@ func IsStageExecutable(s config.WorkflowStage, env map[string]string) bool {
 }
 
 // IsActionExecutable returns true if the action is executable (enabled + at least one rule matches)
-func IsActionExecutable(a config.Action, env map[string]string) bool {
+func IsActionExecutable(a *config.Action, env map[string]string) bool {
 	matchingRules := rules.EvaluateRules(a.Rules, rules.GetRuleContext(env))
 
 	if len(a.Rules) == 0 || matchingRules > 0 {
@@ -72,11 +73,11 @@ func RunWorkflow(cfg *config.CIDConfig, wf *config.Workflow, env map[string]stri
 	ruleContext := rules.GetRuleContext(env)
 
 	if rules.AnyRuleMatches(wf.Rules, ruleContext) {
-		for _, stage := range wf.Stages {
-			if len(stagesFilter) == 0 || funk.Contains(stagesFilter, stage.Name) {
-				RunWorkflowStage(cfg, &stage, env, projectDir, modulesFilter)
+		for i := range wf.Stages {
+			if len(stagesFilter) == 0 || funk.Contains(stagesFilter, wf.Stages[i].Name) {
+				RunWorkflowStage(cfg, &wf.Stages[i], env, projectDir, modulesFilter)
 			} else {
-				log.Debug().Str("workflow", wf.Name).Str("stage", stage.Name).Strs("filter", stagesFilter).Msg("stage has been skipped")
+				log.Debug().Str("workflow", wf.Name).Str("stage", wf.Stages[i].Name).Strs("filter", stagesFilter).Msg("stage has been skipped")
 			}
 		}
 
@@ -93,8 +94,8 @@ func RunWorkflowStage(cfg *config.CIDConfig, stage *config.WorkflowStage, env ma
 	ruleContext := rules.GetRuleContext(env)
 
 	if rules.AnyRuleMatches(stage.Rules, ruleContext) {
-		for _, action := range stage.Actions {
-			RunWorkflowAction(cfg, &action, env, projectDir, modulesFilter)
+		for i := range stage.Actions {
+			RunWorkflowAction(cfg, &stage.Actions[i], env, projectDir, modulesFilter)
 		}
 
 		// complete
@@ -105,8 +106,8 @@ func RunWorkflowStage(cfg *config.CIDConfig, stage *config.WorkflowStage, env ma
 }
 
 func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env map[string]string, projectDir string, modulesFilter []string) {
-	log.Debug().Str("action", action.Id).Msg("action start")
-	catalogAction := cfg.FindAction(action.Id)
+	log.Debug().Str("action", action.ID).Msg("action start")
+	catalogAction := cfg.FindAction(action.ID)
 	ctx := api.GetActionContext(projectDir, env, nil)
 
 	// serialize action config for pass-thru
@@ -117,9 +118,9 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 	if catalogAction.Scope == config.ActionScopeProject {
 		ruleContext := rules.GetRuleContext(env)
 		ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
-		log.Debug().Str("action", action.Id).Bool("rules_match", ruleMatch).Msg("check action rules")
+		log.Debug().Str("action", action.ID).Bool("rules_match", ruleMatch).Msg("check action rules")
 		if ruleMatch {
-			runWorkflowAction(catalogAction, action, ctx)
+			runWorkflowAction(catalogAction, action, &ctx)
 		}
 	}
 
@@ -128,7 +129,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 		// for each module
 		for _, module := range ctx.Modules {
 			moduleRef := *module
-			log.Trace().Str("action", action.Id).Msg("action start")
+			log.Trace().Str("action", action.ID).Msg("action start")
 
 			// customize context
 			ctx.CurrentModule = &moduleRef
@@ -139,17 +140,17 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 				continue
 			}
 
-			ruleContext := rules.GetModuleRuleContext(env, moduleRef)
+			ruleContext := rules.GetModuleRuleContext(env, &moduleRef)
 			ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
-			log.Debug().Str("action", action.Id).Str("module", moduleRef.Name).Bool("rules_match", ruleMatch).Msg("check action rules")
+			log.Debug().Str("action", action.ID).Str("module", moduleRef.Name).Bool("rules_match", ruleMatch).Msg("check action rules")
 			if ruleMatch {
-				runWorkflowAction(catalogAction, action, ctx)
+				runWorkflowAction(catalogAction, action, &ctx)
 			}
 		}
 	}
 }
 
-func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowAction, ctx api.ActionExecutionContext) {
+func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowAction, ctx *api.ActionExecutionContext) {
 	start := time.Now()
 	ruleContext := rules.GetRuleContext(ctx.Env)
 	if rules.AnyRuleMatches(action.Rules, ruleContext) {
@@ -158,7 +159,7 @@ func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowActi
 
 		// serialize action config for pass-thru
 		actConfig, _ := yaml.Marshal(&action.Config)
-		log.Trace().Str("action", action.Id).Str("type", string(catalogAction.Type)).Str("config", string(actConfig)).Msg("action configuration")
+		log.Trace().Str("action", action.ID).Str("type", string(catalogAction.Type)).Str("config", string(actConfig)).Msg("action configuration")
 
 		// paths
 		filesystem.CreateDirectory(ctx.Paths.Temp)
@@ -166,22 +167,26 @@ func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowActi
 
 		// execute
 		if catalogAction.Type == config.ActionTypeBuiltinGolang {
-			if evaluateActionBuiltinGolang(&ctx, &state, catalogAction, action) {
-				runActionBuiltinGolang(&ctx, &state, catalogAction, action)
+			if evaluateActionBuiltinGolang(ctx, &state, catalogAction, action) {
+				err := runActionBuiltinGolang(ctx, &state, catalogAction, action)
+				if err != nil {
+					log.Fatal().Err(err).Str("action", action.ID).Msg("action error")
+					return
+				}
 			} else {
-				log.Debug().Str("action", action.Id).Msg("requirements not fulfilled, not running action")
+				log.Debug().Str("action", action.ID).Msg("requirements not fulfilled, not running action")
 				return
 			}
 		} else {
-			log.Error().Str("action", action.Id).Str("type", string(catalogAction.Type)).Msg("action type is not supported")
+			log.Error().Str("action", action.ID).Str("type", string(catalogAction.Type)).Msg("action type is not supported")
 		}
 
 		// state: store
 		persistState(ctx, state)
 
 		// complete
-		log.Info().Str("action", action.Id).Str("duration", time.Since(start).String()).Msg("action completed")
+		log.Info().Str("action", action.ID).Str("duration", time.Since(start).String()).Msg("action completed")
 	} else {
-		log.Debug().Str("action", action.Id).Msg("no workflow rule matches, not running action")
+		log.Debug().Str("action", action.ID).Msg("no workflow rule matches, not running action")
 	}
 }

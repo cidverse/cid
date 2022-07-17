@@ -2,6 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
+	"text/tabwriter"
+
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
@@ -9,10 +14,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/spf13/cobra"
-	"os"
-	"strconv"
-	"strings"
-	"text/tabwriter"
 )
 
 func init() {
@@ -83,7 +84,7 @@ var actionRunCmd = &cobra.Command{
 		// pass action
 		action := cfg.FindAction(actionName)
 		act := config.WorkflowAction{
-			Id:     action.Repository + "/" + action.Name,
+			ID:     action.Repository + "/" + action.Name,
 			Rules:  []config.WorkflowRule{},
 			Config: nil,
 			Module: nil,

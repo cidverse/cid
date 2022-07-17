@@ -2,13 +2,14 @@ package workflowrun
 
 import (
 	"encoding/json"
+	"path/filepath"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
-	"path/filepath"
 )
 
-func getState(ctx api.ActionExecutionContext) api.ActionStateContext {
+func getState(ctx *api.ActionExecutionContext) api.ActionStateContext {
 	stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
 	state := api.ActionStateContext{
 		Version: 1,
@@ -19,7 +20,7 @@ func getState(ctx api.ActionExecutionContext) api.ActionStateContext {
 		if stateContentErr == nil {
 			err := json.Unmarshal([]byte(stateContent), &state)
 			if err != nil {
-				log.Warn().Err(err).Str("file", stateFile).Msg("failed to restore state")
+				log.Debug().Err(err).Str("file", stateFile).Msg("failed to restore state")
 			}
 		}
 	}
@@ -27,7 +28,7 @@ func getState(ctx api.ActionExecutionContext) api.ActionStateContext {
 	return state
 }
 
-func persistState(ctx api.ActionExecutionContext, state api.ActionStateContext) {
+func persistState(ctx *api.ActionExecutionContext, state api.ActionStateContext) {
 	stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
 	stateOut, err := json.Marshal(state)
 	if err != nil {

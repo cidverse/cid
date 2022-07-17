@@ -2,17 +2,18 @@ package java
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
-	"strings"
 )
 
 type PublishActionStruct struct{}
 
 // GetDetails returns information about this action
-func (action PublishActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action PublishActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "java-publish",
 		Version:   "0.1.0",
@@ -21,7 +22,7 @@ func (action PublishActionStruct) GetDetails(ctx api.ActionExecutionContext) api
 }
 
 // Check evaluates if the action should be executed or not
-func (action PublishActionStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action PublishActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 	if ctx.CurrentModule != nil && (ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle || ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven) {
 		return ctx.Env["NCI_COMMIT_REF_TYPE"] == "tag"
 	}
@@ -30,7 +31,7 @@ func (action PublishActionStruct) Check(ctx api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action PublishActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// release env
 	releaseEnv := ctx.Env
 	// - gpg signing

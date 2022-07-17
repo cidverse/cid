@@ -8,7 +8,7 @@ import (
 type ScanActionStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action ScanActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action ScanActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "fossa-scan",
 		Version:   "0.1.0",
@@ -17,12 +17,12 @@ func (action ScanActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Ac
 }
 
 // Check evaluates if the action should be executed or not
-func (action ScanActionStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action ScanActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 	return len(ctx.MachineEnv["FOSSA_API_KEY"]) > 0
 }
 
 // Execute runs the action
-func (action ScanActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action ScanActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// env
 	ctx.Env["FOSSA_API_KEY"] = ctx.MachineEnv["FOSSA_API_KEY"]
 

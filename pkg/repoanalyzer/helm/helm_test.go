@@ -1,11 +1,12 @@
 package helm
 
 import (
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAnalyzer_AnalyzeHugo(t *testing.T) {

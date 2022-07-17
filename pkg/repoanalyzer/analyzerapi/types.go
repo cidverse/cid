@@ -25,7 +25,7 @@ type ProjectModule struct {
 	// Name stores the module name
 	Name string
 
-	// Slug contains a url/folder name compatible name of the module
+	// Slug contains an url/folder name compatible name of the module
 	Slug string
 
 	// BuildSystem used in this project
@@ -57,18 +57,22 @@ const (
 	LanguageJava       ProjectLanguage = "java"
 	LanguageJavascript ProjectLanguage = "javascript"
 	LanguageTypescript ProjectLanguage = "typescript"
+	LanguagePython     ProjectLanguage = "python"
 )
 
 type ProjectBuildSystem string
 
 const (
-	BuildSystemGradle    ProjectBuildSystem = "gradle"
-	BuildSystemMaven     ProjectBuildSystem = "maven"
-	BuildSystemGoMod     ProjectBuildSystem = "gomod"
-	BuildSystemNpm       ProjectBuildSystem = "npm"
-	BuildSystemHugo      ProjectBuildSystem = "hugo"
-	BuildSystemHelm      ProjectBuildSystem = "helm"
-	BuildSystemContainer ProjectBuildSystem = "container"
+	BuildSystemGradle          ProjectBuildSystem = "gradle"
+	BuildSystemMaven           ProjectBuildSystem = "maven"
+	BuildSystemGoMod           ProjectBuildSystem = "gomod"
+	BuildSystemNpm             ProjectBuildSystem = "npm"
+	BuildSystemHugo            ProjectBuildSystem = "hugo"
+	BuildSystemHelm            ProjectBuildSystem = "helm"
+	BuildSystemContainer       ProjectBuildSystem = "container"
+	BuildSystemRequirementsTXT ProjectBuildSystem = "python-requirements.txt"
+	BuildSystemPipfile         ProjectBuildSystem = "pipfile"
+	BuildSystemSetupPy         ProjectBuildSystem = "setup.py"
 )
 
 type ProjectBuildSystemSyntax string
@@ -86,8 +90,8 @@ type ProjectDependency struct {
 	// Type is the dep kind
 	Type string
 
-	// Id is the identifier
-	Id string
+	// ID is the identifier
+	ID string
 
 	// Version is the dep version
 	Version string

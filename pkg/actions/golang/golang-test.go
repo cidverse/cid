@@ -2,18 +2,19 @@ package golang
 
 import (
 	"errors"
+	"path/filepath"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
-	"path/filepath"
-	"strings"
 )
 
 type TestActionStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action TestActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:             "golang-test",
 		Version:          "0.1.0",
@@ -23,12 +24,12 @@ func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Ac
 }
 
 // Check evaluates if the action should be executed or not
-func (action TestActionStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action TestActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGoMod
 }
 
 // Execute runs the action
-func (action TestActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action TestActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// config
 	coverageFile := filepath.Join(ctx.Paths.Temp, "coverage.txt")
 
@@ -36,7 +37,6 @@ func (action TestActionStruct) Execute(ctx api.ActionExecutionContext, state *ap
 	var testArgs []string
 	testArgs = append(testArgs, `go test`)
 	testArgs = append(testArgs, `-cover`)
-	// testArgs = append(testArgs, `-race`)
 	testArgs = append(testArgs, `-vet off`)
 	testArgs = append(testArgs, `-coverprofile `+coverageFile)
 	testArgs = append(testArgs, `./...`)

@@ -9,7 +9,7 @@ import (
 type TagCreateStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action TagCreateStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action TagCreateStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	var usedTools []string
 
 	if ctx.Env["NCI_REPOSITORY_KIND"] == "git" {
@@ -24,7 +24,7 @@ func (action TagCreateStruct) GetDetails(ctx api.ActionExecutionContext) api.Act
 }
 
 // Check evaluates if the action should be executed or not
-func (action TagCreateStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action TagCreateStruct) Check(ctx *api.ActionExecutionContext) bool {
 	if len(ctx.MachineEnv["GITHUB_TOKEN"]) > 0 {
 		ctx.Env["GITHUB_TOKEN"] = ctx.MachineEnv["GITHUB_TOKEN"]
 
@@ -35,7 +35,7 @@ func (action TagCreateStruct) Check(ctx api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action TagCreateStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action TagCreateStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	tagName := "v" + ctx.Env["NCI_NEXTRELEASE_NAME"]
 
 	// create tag

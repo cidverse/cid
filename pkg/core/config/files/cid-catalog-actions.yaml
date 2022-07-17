@@ -75,14 +75,35 @@ catalog:
       name: python-run
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "python-requirements.txt"
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "pipfile"
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "setup.py"
     - repository: central
       name: python-build
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "python-requirements.txt"
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "pipfile"
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "setup.py"
     - repository: central
       name: python-lint
       type: builtin-golang
       scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "python-requirements.txt"
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "pipfile"
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "setup.py"
     # node
     - repository: central
       name: node-build

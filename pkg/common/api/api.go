@@ -4,6 +4,10 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/cidverse/cid/pkg/common/commitanalyser"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/config"
@@ -15,9 +19,6 @@ import (
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 // FindProjectDir finds the project directory from the current dir
@@ -150,7 +151,7 @@ func DecodeEnvValue(value string) string {
 	return value
 }
 
-func GetEnvValue(ctx ActionExecutionContext, name string) string {
+func GetEnvValue(ctx *ActionExecutionContext, name string) string {
 	// check secret storage TODO: cache this somewhere
 	secretFile := filepath.Join(ctx.ProjectDir, ".cid-secrets")
 	if filesystem.FileExists(secretFile) {

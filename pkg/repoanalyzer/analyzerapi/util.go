@@ -3,13 +3,14 @@ package analyzerapi
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rs/zerolog/log"
-	"github.com/stretchr/testify/assert"
 	"io/fs"
 	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/rs/zerolog/log"
+	"github.com/stretchr/testify/assert"
 )
 
 func GetAnalyzerContext(projectDir string) AnalyzerContext {

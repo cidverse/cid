@@ -1,21 +1,21 @@
 package config
 
 type ToolBinary struct {
-	Binary  string `json:"binary"`
-	Version string `json:"version"`
+	Binary  string `yaml:"binary"`
+	Version string `yaml:"version"`
 }
 
 type ToolContainerImage struct {
-	Provides []ToolBinary            `json:"provides"`
-	Image    string                  `json:"image"`
-	Cache    map[string]ToolCacheDir `json:"cache"`
-	User     string                  `json:"user"`
+	Provides []ToolBinary            `yaml:"provides"`
+	Image    string                  `yaml:"image"`
+	Cache    map[string]ToolCacheDir `yaml:"cache"`
+	User     string                  `yaml:"user"`
 }
 
 type ToolLocal struct {
 	Binary         []string
 	Lookup         []ToolLocalLookup
-	LookupSuffixes []string `json:"lookup-suffixes"`
+	LookupSuffixes []string `yaml:"lookup-suffixes"`
 	Path           string
 	ResolvedBinary string
 }
@@ -27,7 +27,7 @@ type ToolLocalLookup struct {
 }
 
 type ToolCacheDir struct {
-	Id            string
+	ID            string
 	ContainerPath string `yaml:"dir"`
 	MountType     string `yaml:"type"`
 }

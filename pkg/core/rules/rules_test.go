@@ -1,9 +1,10 @@
 package rules
 
 import (
+	"testing"
+
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCELExpression(t *testing.T) {

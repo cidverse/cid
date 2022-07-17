@@ -1,10 +1,11 @@
 package node
 
 import (
+	"path/filepath"
+
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/gosimple/slug"
 	"github.com/thoas/go-funk"
-	"path/filepath"
 )
 
 type Analyzer struct{}
@@ -33,8 +34,8 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 
 			// - typescript?
 			if funk.Contains(packageData.Dependencies, "typescript") {
-				// semver.MustParse(packageData.Dependencies["typescript"])
-				language[analyzerapi.LanguageTypescript] = nil
+				typescriptVersion := packageData.Dependencies["typescript"]
+				language[analyzerapi.LanguageTypescript] = &typescriptVersion
 			}
 
 			// deps
@@ -42,7 +43,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 			for key, value := range packageData.Dependencies {
 				dep := analyzerapi.ProjectDependency{
 					Type:    string(analyzerapi.BuildSystemNpm),
-					Id:      key,
+					ID:      key,
 					Version: value,
 				}
 				dependencies = append(dependencies, dep)
@@ -76,8 +77,4 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 	}
 
 	return result
-}
-
-func init() {
-	analyzerapi.Analyzers = append(analyzerapi.Analyzers, Analyzer{})
 }

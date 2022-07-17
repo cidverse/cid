@@ -2,8 +2,9 @@ package protectoutput
 
 import (
 	"encoding/base64"
-	"github.com/thoas/go-funk"
 	"strings"
+
+	"github.com/thoas/go-funk"
 )
 
 var protectedPhrases []string

@@ -3,8 +3,9 @@ package node
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"os"
+
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 )
 
 type PackageStruct struct {
@@ -19,20 +20,18 @@ func ParsePackageJSON(file string) (PackageStruct, error) {
 	var result PackageStruct
 
 	// package.json
-	if _, err := os.Stat(file); !os.IsNotExist(err) {
-		if err != nil {
-			return PackageStruct{}, errors.New("failed to open package.json")
-		}
+	if !filesystem.FileExists(file) {
+		return PackageStruct{}, errors.New("failed to open package.json")
+	}
 
-		fileBytes, fileErr := ioutil.ReadFile(file)
-		if fileErr == nil {
-			unmarshalErr := json.Unmarshal(fileBytes, &result)
-			if unmarshalErr != nil {
-				return PackageStruct{}, errors.New("failed to parse package.json")
-			}
-		} else {
-			return PackageStruct{}, errors.New("failed to open package.json")
+	fileBytes, fileErr := os.ReadFile(file)
+	if fileErr == nil {
+		unmarshalErr := json.Unmarshal(fileBytes, &result)
+		if unmarshalErr != nil {
+			return PackageStruct{}, errors.New("failed to parse package.json")
 		}
+	} else {
+		return PackageStruct{}, errors.New("failed to open package.json")
 	}
 
 	return result, nil

@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"os"
+
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 )
 
 // PathConfig contains the path configuration for build/tmp directories

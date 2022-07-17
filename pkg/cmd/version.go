@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"runtime"
+
 	"github.com/cidverse/cid/pkg/core/version"
 	"github.com/spf13/cobra"
-	"runtime"
 )
 
 // Version will be set at build time

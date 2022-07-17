@@ -1,4 +1,4 @@
 package gitguardian
 
-const GITGUARDIAN_API_KEY = "GITGUARDIAN_API_KEY"
-const GITGUARDIAN_PREFIX = "GITGUARDIAN_"
+const GitguardianAPIKey = "GITGUARDIAN_API_KEY"
+const GitguardianPrefix = "GITGUARDIAN_"

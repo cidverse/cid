@@ -1,9 +1,10 @@
 package helm
 
 import (
+	"path/filepath"
+
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/gosimple/slug"
-	"path/filepath"
 )
 
 type Analyzer struct{}
@@ -39,8 +40,4 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 	}
 
 	return result
-}
-
-func init() {
-	analyzerapi.Analyzers = append(analyzerapi.Analyzers, Analyzer{})
 }

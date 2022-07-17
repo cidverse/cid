@@ -1,9 +1,10 @@
 package commitanalyser
 
 import (
+	"testing"
+
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestDeterminateNextReleaseVersionBreaking(t *testing.T) {

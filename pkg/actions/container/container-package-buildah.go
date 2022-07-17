@@ -2,14 +2,15 @@ package container
 
 import (
 	"errors"
+	"strings"
+	"time"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
-	"strings"
-	"time"
 )
 
 type BuildahPackageActionStruct struct{}
@@ -22,7 +23,7 @@ type BuildahConfig struct {
 }
 
 // GetDetails retrieves information about the action
-func (action BuildahPackageActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action BuildahPackageActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "container-package-buildah",
 		Version:   "0.1.0",
@@ -31,22 +32,12 @@ func (action BuildahPackageActionStruct) GetDetails(ctx api.ActionExecutionConte
 }
 
 // Check evaluates if the action should be executed or not
-func (action BuildahPackageActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	var missingRequirements []api.MissingRequirement
-
-	if ctx.CurrentModule != nil {
-		if (ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerFile || ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript) == false {
-			missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "module is not of syntax " + string(analyzerapi.ContainerFile) + " or " + string(analyzerapi.ContainerBuildahScript)})
-		}
-	} else {
-		missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "no module context present"})
-	}
-
-	return len(missingRequirements) == 0
+func (action BuildahPackageActionStruct) Check(ctx *api.ActionExecutionContext) bool {
+	return true
 }
 
 // Execute runs the action
-func (action BuildahPackageActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	var config BuildahConfig
 	configParseErr := yaml.Unmarshal([]byte(ctx.Config), &config)
 	if configParseErr != nil {
@@ -67,7 +58,7 @@ func (action BuildahPackageActionStruct) Execute(ctx api.ActionExecutionContext,
 		log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", image).Msg("building container image")
 
 		// skip image generation, if image is present in remote registry
-		if config.Rebuild != true {
+		if !config.Rebuild {
 			_, remoteImageErr := LoadRemoteImageInformation(image)
 			if remoteImageErr == nil {
 				log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", image).Str("cause", "present_in_remote").Msg("skipping container image build")
@@ -131,7 +122,6 @@ func (action BuildahPackageActionStruct) Execute(ctx api.ActionExecutionContext,
 		var pushArgs []string
 		pushArgs = append(pushArgs, `buildah push`)
 
-		// pushArgs = append(pushArgs, `--sign-by test`)
 		if len(platforms) > 1 {
 			pushArgs = append(pushArgs, `--all`)
 		}

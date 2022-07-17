@@ -9,7 +9,7 @@ import (
 type TestActionStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action TestActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "java-test",
 		Version:   "0.1.0",
@@ -18,12 +18,12 @@ func (action TestActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Ac
 }
 
 // Check evaluates if the action should be executed or not
-func (action TestActionStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action TestActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 	return ctx.CurrentModule != nil && (ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle || ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven)
 }
 
 // Execute runs the action
-func (action TestActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action TestActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// get release version
 	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
 

@@ -2,11 +2,12 @@ package container
 
 import (
 	"embed"
+	"path/filepath"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
-	"path/filepath"
-	"strings"
 )
 
 //go:embed dockerfiles/*
@@ -18,7 +19,7 @@ type Platform struct {
 }
 
 // DetectAppType checks what kind of app the project is (via artifacts, should run after build actions)
-func DetectAppType(ctx api.ActionExecutionContext) string {
+func DetectAppType(ctx *api.ActionExecutionContext) string {
 	// java | jar
 	files, filesErr := filesystem.FindFilesByExtension(filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact), []string{".jar"})
 	if filesErr != nil {

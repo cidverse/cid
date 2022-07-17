@@ -1,16 +1,17 @@
 package config
 
 import (
-	"github.com/cidverse/cid/pkg/core/version"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
-	"github.com/cidverse/normalizeci/pkg/common"
-	"github.com/rs/zerolog/log"
-	"github.com/thoas/go-funk"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"sort"
+
+	"github.com/cidverse/cid/pkg/core/version"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/normalizeci/pkg/common"
+	"github.com/rs/zerolog/log"
+	"github.com/thoas/go-funk"
 )
 
 type ExecutionType string
@@ -43,7 +44,7 @@ type BinaryExecutionCandidate struct {
 }
 
 // FindExecutionCandidates returns a full list of all available execution options for the specified binary
-func (c CIDConfig) FindExecutionCandidates(binary string, constraint string, preferExecutionType ExecutionType, preferVersion PreferVersion) []BinaryExecutionCandidate {
+func (c *CIDConfig) FindExecutionCandidates(binary string, constraint string, preferExecutionType ExecutionType, preferVersion PreferVersion) []BinaryExecutionCandidate { //nolint:gocyclo
 	var options []BinaryExecutionCandidate
 
 	// container
@@ -84,7 +85,7 @@ func (c CIDConfig) FindExecutionCandidates(binary string, constraint string, pre
 					}
 				}
 				// check main env name
-				if len(env[lookup.Key]) > 0 {
+				if env[lookup.Key] != "" {
 					if version.FulfillsConstraint(lookup.Version, constraint) {
 						file := findExecutable(env[lookup.Key]+entry.Path, binary)
 						if filesystem.FileExists(file) {
@@ -99,7 +100,7 @@ func (c CIDConfig) FindExecutionCandidates(binary string, constraint string, pre
 				}
 				// check with all possible suffixes
 				for _, envSuffix := range entry.LookupSuffixes {
-					if len(env[lookup.Key+envSuffix]) > 0 {
+					if env[lookup.Key+envSuffix] != "" {
 						if version.FulfillsConstraint(lookup.Version, constraint) {
 							file := findExecutable(env[lookup.Key+envSuffix]+entry.Path, binary)
 							if filesystem.FileExists(file) {
@@ -144,7 +145,7 @@ func (c CIDConfig) FindExecutionCandidates(binary string, constraint string, pre
 }
 
 // FindImageOfBinary retrieves information about the container image for the specified binary fulfilling the constraint
-func (c CIDConfig) FindImageOfBinary(binary string, constraint string) *ToolContainerImage {
+func (c *CIDConfig) FindImageOfBinary(binary string, constraint string) *ToolContainerImage {
 	// lookup
 	for _, entry := range c.ContainerImages {
 		for _, provided := range entry.Provides {
@@ -161,7 +162,7 @@ func (c CIDConfig) FindImageOfBinary(binary string, constraint string) *ToolCont
 }
 
 // FindPathOfBinary retrieves information about the local path of the specified binary fulfilling the constraint
-func (c CIDConfig) FindPathOfBinary(binary string, constraint string) *ToolLocal {
+func (c *CIDConfig) FindPathOfBinary(binary string, constraint string) *ToolLocal {
 	// lookup
 	env := common.GetMachineEnvironment()
 	for _, entry := range c.LocalTools {
@@ -195,7 +196,6 @@ func (c CIDConfig) FindPathOfBinary(binary string, constraint string) *ToolLocal
 				}
 			}
 		}
-
 	}
 
 	return nil
@@ -216,7 +216,7 @@ func findExecutable(path string, file string) string {
 	} else {
 		// unix
 		if _, err := os.Stat(filepath.Join(path, file)); err == nil {
-			return path + string(os.PathSeparator) + file
+			return filepath.Join(path, file)
 		}
 	}
 

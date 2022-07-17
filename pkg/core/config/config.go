@@ -2,6 +2,7 @@ package config
 
 import (
 	"embed"
+
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/jinzhu/configor"
 	"github.com/rs/zerolog/log"

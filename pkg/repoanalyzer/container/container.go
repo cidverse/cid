@@ -1,12 +1,13 @@
 package container
 
 import (
+	"path/filepath"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/gosimple/slug"
 	"github.com/rs/zerolog/log"
-	"path/filepath"
-	"strings"
 )
 
 type Analyzer struct{}
@@ -73,8 +74,4 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 	}
 
 	return result
-}
-
-func init() {
-	analyzerapi.Analyzers = append(analyzerapi.Analyzers, Analyzer{})
 }

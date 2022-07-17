@@ -2,16 +2,17 @@ package java
 
 import (
 	"archive/zip"
+	"io"
+	"strings"
+
 	"github.com/cavaliergopher/grab/v3"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
-	"io"
-	"strings"
 )
 
 const GradleCommandPrefix = `java "-Dorg.gradle.appname=gradlew" "-classpath" "gradle/wrapper/gradle-wrapper.jar" "org.gradle.wrapper.GradleWrapperMain"`
 
-// MavenWrapperSetup makes sure that the maven wrapper is setup correctly for a maven project
+// MavenWrapperSetup makes sure that the maven wrapper is set up correctly for a maven project
 func MavenWrapperSetup(projectDirectory string) {
 	mavenVersion := "3.8.1"
 	mavenWrapperVersion := "0.5.6"
@@ -33,14 +34,14 @@ func MavenWrapperSetup(projectDirectory string) {
 
 	// ensure the maven wrapper jar is present
 	if !filesystem.FileExists(projectDirectory + "/.mvn/wrapper/maven-wrapper.jar") {
-		sourceUrl := "https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/" + mavenWrapperVersion + "/maven-wrapper-" + mavenWrapperVersion + ".jar"
+		sourceURL := "https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/" + mavenWrapperVersion + "/maven-wrapper-" + mavenWrapperVersion + ".jar"
 		targetFile := projectDirectory + "/.mvn/wrapper/maven-wrapper.jar"
-		log.Debug().Str("sourceUrl", sourceUrl).Str("targetFile", targetFile).Msg("Downloading file ...")
+		log.Debug().Str("sourceURL", sourceURL).Str("targetFile", targetFile).Msg("Downloading file ...")
 
 		// download
-		_, err := grab.Get(targetFile, sourceUrl)
+		_, err := grab.Get(targetFile, sourceURL)
 		if err != nil {
-			log.Fatal().Err(err).Str("sourceUrl", sourceUrl).Str("targetFile", targetFile).Msg("failed to download file")
+			log.Fatal().Err(err).Str("sourceURL", sourceURL).Str("targetFile", targetFile).Msg("failed to download file")
 		}
 	}
 }
@@ -54,15 +55,17 @@ func GetJarManifestContent(jarFile string) (string, error) {
 
 	// check for manifest file
 	for _, file := range jar.File {
-		if file.Name == "META-INF/MANIFEST.MF" {
-			fc, _ := file.Open()
-			defer fc.Close()
-
-			contentBytes, _ := io.ReadAll(fc)
-			content := string(contentBytes)
-
-			return content, nil
+		if file.Name != "META-INF/MANIFEST.MF" {
+			continue
 		}
+
+		fc, _ := file.Open()
+		defer fc.Close() //nolint
+
+		contentBytes, _ := io.ReadAll(fc)
+		content := string(contentBytes)
+
+		return content, nil
 	}
 
 	return "", nil

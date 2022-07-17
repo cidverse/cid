@@ -2,20 +2,21 @@ package golang
 
 import (
 	"errors"
+	"os"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 	"github.com/shomali11/parallelizer"
 	"gopkg.in/yaml.v2"
-	"os"
-	"strings"
 )
 
 type BuildActionStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action BuildActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:             "golang-build",
 		Version:          "0.1.0",
@@ -25,12 +26,12 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 }
 
 // Check evaluates if the action should be executed or not
-func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGoMod
 }
 
 // Execute runs the action
-func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	var config Config
 	configParseErr := yaml.Unmarshal([]byte(ctx.Config), &config)
 	if configParseErr != nil {

@@ -1,11 +1,12 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 func init() {

@@ -3,6 +3,13 @@ package command
 import (
 	"bytes"
 	"errors"
+	"io"
+	"os"
+	"os/exec"
+	"path"
+	"runtime"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
@@ -10,12 +17,6 @@ import (
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
-	"io"
-	"os"
-	"os/exec"
-	"path"
-	"runtime"
-	"strings"
 )
 
 // GetCommandVersion returns the version of an executable
@@ -112,12 +113,12 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 
 		// cache
 		for _, c := range candidate.ImageCache {
-			cacheDir := path.Join(os.TempDir(), "cid", c.Id)
+			cacheDir := path.Join(os.TempDir(), "cid", c.ID)
 			_ = os.MkdirAll(cacheDir, os.ModePerm)
 
 			// support mounting volumes (auto created if not present) or directories
 			if c.MountType == "volume" {
-				containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: c.Id, Target: c.ContainerPath})
+				containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: c.ID, Target: c.ContainerPath})
 			} else {
 				containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: cihelper.ToUnixPath(cacheDir), Target: c.ContainerPath})
 			}
@@ -163,23 +164,23 @@ func RunSystemCommandPassThru(file string, args string, env map[string]string, w
 // GetPlatformSpecificCommand returns a platform-specific exec.Cmd
 func GetPlatformSpecificCommand(platform string, file string, args string, workDir string) (*exec.Cmd, error) {
 	if platform == "linux" {
-		return exec.Command("sh", "-c", file+` `+args), nil
+		return exec.Command("sh", "-c", file+` `+args), nil //nolint:gosec
 	} else if platform == "windows" {
 		// Notes:
 		// powershell needs .\ prefix for executables in the current directory
 		if filesystem.FileExists(file) {
-			return exec.Command("powershell", `& '`+file+`' `+args), nil
+			return exec.Command("powershell", `& '`+file+`' `+args), nil //nolint:gosec
 		} else if filesystem.FileExists(workDir + `/` + file + `.bat`) {
-			return exec.Command("powershell", `.\`+file+`.bat `+args), nil
+			return exec.Command("powershell", `.\`+file+`.bat `+args), nil //nolint:gosec
 		} else if filesystem.FileExists(workDir + `/` + file + `.ps1`) {
-			return exec.Command("powershell", `.\`+file+`.ps1 `+args), nil
+			return exec.Command("powershell", `.\`+file+`.ps1 `+args), nil //nolint:gosec
 		} else if filesystem.FileExists(workDir + `/` + file) {
-			return exec.Command("powershell", `.\`+file+` `+args), nil
+			return exec.Command("powershell", `.\`+file+` `+args), nil //nolint:gosec
 		}
 
-		return exec.Command("powershell", file+` `+args), nil
+		return exec.Command("powershell", file+` `+args), nil //nolint:gosec
 	} else if platform == "darwin" {
-		return exec.Command("sh", "-c", file+` `+args), nil
+		return exec.Command("sh", "-c", file+` `+args), nil //nolint:gosec
 	}
 
 	return nil, errors.New("command.GetPlatformSpecificCommand failed, platform " + platform + " is not supported!")

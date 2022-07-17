@@ -16,7 +16,7 @@ type WorkflowRule struct {
 }
 
 type WorkflowAction struct {
-	Id     string                     `required:"true" yaml:"id"`
+	ID     string                     `required:"true" yaml:"id"`
 	Rules  []WorkflowRule             `yaml:"rules,omitempty"`
 	Config interface{}                `yaml:"config,omitempty"`
 	Module *analyzerapi.ProjectModule `yaml:"-"`
@@ -35,7 +35,7 @@ type Workflow struct {
 }
 
 // FindWorkflow finds a workflow by name
-func (c CIDConfig) FindWorkflow(name string) *Workflow {
+func (c *CIDConfig) FindWorkflow(name string) *Workflow {
 	for _, w := range c.Workflows {
 		if w.Name == name {
 			return &w
@@ -45,10 +45,11 @@ func (c CIDConfig) FindWorkflow(name string) *Workflow {
 	return nil
 }
 
-// FindAction finds a action by id
-func (c CIDConfig) FindAction(name string) *Action {
+// FindAction finds an action by id
+func (c *CIDConfig) FindAction(name string) *Action {
 	// exact match
-	for _, a := range c.Catalog.Actions {
+	for i := range c.Catalog.Actions {
+		a := c.Catalog.Actions[i]
 		if a.Repository+"/"+a.Name == name {
 			return &a
 		}
@@ -58,10 +59,10 @@ func (c CIDConfig) FindAction(name string) *Action {
 }
 
 // ActionCount returns the total count of actions across all stages
-func (w Workflow) ActionCount() int {
+func (w *Workflow) ActionCount() int {
 	actionCount := 0
 	for _, s := range w.Stages {
-		actionCount = actionCount + len(s.Actions)
+		actionCount += len(s.Actions)
 	}
 
 	return actionCount

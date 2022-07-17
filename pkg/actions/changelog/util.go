@@ -3,9 +3,10 @@ package changelog
 import (
 	"embed"
 	"errors"
+	"path/filepath"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
-	"path/filepath"
 )
 
 // GetFileContent returns the file content from either the directory or the embedded filesystem in that order
@@ -29,6 +30,5 @@ func GetFileContent(folder string, fs embed.FS, file string) (string, error) {
 }
 
 func AddLinks(input string) string {
-
 	return input
 }

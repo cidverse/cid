@@ -1,17 +1,18 @@
 package python
 
 import (
+	"strings"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
-	"strings"
 )
 
 type RunActionStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action RunActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "python-run",
 		Version:   "0.1.0",
@@ -20,12 +21,12 @@ func (action RunActionStruct) GetDetails(ctx api.ActionExecutionContext) api.Act
 }
 
 // Check evaluates if the action should be executed or not
-func (action RunActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return DetectPythonProject(ctx.ProjectDir)
+func (action RunActionStruct) Check(ctx *api.ActionExecutionContext) bool {
+	return true
 }
 
 // Execute runs the action
-func (action RunActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action RunActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	files, filesErr := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".py"})
 	if filesErr != nil {
 		log.Fatal().Err(filesErr).Str("path", ctx.ProjectDir).Msg("failed to list files")

@@ -1,16 +1,17 @@
 package gitleaks
 
 import (
+	"strings"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
-	"strings"
 )
 
 type ScanStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action ScanStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "gitleaks-scan",
 		Version:   "0.1.0",
@@ -19,12 +20,12 @@ func (action ScanStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDe
 }
 
 // Check evaluates if the action should be executed or not
-func (action ScanStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action ScanStruct) Check(ctx *api.ActionExecutionContext) bool {
 	return vcsrepository.GetVCSRepositoryType(ctx.ProjectDir) == "git" && ctx.Env["GITLEAKS_ENABLED"] == "true"
 }
 
 // Execute runs the action
-func (action ScanStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	var opts []string
 	if ctx.MachineEnv["CI"] == "true" {
 		opts = append(opts, "--redact")

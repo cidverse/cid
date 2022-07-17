@@ -1,19 +1,20 @@
 package repo
 
 import (
+	"path/filepath"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/core/version"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
-	"path/filepath"
-	"strings"
 )
 
 type AssetPublishGitHubStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action AssetPublishGitHubStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action AssetPublishGitHubStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "repo-release-github",
 		Version:   "0.1.0",
@@ -22,7 +23,7 @@ func (action AssetPublishGitHubStruct) GetDetails(ctx api.ActionExecutionContext
 }
 
 // Check evaluates if the action should be executed or not
-func (action AssetPublishGitHubStruct) Check(ctx api.ActionExecutionContext) bool {
+func (action AssetPublishGitHubStruct) Check(ctx *api.ActionExecutionContext) bool {
 	if len(ctx.MachineEnv["GITHUB_TOKEN"]) > 0 && strings.HasPrefix(ctx.Env["NCI_REPOSITORY_REMOTE"], "https://github.com") {
 		return ctx.Env["NCI_COMMIT_REF_TYPE"] == "tag"
 	}
@@ -31,14 +32,14 @@ func (action AssetPublishGitHubStruct) Check(ctx api.ActionExecutionContext) boo
 }
 
 // Execute runs the action
-func (action AssetPublishGitHubStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action AssetPublishGitHubStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// context
 	ctx.Env["GITHUB_TOKEN"] = ctx.MachineEnv["GITHUB_TOKEN"]
 
 	// input
 	tagName := ctx.Env["NCI_COMMIT_REF_NAME"]
 
-	// create github release
+	// create GitHub release
 	var opts []string
 
 	// title

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+
 	hashicorpVersion "github.com/hashicorp/go-version"
 	"github.com/rs/zerolog/log"
 )
@@ -11,11 +12,7 @@ import (
 // IsValidSemver checks that the given input is a valid semver version
 func IsValidSemver(input string) bool {
 	_, versionErr := hashicorpVersion.NewSemver(input)
-	if versionErr != nil {
-		return false
-	}
-
-	return true
+	return versionErr == nil
 }
 
 // IsStable checks if the input is a stable semver version
@@ -102,12 +99,12 @@ func Bump(version string, releaseType ReleaseType) (string, error) {
 	}
 
 	var buf bytes.Buffer
-	fmt.Fprintf(&buf, "%d.%d.%d", segments[0], segments[1], segments[2])
+	_, _ = fmt.Fprintf(&buf, "%d.%d.%d", segments[0], segments[1], segments[2])
 	if v.Prerelease() != "" {
-		fmt.Fprintf(&buf, "-%s", v.Prerelease())
+		_, _ = fmt.Fprintf(&buf, "-%s", v.Prerelease())
 	}
 	if v.Metadata() != "" {
-		fmt.Fprintf(&buf, "+%s", v.Metadata())
+		_, _ = fmt.Fprintf(&buf, "+%s", v.Metadata())
 	}
 
 	return buf.String(), nil

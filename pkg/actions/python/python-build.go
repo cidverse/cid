@@ -3,12 +3,13 @@ package python
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 )
 
 type BuildActionStruct struct{}
 
 // GetDetails retrieves information about the action
-func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.ActionDetails {
+func (action BuildActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
 		Name:      "python-build",
 		Version:   "0.1.0",
@@ -17,18 +18,17 @@ func (action BuildActionStruct) GetDetails(ctx api.ActionExecutionContext) api.A
 }
 
 // Check evaluates if the action should be executed or not
-func (action BuildActionStruct) Check(ctx api.ActionExecutionContext) bool {
-	return DetectPythonProject(ctx.ProjectDir)
+func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
+	return true
 }
 
 // Execute runs the action
-func (action BuildActionStruct) Execute(ctx api.ActionExecutionContext, state *api.ActionStateContext) error {
-	buildSystem := DetectPythonBuildSystem(ctx.ProjectDir)
-	if buildSystem == "requirements.txt" {
+func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+	if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemRequirementsTXT {
 		command.RunCommand(`pip install -r requirements.txt`, ctx.Env, ctx.ProjectDir)
-	} else if buildSystem == "pipenv" {
+	} else if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemPipfile {
 		command.RunCommand(`pipenv install`, ctx.Env, ctx.ProjectDir)
-	} else if buildSystem == "setup.py" {
+	} else if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemSetupPy {
 		command.RunCommand(`pip install `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
 	}
 

@@ -1,14 +1,15 @@
 package cmd
 
 import (
+	"os"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/mattn/go-colorable"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/thoas/go-funk"
-	"os"
-	"strings"
 )
 
 var (

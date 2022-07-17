@@ -2,10 +2,7 @@ package helm
 
 import (
 	"bytes"
-	"github.com/rs/zerolog/log"
-	"gopkg.in/yaml.v3"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -13,6 +10,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/rs/zerolog/log"
+	"gopkg.in/yaml.v3"
 )
 
 var netClient = &http.Client{
@@ -20,7 +20,7 @@ var netClient = &http.Client{
 }
 
 type ChartConfig struct {
-	ApiVersion  string            `yaml:"apiVersion"`
+	APIVersion  string            `yaml:"apiVersion"`
 	AppVersion  string            `yaml:"appVersion"`
 	KubeVersion string            `yaml:"kubeVersion"`
 	Version     string            `yaml:"version"`
@@ -34,7 +34,7 @@ type ChartConfig struct {
 	Maintainers []struct {
 		Name  string `yaml:"name"`
 		EMail string `yaml:"email"`
-		Url   string `yaml:"url"`
+		URL   string `yaml:"url"`
 	} `yaml:"maintainers"`
 	Dependencies []struct {
 		Name       string `yaml:"name"`
@@ -43,7 +43,8 @@ type ChartConfig struct {
 	} `yaml:"dependencies"`
 }
 
-func UploadChart(url string, username string, password string, file string) (int, []byte) {
+// UploadChart will upload the chart to a nexus repository
+func UploadChart(url string, username string, password string, file string) (responseCode int, responseContent []byte) {
 	// prepare
 	contentType, body, err := createForm(map[string]string{"file": "@" + file})
 	if err != nil {
@@ -64,7 +65,7 @@ func UploadChart(url string, username string, password string, file string) (int
 		log.Err(err).Msg("failed to upload chart")
 	}
 
-	content, err := ioutil.ReadAll(resp.Body)
+	content, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Err(err).Msg("failed to parse response")
 	}
@@ -76,7 +77,7 @@ func UploadChart(url string, username string, password string, file string) (int
 }
 
 func ParseChart(file string) *ChartConfig {
-	content, contentErr := ioutil.ReadFile(file)
+	content, contentErr := os.ReadFile(file)
 	if contentErr != nil {
 		log.Err(contentErr).Str("file", file).Msg("failed to get file content")
 		return nil
@@ -103,20 +104,20 @@ func createForm(form map[string]string) (string, io.Reader, error) {
 			if err != nil {
 				return "", nil, err
 			}
-			defer file.Close()
-			part, err := mp.CreateFormFile(key, val)
-			if err != nil {
+			defer file.Close() //nolint
+			part, partErr := mp.CreateFormFile(key, val)
+			if partErr != nil {
 				return "", nil, err
 			}
-			io.Copy(part, file)
+			_, _ = io.Copy(part, file)
 		} else {
-			mp.WriteField(key, val)
+			_ = mp.WriteField(key, val)
 		}
 	}
 	return mp.FormDataContentType(), body, nil
 }
 
 func extractNumbers(input string) string {
-	reg, _ := regexp.Compile("\\D+")
+	reg := regexp.MustCompile(`\D+`)
 	return reg.ReplaceAllString(input, "")
 }

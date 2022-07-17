@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
@@ -13,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v3"
-	"strings"
 )
 
 type InfoCommandResponse struct {
@@ -68,11 +69,6 @@ var infoCmd = &cobra.Command{
 		response.ToolConstraints = make(map[string]string)
 		for key, value := range config.Current.Dependencies {
 			response.ToolConstraints[key] = value
-		}
-
-		// workflow (omit some information
-		if funk.Contains(excludes, "plan") {
-
 		}
 
 		// tools
