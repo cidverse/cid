@@ -8,7 +8,7 @@ require (
 	github.com/cidverse/cidverseutils v0.0.0-20220318153543-78db8e6a36bd
 	github.com/cidverse/normalizeci v1.1.1-0.20220511222032-c021e3301e69
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/google/cel-go v0.9.0
+	github.com/google/cel-go v0.12.4
 	github.com/google/go-containerregistry v0.10.0
 	github.com/gosimple/slug v1.12.0
 	github.com/hashicorp/go-version v1.6.0
@@ -22,7 +22,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/thoas/go-funk v0.9.2
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
-	google.golang.org/genproto v0.0.0-20220304144024-325a89244dc8
+	google.golang.org/genproto v0.0.0-20220502173005-c8bf987b8c21
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -34,7 +34,7 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20220407094043-a94812496cf5 // indirect
 	github.com/ProtonMail/go-mime v0.0.0-20220302105931-303f85f7fe0f // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
-	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20220111164937-1b144fa7b40f // indirect
+	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20220418222510-f25a4f6275ed // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/cli v20.10.16+incompatible // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
