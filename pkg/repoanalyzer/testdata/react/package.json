@@ -16,7 +16,7 @@
     "@types/react-dom": "^16.9.8",
     "@types/react-timeago": "^4.1.2",
     "axios": "^0.21.1",
-    "json-server": "^0.16.3",
+    "json-server": "0.17.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.32",
     "react": "^17.0.1",
