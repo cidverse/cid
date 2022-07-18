@@ -11,7 +11,7 @@ require (
 	github.com/google/cel-go v0.9.0
 	github.com/google/go-containerregistry v0.10.0
 	github.com/gosimple/slug v1.12.0
-	github.com/hashicorp/go-version v1.4.0
+	github.com/hashicorp/go-version v1.6.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/mattn/go-colorable v0.1.12
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
