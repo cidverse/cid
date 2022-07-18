@@ -209,7 +209,7 @@ catalog:
       scope: project
       rules:
         - type: cel
-          expression: ENV["SONAR_TOKEN"] != ""
+          expression: ENV["SONAR_TOKEN"] != "" && NCI_COMMIT_REF_TYPE == "branch"
       access:
         env:
           - SONAR_.*

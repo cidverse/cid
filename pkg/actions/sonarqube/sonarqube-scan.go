@@ -1,8 +1,9 @@
 package sonarqube
 
 import (
-	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"strings"
+
+	"github.com/cidverse/cid/pkg/common/protectoutput"
 
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
@@ -37,11 +38,16 @@ func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, state *api.Act
 	if ctx.Env[SonarProjectKey] == "" {
 		ctx.Env[SonarProjectKey] = ctx.Env[ncispec.NCI_PROJECT_ID]
 	}
+	if ctx.Env[SonarDefaultBranch] == "" {
+		ctx.Env[SonarDefaultBranch] = "develop"
+	}
+
+	// ensure that the default branch is configured correctly
+	prepareProject(ctx.Env[SonarHostURL], ctx.Env[SonarToken], ctx.Env[SonarOrganization], ctx.Env[SonarProjectKey], ctx.Env[ncispec.NCI_PROJECT_NAME], ctx.Env[ncispec.NCI_PROJECT_DESCRIPTION], ctx.Env[SonarDefaultBranch])
 
 	// run scan
 	var scanArgs []string
 	scanArgs = append(scanArgs, `sonar-scanner`)
-
 	scanArgs = append(scanArgs, `-D sonar.host.url=`+ctx.Env[SonarHostURL])
 	scanArgs = append(scanArgs, `-D sonar.login=`+ctx.Env[SonarToken])
 	if ctx.Env[SonarOrganization] != "" {

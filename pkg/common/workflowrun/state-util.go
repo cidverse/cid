@@ -10,7 +10,7 @@ import (
 )
 
 func getState(ctx *api.ActionExecutionContext) api.ActionStateContext {
-	stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
+	stateFile := filepath.Join(ctx.Paths.Temp, "state.json")
 	state := api.ActionStateContext{
 		Version: 1,
 		Modules: ctx.Modules,
@@ -29,7 +29,7 @@ func getState(ctx *api.ActionExecutionContext) api.ActionStateContext {
 }
 
 func persistState(ctx *api.ActionExecutionContext, state api.ActionStateContext) {
-	stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
+	stateFile := filepath.Join(ctx.Paths.Temp, "state.json")
 	stateOut, err := json.Marshal(state)
 	if err != nil {
 		log.Warn().Err(err).Str("file", stateFile).Msg("failed to store state")

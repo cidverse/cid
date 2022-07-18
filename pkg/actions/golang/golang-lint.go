@@ -26,15 +26,10 @@ func (action LintActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 
 // Execute runs the action
 func (action LintActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
-	// golangci lint preset
-	configFile := filepath.Join(ctx.CurrentModule.Directory, ".golangci.yml")
-	if !filesystem.FileExists(configFile) {
-		content, _ := embeddedConfigFS.ReadFile("files/golangci-default.yml")
-		_ = filesystem.CreateFileWithContent(configFile, string(content))
-	}
-
 	// run lint
-	command.RunCommand(`golangci-lint run --sort-results --issues-exit-code 1`, ctx.Env, ctx.CurrentModule.Directory)
+	if filesystem.FileExists(filepath.Join(ctx.CurrentModule.Directory, ".golangci.yml")) || filesystem.FileExists(filepath.Join(ctx.ProjectDir, ".golangci.yml")) {
+		command.RunCommand(`golangci-lint run --sort-results --issues-exit-code 1`, ctx.Env, ctx.CurrentModule.Directory)
+	}
 
 	return nil
 }
