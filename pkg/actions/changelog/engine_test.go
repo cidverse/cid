@@ -75,8 +75,8 @@ func TestRenderGitHubReleaseTemplate(t *testing.T) {
 	output, outputErr := RenderTemplate(&templateData, template)
 	assert.NoError(t, outputErr)
 	assert.Equal(t, `## Bug Fixes
-- **core:** resolves a issue
 - **core:** resolves a different issue
+- **core:** resolves a issue
 
 ## Features
 - adds new feature
@@ -106,8 +106,8 @@ func TestRenderDiscordTemplate(t *testing.T) {
 	assert.Equal(t, `:rocket: CID - ***1.0.0*** - 2021-01-01 :rocket:
 
 **Bug Fixes**
-- **core:** resolves a issue
 - **core:** resolves a different issue
+- **core:** resolves a issue
 
 **Features**
 - adds new feature

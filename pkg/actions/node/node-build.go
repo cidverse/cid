@@ -28,10 +28,10 @@ func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 // Execute runs the action
 func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// parse package.json
-	packageConfig := ParsePackageJSON(filepath.Join(ctx.ProjectDir, `package.json`))
+	packageConfig := ParsePackageJSON(filepath.Join(ctx.CurrentModule.Directory, `package.json`))
 
 	// dependencies
-	command.RunCommand(`yarn install --frozen-lockfile --cache-folder `+api.GetCacheDir(ctx.Paths, "yarn"), ctx.Env, ctx.ProjectDir)
+	command.RunCommand(`yarn install --frozen-lockfile`, ctx.Env, ctx.ProjectDir)
 
 	// dependency specific
 	reactDependencyVersion, reactDependencyPresent := packageConfig.Dependencies[`react`]
@@ -45,7 +45,7 @@ func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *
 	buildScriptLine, buildScriptPresent := packageConfig.Scripts[`build`]
 	if buildScriptPresent {
 		log.Debug().Str("build", buildScriptLine).Msg("found build script")
-		command.RunCommand(`yarn build --cache-folder `+api.GetCacheDir(ctx.Paths, "yarn")+` `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
+		command.RunCommand(`yarn build `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
 	}
 
 	return nil
