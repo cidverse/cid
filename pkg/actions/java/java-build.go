@@ -29,18 +29,8 @@ func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 
 // Execute runs the action
 func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
-	// get release version
-	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
-
 	// run build
-	if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle {
-		command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" assemble --no-daemon --warning-mode=all --console=plain`, ctx.Env, ctx.ProjectDir)
-	} else if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven {
-		MavenWrapperSetup(ctx.ProjectDir)
-
-		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" versions:set -DnewVersion="+releaseVersion+"--batch-mode", ctx.Env, ctx.ProjectDir)
-		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" package -DskipTests=true --batch-mode", ctx.Env, ctx.ProjectDir)
-	}
+	BuildJavaProject(ctx, state, ctx.CurrentModule)
 
 	// find artifacts
 	files, _ := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".jar"})
@@ -56,4 +46,18 @@ func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *
 
 func init() {
 	api.RegisterBuiltinAction(BuildActionStruct{})
+}
+
+func BuildJavaProject(ctx *api.ActionExecutionContext, state *api.ActionStateContext, module *analyzerapi.ProjectModule) {
+	// get release version
+	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
+
+	if module.BuildSystem == analyzerapi.BuildSystemGradle {
+		command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" assemble --no-daemon --warning-mode=all --console=plain`, ctx.Env, module.Directory)
+	} else if module.BuildSystem == analyzerapi.BuildSystemMaven {
+		MavenWrapperSetup(module.Directory)
+
+		command.RunCommand(getMavenCommandPrefix(module.Directory)+" versions:set -DnewVersion="+releaseVersion+"--batch-mode", ctx.Env, module.Directory)
+		command.RunCommand(getMavenCommandPrefix(module.Directory)+" package -DskipTests=true --batch-mode", ctx.Env, module.Directory)
+	}
 }

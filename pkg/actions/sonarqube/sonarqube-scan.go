@@ -1,6 +1,8 @@
 package sonarqube
 
 import (
+	"github.com/cidverse/cid/pkg/actions/java"
+	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"strings"
 
 	"github.com/cidverse/cid/pkg/common/protectoutput"
@@ -57,6 +59,14 @@ func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, state *api.Act
 	scanArgs = append(scanArgs, `-D sonar.projectName=`+ctx.Env[ncispec.NCI_PROJECT_NAME])
 	scanArgs = append(scanArgs, `-D sonar.branch.name=`+ctx.Env[ncispec.NCI_COMMIT_REF_SLUG])
 	scanArgs = append(scanArgs, `-D sonar.sources=.`)
+
+	// analysis tasks that require compiled code
+	scanArgs = append(scanArgs, `-D sonar.java.binaries=.`)
+	for _, module := range ctx.Modules {
+		if module.BuildSystem == analyzerapi.BuildSystemGradle || module.BuildSystem == analyzerapi.BuildSystemMaven {
+			java.BuildJavaProject(ctx, state, module)
+		}
+	}
 
 	return command.RunOptionalCommand(strings.Join(scanArgs, " "), ctx.Env, ctx.ProjectDir)
 }
