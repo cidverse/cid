@@ -36,7 +36,7 @@ func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *
 	files, _ := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".jar"})
 	for _, file := range files {
 		if strings.Contains(file, filepath.Join("build", "libs")) && IsJarExecutable(file) {
-			moveErr := filesystem.MoveFile(files[0], ctx.ProjectDir+`/dist/`+filepath.Base(files[0]))
+			moveErr := filesystem.MoveFile(files[0], filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug), filepath.Base(files[0])))
 			log.Fatal().Err(moveErr).Msg("failed to move artifacts into artifact dir")
 		}
 	}
@@ -57,7 +57,7 @@ func BuildJavaProject(ctx *api.ActionExecutionContext, state *api.ActionStateCon
 	} else if module.BuildSystem == analyzerapi.BuildSystemMaven {
 		MavenWrapperSetup(module.Directory)
 
-		command.RunCommand(getMavenCommandPrefix(module.Directory)+" versions:set -DnewVersion="+releaseVersion+"--batch-mode", ctx.Env, module.Directory)
+		command.RunCommand(getMavenCommandPrefix(module.Directory)+" versions:set -DnewVersion="+releaseVersion+" --batch-mode", ctx.Env, module.Directory)
 		command.RunCommand(getMavenCommandPrefix(module.Directory)+" package -DskipTests=true --batch-mode", ctx.Env, module.Directory)
 	}
 }

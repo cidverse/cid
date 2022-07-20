@@ -36,7 +36,7 @@ func persistState(ctx *api.ActionExecutionContext, state api.ActionStateContext)
 	} else {
 		_ = filesystem.RemoveFile(stateFile)
 
-		storeErr := filesystem.SaveFileContent(stateFile, string(stateOut))
+		storeErr := filesystem.SaveFileText(stateFile, string(stateOut))
 		if storeErr != nil {
 			log.Warn().Err(storeErr).Str("file", stateFile).Msg("failed to store state")
 		}

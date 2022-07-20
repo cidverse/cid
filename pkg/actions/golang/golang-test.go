@@ -2,6 +2,7 @@ package golang
 
 import (
 	"errors"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"path/filepath"
 	"strings"
 
@@ -31,30 +32,38 @@ func (action TestActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 // Execute runs the action
 func (action TestActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// config
-	coverageFile := filepath.Join(ctx.Paths.Temp, "coverage.txt")
+	coverageFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug), "coverage.out")
+	coverageJSON := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug), "coverage.json")
 
 	// test
 	var testArgs []string
 	testArgs = append(testArgs, `go test`)
-	testArgs = append(testArgs, `-cover`)
 	testArgs = append(testArgs, `-vet off`)
+	testArgs = append(testArgs, `-cover`)
 	testArgs = append(testArgs, `-coverprofile `+coverageFile)
+	testArgs = append(testArgs, `-covermode=count`)
 	testArgs = append(testArgs, `./...`)
-	testResult := command.RunOptionalCommand(strings.Join(testArgs, " "), ctx.Env, ctx.ProjectDir)
+	testResult := command.RunOptionalCommand(strings.Join(testArgs, " "), ctx.Env, ctx.CurrentModule.Directory)
 	if testResult != nil {
 		return errors.New("go unit tests failed. Cause: " + testResult.Error())
 	}
 
 	// get report
-	covOut, covOutErr := command.RunCommandAndGetOutput("go tool cover -func "+coverageFile, ctx.Env, ctx.WorkDir)
+	covOut, covOutErr := command.RunCommandAndGetOutput("go tool cover -func "+coverageFile, ctx.Env, ctx.CurrentModule.Directory)
 	if covOutErr != nil {
 		return errors.New("failed to retrieve go coverage report. Cause: " + covOutErr.Error())
 	}
 
 	// parse report
 	report := ParseCoverageProfile(covOut)
-
 	log.Info().Float64("coverage", report.Percent).Msg("calculated final code coverage")
+
+	// json report
+	jsonOut, jsonOutErr := command.RunCommandAndGetOutput("go test -coverprofile "+coverageFile+" -covermode=count -json ./...", ctx.Env, ctx.CurrentModule.Directory)
+	if jsonOutErr != nil {
+		return errors.New("failed to retrieve go coverage report. Cause: " + covOutErr.Error())
+	}
+	_ = filesystem.SaveFileText(coverageJSON, jsonOut) //nolint:errcheck
 
 	return nil
 }

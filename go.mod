@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.4.8
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/cidverse/cidverseutils v0.0.0-20220318153543-78db8e6a36bd
+	github.com/cidverse/cidverseutils v0.0.0-20220720191048-48ded521d1ff
 	github.com/cidverse/normalizeci v1.1.1-0.20220511222032-c021e3301e69
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.12.4
@@ -75,7 +75,7 @@ require (
 	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
 	golang.org/x/oauth2 v0.0.0-20220524215830-622c5d57e401 // indirect
 	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29 // indirect
-	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 	google.golang.org/appengine v1.6.7 // indirect

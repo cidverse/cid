@@ -30,11 +30,17 @@ func (action TestActionStruct) Execute(ctx *api.ActionExecutionContext, state *a
 	// run test
 	if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle {
 		command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" test --no-daemon --warning-mode=all --console=plain`, ctx.Env, ctx.ProjectDir)
+
+		// jacoco
+		processJacocoFile(ctx, "build/reports/jacoco/test/jacocoTestReport.xml")
 	} else if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven {
 		MavenWrapperSetup(ctx.ProjectDir)
 
-		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" versions:set -DnewVersion="+releaseVersion+"--batch-mode", ctx.Env, ctx.ProjectDir)
+		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" versions:set -DnewVersion="+releaseVersion+" --batch-mode", ctx.Env, ctx.ProjectDir)
 		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" test -DskipTests=true --batch-mode", ctx.Env, ctx.ProjectDir)
+
+		// jacoco
+		processJacocoFile(ctx, "target/site/jacoco/jacoco.xml")
 	}
 
 	return nil

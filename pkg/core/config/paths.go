@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 )
@@ -14,16 +15,38 @@ type PathConfig struct {
 	Cache          string `default:""`
 }
 
+// ArtifactModule returns dist folder for a specific module
+func (c PathConfig) ArtifactModule(name string) string {
+	dir := filepath.Join(c.Artifact, name)
+
+	if !filesystem.DirectoryExists(dir) {
+		filesystem.CreateDirectory(dir)
+	}
+	return dir
+}
+
+// TempModule returns temp folder for a specific module
+func (c PathConfig) TempModule(name string) string {
+	dir := filepath.Join(c.Temp, name)
+
+	if !filesystem.DirectoryExists(dir) {
+		filesystem.CreateDirectory(dir)
+	}
+	return dir
+}
+
 // NamedCache returns the cache directory for a named cache
 func (c PathConfig) NamedCache(name string) string {
 	dir := ""
 	if len(c.Cache) > 0 {
-		dir = c.Cache + `/` + name
+		dir = filepath.Join(c.Cache, name)
 	} else {
-		dir = os.TempDir() + `/.cid/` + name
+		dir = filepath.Join(os.TempDir(), `.cid`, name)
 	}
 
-	filesystem.CreateDirectory(dir)
+	if !filesystem.DirectoryExists(dir) {
+		filesystem.CreateDirectory(dir)
+	}
 	return dir
 }
 
@@ -31,11 +54,13 @@ func (c PathConfig) NamedCache(name string) string {
 func (c PathConfig) ModuleCache(module string) string {
 	dir := ""
 	if len(c.Cache) > 0 {
-		dir = c.Cache + `/module/` + module
+		dir = filepath.Join(c.Cache, `module`, module)
 	} else {
-		dir = os.TempDir() + `/.cid/module/` + module
+		dir = filepath.Join(os.TempDir(), `.cid/module-`+module)
 	}
 
-	filesystem.CreateDirectory(dir)
+	if !filesystem.DirectoryExists(dir) {
+		filesystem.CreateDirectory(dir)
+	}
 	return dir
 }

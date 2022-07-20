@@ -72,7 +72,7 @@ func (action ChangelogGenerateStruct) Execute(ctx *api.ActionExecutionContext, s
 		targetFile := filepath.Join(targetPath, templateFile)
 		filesystem.CreateDirectory(targetPath)
 		_ = filesystem.RemoveFile(targetFile)
-		saveErr := filesystem.SaveFileContent(targetFile, output)
+		saveErr := filesystem.SaveFileText(targetFile, output)
 		if saveErr != nil {
 			return errors.New("failed to save changelog file of " + templateFile + " to " + targetPath)
 		}

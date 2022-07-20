@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const GradleCommandPrefix = `java "-Dorg.gradle.appname=gradlew" "-classpath" "gradle/wrapper/gradle-wrapper.jar" "org.gradle.wrapper.GradleWrapperMain"`
+const GradleCommandPrefix = `java --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED "-Dorg.gradle.appname=gradlew" "-classpath" "gradle/wrapper/gradle-wrapper.jar" "org.gradle.wrapper.GradleWrapperMain"`
 
 // MavenWrapperSetup makes sure that the maven wrapper is set up correctly for a maven project
 func MavenWrapperSetup(projectDirectory string) {
@@ -26,7 +26,7 @@ func MavenWrapperSetup(projectDirectory string) {
 	// check for maven wrapper properties file
 	wrapperPropertiesFile := projectDirectory + "/.mvn/wrapper/maven-wrapper.properties"
 	if !filesystem.FileExists(wrapperPropertiesFile) {
-		saveFileErr := filesystem.SaveFileContent(wrapperPropertiesFile, "distributionUrl=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/"+mavenVersion+"/apache-maven-"+mavenVersion+"-bin.zip")
+		saveFileErr := filesystem.SaveFileText(wrapperPropertiesFile, "distributionUrl=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/"+mavenVersion+"/apache-maven-"+mavenVersion+"-bin.zip")
 		if saveFileErr != nil {
 			log.Fatal().Err(saveFileErr).Str("file", wrapperPropertiesFile).Msg("failed to create file")
 		}
