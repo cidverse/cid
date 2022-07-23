@@ -16,22 +16,18 @@ type PathConfig struct {
 }
 
 // ArtifactModule returns dist folder for a specific module
-func (c PathConfig) ArtifactModule(name string) string {
-	dir := filepath.Join(c.Artifact, name)
+func (c PathConfig) ArtifactModule(dir ...string) string {
+	path := filepath.Join(c.Artifact, filepath.Join(dir...))
 
-	if !filesystem.DirectoryExists(dir) {
-		filesystem.CreateDirectory(dir)
-	}
-	return dir
+	filesystem.CreateDirectory(path)
+	return path
 }
 
 // TempModule returns temp folder for a specific module
 func (c PathConfig) TempModule(name string) string {
 	dir := filepath.Join(c.Temp, name)
 
-	if !filesystem.DirectoryExists(dir) {
-		filesystem.CreateDirectory(dir)
-	}
+	filesystem.CreateDirectory(dir)
 	return dir
 }
 

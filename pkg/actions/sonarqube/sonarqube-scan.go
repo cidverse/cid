@@ -1,7 +1,6 @@
 package sonarqube
 
 import (
-	"github.com/cidverse/cid/pkg/actions/java"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"path/filepath"
 	"strings"
@@ -69,17 +68,22 @@ func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, state *api.Act
 	var testExclusions []string
 	for _, module := range ctx.Modules {
 		if module.BuildSystem == analyzerapi.BuildSystemGradle || module.BuildSystem == analyzerapi.BuildSystemMaven {
-			java.BuildJavaProject(ctx, state, module)
+			sourceInclusion = append(sourceInclusion, "**/src/main/java/**", "**/src/main/kotlin/**")
+			testInclusion = append(testInclusion, "**/src/test/java/**", "**/src/test/kotlin/**")
+			scanArgs = append(scanArgs, `-D sonar.coverage.jacoco.xmlReportPaths=`+filepath.Join(ctx.Paths.Artifact, "**", "test", "jacoco.xml"))
 
-			scanArgs = append(scanArgs, `-D sonar.java.binaries=.`)
-			scanArgs = append(scanArgs, `-D sonar.java.libraries=`)
-			scanArgs = append(scanArgs, `-D sonar.coverage.jacoco.xmlReportPaths=`+filepath.Join(ctx.Paths.ArtifactModule(module.Slug), "jacoco.xml"))
+			if module.BuildSystem == analyzerapi.BuildSystemGradle {
+				scanArgs = append(scanArgs, `-D sonar.java.binaries=`+filepath.Join(ctx.Paths.Artifact, "**", "classes", "java", "main"))
+				scanArgs = append(scanArgs, `-D sonar.java.test.binaries=`+filepath.Join(ctx.Paths.Artifact, "**", "classes", "java", "test"))
+
+				// TODO: figure sth. out for sonar.java.libraries and sonar.java.test.libraries
+			}
 		} else if module.BuildSystem == analyzerapi.BuildSystemGoMod {
 			sourceExclusions = append(sourceExclusions, "**/*_test.go", "**/vendor/**", "**/testdata/*")
 			testInclusion = append(testInclusion, "**/*_test.go")
 			testExclusions = append(testExclusions, "**/vendor/**")
-			scanArgs = append(scanArgs, `-D sonar.go.coverage.reportPaths=`+filepath.Join(ctx.Paths.ArtifactModule(module.Slug), "coverage.out"))
-			scanArgs = append(scanArgs, `-D sonar.go.tests.reportPaths=`+filepath.Join(ctx.Paths.ArtifactModule(module.Slug), "coverage.json"))
+			scanArgs = append(scanArgs, `-D sonar.go.coverage.reportPaths=`+filepath.Join(ctx.Paths.ArtifactModule(module.Slug, "test"), "coverage.out"))
+			scanArgs = append(scanArgs, `-D sonar.go.tests.reportPaths=`+filepath.Join(ctx.Paths.ArtifactModule(module.Slug, "test"), "coverage.json"))
 		}
 	}
 	scanArgs = append(scanArgs, `-D sonar.inclusions=`+strings.Join(sourceInclusion, ","))

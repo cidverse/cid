@@ -155,7 +155,7 @@ containerimages:
       - id: twitchcli-config
         dir: /root/.twitch-cli
   # fossa
-  - image: ghcr.io/cidverse/fossacli:2.7.2
+  - image: quay.io/cidverse/fossacli:3.3.9
     provides:
       - binary: fossa
-        version: 2.7.2
+        version: 3.3.9

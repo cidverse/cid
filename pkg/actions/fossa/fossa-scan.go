@@ -1,8 +1,9 @@
-package codecov
+package fossa
 
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"strings"
 )
 
 type ScanActionStruct struct{}
@@ -10,7 +11,7 @@ type ScanActionStruct struct{}
 // GetDetails retrieves information about the action
 func (action ScanActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionDetails {
 	return api.ActionDetails{
-		Name:      "fossa-scan",
+		Name:      "fossa-source-scan",
 		Version:   "0.1.0",
 		UsedTools: []string{"fossa"},
 	}
@@ -23,11 +24,10 @@ func (action ScanActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 
 // Execute runs the action
 func (action ScanActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
-	// env
-	ctx.Env["FOSSA_API_KEY"] = ctx.Env["FOSSA_API_KEY"]
-
-	// command
-	_ = command.RunOptionalCommand("fossa analyze -o", ctx.Env, ctx.WorkDir)
+	// run scan
+	var scanArgs []string
+	scanArgs = append(scanArgs, `fossa analyze`)
+	_ = command.RunOptionalCommand(strings.Join(scanArgs, " "), ctx.Env, ctx.ProjectDir)
 
 	return nil
 }

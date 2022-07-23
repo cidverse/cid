@@ -41,12 +41,8 @@ workflows:
           - id: central/helm-lint
       - name: scan
         actions:
-          - id: central/trivy-fs-scan
-          - id: central/fossa-scan
-          - id: central/gitleaks-scan
-          - id: central/gitguardian-scan
+          - id: central/fossa-source-scan
           - id: central/sonarqube-scan
-          - id: central/dependencycheck-scan
       - name: publish
         actions:
           - id: central/repo-tag-create

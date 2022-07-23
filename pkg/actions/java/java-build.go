@@ -32,6 +32,9 @@ func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *
 	// run build
 	BuildJavaProject(ctx, state, ctx.CurrentModule)
 
+	// colelct artifacts
+	CollectGradleArtifacts(ctx, state, ctx.CurrentModule)
+
 	// find artifacts
 	files, _ := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".jar"})
 	for _, file := range files {

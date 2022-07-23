@@ -187,22 +187,28 @@ catalog:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "container" && MODULE_BUILD_SYSTEM_SYNTAX == "containerfile"
     # scanner
+    #- repository: central
+    #  name: trivy-fs-scan
+    #  type: builtin-golang
+    #  scope: project
     - repository: central
-      name: trivy-fs-scan
+      name: fossa-source-scan
       type: builtin-golang
       scope: project
-    - repository: central
-      name: fossa-scan
-      type: builtin-golang
-      scope: project
-    - repository: central
-      name: gitleaks-scan
-      type: builtin-golang
-      scope: project
-    - repository: central
-      name: gitguardian-scan
-      type: builtin-golang
-      scope: project
+      rules:
+        - type: cel
+          expression: ENV["FOSSA_API_KEY"] != "" && NCI_COMMIT_REF_TYPE == "branch"
+      access:
+        env:
+          - FOSSA_.*
+    #- repository: central
+    #  name: gitleaks-scan
+    #  type: builtin-golang
+    #  scope: project
+    #- repository: central
+    #  name: gitguardian-scan
+    #  type: builtin-golang
+    #  scope: project
     - repository: central
       name: sonarqube-scan
       type: builtin-golang
@@ -213,10 +219,10 @@ catalog:
       access:
         env:
           - SONAR_.*
-    - repository: central
-      name: dependencycheck-scan
-      type: builtin-golang
-      scope: project
+    #- repository: central
+    #  name: dependencycheck-scan
+    #  type: builtin-golang
+    #  scope: project
     # publish
     - repository: central
       name: repo-tag-create

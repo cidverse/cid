@@ -10,8 +10,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const GradleCommandPrefix = `java --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED "-Dorg.gradle.appname=gradlew" "-classpath" "gradle/wrapper/gradle-wrapper.jar" "org.gradle.wrapper.GradleWrapperMain"`
-
 // MavenWrapperSetup makes sure that the maven wrapper is set up correctly for a maven project
 func MavenWrapperSetup(projectDirectory string) {
 	mavenVersion := "3.8.1"

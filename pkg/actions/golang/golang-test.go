@@ -32,8 +32,8 @@ func (action TestActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 // Execute runs the action
 func (action TestActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// config
-	coverageFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug), "coverage.out")
-	coverageJSON := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug), "coverage.json")
+	coverageFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "test"), "coverage.out")
+	coverageJSON := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "test"), "coverage.json")
 
 	// test
 	var testArgs []string
