@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.4.8
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/cidverse/cidverseutils v0.0.0-20220720191048-48ded521d1ff
+	github.com/cidverse/cidverseutils v0.0.0-20220724174502-7db3caf8502d
 	github.com/cidverse/normalizeci v1.1.1-0.20220511222032-c021e3301e69
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.12.4

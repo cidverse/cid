@@ -159,3 +159,19 @@ containerimages:
     provides:
       - binary: fossa
         version: 3.3.9
+  # hadolint
+  - image: quay.io/cidverse/hadolint:2.10.0
+    provides:
+      - binary: hadolint
+        version: 2.10.0
+  # buildah
+  - image: quay.io/cidverse/buildah:1.26.2
+    provides:
+      - binary: buildah
+        version: 1.26.2
+      - binary: buildah-script
+        version: 1.26.2
+    security:
+      capabilities:
+        - CAP_SETGID
+        - CAP_SETUID

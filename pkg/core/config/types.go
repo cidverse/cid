@@ -5,10 +5,15 @@ type ToolBinary struct {
 	Version string `yaml:"version"`
 }
 
+type ToolSecurity struct {
+	Capabilities []string `yaml:"capabilities"`
+}
+
 type ToolContainerImage struct {
 	Provides []ToolBinary   `yaml:"provides"`
 	Image    string         `yaml:"image"`
 	Cache    []ToolCacheDir `yaml:"cache"`
+	Security ToolSecurity   `yaml:"security"`
 	User     string         `yaml:"user"`
 }
 

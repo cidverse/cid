@@ -110,9 +110,14 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 		containerExec.SetEntrypoint("unset")
 		containerExec.SetCommand(strings.Join(cmdArgs, " "))
 
+		// security
+		for _, cap := range candidate.Security.Capabilities {
+			containerExec.AddCapability(cap)
+		}
+
 		// add env + sort by key
 		sortedEnvKeys := lo.Keys(env)
-		sort.Sort(sort.StringSlice(sortedEnvKeys))
+		sort.Strings(sortedEnvKeys)
 		for _, key := range sortedEnvKeys {
 			containerExec.AddEnvironmentVariable(key, env[key])
 		}

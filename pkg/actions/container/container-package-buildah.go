@@ -129,6 +129,12 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 		command.RunCommand(strings.Join(pushArgs, " "), ctx.Env, ctx.ProjectDir)
 	} else if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript {
 		log.Info().Str("image", image).Str("script", containerFile).Msg("building container image")
+
+		var buildArgs []string
+		buildArgs = append(buildArgs, `buildah-script`)
+		buildArgs = append(buildArgs, containerFile)
+
+		command.RunCommand(strings.Join(buildArgs, " "), ctx.Env, ctx.ProjectDir)
 	}
 
 	return nil

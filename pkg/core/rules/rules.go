@@ -125,7 +125,8 @@ func evalRuleCEL(rule config.WorkflowRule, evalContext map[string]interface{}) b
 	// evaluate
 	execOut, _, execErr := prg.Eval(evalContext)
 	if execErr != nil {
-		log.Warn().Err(execErr).Msg("failed to evaluate filter rule")
+		log.Debug().Err(execErr).Str("type", string(rule.Type)).Str("expression", rule.Expression).Msg("failed to evaluate filter rule")
+		return false
 	}
 
 	// check result

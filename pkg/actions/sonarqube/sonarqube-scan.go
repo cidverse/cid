@@ -71,13 +71,8 @@ func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, state *api.Act
 			sourceInclusion = append(sourceInclusion, "**/src/main/java/**", "**/src/main/kotlin/**")
 			testInclusion = append(testInclusion, "**/src/test/java/**", "**/src/test/kotlin/**")
 			scanArgs = append(scanArgs, `-D sonar.coverage.jacoco.xmlReportPaths=`+filepath.Join(ctx.Paths.Artifact, "**", "test", "jacoco.xml"))
-
-			if module.BuildSystem == analyzerapi.BuildSystemGradle {
-				scanArgs = append(scanArgs, `-D sonar.java.binaries=`+filepath.Join(ctx.Paths.Artifact, "**", "classes", "java", "main"))
-				scanArgs = append(scanArgs, `-D sonar.java.test.binaries=`+filepath.Join(ctx.Paths.Artifact, "**", "classes", "java", "test"))
-
-				// TODO: figure sth. out for sonar.java.libraries and sonar.java.test.libraries
-			}
+			scanArgs = append(scanArgs, `-D sonar.java.binaries=.`)
+			scanArgs = append(scanArgs, `-D sonar.java.test.binaries=.`)
 		} else if module.BuildSystem == analyzerapi.BuildSystemGoMod {
 			sourceExclusions = append(sourceExclusions, "**/*_test.go", "**/vendor/**", "**/testdata/*")
 			testInclusion = append(testInclusion, "**/*_test.go")
