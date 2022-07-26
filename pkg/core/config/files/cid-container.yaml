@@ -131,11 +131,6 @@ containerimages:
     cache:
       - id: trivy-cache
         dir: /root/.cache/trivy
-  # clair
-  - image: quay.io/projectquay/clair:4.4.4
-    provides:
-      - binary: clair
-        version: 4.4.4
   # shellcheck
   - image: docker.io/koalaman/shellcheck:v0.8.0
     provides:
@@ -176,7 +171,7 @@ containerimages:
         - CAP_SETGID
         - CAP_SETUID
   # gitleaks
-  - image: zricethezav/gitleaks:v8.8.12
+  - image: quay.io/cidverse/gitleaks:8.8.12
     provides:
       - binary: gitleaks
         version: 8.8.12

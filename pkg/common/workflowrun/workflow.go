@@ -109,7 +109,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 	log.Debug().Str("action", action.ID).Msg("action start")
 	catalogAction := cfg.FindAction(action.ID)
 	ctx := api.GetActionContext(projectDir, env, &catalogAction.Access)
-	
+
 	// serialize action config for pass-thru
 	configAsYaml, _ := yaml.Marshal(&action.Config)
 	ctx.Config = string(configAsYaml)

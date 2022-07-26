@@ -43,6 +43,11 @@ func PreprocessCommits(config *Config, commits []vcsrepository.Commit) []vcsrepo
 			commit.Context["scope"] = match["scope"]
 			commit.Context["breaking"] = strconv.FormatBool(len(match["breaking"]) > 0)
 			commit.Context["subject"] = match["subject"]
+			commit.Context["author_name"] = commit.Author.Name
+			commit.Context["author_email"] = commit.Author.Email
+			commit.Context["committer_name"] = commit.Committer.Name
+			commit.Context["committer_email"] = commit.Committer.Email
+
 			break
 		}
 

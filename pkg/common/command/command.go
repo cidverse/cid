@@ -164,7 +164,7 @@ func RunSystemCommandPassThru(file string, args string, env map[string]string, w
 	cmd.Stderr = stderr
 	err := cmd.Run()
 	if err != nil {
-		log.Fatal().Str("file", file).Str("args", args).Str("error", err.Error()).Msg("command execution failed")
+		log.Debug().Err(err).Str("file", file).Str("args", args).Msg("command execution failed")
 		return err
 	}
 
