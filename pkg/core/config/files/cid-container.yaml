@@ -109,11 +109,6 @@ containerimages:
     provides:
       - binary: upx
         version: 3.95.0
-  # gitleaks
-  - image: docker.io/zricethezav/gitleaks:v8.4.0
-    provides:
-      - binary: gitleaks
-        version: 8.4.0
   # gitguardian ggshield
   - image: docker.io/gitguardian/ggshield:v1.10.8
     provides:
@@ -129,13 +124,18 @@ containerimages:
       - id: sonarscanner-cache
         dir: /opt/sonar-scanner/.sonar
   # trivy security scanner
-  - image: aquasec/trivy:0.25.4
+  - image: docker.io/aquasec/trivy:0.30.2
     provides:
       - binary: trivy
-        version: 0.25.4
+        version: 0.30.2
     cache:
       - id: trivy-cache
         dir: /root/.cache/trivy
+  # clair
+  - image: quay.io/projectquay/clair:4.4.4
+    provides:
+      - binary: clair
+        version: 4.4.4
   # shellcheck
   - image: docker.io/koalaman/shellcheck:v0.8.0
     provides:
@@ -175,3 +175,18 @@ containerimages:
       capabilities:
         - CAP_SETGID
         - CAP_SETUID
+  # gitleaks
+  - image: zricethezav/gitleaks:v8.8.12
+    provides:
+      - binary: gitleaks
+        version: 8.8.12
+  # syft
+  - image: quay.io/cidverse/syft:0.52.0
+    provides:
+      - binary: syft
+        version: 0.52.0
+  # grype
+  - image: quay.io/cidverse/grype:0.43.0
+    provides:
+      - binary: grype
+        version: 0.43.0

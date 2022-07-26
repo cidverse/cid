@@ -2,6 +2,7 @@ package container
 
 import (
 	"errors"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -45,7 +46,7 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 	}
 
 	containerFile := strings.TrimPrefix(ctx.CurrentModule.Discovery, "file~")
-	image := getFullImage(ctx.Env["NCI_CONTAINERREGISTRY_HOST"], ctx.Env["NCI_CONTAINERREGISTRY_REPOSITORY"], ctx.Env["NCI_CONTAINERREGISTRY_TAG"])
+	imageReference := getFullImage(ctx.Env["NCI_CONTAINERREGISTRY_HOST"], ctx.Env["NCI_CONTAINERREGISTRY_REPOSITORY"], ctx.Env["NCI_CONTAINERREGISTRY_TAG"])
 
 	if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerFile {
 		dockerfileContent, _ := filesystem.GetFileContent(containerFile)
@@ -53,21 +54,21 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 		platforms := getDockerfileTargetPlatforms(dockerfileContent)
 		targetImage := getDockerfileTargetImage(dockerfileContent)
 		if len(targetImage) > 0 {
-			image = targetImage
+			imageReference = targetImage
 		}
-		log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", image).Msg("building container image")
+		log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", imageReference).Msg("building container image")
 
 		// skip image generation, if image is present in remote registry
 		if !config.Rebuild {
-			_, remoteImageErr := LoadRemoteImageInformation(image)
+			_, remoteImageErr := LoadRemoteImageInformation(imageReference)
 			if remoteImageErr == nil {
-				log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", image).Str("cause", "present_in_remote").Msg("skipping container image build")
+				log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", imageReference).Str("cause", "present_in_remote").Msg("skipping container image build")
 				return nil
 			}
 		}
 
 		// old manifest needs to be deleted first if it was present
-		command.RunCommand(`buildah manifest rm `+image+` > /dev/null 2>&1 || return 0`, ctx.Env, ctx.ProjectDir)
+		command.RunCommand(`buildah manifest rm `+imageReference+` > /dev/null 2>&1 || return 0`, ctx.Env, ctx.ProjectDir)
 
 		// build each image and add to manifest
 		for _, platform := range platforms {
@@ -86,9 +87,9 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 
 			// manifest creation for multi-platform images
 			if len(platforms) > 1 {
-				buildArgs = append(buildArgs, `--manifest `+image)
+				buildArgs = append(buildArgs, `--manifest `+imageReference)
 			} else {
-				buildArgs = append(buildArgs, `-t `+image)
+				buildArgs = append(buildArgs, `-t `+imageReference)
 			}
 
 			// download cache
@@ -114,28 +115,28 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 			}
 
 			buildArgs = append(buildArgs, ctx.CurrentModule.Directory)
-
 			command.RunCommand(strings.Join(buildArgs, " "), ctx.Env, ctx.ProjectDir)
-		}
 
-		// push image (sign image if possible)
-		var pushArgs []string
-		pushArgs = append(pushArgs, `buildah push`)
-
-		if len(platforms) > 1 {
-			pushArgs = append(pushArgs, `--all`)
+			// store result
+			containerArchiveFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), platform.OS+"_"+platform.Arch+".tar")
+			command.RunCommand("podman save --format oci-archive -o "+containerArchiveFile+" "+imageReference, ctx.Env, ctx.ProjectDir)
 		}
-		pushArgs = append(pushArgs, image)
-		command.RunCommand(strings.Join(pushArgs, " "), ctx.Env, ctx.ProjectDir)
 	} else if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript {
-		log.Info().Str("image", image).Str("script", containerFile).Msg("building container image")
+		log.Info().Str("image", imageReference).Str("script", containerFile).Msg("building container image")
 
+		// build
 		var buildArgs []string
 		buildArgs = append(buildArgs, `buildah-script`)
 		buildArgs = append(buildArgs, containerFile)
-
 		command.RunCommand(strings.Join(buildArgs, " "), ctx.Env, ctx.ProjectDir)
+
+		// store result
+		containerArchiveFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), "container.tar")
+		command.RunCommand("podman save --format oci-archive -o "+containerArchiveFile+" "+imageReference, ctx.Env, ctx.ProjectDir)
 	}
+
+	// store image ref
+	_ = filesystem.SaveFileText(filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), "image.txt"), imageReference)
 
 	return nil
 }

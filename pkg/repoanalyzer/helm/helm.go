@@ -13,8 +13,8 @@ func (a Analyzer) GetName() string {
 	return "helm"
 }
 
-func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.ProjectModule {
-	var result []*analyzerapi.ProjectModule
+func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.ProjectModule {
+	var result []analyzerapi.ProjectModule
 
 	for _, file := range ctx.FilesByExtension["yaml"] {
 		filename := filepath.Base(file)
@@ -35,7 +35,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 				Files:             ctx.Files,
 				FilesByExtension:  ctx.FilesByExtension,
 			}
-			analyzerapi.AddModuleToResult(&result, &module)
+			analyzerapi.AddModuleToResult(&result, module)
 		}
 	}
 

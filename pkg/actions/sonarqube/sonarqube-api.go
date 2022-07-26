@@ -7,7 +7,6 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-// Create a Resty Client
 var apiClient = resty.New()
 
 func init() {

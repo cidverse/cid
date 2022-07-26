@@ -25,7 +25,7 @@ func (action ChangelogGenerateStruct) GetDetails(ctx *api.ActionExecutionContext
 
 // Check evaluates if the action should be executed or not
 func (action ChangelogGenerateStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return ctx.Env["NCI_COMMIT_REF_TYPE"] == "tag"
+	return true
 }
 
 // Execute runs the action
@@ -67,17 +67,15 @@ func (action ChangelogGenerateStruct) Execute(ctx *api.ActionExecutionContext, s
 			return errors.New("failed to render template " + templateFile)
 		}
 
-		// save into tmp file
-		targetPath := filepath.Join(ctx.Paths.Artifact, "changelog")
-		targetFile := filepath.Join(targetPath, templateFile)
-		filesystem.CreateDirectory(targetPath)
-		_ = filesystem.RemoveFile(targetFile)
+		// savet to file
+		filesystem.CreateDirectory(filepath.Join(ctx.Paths.Artifact, "generated", "changelog"))
+		targetFile := filepath.Join(ctx.Paths.Artifact, "generated", "changelog", templateFile)
 		saveErr := filesystem.SaveFileText(targetFile, output)
 		if saveErr != nil {
-			return errors.New("failed to save changelog file of " + templateFile + " to " + targetPath)
+			return errors.New("failed to save changelog file of " + templateFile + " to " + targetFile)
 		}
 
-		log.Info().Str("template", templateFile).Str("output-file", targetPath).Msg("rendered changelog template successfully")
+		log.Info().Str("template", templateFile).Str("output-file", targetFile).Msg("rendered changelog template successfully")
 	}
 
 	return nil

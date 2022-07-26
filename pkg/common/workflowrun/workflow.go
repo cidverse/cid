@@ -108,8 +108,8 @@ func RunWorkflowStage(cfg *config.CIDConfig, stage *config.WorkflowStage, env ma
 func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env map[string]string, projectDir string, modulesFilter []string) {
 	log.Debug().Str("action", action.ID).Msg("action start")
 	catalogAction := cfg.FindAction(action.ID)
-	ctx := api.GetActionContext(projectDir, env, nil, &catalogAction.Access)
-
+	ctx := api.GetActionContext(projectDir, env, &catalogAction.Access)
+	
 	// serialize action config for pass-thru
 	configAsYaml, _ := yaml.Marshal(&action.Config)
 	ctx.Config = string(configAsYaml)
@@ -127,9 +127,8 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 	// module-scoped actions
 	if catalogAction.Scope == config.ActionScopeModule {
 		// for each module
-		for _, module := range ctx.Modules {
-			moduleRef := *module
-			log.Trace().Str("action", action.ID).Msg("action start")
+		for _, m := range ctx.Modules { //nolint:gocritic
+			moduleRef := m
 
 			// customize context
 			ctx.CurrentModule = &moduleRef
@@ -137,10 +136,11 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 
 			// check module filter
 			if len(modulesFilter) > 0 && !funk.Contains(modulesFilter, moduleRef.Name) {
+				log.Trace().Str("action", action.ID).Str("module", moduleRef.Slug).Strs("filter", modulesFilter).Msg("action skipped by module filter")
 				continue
 			}
 
-			ruleContext := rules.GetModuleRuleContext(ctx.Env, &moduleRef)
+			var ruleContext = rules.GetModuleRuleContext(ctx.Env, &moduleRef)
 			ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
 			log.Debug().Str("action", action.ID).Str("module", moduleRef.Name).Bool("rules_match", ruleMatch).Msg("check action rules")
 			if ruleMatch {

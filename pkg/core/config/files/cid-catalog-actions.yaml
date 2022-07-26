@@ -186,6 +186,13 @@ catalog:
       rules:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "container" && MODULE_BUILD_SYSTEM_SYNTAX == "containerfile"
+    - repository: central
+      name: container-publish
+      type: builtin-golang
+      scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "container" && (MODULE_BUILD_SYSTEM_SYNTAX == "buildah-script" || MODULE_BUILD_SYSTEM_SYNTAX == "containerfile")
     # scanner
     #- repository: central
     #  name: trivy-fs-scan

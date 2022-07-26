@@ -13,8 +13,8 @@ func (a Analyzer) GetName() string {
 	return "gradle"
 }
 
-func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.ProjectModule {
-	var result []*analyzerapi.ProjectModule
+func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.ProjectModule {
+	var result []analyzerapi.ProjectModule
 
 	for _, file := range ctx.Files {
 		filename := filepath.Base(file)
@@ -51,7 +51,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 			Files:             ctx.Files,
 			FilesByExtension:  ctx.FilesByExtension,
 		}
-		analyzerapi.AddModuleToResult(&result, &module)
+		analyzerapi.AddModuleToResult(&result, module)
 	}
 
 	return result

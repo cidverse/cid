@@ -1,6 +1,7 @@
 package repoanalyzer
 
 import (
+	"github.com/thoas/go-funk"
 	"strings"
 	"time"
 
@@ -13,15 +14,14 @@ import (
 	"github.com/cidverse/cid/pkg/repoanalyzer/node"
 	"github.com/cidverse/cid/pkg/repoanalyzer/python"
 	"github.com/rs/zerolog/log"
-	"github.com/thoas/go-funk"
 )
 
-var analyzerCache = make(map[string][]*analyzerapi.ProjectModule)
+var analyzerCache = make(map[string][]analyzerapi.ProjectModule)
 
 // AnalyzeProject will analyze a project and return all modules in path
-func AnalyzeProject(projectDir string, path string) []*analyzerapi.ProjectModule {
+func AnalyzeProject(projectDir string, path string) []analyzerapi.ProjectModule {
 	if funk.Contains(analyzerCache, path) {
-		return analyzerCache[path]
+		return getCopyOf(analyzerCache[path])
 	}
 
 	if len(analyzerapi.Analyzers) == 0 {
@@ -35,29 +35,38 @@ func AnalyzeProject(projectDir string, path string) []*analyzerapi.ProjectModule
 	ctx := analyzerapi.GetAnalyzerContext(projectDir)
 
 	// run
-	var result []*analyzerapi.ProjectModule
+	var allModules []analyzerapi.ProjectModule
 	for _, a := range analyzerapi.Analyzers {
 		log.Debug().Str("name", a.GetName()).Msg("repo analyzer run")
 		modules := a.Analyze(ctx)
-		for _, module := range modules {
+		for _, module := range modules { //nolint:gocritic
 			if strings.HasPrefix(module.Directory, path) && !strings.Contains(module.Directory, "testdata") {
-				result = append(result, module)
+				allModules = append(allModules, module)
 			}
 		}
 	}
 
-	log.Info().Int("module_count", len(result)).Str("duration", time.Since(start).String()).Int("file_count", len(ctx.Files)).Msg("repo analyzer complete")
+	log.Info().Int("module_count", len(allModules)).Str("duration", time.Since(start).String()).Int("file_count", len(ctx.Files)).Msg("repo analyzer complete")
 
-	analyzerCache[projectDir] = result
+	analyzerCache[projectDir] = allModules
+	return getCopyOf(allModules)
+}
+
+func getCopyOf(modules []analyzerapi.ProjectModule) []analyzerapi.ProjectModule {
+	result := make([]analyzerapi.ProjectModule, len(modules))
+	copy(result, modules)
+
 	return result
 }
 
 func initAnalyzers() {
-	analyzerapi.Analyzers = append(analyzerapi.Analyzers, container.Analyzer{})
-	analyzerapi.Analyzers = append(analyzerapi.Analyzers, gomod.Analyzer{})
-	analyzerapi.Analyzers = append(analyzerapi.Analyzers, gradle.Analyzer{})
-	analyzerapi.Analyzers = append(analyzerapi.Analyzers, helm.Analyzer{})
-	analyzerapi.Analyzers = append(analyzerapi.Analyzers, hugo.Analyzer{})
-	analyzerapi.Analyzers = append(analyzerapi.Analyzers, node.Analyzer{})
-	analyzerapi.Analyzers = append(analyzerapi.Analyzers, python.Analyzer{})
+	analyzerapi.Analyzers = append(analyzerapi.Analyzers,
+		container.Analyzer{},
+		gomod.Analyzer{},
+		gradle.Analyzer{},
+		helm.Analyzer{},
+		hugo.Analyzer{},
+		node.Analyzer{},
+		python.Analyzer{},
+	)
 }

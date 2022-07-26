@@ -16,8 +16,8 @@ func (a Analyzer) GetName() string {
 	return "container"
 }
 
-func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.ProjectModule {
-	var result []*analyzerapi.ProjectModule
+func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.ProjectModule {
+	var result []analyzerapi.ProjectModule
 
 	// dockerfile
 	for _, file := range ctx.FilesWithoutExtension {
@@ -38,7 +38,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 				Files:             ctx.Files,
 				FilesByExtension:  ctx.FilesByExtension,
 			}
-			analyzerapi.AddModuleToResult(&result, &module)
+			analyzerapi.AddModuleToResult(&result, module)
 		}
 	}
 
@@ -66,7 +66,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 					Files:             ctx.Files,
 					FilesByExtension:  ctx.FilesByExtension,
 				}
-				analyzerapi.AddModuleToResult(&result, &module)
+				analyzerapi.AddModuleToResult(&result, module)
 			} else if contentErr != nil {
 				log.Warn().Str("file", file).Msg("failed to read file content")
 			}

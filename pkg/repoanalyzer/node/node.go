@@ -14,8 +14,8 @@ func (a Analyzer) GetName() string {
 	return "node"
 }
 
-func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.ProjectModule {
-	var result []*analyzerapi.ProjectModule
+func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.ProjectModule {
+	var result []analyzerapi.ProjectModule
 
 	// iterate
 	for _, file := range ctx.FilesByExtension["json"] {
@@ -65,12 +65,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.Projec
 				FilesByExtension:  ctx.FilesByExtension,
 			}
 
-			parent := analyzerapi.FindParentModule(result, &module)
-			if parent != nil {
-				parent.Submodules = append(parent.Submodules, &module)
-			} else {
-				result = append(result, &module)
-			}
+			analyzerapi.AddModuleToResult(&result, module)
 		} else {
 			continue
 		}

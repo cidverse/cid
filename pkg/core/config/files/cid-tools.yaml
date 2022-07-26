@@ -56,6 +56,11 @@ localtools:
     lookup:
       - key: PATH
         version: 0.0.0
+  # podman
+  - binary: ["podman"]
+    lookup:
+      - key: PATH
+        version: 0.0.0
   # git
   - binary: ["git"]
     lookup:

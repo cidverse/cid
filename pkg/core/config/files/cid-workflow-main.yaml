@@ -43,15 +43,15 @@ workflows:
         actions:
           - id: central/fossa-source-scan
           - id: central/sonarqube-scan
-      - name: publish
+      - name: report
         actions:
-          - id: central/repo-tag-create
+          - id: central/syft-container-sbom
           - id: central/repo-changelog-generate
             config:
               # changelog generator configuration
               templates:
-                - github-release.tmpl
-                - discord-release.tmpl
+                - github.changelog
+                - discord.changelog
               commit_pattern:
                 - (?P<type>[A-Za-z]+)((?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?)(:\s?(?P<subject>.*))?
               title_maps:
@@ -70,6 +70,10 @@ workflows:
                   title: Notes
                 - keyword: BREAKING CHANGE
                   title: Breaking Changes
-          - id: central/repo-release-github
-          - id: central/java-publish
+      - name: publish
+        actions:
+          - id: central/container-publish
+          #- id: central/repo-tag-create
+          #- id: central/repo-release-github
+          #- id: central/java-publish
           - id: central/helm-publish-nexus
