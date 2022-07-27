@@ -46,6 +46,7 @@ workflows:
       - name: report
         actions:
           - id: central/syft-container-sbom
+          - id: central/grype-scan-sbom
           - id: central/repo-changelog-generate
             config:
               # changelog generator configuration

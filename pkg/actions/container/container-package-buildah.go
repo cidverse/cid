@@ -52,10 +52,7 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 		dockerfileContent, _ := filesystem.GetFileContent(containerFile)
 		syntax := getDockerfileSyntax(dockerfileContent)
 		platforms := getDockerfileTargetPlatforms(dockerfileContent)
-		targetImage := getDockerfileTargetImage(dockerfileContent)
-		if len(targetImage) > 0 {
-			imageReference = targetImage
-		}
+		imageReference := getDockerfileTargetImage(dockerfileContent, imageReference)
 		log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", imageReference).Msg("building container image")
 
 		// skip image generation, if image is present in remote registry
@@ -67,15 +64,13 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 			}
 		}
 
-		// old manifest needs to be deleted first if it was present
-		command.RunCommand(`buildah manifest rm `+imageReference+` > /dev/null 2>&1 || return 0`, ctx.Env, ctx.ProjectDir)
-
 		// build each image and add to manifest
 		for _, platform := range platforms {
 			var buildArgs []string
 			buildArgs = append(buildArgs, `buildah bud`)
 			buildArgs = append(buildArgs, `--os `+platform.OS)
 			buildArgs = append(buildArgs, `--arch `+platform.Arch)
+			buildArgs = append(buildArgs, `-t `+imageReference)
 
 			// options
 			if config.NoCache {
@@ -83,13 +78,6 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 			}
 			if config.Squash {
 				buildArgs = append(buildArgs, `--squash`) // squash, excluding the base layer
-			}
-
-			// manifest creation for multi-platform images
-			if len(platforms) > 1 {
-				buildArgs = append(buildArgs, `--manifest `+imageReference)
-			} else {
-				buildArgs = append(buildArgs, `-t `+imageReference)
 			}
 
 			// download cache
@@ -119,20 +107,30 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 
 			// store result
 			containerArchiveFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), platform.OS+"_"+platform.Arch+".tar")
-			command.RunCommand("podman save --format oci-archive -o "+containerArchiveFile+" "+imageReference, ctx.Env, ctx.ProjectDir)
+			command.RunCommand("buildah push "+imageReference+" oci-archive:"+containerArchiveFile, ctx.Env, ctx.ProjectDir)
 		}
 	} else if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript {
-		log.Info().Str("image", imageReference).Str("script", containerFile).Msg("building container image")
+		buildahScriptContent, _ := filesystem.GetFileContent(containerFile)
+		platforms := getDockerfileTargetPlatforms(buildahScriptContent)
+		imageReference = getDockerfileTargetImage(buildahScriptContent, imageReference)
+		log.Info().Interface("platforms", platforms).Str("image", imageReference).Msg("building container image")
 
-		// build
-		var buildArgs []string
-		buildArgs = append(buildArgs, `buildah-script`)
-		buildArgs = append(buildArgs, containerFile)
-		command.RunCommand(strings.Join(buildArgs, " "), ctx.Env, ctx.ProjectDir)
+		// build each image and add to manifest
+		for _, platform := range platforms {
+			// build
+			var buildArgs []string
+			buildArgs = append(buildArgs, `buildah-script`)
+			buildArgs = append(buildArgs, containerFile)
+			ctx.Env["TARGETIMAGE"] = imageReference
+			ctx.Env["TARGETPLATFORM"] = platform.OS + `/` + platform.Arch
+			ctx.Env["TARGETOS"] = platform.OS
+			ctx.Env["TARGETARCH"] = platform.Arch
+			command.RunCommand(strings.Join(buildArgs, " "), ctx.Env, ctx.ProjectDir)
 
-		// store result
-		containerArchiveFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), "container.tar")
-		command.RunCommand("podman save --format oci-archive -o "+containerArchiveFile+" "+imageReference, ctx.Env, ctx.ProjectDir)
+			// store result
+			containerArchiveFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), platform.OS+"_"+platform.Arch+".tar")
+			command.RunCommand("buildah push "+imageReference+" oci-archive:"+containerArchiveFile, ctx.Env, ctx.ProjectDir)
+		}
 	}
 
 	// store image ref

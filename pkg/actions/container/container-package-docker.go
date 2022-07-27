@@ -37,7 +37,7 @@ func (action DockerPackageActionStruct) Execute(ctx *api.ActionExecutionContext,
 
 		syntax := getDockerfileSyntax(dockerfileContent)
 		platforms := getDockerfileTargetPlatforms(dockerfileContent)
-		targetImage := getDockerfileTargetImage(dockerfileContent)
+		targetImage := getDockerfileTargetImage(dockerfileContent, image)
 		if len(targetImage) > 0 {
 			image = targetImage
 		}

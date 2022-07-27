@@ -236,6 +236,16 @@ catalog:
       access:
         env:
           - SYFT_.*
+    - repository: central
+      name: grype-scan-sbom
+      type: builtin-golang
+      scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "container" && NCI_COMMIT_REF_TYPE == "branch"
+      access:
+        env:
+          - GRYPE_.*
     #- repository: central
     #  name: dependencycheck-scan
     #  type: builtin-golang

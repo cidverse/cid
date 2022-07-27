@@ -181,7 +181,15 @@ containerimages:
       - binary: syft
         version: 0.52.0
   # grype
-  - image: quay.io/cidverse/grype:0.43.0
+  - image: quay.io/cidverse/grype:0.44.0
     provides:
       - binary: grype
-        version: 0.43.0
+        version: 0.44.0
+    cache:
+      - id: grype-cache
+        dir: /app/.cache/grype
+  # cosign
+  - image: quay.io/cidverse/cosign:1.9.0
+    provides:
+      - binary: cosign
+        version: 1.9.0

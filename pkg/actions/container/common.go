@@ -77,7 +77,7 @@ func getDockerfileTargetPlatforms(dockerfileContent string) []Platform {
 	return platforms
 }
 
-func getDockerfileTargetImage(dockerfileContent string) string {
+func getDockerfileTargetImage(dockerfileContent string, suggestedName string) string {
 	image := ""
 	for _, line := range strings.Split(strings.TrimSuffix(dockerfileContent, "\n"), "\n") {
 		if strings.HasPrefix(line, "# image=") {
@@ -93,6 +93,10 @@ func getDockerfileTargetImage(dockerfileContent string) string {
 				break
 			}
 		}
+	}
+
+	if image == "" {
+		return suggestedName
 	}
 
 	return image

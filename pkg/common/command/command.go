@@ -125,7 +125,8 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 		// cache
 		for _, c := range candidate.ImageCache {
 			cacheDir := path.Join(os.TempDir(), "cid", c.ID)
-			_ = os.MkdirAll(cacheDir, os.ModePerm)
+			_ = os.MkdirAll(cacheDir, 0777)
+			_ = os.Chmod(cacheDir, 0777)
 
 			// support mounting volumes (auto created if not present) or directories
 			if c.MountType == "volume" {
