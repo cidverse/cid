@@ -30,9 +30,10 @@ func (action PublishActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 // Execute runs the action
 func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// target image reference
-	imageRef, imageRefErr := filesystem.GetFileContent(filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), "image.txt"))
+	imageRefFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), "image.txt")
+	imageRef, imageRefErr := filesystem.GetFileContent(imageRefFile)
 	if imageRefErr != nil {
-		return errors.New("failed to parse image reference from " + filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), "image.txt"))
+		return errors.New("failed to parse image reference from " + imageRefFile)
 	}
 
 	// for each container archive

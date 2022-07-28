@@ -14,8 +14,18 @@ import (
 var DockerfileFS embed.FS
 
 type Platform struct {
-	OS   string
-	Arch string
+	OS      string
+	Arch    string
+	Variant string
+}
+
+// Platform returns the platform string (linux/amd64, linux/arm64/v8, ...)
+func (p Platform) Platform(separator string) string {
+	if p.Variant == "" {
+		return p.OS + separator + p.Arch
+	}
+
+	return p.OS + separator + p.Arch + separator + p.Variant
 }
 
 // DetectAppType checks what kind of app the project is (via artifacts, should run after build actions)
@@ -62,7 +72,9 @@ func getDockerfileTargetPlatforms(dockerfileContent string) []Platform {
 				elementSections := strings.Split(element, "/")
 
 				if len(elementSections) == 2 {
-					platforms = append(platforms, Platform{strings.ToLower(elementSections[0]), strings.ToLower(elementSections[1])})
+					platforms = append(platforms, Platform{strings.ToLower(elementSections[0]), strings.ToLower(elementSections[1]), ""})
+				} else if len(elementSections) == 3 {
+					platforms = append(platforms, Platform{strings.ToLower(elementSections[0]), strings.ToLower(elementSections[1]), strings.ToLower(elementSections[2])})
 				} else {
 					log.Warn().Str("platform", element).Msg("skipping invalid platform definition from dockerfile")
 				}
@@ -71,7 +83,7 @@ func getDockerfileTargetPlatforms(dockerfileContent string) []Platform {
 	}
 
 	if len(platforms) == 0 {
-		platforms = append(platforms, Platform{"linux", "amd64"})
+		platforms = append(platforms, Platform{"linux", "amd64", ""})
 	}
 
 	return platforms

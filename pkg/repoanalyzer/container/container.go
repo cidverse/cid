@@ -20,10 +20,10 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 	var result []analyzerapi.ProjectModule
 
 	// dockerfile
-	for _, file := range ctx.FilesWithoutExtension {
+	for _, file := range ctx.Files {
 		filename := filepath.Base(file)
 
-		if filename == "Dockerfile" || filename == "Containerfile" {
+		if filename == "Dockerfile" || filename == "Containerfile" || strings.HasSuffix(filename, ".Dockerfile") || strings.HasSuffix(filename, ".Containerfile") {
 			module := analyzerapi.ProjectModule{
 				RootDirectory:     ctx.ProjectDir,
 				Directory:         filepath.Dir(file),
