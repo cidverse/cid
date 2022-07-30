@@ -6,7 +6,6 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/core/version"
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/gosimple/slug"
 	"github.com/rs/zerolog/log"
 )
@@ -24,7 +23,7 @@ func (action BuildActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.
 
 // Check evaluates if the action should be executed or not
 func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemHelm
+	return true
 }
 
 // Execute runs the action

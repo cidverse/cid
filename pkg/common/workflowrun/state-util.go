@@ -9,22 +9,23 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func getState(ctx *api.ActionExecutionContext) api.ActionStateContext {
-	stateFile := filepath.Join(ctx.Paths.Temp, "state.json")
+func getState(ctx api.ActionExecutionContext) api.ActionStateContext { //nolint:gocritic
 	state := api.ActionStateContext{
 		Version: 1,
 		Modules: ctx.Modules,
 	}
-	if filesystem.FileExists(stateFile) {
-		stateContent, stateContentErr := filesystem.GetFileContent(stateFile)
-		if stateContentErr == nil {
-			err := json.Unmarshal([]byte(stateContent), &state)
-			if err != nil {
-				log.Debug().Err(err).Str("file", stateFile).Msg("failed to restore state")
+	/*
+		stateFile := filepath.Join(ctx.Paths.Temp, "state.json")
+		if filesystem.FileExists(stateFile) {
+			stateContent, stateContentErr := filesystem.GetFileContent(stateFile)
+			if stateContentErr == nil {
+				err := json.Unmarshal([]byte(stateContent), &state)
+				if err != nil {
+					log.Debug().Err(err).Str("file", stateFile).Msg("failed to restore state")
+				}
 			}
 		}
-	}
-
+	*/
 	return state
 }
 

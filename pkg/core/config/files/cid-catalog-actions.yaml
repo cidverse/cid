@@ -140,7 +140,7 @@ catalog:
       scope: module
       rules:
         - type: cel
-          expression: MODULE_BUILD_SYSTEM == "helm"
+          expression: MODULE_BUILD_SYSTEM == "helm" && ENV["HELM_NEXUS_URL"] != ""
     # hugo
     - repository: central
       name: hugo-run

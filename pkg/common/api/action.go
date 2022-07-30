@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/core/config"
-	"github.com/cidverse/cid/pkg/repoanalyzer"
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/common"
@@ -60,12 +59,12 @@ type ActionExecutionContext struct {
 	Modules []analyzerapi.ProjectModule
 
 	// CurrentModule contains the module that is currently being build
-	CurrentModule *analyzerapi.ProjectModule
+	CurrentModule analyzerapi.ProjectModule
 }
 
 // UpdateContext will update the context
 func UpdateContext(ctx *ActionExecutionContext) {
-	if ctx.CurrentModule != nil {
+	if ctx.CurrentModule.Slug != "" {
 		ctx.Paths = config.PathConfig{
 			Artifact:       filepath.Join(ctx.ProjectDir, ".dist"),
 			ModuleArtifact: filepath.Join(ctx.ProjectDir, ".dist", ctx.CurrentModule.Slug),
@@ -105,7 +104,7 @@ func RegisterBuiltinAction(action ActionStep) {
 }
 
 // GetActionContext gets the action context, this operation is expensive and should only be called once per execution
-func GetActionContext(projectDir string, env map[string]string, access *config.ActionAccess) ActionExecutionContext {
+func GetActionContext(modules []analyzerapi.ProjectModule, projectDir string, env map[string]string, access *config.ActionAccess) ActionExecutionContext {
 	finalEnv := make(map[string]string)
 	fullEnv := lo.Assign(env, common.GetMachineEnvironment())
 
@@ -138,8 +137,8 @@ func GetActionContext(projectDir string, env map[string]string, access *config.A
 		Args:            nil,
 		Env:             finalEnv,
 		Parallelization: DefaultParallelization,
-		Modules:         repoanalyzer.AnalyzeProject(projectDir, filesystem.GetWorkingDirectory()),
-		CurrentModule:   nil,
+		Modules:         modules,
+		CurrentModule:   analyzerapi.ProjectModule{},
 	}
 }
 

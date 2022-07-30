@@ -55,7 +55,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 				Directory:         filepath.Dir(file),
 				Name:              packageData.Name,
 				Slug:              slug.Make(packageData.Name),
-				Discovery:         "file~" + file,
+				Discovery:         []string{"file~" + file},
 				BuildSystem:       analyzerapi.BuildSystemNpm,
 				BuildSystemSyntax: analyzerapi.BuildSystemSyntaxDefault,
 				Language:          language,

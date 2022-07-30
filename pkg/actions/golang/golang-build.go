@@ -7,7 +7,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 	"github.com/shomali11/parallelizer"
 	"gopkg.in/yaml.v2"
@@ -27,7 +26,7 @@ func (action BuildActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.
 
 // Check evaluates if the action should be executed or not
 func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGoMod
+	return true
 }
 
 // Execute runs the action

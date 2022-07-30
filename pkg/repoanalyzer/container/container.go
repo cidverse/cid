@@ -1,6 +1,7 @@
 package container
 
 import (
+	"golang.org/x/exp/slices"
 	"path/filepath"
 	"strings"
 
@@ -24,21 +25,29 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 		filename := filepath.Base(file)
 
 		if filename == "Dockerfile" || filename == "Containerfile" || strings.HasSuffix(filename, ".Dockerfile") || strings.HasSuffix(filename, ".Containerfile") {
-			module := analyzerapi.ProjectModule{
-				RootDirectory:     ctx.ProjectDir,
-				Directory:         filepath.Dir(file),
-				Name:              filepath.Base(filepath.Dir(file)),
-				Slug:              slug.Make(filepath.Base(filepath.Dir(file))),
-				Discovery:         "file~" + file,
-				BuildSystem:       analyzerapi.BuildSystemContainer,
-				BuildSystemSyntax: analyzerapi.ContainerFile,
-				Language:          nil,
-				Dependencies:      nil,
-				Submodules:        nil,
-				Files:             ctx.Files,
-				FilesByExtension:  ctx.FilesByExtension,
+			// add new module or append file to existing module
+			moduleIdx := slices.IndexFunc(result, func(m analyzerapi.ProjectModule) bool {
+				return m.Name == filepath.Base(filepath.Dir(file)) && m.BuildSystem == analyzerapi.BuildSystemContainer && m.BuildSystemSyntax == analyzerapi.ContainerFile
+			})
+			if moduleIdx == -1 {
+				module := analyzerapi.ProjectModule{
+					RootDirectory:     ctx.ProjectDir,
+					Directory:         filepath.Dir(file),
+					Name:              filepath.Base(filepath.Dir(file)),
+					Slug:              slug.Make(filepath.Base(filepath.Dir(file))),
+					Discovery:         []string{"file~" + file},
+					BuildSystem:       analyzerapi.BuildSystemContainer,
+					BuildSystemSyntax: analyzerapi.ContainerFile,
+					Language:          nil,
+					Dependencies:      nil,
+					Submodules:        nil,
+					Files:             ctx.Files,
+					FilesByExtension:  ctx.FilesByExtension,
+				}
+				analyzerapi.AddModuleToResult(&result, module)
+			} else {
+				result[moduleIdx].Discovery = append(result[moduleIdx].Discovery, "file~"+file)
 			}
-			analyzerapi.AddModuleToResult(&result, module)
 		}
 	}
 
@@ -57,7 +66,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 					Directory:         filepath.Dir(file),
 					Name:              filepath.Base(filepath.Dir(file)),
 					Slug:              slug.Make(filepath.Base(filepath.Dir(file))),
-					Discovery:         "file~" + file,
+					Discovery:         []string{"file~" + file},
 					BuildSystem:       analyzerapi.BuildSystemContainer,
 					BuildSystemSyntax: analyzerapi.ContainerBuildahScript,
 					Language:          nil,

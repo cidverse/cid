@@ -45,92 +45,94 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 		return errors.New("failed to parse action configuration")
 	}
 
-	containerFile := strings.TrimPrefix(ctx.CurrentModule.Discovery, "file~")
 	imageReference := getFullImage(ctx.Env["NCI_CONTAINERREGISTRY_HOST"], ctx.Env["NCI_CONTAINERREGISTRY_REPOSITORY"], ctx.Env["NCI_CONTAINERREGISTRY_TAG"])
+	for _, discovery := range ctx.CurrentModule.Discovery {
+		containerFile := strings.TrimPrefix(discovery, "file~")
 
-	if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerFile {
-		dockerfileContent, _ := filesystem.GetFileContent(containerFile)
-		syntax := getDockerfileSyntax(dockerfileContent)
-		platforms := getDockerfileTargetPlatforms(dockerfileContent)
-		imageReference = getDockerfileTargetImage(dockerfileContent, imageReference)
-		log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", imageReference).Msg("building container image")
+		if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerFile {
+			dockerfileContent, _ := filesystem.GetFileContent(containerFile)
+			syntax := getDockerfileSyntax(dockerfileContent)
+			platforms := getDockerfileTargetPlatforms(dockerfileContent)
+			imageReference = getDockerfileTargetImage(dockerfileContent, imageReference)
+			log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", imageReference).Msg("building container image")
 
-		// skip image generation, if image is present in remote registry
-		if !config.Rebuild {
-			_, remoteImageErr := LoadRemoteImageInformation(imageReference)
-			if remoteImageErr == nil {
-				log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", imageReference).Str("cause", "present_in_remote").Msg("skipping container image build")
-				return nil
-			}
-		}
-
-		// build each image and add to manifest
-		for _, platform := range platforms {
-			containerArchiveFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), platform.Platform("_")+".tar")
-
-			var buildArgs []string
-			buildArgs = append(buildArgs, `buildah bud`)
-			buildArgs = append(buildArgs, `--platform `+platform.Platform("/"))
-			buildArgs = append(buildArgs, `-f `+filepath.Base(containerFile))
-			buildArgs = append(buildArgs, `-t `+"oci-archive:"+containerArchiveFile)
-
-			// options
-			if config.NoCache {
-				buildArgs = append(buildArgs, `--no-cache`)
-			}
-			if config.Squash {
-				buildArgs = append(buildArgs, `--squash`) // squash, excluding the base layer
+			// skip image generation, if image is present in remote registry
+			if !config.Rebuild {
+				_, remoteImageErr := LoadRemoteImageInformation(imageReference)
+				if remoteImageErr == nil {
+					log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", imageReference).Str("cause", "present_in_remote").Msg("skipping container image build")
+					return nil
+				}
 			}
 
-			// download cache
-			downloadCache := ctx.Paths.NamedCache("buildah-download/" + platform.OS + "-" + platform.Arch)
-			log.Debug().Str("source", downloadCache).Msg("mounting external cache for /cache")
-			buildArgs = append(buildArgs, `-v `+downloadCache+`:/cache`)
+			// build each image and add to manifest
+			for _, platform := range platforms {
+				containerArchiveFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), platform.Platform("_")+".tar")
 
-			// labels (oci annotations: https://github.com/opencontainers/image-spec/blob/main/annotations.md)
-			buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.source=`+strings.TrimSuffix(ctx.Env["NCI_REPOSITORY_REMOTE"], ".git")+`"`)
-			buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.created=`+time.Now().Format(time.RFC3339)+`"`)
-			buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.authors="`)
-			buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.title=`+ctx.CurrentModule.Name+`"`)
-			buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.description="`)
+				var buildArgs []string
+				buildArgs = append(buildArgs, `buildah bud`)
+				buildArgs = append(buildArgs, `--platform `+platform.Platform("/"))
+				buildArgs = append(buildArgs, `-f `+filepath.Base(containerFile))
+				buildArgs = append(buildArgs, `-t `+"oci-archive:"+containerArchiveFile)
 
-			// dynamic build-args
-			if strings.Contains(dockerfileContent, "ARG TARGETPLATFORM") {
-				buildArgs = append(buildArgs, `--build-arg TARGETPLATFORM=`+platform.Platform("/"))
+				// options
+				if config.NoCache {
+					buildArgs = append(buildArgs, `--no-cache`)
+				}
+				if config.Squash {
+					buildArgs = append(buildArgs, `--squash`) // squash, excluding the base layer
+				}
+
+				// download cache
+				downloadCache := ctx.Paths.NamedCache("buildah-download/" + platform.OS + "-" + platform.Arch)
+				log.Debug().Str("source", downloadCache).Msg("mounting external cache for /cache")
+				buildArgs = append(buildArgs, `-v `+downloadCache+`:/cache`)
+
+				// labels (oci annotations: https://github.com/opencontainers/image-spec/blob/main/annotations.md)
+				buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.source=`+strings.TrimSuffix(ctx.Env["NCI_REPOSITORY_REMOTE"], ".git")+`"`)
+				buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.created=`+time.Now().Format(time.RFC3339)+`"`)
+				buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.authors="`)
+				buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.title=`+ctx.CurrentModule.Name+`"`)
+				buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.description="`)
+
+				// dynamic build-args
+				if strings.Contains(dockerfileContent, "ARG TARGETPLATFORM") {
+					buildArgs = append(buildArgs, `--build-arg TARGETPLATFORM=`+platform.Platform("/"))
+				}
+				if strings.Contains(dockerfileContent, "ARG TARGETOS") {
+					buildArgs = append(buildArgs, `--build-arg TARGETOS=`+platform.OS)
+				}
+				if strings.Contains(dockerfileContent, "ARG TARGETARCH") {
+					buildArgs = append(buildArgs, `--build-arg TARGETARCH=`+platform.Arch)
+				}
+				if strings.Contains(dockerfileContent, "ARG TARGETVARIANT") {
+					buildArgs = append(buildArgs, `--build-arg TARGETVARIANT=`+platform.Variant)
+				}
+
+				buildArgs = append(buildArgs, ctx.CurrentModule.Directory)
+				command.RunCommand(strings.Join(buildArgs, " "), ctx.Env, ctx.ProjectDir)
 			}
-			if strings.Contains(dockerfileContent, "ARG TARGETOS") {
-				buildArgs = append(buildArgs, `--build-arg TARGETOS=`+platform.OS)
-			}
-			if strings.Contains(dockerfileContent, "ARG TARGETARCH") {
-				buildArgs = append(buildArgs, `--build-arg TARGETARCH=`+platform.Arch)
-			}
-			if strings.Contains(dockerfileContent, "ARG TARGETVARIANT") {
-				buildArgs = append(buildArgs, `--build-arg TARGETVARIANT=`+platform.Variant)
-			}
+		} else if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript {
+			buildahScriptContent, _ := filesystem.GetFileContent(containerFile)
+			platforms := getDockerfileTargetPlatforms(buildahScriptContent)
+			imageReference = getDockerfileTargetImage(buildahScriptContent, imageReference)
+			log.Info().Interface("platforms", platforms).Str("image", imageReference).Msg("building container image")
 
-			buildArgs = append(buildArgs, ctx.CurrentModule.Directory)
-			command.RunCommand(strings.Join(buildArgs, " "), ctx.Env, ctx.ProjectDir)
-		}
-	} else if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript {
-		buildahScriptContent, _ := filesystem.GetFileContent(containerFile)
-		platforms := getDockerfileTargetPlatforms(buildahScriptContent)
-		imageReference = getDockerfileTargetImage(buildahScriptContent, imageReference)
-		log.Info().Interface("platforms", platforms).Str("image", imageReference).Msg("building container image")
+			// build each image and add to manifest
+			for _, platform := range platforms {
+				containerArchiveFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), platform.Platform("_")+".tar")
 
-		// build each image and add to manifest
-		for _, platform := range platforms {
-			containerArchiveFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), platform.Platform("_")+".tar")
-
-			// build
-			var buildArgs []string
-			buildArgs = append(buildArgs, `buildah-script`)
-			buildArgs = append(buildArgs, containerFile)
-			ctx.Env["TARGETIMAGE"] = "oci-archive:" + containerArchiveFile
-			ctx.Env["TARGETPLATFORM"] = platform.Platform("/")
-			ctx.Env["TARGETOS"] = platform.OS
-			ctx.Env["TARGETARCH"] = platform.Arch
-			ctx.Env["TARGETVARIANT"] = platform.Variant
-			command.RunCommand(strings.Join(buildArgs, " "), ctx.Env, ctx.ProjectDir)
+				// build
+				var buildArgs []string
+				buildArgs = append(buildArgs, `buildah-script`)
+				buildArgs = append(buildArgs, containerFile)
+				ctx.Env["TARGETIMAGE"] = "oci-archive:" + containerArchiveFile
+				ctx.Env["TARGETPLATFORM"] = platform.Platform("/")
+				ctx.Env["TARGETOS"] = platform.OS
+				ctx.Env["TARGETARCH"] = platform.Arch
+				ctx.Env["TARGETVARIANT"] = platform.Variant
+				command.RunCommand(strings.Join(buildArgs, " "), ctx.Env, ctx.ProjectDir)
+			}
 		}
 	}
 

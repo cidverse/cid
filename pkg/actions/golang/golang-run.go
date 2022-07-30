@@ -5,7 +5,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 )
 
 type RunActionStruct struct{}
@@ -22,7 +21,7 @@ func (action RunActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.Ac
 
 // Check evaluates if the action should be executed or not
 func (action RunActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGoMod
+	return true
 }
 
 // Execute runs the action

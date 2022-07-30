@@ -1,6 +1,7 @@
 package workflowrun
 
 import (
+	"github.com/cidverse/cid/pkg/repoanalyzer"
 	"time"
 
 	"github.com/cidverse/cid/pkg/common/api"
@@ -108,7 +109,8 @@ func RunWorkflowStage(cfg *config.CIDConfig, stage *config.WorkflowStage, env ma
 func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env map[string]string, projectDir string, modulesFilter []string) {
 	log.Debug().Str("action", action.ID).Msg("action start")
 	catalogAction := cfg.FindAction(action.ID)
-	ctx := api.GetActionContext(projectDir, env, &catalogAction.Access)
+	modules := repoanalyzer.AnalyzeProject(projectDir, filesystem.GetWorkingDirectory())
+	ctx := api.GetActionContext(modules, projectDir, env, &catalogAction.Access)
 
 	// serialize action config for pass-thru
 	configAsYaml, _ := yaml.Marshal(&action.Config)
@@ -131,7 +133,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 			moduleRef := m
 
 			// customize context
-			ctx.CurrentModule = &moduleRef
+			ctx.CurrentModule = moduleRef
 			api.UpdateContext(&ctx)
 
 			// check module filter
@@ -155,7 +157,7 @@ func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowActi
 	ruleContext := rules.GetRuleContext(ctx.Env)
 	if rules.AnyRuleMatches(action.Rules, ruleContext) {
 		// state: retrieve/init
-		state := getState(ctx)
+		state := getState(*ctx)
 
 		// serialize action config for pass-thru
 		actConfig, _ := yaml.Marshal(&action.Config)

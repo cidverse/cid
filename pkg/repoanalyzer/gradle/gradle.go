@@ -42,7 +42,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 			Directory:         filepath.Dir(file),
 			Name:              filepath.Base(filepath.Dir(file)),
 			Slug:              slug.Make(filepath.Base(filepath.Dir(file))),
-			Discovery:         "file~" + file,
+			Discovery:         []string{"file~" + file},
 			BuildSystem:       analyzerapi.BuildSystemGradle,
 			BuildSystemSyntax: buildSystemSyntax,
 			Language:          language,

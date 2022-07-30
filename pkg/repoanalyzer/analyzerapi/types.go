@@ -20,7 +20,7 @@ type ProjectModule struct {
 	Directory string
 
 	// Discovery stores information on how this module was discovered
-	Discovery string
+	Discovery []string
 
 	// Name stores the module name
 	Name string

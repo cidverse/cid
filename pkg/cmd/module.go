@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/cidverse/cid/pkg/common/api"
@@ -43,9 +44,9 @@ var moduleListCmd = &cobra.Command{
 
 		// print list
 		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
-		_, _ = fmt.Fprintln(w, "NAME\tBUILD-SYSTEM\tBUILD-SYSTEM-SYNTAX\tFILE")
+		_, _ = fmt.Fprintln(w, "NAME\tBUILD-SYSTEM\tBUILD-SYNTAX\tFILE\tSUBMODULES")
 		for _, module := range modules {
-			_, _ = fmt.Fprintln(w, module.Name+"\t"+string(module.BuildSystem)+"\t"+string(module.BuildSystemSyntax)+"\t"+module.Discovery)
+			_, _ = fmt.Fprintln(w, module.Name+"\t"+string(module.BuildSystem)+"\t"+string(module.BuildSystemSyntax)+"\t"+strings.Join(module.Discovery, ",")+"\t0")
 		}
 		_ = w.Flush()
 	},

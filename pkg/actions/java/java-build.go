@@ -24,16 +24,16 @@ func (action BuildActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.
 
 // Check evaluates if the action should be executed or not
 func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return ctx.CurrentModule != nil && (ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle || ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven)
+	return true
 }
 
 // Execute runs the action
 func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// run build
-	BuildJavaProject(ctx, state, ctx.CurrentModule)
+	BuildJavaProject(ctx, state, &ctx.CurrentModule)
 
 	// colelct artifacts
-	CollectGradleArtifacts(ctx, state, ctx.CurrentModule)
+	CollectGradleArtifacts(ctx, state, &ctx.CurrentModule)
 
 	// find artifacts
 	files, _ := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".jar"})

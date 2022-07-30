@@ -19,7 +19,7 @@ func (action TestActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.A
 
 // Check evaluates if the action should be executed or not
 func (action TestActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return ctx.CurrentModule != nil && (ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGradle || ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemMaven)
+	return true
 }
 
 // Execute runs the action
@@ -32,7 +32,7 @@ func (action TestActionStruct) Execute(ctx *api.ActionExecutionContext, state *a
 		command.RunCommand(GradleCommandPrefix+` -Pversion="`+releaseVersion+`" check --no-daemon --warning-mode=all --console=plain`, ctx.Env, ctx.ProjectDir)
 
 		// collect jacoco reports from all modules
-		processJacocoFile(ctx, ctx.CurrentModule, "build/reports/jacoco/test/jacocoTestReport.xml")
+		processJacocoFile(ctx, &ctx.CurrentModule, "build/reports/jacoco/test/jacocoTestReport.xml")
 		for _, submodule := range ctx.CurrentModule.Submodules {
 			processJacocoFile(ctx, submodule, "build/reports/jacoco/test/jacocoTestReport.xml")
 		}
@@ -43,7 +43,7 @@ func (action TestActionStruct) Execute(ctx *api.ActionExecutionContext, state *a
 		command.RunCommand(getMavenCommandPrefix(ctx.ProjectDir)+" test -DskipTests=true --batch-mode", ctx.Env, ctx.ProjectDir)
 
 		// collect jacoco reports from all modules
-		processJacocoFile(ctx, ctx.CurrentModule, "target/site/jacoco/jacoco.xml")
+		processJacocoFile(ctx, &ctx.CurrentModule, "target/site/jacoco/jacoco.xml")
 		for _, submodule := range ctx.CurrentModule.Submodules {
 			processJacocoFile(ctx, submodule, "target/site/jacoco/jacoco.xml")
 		}

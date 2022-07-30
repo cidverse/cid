@@ -54,7 +54,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 				Directory:         filepath.Dir(file),
 				Name:              goMod.Module.Mod.Path,
 				Slug:              slug.Make(goMod.Module.Mod.Path),
-				Discovery:         "file~" + file,
+				Discovery:         []string{"file~" + file},
 				BuildSystem:       analyzerapi.BuildSystemGoMod,
 				BuildSystemSyntax: analyzerapi.BuildSystemSyntaxDefault,
 				Language:          analyzerapi.GetSingleLanguageMap(analyzerapi.LanguageGolang, &goVersion),

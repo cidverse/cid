@@ -7,7 +7,6 @@ import (
 	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
-	"github.com/thoas/go-funk"
 )
 
 type PublishActionStruct struct{}
@@ -23,19 +22,7 @@ func (action PublishActionStruct) GetDetails(ctx *api.ActionExecutionContext) ap
 
 // Check evaluates if the action should be executed or not
 func (action PublishActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	var missingRequirements []api.MissingRequirement
-
-	if ctx.CurrentModule != nil {
-		if ctx.CurrentModule.BuildSystem != analyzerapi.BuildSystemHelm {
-			missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "module build system is not helm"})
-		} else if !funk.Contains(ctx.Env, "HELM_NEXUS_URL") {
-			missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "HELM_NEXUS_URL is not set"})
-		}
-	} else {
-		missingRequirements = append(missingRequirements, api.MissingRequirement{Message: "no module context present"})
-	}
-
-	return len(missingRequirements) == 0
+	return true
 }
 
 // Execute runs the action
