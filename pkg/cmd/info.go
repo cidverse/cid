@@ -59,7 +59,7 @@ var infoCmd = &cobra.Command{
 				module.Files = nil
 				module.FilesByExtension = nil
 			}
-			response.Modules = append(response.Modules, &module)
+			response.Modules = append(response.Modules, module)
 		}
 
 		// tool constraints

@@ -60,10 +60,10 @@ type ActionExecutionContext struct {
 	CurrentUser user.User
 
 	// Modules contains the project modules
-	Modules []analyzerapi.ProjectModule
+	Modules []*analyzerapi.ProjectModule
 
 	// CurrentModule contains the module that is currently being build
-	CurrentModule analyzerapi.ProjectModule
+	CurrentModule *analyzerapi.ProjectModule
 }
 
 // UpdateContext will update the context
@@ -90,7 +90,7 @@ type ActionStateContext struct {
 	Version int `json:"version"`
 
 	// Modules contains the project modules
-	Modules []analyzerapi.ProjectModule
+	Modules []*analyzerapi.ProjectModule
 }
 
 // CoverageReport contains a generic coverage report
@@ -108,7 +108,7 @@ func RegisterBuiltinAction(action ActionStep) {
 }
 
 // GetActionContext gets the action context, this operation is expensive and should only be called once per execution
-func GetActionContext(modules []analyzerapi.ProjectModule, projectDir string, env map[string]string, access *config.ActionAccess) ActionExecutionContext {
+func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, env map[string]string, access *config.ActionAccess) ActionExecutionContext {
 	finalEnv := make(map[string]string)
 	fullEnv := lo.Assign(env, common.GetMachineEnvironment())
 
@@ -146,7 +146,7 @@ func GetActionContext(modules []analyzerapi.ProjectModule, projectDir string, en
 		Parallelization: DefaultParallelization,
 		CurrentUser:     *currentUser,
 		Modules:         modules,
-		CurrentModule:   analyzerapi.ProjectModule{},
+		CurrentModule:   nil,
 	}
 }
 

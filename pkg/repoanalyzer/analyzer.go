@@ -16,12 +16,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var analyzerCache = make(map[string][]analyzerapi.ProjectModule)
+var analyzerCache = make(map[string][]*analyzerapi.ProjectModule)
 
 // AnalyzeProject will analyze a project and return all modules in path
-func AnalyzeProject(projectDir string, path string) []analyzerapi.ProjectModule {
+func AnalyzeProject(projectDir string, path string) []*analyzerapi.ProjectModule {
 	if funk.Contains(analyzerCache, path) {
-		return getCopyOf(analyzerCache[path])
+		return analyzerCache[path]
 	}
 
 	if len(analyzerapi.Analyzers) == 0 {
@@ -35,28 +35,24 @@ func AnalyzeProject(projectDir string, path string) []analyzerapi.ProjectModule 
 	ctx := analyzerapi.GetAnalyzerContext(projectDir)
 
 	// run
-	var allModules []analyzerapi.ProjectModule
+	var allModules []*analyzerapi.ProjectModule
+	var allModuleNames []string
 	for _, a := range analyzerapi.Analyzers {
 		log.Debug().Str("name", a.GetName()).Msg("repo analyzer run")
 		modules := a.Analyze(ctx)
-		for _, module := range modules { //nolint:gocritic
-			if strings.HasPrefix(module.Directory, path) && !strings.Contains(module.Directory, "testdata") {
-				allModules = append(allModules, module)
+		for _, module := range modules {
+			currentModule := module
+			if strings.HasPrefix(currentModule.Directory, path) && !strings.Contains(currentModule.Directory, "testdata") {
+				allModules = append(allModules, &currentModule)
+				allModuleNames = append(allModuleNames, currentModule.Slug)
 			}
 		}
 	}
 
-	log.Info().Int("module_count", len(allModules)).Str("duration", time.Since(start).String()).Int("file_count", len(ctx.Files)).Msg("repo analyzer complete")
+	log.Info().Int("module_count", len(allModules)).Strs("modules", allModuleNames).Str("duration", time.Since(start).String()).Int("file_count", len(ctx.Files)).Msg("repo analyzer complete")
 
 	analyzerCache[projectDir] = allModules
-	return getCopyOf(allModules)
-}
-
-func getCopyOf(modules []analyzerapi.ProjectModule) []analyzerapi.ProjectModule {
-	result := make([]analyzerapi.ProjectModule, len(modules))
-	copy(result, modules)
-
-	return result
+	return allModules
 }
 
 func initAnalyzers() {

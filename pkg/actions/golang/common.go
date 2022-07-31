@@ -42,7 +42,7 @@ func GetLdFlags(config Config) string {
 
 func GetToolDependencies(ctx *api.ActionExecutionContext) map[string]string {
 	var deps map[string]string
-	if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGoMod {
+	if ctx.CurrentModule != nil && ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemGoMod {
 		deps = map[string]string{
 			"go": *ctx.CurrentModule.Language[analyzerapi.LanguageGolang],
 		}

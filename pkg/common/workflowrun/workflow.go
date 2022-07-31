@@ -120,7 +120,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 	if catalogAction.Scope == config.ActionScopeProject {
 		ruleContext := rules.GetRuleContext(ctx.Env)
 		ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
-		log.Debug().Str("action", action.ID).Bool("rules_match", ruleMatch).Msg("check action rules")
+		log.Debug().Str("Trace", action.ID).Bool("rules_match", ruleMatch).Msg("check action rules")
 		if ruleMatch {
 			runWorkflowAction(catalogAction, action, &ctx)
 		}
@@ -129,11 +129,12 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 	// module-scoped actions
 	if catalogAction.Scope == config.ActionScopeModule {
 		// for each module
-		for _, m := range ctx.Modules { //nolint:gocritic
-			moduleRef := m
+		for _, m := range ctx.Modules {
+			moduleRef := *m
+			log.Trace().Str("action", action.ID).Str("module", moduleRef.Slug).Msg("action for module")
 
 			// customize context
-			ctx.CurrentModule = moduleRef
+			ctx.CurrentModule = &moduleRef
 			api.UpdateContext(&ctx)
 
 			// check module filter
@@ -144,12 +145,14 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 
 			var ruleContext = rules.GetModuleRuleContext(ctx.Env, &moduleRef)
 			ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
-			log.Debug().Str("action", action.ID).Str("module", moduleRef.Name).Bool("rules_match", ruleMatch).Msg("check action rules")
+			log.Trace().Str("action", action.ID).Str("module", moduleRef.Name).Bool("rules_match", ruleMatch).Msg("check action rules")
 			if ruleMatch {
 				runWorkflowAction(catalogAction, action, &ctx)
 			}
 		}
 	}
+
+	log.Debug().Str("action", action.ID).Msg("action end")
 }
 
 func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowAction, ctx *api.ActionExecutionContext) {

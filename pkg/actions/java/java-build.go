@@ -30,10 +30,10 @@ func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 // Execute runs the action
 func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// run build
-	BuildJavaProject(ctx, state, &ctx.CurrentModule)
+	BuildJavaProject(ctx, state, ctx.CurrentModule)
 
 	// colelct artifacts
-	CollectGradleArtifacts(ctx, state, &ctx.CurrentModule)
+	CollectGradleArtifacts(ctx, state, ctx.CurrentModule)
 
 	// find artifacts
 	files, _ := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".jar"})

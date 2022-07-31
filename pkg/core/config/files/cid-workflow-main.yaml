@@ -33,7 +33,6 @@ workflows:
               no-cache: true
               squash: true
               rebuild: true
-          #- id: builtin/container-package-docker
       - name: lint
         actions:
           - id: central/golang-lint
@@ -74,7 +73,7 @@ workflows:
       - name: publish
         actions:
           - id: central/container-publish
+          - id: central/helm-publish-nexus
           #- id: central/repo-tag-create
           #- id: central/repo-release-github
           #- id: central/java-publish
-          - id: central/helm-publish-nexus
