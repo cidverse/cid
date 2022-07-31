@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"io/fs"
-	"os/user"
 	"path/filepath"
 	"strings"
 )
@@ -32,9 +31,8 @@ func (action PublishActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 // Execute runs the action
 func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
 	// find registry auth file
-	currentUser, _ := user.Current()
 	authFile := getFirstExistingFile([]string{
-		"/var/tmp/containers-user-" + currentUser.Uid + "/containers/containers/auth.json",
+		"/var/tmp/containers-user-" + ctx.CurrentUser.Uid + "/containers/containers/auth.json",
 	})
 	ctx.Env["REGISTRY_AUTH_FILE"] = authFile
 
@@ -43,6 +41,12 @@ func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, state
 	imageRef, imageRefErr := filesystem.GetFileContent(imageRefFile)
 	if imageRefErr != nil {
 		return errors.New("failed to parse image reference from " + imageRefFile)
+	}
+
+	// dockerhub still has some issues with the oci format
+	format := "oci"
+	if strings.HasPrefix(imageRef, "docker.io/") {
+		format = "v2s2"
 	}
 
 	// for each container archive
@@ -56,6 +60,7 @@ func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, state
 	})
 	if len(files) == 0 {
 		log.Error().Str("path", ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image")).Msg("no candidates for image publication found!")
+		return nil
 	}
 
 	// prepare manifest
@@ -74,11 +79,6 @@ func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, state
 
 	// publish manifest to registry
 	log.Info().Str("manifest", manifestName).Str("ref", imageRef).Msg("uploading manifest ...")
-	format := "oci"
-	// dockerhub still has issues with the oci format
-	if strings.HasPrefix(imageRef, "docker.io/") {
-		format = "v2s2"
-	}
 	command.RunCommand("buildah manifest push --all --format "+format+" "+manifestName+" docker://"+imageRef, ctx.Env, ctx.ProjectDir) // format: v2s2 or oci
 
 	return nil

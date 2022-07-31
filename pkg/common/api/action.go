@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/samber/lo"
+	"os/user"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -54,6 +55,9 @@ type ActionExecutionContext struct {
 
 	// Parallelization defines how many tasks can be run in parallel inside an action
 	Parallelization int
+
+	// CurrentUser holds information about the user running this process
+	CurrentUser user.User
 
 	// Modules contains the project modules
 	Modules []analyzerapi.ProjectModule
@@ -108,6 +112,9 @@ func GetActionContext(modules []analyzerapi.ProjectModule, projectDir string, en
 	finalEnv := make(map[string]string)
 	fullEnv := lo.Assign(env, common.GetMachineEnvironment())
 
+	// user
+	currentUser, _ := user.Current()
+
 	// evaluate access
 	for k, v := range fullEnv {
 		if strings.HasPrefix(k, "NCI_") {
@@ -137,6 +144,7 @@ func GetActionContext(modules []analyzerapi.ProjectModule, projectDir string, en
 		Args:            nil,
 		Env:             finalEnv,
 		Parallelization: DefaultParallelization,
+		CurrentUser:     *currentUser,
 		Modules:         modules,
 		CurrentModule:   analyzerapi.ProjectModule{},
 	}

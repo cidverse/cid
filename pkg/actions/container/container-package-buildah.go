@@ -48,12 +48,12 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 	imageReference := getFullImage(ctx.Env["NCI_CONTAINERREGISTRY_HOST"], ctx.Env["NCI_CONTAINERREGISTRY_REPOSITORY"], ctx.Env["NCI_CONTAINERREGISTRY_TAG"])
 	for _, discovery := range ctx.CurrentModule.Discovery {
 		containerFile := strings.TrimPrefix(discovery, "file~")
+		containerFileContent, _ := filesystem.GetFileContent(containerFile)
 
 		if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerFile {
-			dockerfileContent, _ := filesystem.GetFileContent(containerFile)
-			syntax := getDockerfileSyntax(dockerfileContent)
-			platforms := getDockerfileTargetPlatforms(dockerfileContent)
-			imageReference = getDockerfileTargetImage(dockerfileContent, imageReference)
+			syntax := getDockerfileSyntax(containerFileContent)
+			platforms := getDockerfileTargetPlatforms(containerFileContent)
+			imageReference = getDockerfileTargetImage(containerFileContent, imageReference)
 
 			// skip image generation, if image is present in remote registry
 			if !config.Rebuild {
@@ -96,16 +96,16 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 				buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.description="`)
 
 				// dynamic build-args
-				if strings.Contains(dockerfileContent, "ARG TARGETPLATFORM") {
+				if strings.Contains(containerFileContent, "ARG TARGETPLATFORM") {
 					buildArgs = append(buildArgs, `--build-arg TARGETPLATFORM=`+platform.Platform("/"))
 				}
-				if strings.Contains(dockerfileContent, "ARG TARGETOS") {
+				if strings.Contains(containerFileContent, "ARG TARGETOS") {
 					buildArgs = append(buildArgs, `--build-arg TARGETOS=`+platform.OS)
 				}
-				if strings.Contains(dockerfileContent, "ARG TARGETARCH") {
+				if strings.Contains(containerFileContent, "ARG TARGETARCH") {
 					buildArgs = append(buildArgs, `--build-arg TARGETARCH=`+platform.Arch)
 				}
-				if strings.Contains(dockerfileContent, "ARG TARGETVARIANT") {
+				if strings.Contains(containerFileContent, "ARG TARGETVARIANT") {
 					buildArgs = append(buildArgs, `--build-arg TARGETVARIANT=`+platform.Variant)
 				}
 
@@ -113,9 +113,8 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 				command.RunCommand(strings.Join(buildArgs, " "), ctx.Env, ctx.ProjectDir)
 			}
 		} else if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript {
-			buildahScriptContent, _ := filesystem.GetFileContent(containerFile)
-			platforms := getDockerfileTargetPlatforms(buildahScriptContent)
-			imageReference = getDockerfileTargetImage(buildahScriptContent, imageReference)
+			platforms := getDockerfileTargetPlatforms(containerFileContent)
+			imageReference = getDockerfileTargetImage(containerFileContent, imageReference)
 			log.Info().Interface("platforms", platforms).Str("image", imageReference).Msg("building container image")
 
 			// build each image and add to manifest
