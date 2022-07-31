@@ -54,7 +54,6 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 			syntax := getDockerfileSyntax(dockerfileContent)
 			platforms := getDockerfileTargetPlatforms(dockerfileContent)
 			imageReference = getDockerfileTargetImage(dockerfileContent, imageReference)
-			log.Info().Str("syntax", syntax).Interface("platforms", platforms).Str("image", imageReference).Msg("building container image")
 
 			// skip image generation, if image is present in remote registry
 			if !config.Rebuild {
@@ -68,6 +67,7 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 			// build each image and add to manifest
 			for _, platform := range platforms {
 				containerArchiveFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), platform.Platform("_")+".tar")
+				log.Info().Str("syntax", syntax).Interface("platform", platform.Platform("/")).Str("image", imageReference).Msg("building container image")
 
 				var buildArgs []string
 				buildArgs = append(buildArgs, `buildah bud`)

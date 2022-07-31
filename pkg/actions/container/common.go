@@ -113,3 +113,13 @@ func getDockerfileTargetImage(dockerfileContent string, suggestedName string) st
 
 	return image
 }
+
+func getFirstExistingFile(files []string) string {
+	for _, file := range files {
+		if filesystem.FileExists(file) {
+			return file
+		}
+	}
+
+	return ""
+}

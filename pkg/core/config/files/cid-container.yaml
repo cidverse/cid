@@ -91,10 +91,10 @@ containerimages:
       - id: node-yarn-config
         dir: /root/.config/yarn
   # helm
-  - image: lachlanevenson/k8s-helm:v3.8.1
+  - image: quay.io/cidverse/helm:3.9.2
     provides:
       - binary: helm
-        version: 3.8.1
+        version: 3.9.2
     cache:
       - id: helm-config
         dir: /root/.config/helm
@@ -105,18 +105,17 @@ containerimages:
       - id: helm-repository
         dir: /root/.cache/helm/repository
   # upx
-  - image: envcli/upx:latest
+  - image: quay.io/cidverse/upx:3.96
     provides:
       - binary: upx
-        version: 3.95.0
+        version: 3.96.0
   # gitguardian ggshield
   - image: docker.io/gitguardian/ggshield:v1.10.8
     provides:
       - binary: ggshield
         version: 1.10.8
   # sonarqube
-  - image: docker.io/sonarsource/sonar-scanner-cli:4.7.0
-    # quay.io/cidverse/sonarscannercli:4.7.0.2747
+  - image: quay.io/cidverse/sonarscannercli:4.7.0.2747
     provides:
       - binary: sonar-scanner
         version: 4.7.0
@@ -132,28 +131,28 @@ containerimages:
       - id: trivy-cache
         dir: /root/.cache/trivy
   # shellcheck
-  - image: docker.io/koalaman/shellcheck:v0.8.0
+  - image: quay.io/cidverse/shellcheck:0.8.0
     provides:
       - binary: shellcheck
         version: 0.8.0
   # githubcli - gh
-  - image: cidverse/githubcli:1.11.0
+  - image: quay.io/cidverse/githubcli:2.14.3
     provides:
       - binary: gh
-        version: 1.11.0
+        version: 2.14.3
   # twitch
-  - image: docker.io/cidverse/twitchcli:1.0.2
+  - image: quay.io/cidverse/twitchcli:1.1.6
     provides:
       - binary: twitch
-        version: 1.0.2
+        version: 1.1.6
     cache:
       - id: twitchcli-config
         dir: /root/.twitch-cli
   # fossa
-  - image: quay.io/cidverse/fossacli:3.3.9
+  - image: quay.io/cidverse/fossacli:3.3.11
     provides:
       - binary: fossa
-        version: 3.3.9
+        version: 3.3.11
   # hadolint
   - image: quay.io/cidverse/hadolint:2.10.0
     provides:
@@ -170,6 +169,9 @@ containerimages:
       capabilities:
         - CAP_SETGID
         - CAP_SETUID
+    cache:
+      - id: libcontainers-storage
+        dir: /var/lib/containers/storage
   # gitleaks
   - image: quay.io/cidverse/gitleaks:8.8.12
     provides:

@@ -5,8 +5,10 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"io/fs"
+	"os/user"
 	"path/filepath"
 	"strings"
 )
@@ -29,6 +31,13 @@ func (action PublishActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 
 // Execute runs the action
 func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+	// find registry auth file
+	currentUser, _ := user.Current()
+	authFile := getFirstExistingFile([]string{
+		"/var/tmp/containers-user-" + currentUser.Uid + "/containers/containers/auth.json",
+	})
+	ctx.Env["REGISTRY_AUTH_FILE"] = authFile
+
 	// target image reference
 	imageRefFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), "image.txt")
 	imageRef, imageRefErr := filesystem.GetFileContent(imageRefFile)
@@ -45,11 +54,13 @@ func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, state
 
 		return nil
 	})
+	if len(files) == 0 {
+		log.Error().Str("path", ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image")).Msg("no candidates for image publication found!")
+	}
 
 	// prepare manifest
-	manifestName := ctx.CurrentModule.Slug
+	manifestName := strings.Replace(uuid.NewString(), "-", "", -1)
 	log.Info().Str("manifest", manifestName).Str("ref", imageRef).Int("files", len(files)).Msg("publishing image using manifest ...")
-	_, _ = command.RunCommandAndGetOutput("buildah manifest rm "+manifestName, ctx.Env, ctx.ProjectDir)
 	command.RunCommand("buildah manifest create "+manifestName, ctx.Env, ctx.ProjectDir)
 
 	// add images to manifest
@@ -58,9 +69,17 @@ func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, state
 		command.RunCommand("buildah manifest add "+manifestName+" oci-archive:"+file, ctx.Env, ctx.ProjectDir)
 	}
 
+	// print manifest
+	command.RunCommand("buildah manifest inspect "+manifestName, ctx.Env, ctx.ProjectDir)
+
 	// publish manifest to registry
 	log.Info().Str("manifest", manifestName).Str("ref", imageRef).Msg("uploading manifest ...")
-	command.RunCommand("buildah manifest push --all -f oci "+manifestName+" docker://"+imageRef, ctx.Env, ctx.ProjectDir) // format: v2s2 or oci
+	format := "oci"
+	// dockerhub still has issues with the oci format
+	if strings.HasPrefix(imageRef, "docker.io/") {
+		format = "v2s2"
+	}
+	command.RunCommand("buildah manifest push --all --format "+format+" "+manifestName+" docker://"+imageRef, ctx.Env, ctx.ProjectDir) // format: v2s2 or oci
 
 	return nil
 }

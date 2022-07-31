@@ -10,6 +10,7 @@ require (
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.12.4
 	github.com/google/go-containerregistry v0.11.0
+	github.com/google/uuid v1.3.0
 	github.com/gosimple/slug v1.12.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/jinzhu/configor v1.2.1
@@ -22,6 +23,7 @@ require (
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
 	github.com/thoas/go-funk v0.9.2
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
 	google.golang.org/genproto v0.0.0-20220502173005-c8bf987b8c21
 	gopkg.in/yaml.v2 v2.4.0
@@ -72,7 +74,6 @@ require (
 	github.com/xanzy/go-gitlab v0.65.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	golang.org/x/crypto v0.0.0-20220511200225-c6db032c6c88 // indirect
-	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
 	golang.org/x/oauth2 v0.0.0-20220718184931-c8730f7fcb92 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
