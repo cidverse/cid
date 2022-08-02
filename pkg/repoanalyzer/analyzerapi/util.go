@@ -56,9 +56,9 @@ func GetAnalyzerContext(projectDir string) AnalyzerContext {
 	}
 }
 
-func FindParentModule(modules *[]ProjectModule, module ProjectModule) *ProjectModule {
+func FindParentModule(modules *[]ProjectModule, module *ProjectModule) *ProjectModule {
 	for _, m := range *modules {
-		if strings.HasPrefix(module.Directory, m.Directory) {
+		if strings.HasPrefix(module.Directory, m.Directory+"/") {
 			return &m
 		}
 	}
@@ -72,14 +72,14 @@ func GetSingleLanguageMap(language ProjectLanguage, version *string) map[Project
 	return languageMap
 }
 
-func AddModuleToResult(result *[]ProjectModule, module ProjectModule) {
+func AddModuleToResult(result *[]ProjectModule, module *ProjectModule) {
 	parent := FindParentModule(result, module)
 	if parent != nil {
 		module.Name = parent.Name + "-" + module.Name
 		module.Slug = parent.Slug + "-" + module.Slug
-		parent.Submodules = append(parent.Submodules, &module)
+		parent.Submodules = append(parent.Submodules, module)
 	} else {
-		*result = append(*result, module)
+		*result = append(*result, *module)
 	}
 }
 

@@ -37,7 +37,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 				Files:             ctx.Files,
 				FilesByExtension:  ctx.FilesByExtension,
 			}
-			analyzerapi.AddModuleToResult(&result, module)
+			analyzerapi.AddModuleToResult(&result, &module)
 		} else if filename == "Pipfile" {
 			// module
 			module := analyzerapi.ProjectModule{
@@ -54,7 +54,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 				Files:             ctx.Files,
 				FilesByExtension:  ctx.FilesByExtension,
 			}
-			analyzerapi.AddModuleToResult(&result, module)
+			analyzerapi.AddModuleToResult(&result, &module)
 		} else if filename == "setup.py" {
 			// module
 			module := analyzerapi.ProjectModule{
@@ -71,7 +71,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 				Files:             ctx.Files,
 				FilesByExtension:  ctx.FilesByExtension,
 			}
-			analyzerapi.AddModuleToResult(&result, module)
+			analyzerapi.AddModuleToResult(&result, &module)
 		}
 	}
 

@@ -70,10 +70,9 @@ type ActionExecutionContext struct {
 func UpdateContext(ctx *ActionExecutionContext) {
 	if ctx.CurrentModule.Slug != "" {
 		ctx.Paths = config.PathConfig{
-			Artifact:       filepath.Join(ctx.ProjectDir, ".dist"),
-			ModuleArtifact: filepath.Join(ctx.ProjectDir, ".dist", ctx.CurrentModule.Slug),
-			Temp:           filepath.Join(ctx.ProjectDir, ".tmp"),
-			Cache:          "",
+			Artifact: filepath.Join(ctx.ProjectDir, ".dist"),
+			Temp:     filepath.Join(ctx.ProjectDir, ".tmp"),
+			Cache:    "",
 		}
 	} else {
 		ctx.Paths = config.PathConfig{
@@ -133,10 +132,9 @@ func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, e
 
 	return ActionExecutionContext{
 		Paths: config.PathConfig{
-			Artifact:       filepath.Join(projectDir, ".dist"),
-			ModuleArtifact: filepath.Join(projectDir, ".dist"),
-			Temp:           filepath.Join(projectDir, ".tmp"),
-			Cache:          "",
+			Artifact: filepath.Join(projectDir, ".dist"),
+			Temp:     filepath.Join(projectDir, ".tmp"),
+			Cache:    "",
 		},
 		ProjectDir:      projectDir,
 		WorkDir:         filesystem.GetWorkingDirectory(),

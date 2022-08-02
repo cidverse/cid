@@ -181,7 +181,7 @@ containerimages:
   - image: quay.io/cidverse/syft:0.52.0
     provides:
       - binary: syft
-        version: 0.52.0
+        version: 0.53.2
   # grype
   - image: quay.io/cidverse/grype:0.44.0
     provides:
@@ -195,3 +195,8 @@ containerimages:
     provides:
       - binary: cosign
         version: 1.9.0
+  # hugo
+  - image: quay.io/cidverse/hugo:0.101.0
+    provides:
+      - binary: hugo
+        version: 0.101.0

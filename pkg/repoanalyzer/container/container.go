@@ -44,7 +44,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 					Files:             ctx.Files,
 					FilesByExtension:  ctx.FilesByExtension,
 				}
-				analyzerapi.AddModuleToResult(&result, module)
+				analyzerapi.AddModuleToResult(&result, &module)
 			} else {
 				result[moduleIdx].Discovery = append(result[moduleIdx].Discovery, "file~"+file)
 			}
@@ -75,7 +75,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 					Files:             ctx.Files,
 					FilesByExtension:  ctx.FilesByExtension,
 				}
-				analyzerapi.AddModuleToResult(&result, module)
+				analyzerapi.AddModuleToResult(&result, &module)
 			} else if contentErr != nil {
 				log.Warn().Str("file", file).Msg("failed to read file content")
 			}

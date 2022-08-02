@@ -9,10 +9,9 @@ import (
 
 // PathConfig contains the path configuration for build/tmp directories
 type PathConfig struct {
-	Artifact       string `default:".dist"`
-	ModuleArtifact string `default:".dist"`
-	Temp           string `default:".tmp"`
-	Cache          string `default:""`
+	Artifact string `default:".dist"`
+	Temp     string `default:".tmp"`
+	Cache    string `default:""`
 }
 
 // ArtifactModule returns dist folder for a specific module
@@ -28,6 +27,7 @@ func (c PathConfig) TempModule(name string) string {
 	dir := filepath.Join(c.Temp, name)
 
 	filesystem.CreateDirectory(dir)
+	_ = os.Chmod(dir, 777)
 	return dir
 }
 
