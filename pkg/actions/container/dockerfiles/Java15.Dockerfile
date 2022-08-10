@@ -3,7 +3,7 @@
 ############################################################
 
 # Base Image
-FROM amazoncorretto:15-alpine
+FROM amazoncorretto:17-alpine
 
 ##############################################################
 ## Environment
