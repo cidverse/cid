@@ -97,13 +97,13 @@ containerimages:
         version: 3.9.2
     cache:
       - id: helm-config
-        dir: /root/.config/helm
+        dir: /app/.config/helm
       - id: helm-cache
-        dir: /root/.cache/helm/cache
+        dir: /app/.cache/helm/cache
       - id: helm-plugins
-        dir: /root/.cache/helm/plugins
+        dir: /app/.cache/helm/plugins
       - id: helm-repository
-        dir: /root/.cache/helm/repository
+        dir: /app/.cache/helm/repository
   # upx
   - image: quay.io/cidverse/upx:3.96
     provides:
@@ -159,12 +159,12 @@ containerimages:
       - binary: hadolint
         version: 2.10.0
   # buildah
-  - image: quay.io/cidverse/buildah:1.26.2
+  - image: quay.io/cidverse/buildah:1.26.4
     provides:
       - binary: buildah
-        version: 1.26.2
+        version: 1.26.4
       - binary: buildah-script
-        version: 1.26.2
+        version: 1.26.4
     security:
       capabilities:
         - CAP_SETGID
@@ -178,20 +178,20 @@ containerimages:
       - binary: gitleaks
         version: 8.8.12
   # syft
-  - image: quay.io/cidverse/syft:0.52.0
+  - image: quay.io/cidverse/syft:0.53.4
     provides:
       - binary: syft
-        version: 0.53.2
+        version: 0.53.4
   # grype
-  - image: quay.io/cidverse/grype:0.44.0
+  - image: quay.io/cidverse/grype:0.45.0
     provides:
       - binary: grype
-        version: 0.44.0
+        version: 0.46.0
     cache:
       - id: grype-cache
         dir: /app/.cache/grype
   # cosign
-  - image: quay.io/cidverse/cosign:1.9.0
+  - image: quay.io/cidverse/cosign:1.10.1
     provides:
       - binary: cosign
         version: 1.9.0
