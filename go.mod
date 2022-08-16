@@ -1,6 +1,6 @@
 module github.com/cidverse/cid
 
-go 1.18
+go 1.19
 
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.4.8
