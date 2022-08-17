@@ -1,6 +1,7 @@
 package node
 
 import (
+	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -18,7 +19,5 @@ func TestAnalyzer_AnalyzeReact(t *testing.T) {
 	result := analyzer.Analyze(ctx)
 
 	// module
-
-	// print result
-	analyzerapi.PrintStruct(t, result)
+	log.Info().Interface("result", result).Msg("output")
 }

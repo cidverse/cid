@@ -1,6 +1,7 @@
 package hugo
 
 import (
+	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -22,5 +23,5 @@ func TestAnalyzer_AnalyzeHugo(t *testing.T) {
 	assert.Equal(t, "hugo", result[0].Name)
 
 	// print result
-	analyzerapi.PrintStruct(t, result)
+	log.Info().Interface("result", result).Msg("output")
 }

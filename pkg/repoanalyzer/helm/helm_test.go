@@ -1,6 +1,7 @@
 package helm
 
 import (
+	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -25,5 +26,5 @@ func TestAnalyzer_AnalyzeHugo(t *testing.T) {
 	assert.Nil(t, result[0].Language)
 
 	// print result
-	analyzerapi.PrintStruct(t, result)
+	log.Info().Interface("result", result).Msg("output")
 }

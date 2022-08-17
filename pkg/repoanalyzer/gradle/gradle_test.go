@@ -1,6 +1,7 @@
 package gradle
 
 import (
+	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -32,7 +33,7 @@ func TestGradleAnalyzer_AnalyzeGroovy(t *testing.T) {
 	assert.Nil(t, result[0].Submodules[0].Language[analyzerapi.LanguageJava])
 
 	// print result
-	analyzerapi.PrintStruct(t, result)
+	log.Info().Interface("result", result).Msg("output")
 }
 
 func TestGradleAnalyzer_AnalyzeKotlin(t *testing.T) {
@@ -58,5 +59,5 @@ func TestGradleAnalyzer_AnalyzeKotlin(t *testing.T) {
 	assert.Nil(t, result[0].Submodules[0].Language[analyzerapi.LanguageJava])
 
 	// print result
-	analyzerapi.PrintStruct(t, result)
+	log.Info().Interface("result", result).Msg("output")
 }

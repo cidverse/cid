@@ -8,7 +8,7 @@ type Analyzer interface {
 	GetName() string
 
 	// Analyze will retrieve information about the project
-	Analyze(ctx AnalyzerContext) []ProjectModule
+	Analyze(ctx AnalyzerContext) []*ProjectModule
 }
 
 // ProjectModule contains information about project modules

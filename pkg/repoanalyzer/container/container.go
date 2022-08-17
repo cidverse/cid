@@ -17,8 +17,8 @@ func (a Analyzer) GetName() string {
 	return "container"
 }
 
-func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.ProjectModule {
-	var result []analyzerapi.ProjectModule
+func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.ProjectModule {
+	var result []*analyzerapi.ProjectModule
 
 	// dockerfile
 	for _, file := range ctx.Files {
@@ -26,7 +26,7 @@ func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.Project
 
 		if filename == "Dockerfile" || filename == "Containerfile" || strings.HasSuffix(filename, ".Dockerfile") || strings.HasSuffix(filename, ".Containerfile") {
 			// add new module or append file to existing module
-			moduleIdx := slices.IndexFunc(result, func(m analyzerapi.ProjectModule) bool {
+			moduleIdx := slices.IndexFunc(result, func(m *analyzerapi.ProjectModule) bool {
 				return m.Name == filepath.Base(filepath.Dir(file)) && m.BuildSystem == analyzerapi.BuildSystemContainer && m.BuildSystemSyntax == analyzerapi.ContainerFile
 			})
 			if moduleIdx == -1 {

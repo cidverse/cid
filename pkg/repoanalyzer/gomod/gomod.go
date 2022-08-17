@@ -16,8 +16,8 @@ func (a Analyzer) GetName() string {
 	return "gomod"
 }
 
-func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.ProjectModule {
-	var result []analyzerapi.ProjectModule
+func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.ProjectModule {
+	var result []*analyzerapi.ProjectModule
 
 	for _, file := range ctx.FilesByExtension["mod"] {
 		filename := filepath.Base(file)

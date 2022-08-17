@@ -13,8 +13,8 @@ func (a Analyzer) GetName() string {
 	return "python"
 }
 
-func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.ProjectModule {
-	var result []analyzerapi.ProjectModule
+func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.ProjectModule {
+	var result []*analyzerapi.ProjectModule
 
 	// iterate
 	for _, file := range ctx.FilesByExtension["json"] {

@@ -14,8 +14,8 @@ func (a Analyzer) GetName() string {
 	return "hugo"
 }
 
-func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []analyzerapi.ProjectModule {
-	var result []analyzerapi.ProjectModule
+func (a Analyzer) Analyze(ctx analyzerapi.AnalyzerContext) []*analyzerapi.ProjectModule {
+	var result []*analyzerapi.ProjectModule
 
 	// hugo
 	for _, file := range append(ctx.FilesByExtension["toml"], ctx.FilesByExtension["yaml"]...) {
