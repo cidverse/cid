@@ -8,7 +8,7 @@ require (
 	github.com/cidverse/cidverseutils v0.0.0-20220724174502-7db3caf8502d
 	github.com/cidverse/normalizeci v1.1.1-0.20220511222032-c021e3301e69
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/google/cel-go v0.12.4
+	github.com/google/cel-go v0.12.5
 	github.com/google/go-containerregistry v0.11.0
 	github.com/google/uuid v1.3.0
 	github.com/gosimple/slug v1.12.0
