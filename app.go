@@ -11,6 +11,9 @@ var Version string
 // CommitHash will be set at build time
 var CommitHash string
 
+// RepositoryStatus will be set at build time
+var RepositoryStatus string
+
 // BuildAt will be set at build time
 var BuildAt string
 
@@ -19,6 +22,7 @@ func init() {
 	// Set Version Information
 	cmd.Version = Version
 	cmd.CommitHash = CommitHash
+	cmd.RepositoryStatus = RepositoryStatus
 	cmd.BuildAt = BuildAt
 }
 

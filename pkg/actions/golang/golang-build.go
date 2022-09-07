@@ -52,7 +52,7 @@ func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *
 		if !strings.EqualFold(ctx.Env["CI"], "true") {
 			err := group.Add(func() {
 				log.Info().Msg("go install")
-				command.RunCommand(api.ReplacePlaceholders(`go install -ldflags "`+GetLdFlags(config)+`-X main.Version={NCI_COMMIT_REF_RELEASE} -X main.CommitHash={NCI_COMMIT_SHA_SHORT} -X main.BuildAt={NOW_RFC3339}" .`, ctx.Env), ctx.Env, ctx.CurrentModule.Directory)
+				command.RunCommand(api.ReplacePlaceholders(`go install -buildvcs=false -ldflags "`+GetLdFlags(config)+`-X main.Version={NCI_COMMIT_REF_RELEASE} -X main.CommitHashShort={NCI_COMMIT_SHA_SHORT} -X main.CommitHash={NCI_COMMIT_SHA} -X main.BuildAt={NOW_RFC3339}" .`, ctx.Env), ctx.Env, ctx.CurrentModule.Directory)
 			})
 			if err != nil {
 				return errors.New("failed to schedule go-install task. Cause: " + err.Error())
