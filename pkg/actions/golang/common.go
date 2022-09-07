@@ -28,7 +28,7 @@ func CrossCompile(ctx *api.ActionExecutionContext, config Config, goos string, g
 	compileEnv["GOOS"] = goos
 	compileEnv["GOARCH"] = goarch
 
-	command.RunCommand(api.ReplacePlaceholders(`go build -o `+filepath.Join(ctx.Paths.Artifact, targetFile)+` -ldflags "`+GetLdFlags(config)+`-X main.Version={NCI_COMMIT_REF_RELEASE} -X main.CommitHash={NCI_COMMIT_SHA_SHORT} -X main.BuildAt={NOW_RFC3339}" .`, compileEnv), compileEnv, ctx.CurrentModule.Directory)
+	command.RunCommand(api.ReplacePlaceholders(`go build -buildvcs=false -o `+filepath.Join(ctx.Paths.Artifact, targetFile)+` -ldflags "`+GetLdFlags(config)+`-X main.Version={NCI_COMMIT_REF_RELEASE} -X main.RepositoryStatus={NCI_REPOSITORY_STATUS} -X main.CommitHash={NCI_COMMIT_SHA} -X main.BuildAt={NOW_RFC3339}" .`, compileEnv), compileEnv, ctx.CurrentModule.Directory)
 }
 
 func GetLdFlags(config Config) string {

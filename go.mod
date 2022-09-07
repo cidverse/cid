@@ -6,7 +6,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.4.10
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/cidverse/cidverseutils v0.0.0-20220818230102-9d2a18677b1c
-	github.com/cidverse/normalizeci v1.1.1-0.20220907213037-1e33c7a399e3
+	github.com/cidverse/normalizeci v1.1.1-0.20220908085929-137c938e47a3
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.12.5
 	github.com/google/go-containerregistry v0.11.0
