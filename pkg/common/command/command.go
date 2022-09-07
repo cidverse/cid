@@ -136,9 +136,13 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 			}
 		}
 
-		containerCmd := cihelper.ToUnixPathArgs(containerExec.GetRunCommand(containerExec.DetectRuntime()))
-		log.Debug().Msg("container-exec: " + containerCmd)
-		containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
+		containerCmd, containerCmdErr := containerExec.GetRunCommand(containerExec.DetectRuntime())
+		if containerCmdErr != nil {
+			return containerCmdErr
+		}
+
+		log.Debug().Msg("container-exec: " + cihelper.ToUnixPathArgs(containerCmd))
+		containerCmdArgs := strings.SplitN(cihelper.ToUnixPathArgs(containerCmd), " ", 2)
 		return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdout, stderr)
 	default:
 		log.Fatal().Interface("type", candidate.Type).Msg("execution type is not supported!")
