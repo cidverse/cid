@@ -2,13 +2,18 @@ package analyzerapi
 
 import (
 	"github.com/rs/zerolog/log"
+	ignore "github.com/sabhiram/go-gitignore"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 )
 
 func GetAnalyzerContext(projectDir string) AnalyzerContext {
+	// respect gitignore
+	ignoreMatcher := ProcessIgnoreFiles([]string{filepath.Join(projectDir, ".gitignore"), filepath.Join(projectDir, ".cidignore")})
+
 	// files
 	var files []string
 	filesByExtension := make(map[string][]string)
@@ -17,12 +22,15 @@ func GetAnalyzerContext(projectDir string) AnalyzerContext {
 	err := filepath.WalkDir(projectDir, func(path string, d fs.DirEntry, err error) error {
 		// check for directory skip
 		if d.IsDir() {
-			if d.Name() == ".git" || path == filepath.Join(projectDir, "dist") || path == filepath.Join(projectDir, "tmp") || d.Name() == ".idea" {
+			if d.Name() == ".git" || ignoreMatcher.MatchesPath(path) {
 				return filepath.SkipDir
 			}
 		} else {
-			files = append(files, path)
+			if ignoreMatcher.MatchesPath(path) {
+				return nil
+			}
 
+			files = append(files, path)
 			splitByExt := strings.SplitN(d.Name(), ".", 2)
 			if len(splitByExt) == 2 {
 				filesByExtension[splitByExt[1]] = append(filesByExtension[splitByExt[1]], path)
@@ -76,4 +84,21 @@ func AddModuleToResult(result *[]*ProjectModule, module *ProjectModule) {
 	} else {
 		*result = append(*result, module)
 	}
+}
+
+func ProcessIgnoreFiles(files []string) *ignore.GitIgnore {
+	var ignoreLines []string
+
+	for _, file := range files {
+		if _, err := os.Stat(file); err == nil {
+			content, contentErr := os.ReadFile(file)
+			if contentErr == nil {
+				for _, l := range strings.Split(string(content), "\n") {
+					ignoreLines = append(ignoreLines, l)
+				}
+			}
+		}
+	}
+
+	return ignore.CompileIgnoreLines(ignoreLines...)
 }

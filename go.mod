@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.4.10
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/cidverse/cidverseutils v0.0.0-20220724174502-7db3caf8502d
+	github.com/cidverse/cidverseutils v0.0.0-20220818230102-9d2a18677b1c
 	github.com/cidverse/normalizeci v1.1.1-0.20220511222032-c021e3301e69
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.12.5
@@ -18,6 +18,7 @@ require (
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/otiai10/copy v1.7.0
 	github.com/rs/zerolog v1.27.0
+	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06
 	github.com/samber/lo v1.27.0
 	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
 	github.com/spf13/cobra v1.5.0
