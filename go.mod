@@ -17,7 +17,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/otiai10/copy v1.7.0
-	github.com/rs/zerolog v1.27.0
+	github.com/rs/zerolog v1.28.0
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06
 	github.com/samber/lo v1.27.0
 	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
