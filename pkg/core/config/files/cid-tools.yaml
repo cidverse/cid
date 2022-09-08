@@ -3,6 +3,8 @@ localtools:
   # golang
   - binary: ["go", "gofmt"]
     lookup:
+      - key: GOROOT_1_19
+        version: 1.19.0
       - key: GOROOT_1_18
         version: 1.18.0
       - key: GOROOT_1_17
