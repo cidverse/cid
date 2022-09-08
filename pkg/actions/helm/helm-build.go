@@ -64,7 +64,7 @@ func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *
 	}
 
 	// rebuild the charts/ directory based on the Chart.lock file
-	command.RunCommand("helm dependency build "+ctx.CurrentModule.Directory+" --verify", ctx.Env, ctx.ProjectDir)
+	command.RunCommand("helm dependency build "+ctx.CurrentModule.Directory, ctx.Env, ctx.ProjectDir)
 
 	// package charts
 	log.Info().Str("path", ctx.CurrentModule.Directory).Str("version", ver).Msg("packaging chart")
