@@ -212,3 +212,8 @@ containerimages:
     provides:
       - binary: rke
         version: 1.3.14
+  # reposync
+  - image: quay.io/cidverse/reposync:0.2.0
+    provides:
+      - binary: reposync
+        version: 0.2.0
