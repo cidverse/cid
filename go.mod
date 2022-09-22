@@ -6,7 +6,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.4.10
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/cidverse/cidverseutils v0.0.0-20220818230102-9d2a18677b1c
-	github.com/cidverse/normalizeci v1.1.1-0.20220908085929-137c938e47a3
+	github.com/cidverse/normalizeci v1.1.1-0.20220915203509-f7f8ce189965
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.12.5
 	github.com/google/go-containerregistry v0.11.0
@@ -76,10 +76,10 @@ require (
 	github.com/xanzy/go-gitlab v0.73.1 // indirect
 	github.com/xanzy/ssh-agent v0.3.2 // indirect
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
-	golang.org/x/net v0.0.0-20220907135653-1e95f45603a7 // indirect
-	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094 // indirect
+	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
+	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220907062415-87db552b00fd // indirect
+	golang.org/x/sys v0.0.0-20220915200043-7b5979e65e41 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
