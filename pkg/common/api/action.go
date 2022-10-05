@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/core/config"
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/common"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
 const DefaultParallelization = 10

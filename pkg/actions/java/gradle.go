@@ -2,8 +2,8 @@ package java
 
 import (
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 	cp "github.com/otiai10/copy"
 	"github.com/rs/zerolog/log"
 	"os"

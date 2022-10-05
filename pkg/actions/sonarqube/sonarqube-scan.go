@@ -1,7 +1,7 @@
 package sonarqube
 
 import (
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"path/filepath"
 	"strings"
 

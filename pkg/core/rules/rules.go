@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/cidverse/cid/pkg/core/config"
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/normalizeci/pkg/ncispec"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"

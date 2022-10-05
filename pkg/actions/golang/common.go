@@ -6,7 +6,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
 //go:embed files

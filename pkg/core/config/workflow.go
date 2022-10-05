@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
 type WorkflowExpressionType string

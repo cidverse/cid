@@ -2,8 +2,8 @@ package java
 
 import (
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/repoanalyzer/analyzerapi"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"path/filepath"
 )
 

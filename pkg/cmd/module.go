@@ -8,7 +8,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
-	"github.com/cidverse/cid/pkg/repoanalyzer"
+	"github.com/cidverse/repoanalyzer"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )

@@ -1,7 +1,7 @@
 package workflowrun
 
 import (
-	"github.com/cidverse/cid/pkg/repoanalyzer"
+	"github.com/cidverse/repoanalyzer"
 	"time"
 
 	"github.com/cidverse/cid/pkg/common/api"
