@@ -4,3 +4,6 @@
 # generated artifacts
 .dist/*
 .tmp/*
+
+# notes
+notes
