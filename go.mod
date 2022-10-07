@@ -19,7 +19,7 @@ require (
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/otiai10/copy v1.7.0
 	github.com/rs/zerolog v1.28.0
-	github.com/samber/lo v1.30.0
+	github.com/samber/lo v1.31.0
 	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
