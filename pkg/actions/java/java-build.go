@@ -1,6 +1,7 @@
 package java
 
 import (
+	"github.com/cidverse/cid/pkg/core/state"
 	"path/filepath"
 	"strings"
 
@@ -28,12 +29,12 @@ func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// run build
-	BuildJavaProject(ctx, state, ctx.CurrentModule)
+	BuildJavaProject(ctx, localState, ctx.CurrentModule)
 
 	// colelct artifacts
-	CollectGradleArtifacts(ctx, state, ctx.CurrentModule)
+	CollectGradleArtifacts(ctx, localState, ctx.CurrentModule)
 
 	// find artifacts
 	files, _ := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".jar"})
@@ -51,7 +52,7 @@ func init() {
 	api.RegisterBuiltinAction(BuildActionStruct{})
 }
 
-func BuildJavaProject(ctx *api.ActionExecutionContext, state *api.ActionStateContext, module *analyzerapi.ProjectModule) {
+func BuildJavaProject(ctx *api.ActionExecutionContext, localState *state.ActionStateContext, module *analyzerapi.ProjectModule) {
 	// get release version
 	releaseVersion := ctx.Env["NCI_COMMIT_REF_RELEASE"]
 

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/samber/lo"
 	"os/user"
 	"path/filepath"
@@ -30,7 +31,7 @@ type ActionStep interface {
 	// Check evaluates if the action should be executed or not
 	Check(ctx *ActionExecutionContext) bool
 	// Execute runs the action
-	Execute(ctx *ActionExecutionContext, state *ActionStateContext) error
+	Execute(ctx *ActionExecutionContext, localState *state.ActionStateContext) error
 }
 
 // ActionExecutionContext holds runtime information for the actions
@@ -81,15 +82,6 @@ func UpdateContext(ctx *ActionExecutionContext) {
 			Cache:    "",
 		}
 	}
-}
-
-// ActionStateContext holds state information about executed actions / results (ie. generated artifacts)
-type ActionStateContext struct {
-	// Version of the serialized action state
-	Version int `json:"version"`
-
-	// Modules contains the project modules
-	Modules []*analyzerapi.ProjectModule
 }
 
 // CoverageReport contains a generic coverage report

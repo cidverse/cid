@@ -1,6 +1,7 @@
 package syft
 
 import (
+	"github.com/cidverse/cid/pkg/core/state"
 	"io/fs"
 	"path/filepath"
 	"strings"
@@ -26,7 +27,7 @@ func (action SBOMGrypeScanStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action SBOMGrypeScanStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action SBOMGrypeScanStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// syft configuration
 	ctx.Env["GRYPE_CHECK_FOR_APP_UPDATE"] = "false"
 

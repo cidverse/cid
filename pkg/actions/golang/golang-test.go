@@ -2,6 +2,7 @@ package golang
 
 import (
 	"errors"
+	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"path/filepath"
 	"strings"
@@ -29,7 +30,7 @@ func (action TestActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action TestActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action TestActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// config
 	coverageFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "test"), "coverage.out")
 	coverageJSON := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "test"), "coverage.json")

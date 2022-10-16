@@ -1,7 +1,9 @@
 package workflowrun
 
 import (
+	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer"
+	"path/filepath"
 	"time"
 
 	"github.com/cidverse/cid/pkg/common/api"
@@ -159,8 +161,11 @@ func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowActi
 	start := time.Now()
 	ruleContext := rules.GetRuleContext(ctx.Env)
 	if rules.AnyRuleMatches(action.Rules, ruleContext) {
+		stateFile := filepath.Join(ctx.Paths.Temp, "state.json")
+
 		// state: retrieve/init
-		state := getState(*ctx)
+		localState := state.GetStateFromFile(stateFile)
+		localState.Modules = ctx.Modules
 
 		// serialize action config for pass-thru
 		actConfig, _ := yaml.Marshal(&action.Config)
@@ -172,8 +177,8 @@ func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowActi
 
 		// execute
 		if catalogAction.Type == config.ActionTypeBuiltinGolang {
-			if evaluateActionBuiltinGolang(ctx, &state, catalogAction, action) {
-				err := runActionBuiltinGolang(ctx, &state, catalogAction, action)
+			if evaluateActionBuiltinGolang(ctx, &localState, catalogAction, action) {
+				err := runActionBuiltinGolang(ctx, &localState, catalogAction, action)
 				if err != nil {
 					log.Fatal().Err(err).Str("action", action.ID).Msg("action error")
 					return
@@ -187,7 +192,7 @@ func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowActi
 		}
 
 		// state: store
-		persistState(ctx, state)
+		state.PersistStateToFile(stateFile, localState)
 
 		// complete
 		log.Info().Str("action", action.ID).Str("duration", time.Since(start).String()).Msg("action completed")

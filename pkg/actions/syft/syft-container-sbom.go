@@ -1,6 +1,7 @@
 package syft
 
 import (
+	"github.com/cidverse/cid/pkg/core/state"
 	"io/fs"
 	"path/filepath"
 	"strings"
@@ -26,7 +27,7 @@ func (action SBOMReportStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action SBOMReportStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action SBOMReportStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// syft configuration
 	ctx.Env["SYFT_CHECK_FOR_APP_UPDATE"] = "false"
 

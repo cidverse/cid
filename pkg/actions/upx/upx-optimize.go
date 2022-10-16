@@ -2,6 +2,7 @@ package upx
 
 import (
 	"errors"
+	"github.com/cidverse/cid/pkg/core/state"
 	"path/filepath"
 
 	"github.com/cidverse/cid/pkg/common/api"
@@ -26,7 +27,7 @@ func (action OptimizeActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action OptimizeActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action OptimizeActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	files, filesErr := filesystem.FindFilesByExtension(filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "bin"), nil)
 	if filesErr != nil {
 		return filesErr

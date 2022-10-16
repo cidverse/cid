@@ -4,6 +4,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/core/config"
+	"github.com/cidverse/cid/pkg/core/state"
 )
 
 type TagCreateStruct struct{}
@@ -35,7 +36,7 @@ func (action TagCreateStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action TagCreateStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action TagCreateStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	tagName := "v" + ctx.Env["NCI_NEXTRELEASE_NAME"]
 
 	// create tag

@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"github.com/cidverse/cid/pkg/core/state"
 	"path/filepath"
 	"strings"
 
@@ -32,7 +33,7 @@ func (action AssetPublishGitHubStruct) Check(ctx *api.ActionExecutionContext) bo
 }
 
 // Execute runs the action
-func (action AssetPublishGitHubStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action AssetPublishGitHubStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// context
 	ctx.Env["GITHUB_TOKEN"] = ctx.Env["GITHUB_TOKEN"]
 

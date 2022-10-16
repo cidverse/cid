@@ -1,6 +1,7 @@
 package gitleaks
 
 import (
+	"github.com/cidverse/cid/pkg/core/state"
 	"strings"
 
 	"github.com/cidverse/cid/pkg/common/api"
@@ -25,7 +26,7 @@ func (action ScanStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	var opts []string
 	if ctx.Env["CI"] == "true" {
 		opts = append(opts, "--redact")

@@ -3,6 +3,7 @@ package golang
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"path/filepath"
 )
@@ -24,7 +25,7 @@ func (action LintActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action LintActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action LintActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// run lint
 	if filesystem.FileExists(filepath.Join(ctx.CurrentModule.Directory, ".golangci.yml")) || filesystem.FileExists(filepath.Join(ctx.ProjectDir, ".golangci.yml")) {
 		command.RunCommand(`golangci-lint run --sort-results --issues-exit-code 1`, ctx.Env, ctx.CurrentModule.Directory)

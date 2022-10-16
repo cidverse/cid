@@ -2,6 +2,7 @@ package changelog
 
 import (
 	"errors"
+	"github.com/cidverse/cid/pkg/core/state"
 	"path/filepath"
 	"time"
 
@@ -29,7 +30,7 @@ func (action ChangelogGenerateStruct) Check(ctx *api.ActionExecutionContext) boo
 }
 
 // Execute runs the action
-func (action ChangelogGenerateStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action ChangelogGenerateStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	var config Config
 	configParseErr := yaml.Unmarshal([]byte(ctx.Config), &config)
 	if configParseErr != nil {

@@ -1,6 +1,7 @@
 package sonarqube
 
 import (
+	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"path/filepath"
 	"strings"
@@ -29,7 +30,7 @@ func (action ScanStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// protect token
 	protectoutput.ProtectPhrase(ctx.Env[SonarToken])
 

@@ -1,6 +1,7 @@
 package helm
 
 import (
+	"github.com/cidverse/cid/pkg/core/state"
 	"path/filepath"
 
 	"github.com/cidverse/cid/pkg/common/api"
@@ -27,7 +28,7 @@ func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	chartDir := filepath.Join(ctx.Paths.Artifact, "helm-charts")
 
 	// version

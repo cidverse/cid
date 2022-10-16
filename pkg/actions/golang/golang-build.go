@@ -2,6 +2,7 @@ package golang
 
 import (
 	"errors"
+	"github.com/cidverse/cid/pkg/core/state"
 	"os"
 	"strings"
 
@@ -30,7 +31,7 @@ func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	var config Config
 	configParseErr := yaml.Unmarshal([]byte(ctx.Config), &config)
 	if configParseErr != nil {

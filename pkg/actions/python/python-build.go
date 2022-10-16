@@ -3,6 +3,7 @@ package python
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
@@ -23,7 +24,7 @@ func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemRequirementsTXT {
 		command.RunCommand(`pip install -r requirements.txt`, ctx.Env, ctx.ProjectDir)
 	} else if ctx.CurrentModule.BuildSystem == analyzerapi.BuildSystemPipfile {

@@ -2,6 +2,7 @@ package java
 
 import (
 	"errors"
+	"github.com/cidverse/cid/pkg/core/state"
 	"strings"
 
 	"github.com/cidverse/cid/pkg/common/api"
@@ -27,7 +28,7 @@ func (action PublishActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// release env
 	releaseEnv := ctx.Env
 	// - gpg signing

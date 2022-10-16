@@ -3,6 +3,7 @@ package trivy
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/core/state"
 )
 
 type FSScanStruct struct{}
@@ -22,7 +23,7 @@ func (action FSScanStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action FSScanStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action FSScanStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	_ = command.RunOptionalCommand(`trivy filesystem --exit-code 0 --skip-dirs dist --skip-dirs pkg/repoanalyzer/testdata --timeout=1m0s `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)
 
 	return nil

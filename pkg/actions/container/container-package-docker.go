@@ -1,6 +1,7 @@
 package container
 
 import (
+	"github.com/cidverse/cid/pkg/core/state"
 	"path/filepath"
 	"strings"
 	"time"
@@ -28,7 +29,7 @@ func (action DockerPackageActionStruct) Check(ctx *api.ActionExecutionContext) b
 }
 
 // Execute runs the action
-func (action DockerPackageActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action DockerPackageActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	dockerfile := filepath.Join(ctx.CurrentModule.Directory, "Dockerfile")
 	image := getFullImage(ctx.Env["NCI_CONTAINERREGISTRY_HOST"], ctx.Env["NCI_CONTAINERREGISTRY_REPOSITORY"], ctx.Env["NCI_CONTAINERREGISTRY_TAG"])
 

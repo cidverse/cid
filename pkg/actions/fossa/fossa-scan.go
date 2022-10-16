@@ -3,6 +3,7 @@ package fossa
 import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/core/state"
 	"strings"
 )
 
@@ -23,7 +24,7 @@ func (action ScanActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action ScanActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action ScanActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// run scan
 	var scanArgs []string
 	scanArgs = append(scanArgs, `fossa analyze`)

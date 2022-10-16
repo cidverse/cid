@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
@@ -29,7 +30,7 @@ func (action PublishActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// find registry auth file
 	authFile := getFirstExistingFile([]string{
 		"/var/tmp/containers-user-" + ctx.CurrentUser.Uid + "/containers/containers/auth.json",

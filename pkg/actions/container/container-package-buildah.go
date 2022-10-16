@@ -2,6 +2,7 @@ package container
 
 import (
 	"errors"
+	"github.com/cidverse/cid/pkg/core/state"
 	"path/filepath"
 	"strings"
 	"time"
@@ -38,7 +39,7 @@ func (action BuildahPackageActionStruct) Check(ctx *api.ActionExecutionContext) 
 }
 
 // Execute runs the action
-func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	var config BuildahConfig
 	configParseErr := yaml.Unmarshal([]byte(ctx.Config), &config)
 	if configParseErr != nil {

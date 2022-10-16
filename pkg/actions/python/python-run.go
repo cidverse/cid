@@ -1,6 +1,7 @@
 package python
 
 import (
+	"github.com/cidverse/cid/pkg/core/state"
 	"strings"
 
 	"github.com/cidverse/cid/pkg/common/api"
@@ -26,7 +27,7 @@ func (action RunActionStruct) Check(ctx *api.ActionExecutionContext) bool {
 }
 
 // Execute runs the action
-func (action RunActionStruct) Execute(ctx *api.ActionExecutionContext, state *api.ActionStateContext) error {
+func (action RunActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	files, filesErr := filesystem.FindFilesByExtension(ctx.ProjectDir, []string{".py"})
 	if filesErr != nil {
 		log.Fatal().Err(filesErr).Str("path", ctx.ProjectDir).Msg("failed to list files")
