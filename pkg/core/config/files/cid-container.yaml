@@ -117,10 +117,10 @@ containerimages:
       - binary: upx
         version: 3.96.0
   # gitguardian ggshield
-  - image: quay.io/cidverse/ggshield:1.13.5
+  - image: quay.io/cidverse/ggshield:1.13.6
     provides:
       - binary: ggshield
-        version: 1.13.5
+        version: 1.13.6
   # sonarqube
   - image: quay.io/cidverse/sonarscannercli:4.7.0.2747
     provides:
