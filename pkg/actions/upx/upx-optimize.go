@@ -21,11 +21,6 @@ func (action OptimizeActionStruct) GetDetails(ctx *api.ActionExecutionContext) a
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action OptimizeActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return true
-}
-
 // Execute runs the action
 func (action OptimizeActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	files, filesErr := filesystem.FindFilesByExtension(filepath.Join(ctx.ProjectDir, ctx.Paths.Artifact, "bin"), nil)

@@ -18,11 +18,6 @@ func (action ScanActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.A
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action ScanActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return len(ctx.Env["FOSSA_API_KEY"]) > 0
-}
-
 // Execute runs the action
 func (action ScanActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// run scan

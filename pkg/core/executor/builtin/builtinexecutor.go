@@ -25,12 +25,9 @@ func (e Executor) Check(ctx *commonapi.ActionExecutionContext, localState *state
 	// actionType: builtin
 	builtinAction := commonapi.BuiltinActions[catalogAction.Name]
 	if builtinAction != nil {
-		// runtime check
-		if builtinAction.Check(ctx) {
-			return true
-		}
+		return true
 	} else {
-		log.Error().Str("action", action.ID).Msg("skipping action, does not exist")
+		log.Error().Str("action", action.ID).Str("executorName", e.GetName()).Str("executorVersion", e.GetVersion()).Str("executorType", e.GetType()).Msg("action is not registered")
 	}
 
 	return false
@@ -40,17 +37,12 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	// actionType: builtin
 	builtinAction := commonapi.BuiltinActions[catalogAction.Name]
 	if builtinAction != nil {
-		// runtime check
-		if builtinAction.Check(ctx) {
-			actErr := builtinAction.Execute(ctx, localState)
-			if actErr != nil {
-				log.Fatal().Err(actErr).Str("action", action.ID).Msg("action execution failed")
-			}
-		} else {
-			log.Warn().Msg("action requirements not fulfilled!")
+		actErr := builtinAction.Execute(ctx, localState)
+		if actErr != nil {
+			log.Fatal().Err(actErr).Str("action", action.ID).Msg("action execution failed")
 		}
 	} else {
-		log.Error().Str("action", action.ID).Msg("skipping action, does not exist")
+		log.Error().Str("action", action.ID).Str("executorName", e.GetName()).Str("executorVersion", e.GetVersion()).Str("executorType", e.GetType()).Msg("action is not registered")
 	}
 
 	return nil

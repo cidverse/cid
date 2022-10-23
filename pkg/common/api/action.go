@@ -28,8 +28,7 @@ type ActionDetails struct {
 type ActionStep interface {
 	// GetDetails retrieves information about the action
 	GetDetails(ctx *ActionExecutionContext) ActionDetails
-	// Check evaluates if the action should be executed or not
-	Check(ctx *ActionExecutionContext) bool
+
 	// Execute runs the action
 	Execute(ctx *ActionExecutionContext, localState *state.ActionStateContext) error
 }

@@ -23,11 +23,6 @@ func (action DockerPackageActionStruct) GetDetails(ctx *api.ActionExecutionConte
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action DockerPackageActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return filesystem.FileExists(filepath.Join(ctx.ProjectDir, "Dockerfile")) || len(DetectAppType(ctx)) > 0
-}
-
 // Execute runs the action
 func (action DockerPackageActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	dockerfile := filepath.Join(ctx.CurrentModule.Directory, "Dockerfile")

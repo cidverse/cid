@@ -33,11 +33,6 @@ func (action BuildahPackageActionStruct) GetDetails(ctx *api.ActionExecutionCont
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action BuildahPackageActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return true
-}
-
 // Execute runs the action
 func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	var config BuildahConfig

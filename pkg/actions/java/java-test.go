@@ -18,11 +18,6 @@ func (action TestActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.A
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action TestActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return true
-}
-
 // Execute runs the action
 func (action TestActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// get release version

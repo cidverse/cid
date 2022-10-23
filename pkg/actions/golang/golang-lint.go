@@ -19,11 +19,6 @@ func (action LintActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.A
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action LintActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return true
-}
-
 // Execute runs the action
 func (action LintActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// run lint

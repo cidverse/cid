@@ -23,11 +23,6 @@ func (action BuildActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action BuildActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return true
-}
-
 // Execute runs the action
 func (action BuildActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// run build

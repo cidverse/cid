@@ -212,10 +212,16 @@ catalog:
     #  name: gitleaks-scan
     #  type: builtin-golang
     #  scope: project
-    #- repository: central
-    #  name: gitguardian-scan
-    #  type: builtin-golang
-    #  scope: project
+    - repository: central
+      name: gitguardian-scan
+      type: builtin-golang
+      scope: project
+      rules:
+        - type: cel
+          expression: ENV["GITGUARDIAN_API_KEY"] != "" && NCI_COMMIT_REF_TYPE == "branch"
+      access:
+        env:
+          - GITGUARDIAN_.*
     - repository: central
       name: sonarqube-scan
       type: builtin-golang
@@ -246,10 +252,13 @@ catalog:
       access:
         env:
           - GRYPE_.*
-    #- repository: central
-    #  name: dependencycheck-scan
-    #  type: builtin-golang
-    #  scope: project
+    - repository: central
+      name: dependencycheck-scan
+      type: builtin-golang
+      scope: project
+      rules:
+        - type: cel
+          expression: ENV["OWASP_DEPENDENCYCHECK_ENABLED"] == "true"
     # publish
     - repository: central
       name: repo-tag-create

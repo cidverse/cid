@@ -24,11 +24,6 @@ func (action ScanStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionD
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action ScanStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return true
-}
-
 // Execute runs the action
 func (action ScanStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// protect token

@@ -17,11 +17,6 @@ func (action FSScanStruct) GetDetails(ctx *api.ActionExecutionContext) api.Actio
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action FSScanStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return true
-}
-
 // Execute runs the action
 func (action FSScanStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	_ = command.RunOptionalCommand(`trivy filesystem --exit-code 0 --skip-dirs dist --skip-dirs pkg/repoanalyzer/testdata --timeout=1m0s `+ctx.ProjectDir, ctx.Env, ctx.ProjectDir)

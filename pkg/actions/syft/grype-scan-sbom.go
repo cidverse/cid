@@ -21,11 +21,6 @@ func (action SBOMGrypeScanStruct) GetDetails(ctx *api.ActionExecutionContext) ap
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action SBOMGrypeScanStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return true
-}
-
 // Execute runs the action
 func (action SBOMGrypeScanStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// syft configuration

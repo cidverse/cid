@@ -24,11 +24,6 @@ func (action PublishActionStruct) GetDetails(ctx *api.ActionExecutionContext) ap
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action PublishActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return true
-}
-
 // Execute runs the action
 func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// find registry auth file

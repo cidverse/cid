@@ -21,11 +21,6 @@ func (action SBOMReportStruct) GetDetails(ctx *api.ActionExecutionContext) api.A
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action SBOMReportStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return true
-}
-
 // Execute runs the action
 func (action SBOMReportStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	// syft configuration

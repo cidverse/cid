@@ -17,11 +17,6 @@ func (action RunActionStruct) GetDetails(ctx *api.ActionExecutionContext) api.Ac
 	}
 }
 
-// Check evaluates if the action should be executed or not
-func (action RunActionStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return true
-}
-
 // Execute runs the action
 func (action RunActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
 	_ = command.RunOptionalCommand(`hugo server --minify --gc --log --verboseLog --baseUrl "/" --watch --source `+ctx.ProjectDir+``, ctx.Env, ctx.ProjectDir)
