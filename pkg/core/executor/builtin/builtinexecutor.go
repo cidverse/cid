@@ -1,15 +1,29 @@
-package workflowrun
+package builtin
 
 import (
-	"github.com/cidverse/cid/pkg/common/api"
+	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/rs/zerolog/log"
 )
 
-func evaluateActionBuiltinGolang(ctx *api.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *config.Action, action *config.WorkflowAction) bool {
+type Executor struct{}
+
+func (e Executor) GetName() string {
+	return "builtin"
+}
+
+func (e Executor) GetVersion() string {
+	return "0.1.0"
+}
+
+func (e Executor) GetType() string {
+	return "builtin-golang"
+}
+
+func (e Executor) Check(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *config.Action, action *config.WorkflowAction) bool {
 	// actionType: builtin
-	builtinAction := api.BuiltinActions[catalogAction.Name]
+	builtinAction := commonapi.BuiltinActions[catalogAction.Name]
 	if builtinAction != nil {
 		// runtime check
 		if builtinAction.Check(ctx) {
@@ -22,9 +36,9 @@ func evaluateActionBuiltinGolang(ctx *api.ActionExecutionContext, localState *st
 	return false
 }
 
-func runActionBuiltinGolang(ctx *api.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *config.Action, action *config.WorkflowAction) error {
+func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *config.Action, action *config.WorkflowAction) error {
 	// actionType: builtin
-	builtinAction := api.BuiltinActions[catalogAction.Name]
+	builtinAction := commonapi.BuiltinActions[catalogAction.Name]
 	if builtinAction != nil {
 		// runtime check
 		if builtinAction.Check(ctx) {

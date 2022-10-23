@@ -1,6 +1,7 @@
 package workflowrun
 
 import (
+	"github.com/cidverse/cid/pkg/core/executor"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer"
 	"path/filepath"
@@ -176,9 +177,10 @@ func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowActi
 		filesystem.CreateDirectory(ctx.Paths.Artifact)
 
 		// execute
-		if catalogAction.Type == config.ActionTypeBuiltinGolang {
-			if evaluateActionBuiltinGolang(ctx, &localState, catalogAction, action) {
-				err := runActionBuiltinGolang(ctx, &localState, catalogAction, action)
+		actionExecutor := executor.FindExecutorByType(string(catalogAction.Type))
+		if actionExecutor != nil {
+			if actionExecutor.Check(ctx, &localState, catalogAction, action) {
+				err := actionExecutor.Execute(ctx, &localState, catalogAction, action)
 				if err != nil {
 					log.Fatal().Err(err).Str("action", action.ID).Msg("action error")
 					return
