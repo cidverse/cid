@@ -21,7 +21,7 @@ require (
 	github.com/rs/zerolog v1.28.0
 	github.com/samber/lo v1.33.0
 	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
-	github.com/spf13/cobra v1.6.0
+	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/thoas/go-funk v0.9.2
 	google.golang.org/genproto v0.0.0-20220502173005-c8bf987b8c21
