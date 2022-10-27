@@ -2,7 +2,11 @@ package rules
 
 import (
 	"fmt"
+	"github.com/google/cel-go/common/types/ref"
+	"github.com/thoas/go-funk"
+	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/normalizeci/pkg/ncispec"
@@ -18,6 +22,7 @@ const ModuleName = "MODULE_NAME"
 const ModuleSlug = "MODULE_SLUG"
 const ModuleBuildSystem = "MODULE_BUILD_SYSTEM"
 const ModuleBuildSystemSyntax = "MODULE_BUILD_SYSTEM_SYNTAX"
+const ModuleFiles = "MODULE_FILES"
 
 // AnyRuleMatches will return true if at least one rule matches, if no rules are provided this always returns true
 func AnyRuleMatches(rules []config.WorkflowRule, evalContext map[string]interface{}) bool {
@@ -85,8 +90,18 @@ func GetModuleRuleContext(env map[string]string, module *analyzerapi.ProjectModu
 	ctx[ModuleBuildSystem] = string(module.BuildSystem)
 	ctx[ModuleBuildSystemSyntax] = string(module.BuildSystemSyntax)
 
+	var files []string
+	for _, file := range module.Files {
+		files = append(files, strings.TrimPrefix(strings.TrimPrefix(file, module.Directory+"\\"), module.Directory+"/"))
+	}
+	ctx[ModuleFiles] = files
+
 	return ctx
 }
+
+var (
+	stringListType = reflect.TypeOf([]string{})
+)
 
 func evalRuleCEL(rule config.WorkflowRule, evalContext map[string]interface{}) bool {
 	if rule.Expression == "" {
@@ -101,13 +116,31 @@ func evalRuleCEL(rule config.WorkflowRule, evalContext map[string]interface{}) b
 			exprDecl = append(exprDecl, decls.NewVar(key, decls.Int))
 		case string:
 			exprDecl = append(exprDecl, decls.NewVar(key, decls.String))
+		case []string:
+			exprDecl = append(exprDecl, decls.NewVar(key, decls.NewListType(decls.String)))
 		case map[string]string:
 			exprDecl = append(exprDecl, decls.NewVar(key, decls.NewMapType(decls.String, decls.String)))
 		default:
 			log.Fatal().Str("type", string(rule.Type)).Str("key", key).Interface("value", value).Msg("unsupported evalContext value type")
 		}
 	}
-	celConfig, celConfigErr := cel.NewEnv(cel.Declarations(exprDecl...))
+
+	celConfig, celConfigErr := cel.NewEnv(
+		cel.Declarations(exprDecl...),
+		cel.Function("contains",
+			cel.Overload("contains_string",
+				[]*cel.Type{cel.ListType(cel.StringType), cel.StringType},
+				cel.BoolType,
+				cel.BinaryBinding(func(lhs, rhs ref.Val) ref.Val {
+					list, err := lhs.ConvertToNative(stringListType)
+					if err != nil {
+						return types.NewErr(err.Error())
+					}
+					return types.Bool(funk.ContainsString(list.([]string), string(rhs.(types.String))))
+				}),
+			),
+		),
+	)
 	if celConfigErr != nil {
 		log.Fatal().Err(celConfigErr).Msg("failed to initialize CEL environment")
 	}
