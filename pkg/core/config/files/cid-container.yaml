@@ -222,3 +222,8 @@ containerimages:
     provides:
       - binary: reposync
         version: 0.2.0
+  # techdocs-cli
+  - image: quay.io/cidverse/techdocscli:1.2.2
+    provides:
+      - binary: techdocs-cli
+        version: 1.2.2

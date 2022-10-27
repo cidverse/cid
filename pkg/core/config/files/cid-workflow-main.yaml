@@ -20,6 +20,7 @@ workflows:
           - id: central/node-build
           - id: central/hugo-build
           - id: central/helm-build
+          - id: central/techdocs-build
       - name: test
         actions:
           - id: central/golang-test
