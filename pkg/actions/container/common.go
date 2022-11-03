@@ -52,33 +52,22 @@ func getFullImage(host string, repository string, tag string) string {
 }
 
 func getDockerfileSyntax(dockerfileContent string) string {
-	for _, line := range strings.Split(strings.TrimSuffix(dockerfileContent, "\n"), "\n") {
-		if strings.HasPrefix(line, "# syntax=") {
-			return strings.TrimRight(strings.TrimPrefix(line, "# syntax="), "\r")
-		}
-	}
-
-	return ""
+	return parseLine(dockerfileContent, "# syntax=")
 }
 
 func getDockerfileTargetPlatforms(dockerfileContent string) []Platform {
 	var platforms []Platform
 
-	for _, line := range strings.Split(strings.TrimSuffix(dockerfileContent, "\n"), "\n") {
-		if strings.HasPrefix(line, "# platforms=") {
-			platformsLine := strings.TrimRight(strings.TrimPrefix(line, "# platforms="), "\r")
+	platformsLine := parseLine(dockerfileContent, "# platforms=")
+	for _, element := range strings.Split(platformsLine, ",") {
+		elementSections := strings.Split(element, "/")
 
-			for _, element := range strings.Split(platformsLine, ",") {
-				elementSections := strings.Split(element, "/")
-
-				if len(elementSections) == 2 {
-					platforms = append(platforms, Platform{strings.ToLower(elementSections[0]), strings.ToLower(elementSections[1]), ""})
-				} else if len(elementSections) == 3 {
-					platforms = append(platforms, Platform{strings.ToLower(elementSections[0]), strings.ToLower(elementSections[1]), strings.ToLower(elementSections[2])})
-				} else {
-					log.Warn().Str("platform", element).Msg("skipping invalid platform definition from dockerfile")
-				}
-			}
+		if len(elementSections) == 2 {
+			platforms = append(platforms, Platform{strings.ToLower(elementSections[0]), strings.ToLower(elementSections[1]), ""})
+		} else if len(elementSections) == 3 {
+			platforms = append(platforms, Platform{strings.ToLower(elementSections[0]), strings.ToLower(elementSections[1]), strings.ToLower(elementSections[2])})
+		} else {
+			log.Warn().Str("platform", element).Msg("skipping invalid platform definition from dockerfile")
 		}
 	}
 
@@ -90,28 +79,34 @@ func getDockerfileTargetPlatforms(dockerfileContent string) []Platform {
 }
 
 func getDockerfileTargetImage(dockerfileContent string, suggestedName string) string {
-	image := ""
-	for _, line := range strings.Split(strings.TrimSuffix(dockerfileContent, "\n"), "\n") {
-		if strings.HasPrefix(line, "# image=") {
-			image = strings.TrimRight(strings.TrimPrefix(line, "# image="), "\r")
-		}
-	}
+	image := parseLine(dockerfileContent, "# image=")
+	ver := ""
 
 	if len(image) > 0 {
 		for _, line := range strings.Split(strings.TrimSuffix(dockerfileContent, "\n"), "\n") {
 			if strings.Contains(line, "ARG ") && strings.Contains(line, "_VERSION") {
 				args := strings.SplitN(line, "=", 2)
-				image = image + ":" + strings.TrimRight(args[1], "\r")
+				ver = strings.TrimRight(args[1], "\r")
 				break
 			}
 		}
 	}
 
-	if image == "" {
-		return suggestedName
+	if len(image) > 0 && len(ver) > 0 {
+		return image + ":" + ver
 	}
 
-	return image
+	return suggestedName
+}
+
+func parseLine(content string, prefix string) string {
+	for _, line := range strings.Split(strings.TrimSuffix(content, "\n"), "\n") {
+		if strings.HasPrefix(line, prefix) {
+			return strings.TrimRight(strings.TrimPrefix(line, prefix), "\r")
+		}
+	}
+
+	return ""
 }
 
 func getFirstExistingFile(files []string) string {
