@@ -31,7 +31,7 @@ workflows:
           - id: central/upx-optimize
           - id: central/container-package-buildah
             config:
-              no-cache: true
+              no-cache: false
               squash: true
               rebuild: true
       - name: lint

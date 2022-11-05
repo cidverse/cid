@@ -26,12 +26,6 @@ func (action PublishActionStruct) GetDetails(ctx *api.ActionExecutionContext) ap
 
 // Execute runs the action
 func (action PublishActionStruct) Execute(ctx *api.ActionExecutionContext, localState *state.ActionStateContext) error {
-	// find registry auth file
-	authFile := getFirstExistingFile([]string{
-		"/var/tmp/containers-user-" + ctx.CurrentUser.Uid + "/containers/containers/auth.json",
-	})
-	ctx.Env["REGISTRY_AUTH_FILE"] = authFile
-
 	// target image reference
 	imageRefFile := filepath.Join(ctx.Paths.ArtifactModule(ctx.CurrentModule.Slug, "oci-image"), "image.txt")
 	imageRef, imageRefErr := filesystem.GetFileContent(imageRefFile)

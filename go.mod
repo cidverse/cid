@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.4.10
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/cidverse/cidverseutils v0.0.0-20220818230102-9d2a18677b1c
+	github.com/cidverse/cidverseutils v0.0.0-20221104234928-602479ea4aad
 	github.com/cidverse/normalizeci v1.1.1-0.20220915203509-f7f8ce189965
 	github.com/cidverse/repoanalyzer v0.0.0-20221027184025-b504400a454f
 	github.com/go-resty/resty/v2 v2.7.0

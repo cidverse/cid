@@ -49,7 +49,7 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 		if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerFile {
 			syntax := getDockerfileSyntax(containerFileContent)
 			platforms := getDockerfileTargetPlatforms(containerFileContent)
-			imageReference = getDockerfileTargetImage(containerFileContent, imageReference)
+			imageReference = getDockerfileTargetImageWithVersion(containerFileContent, imageReference)
 
 			// skip image generation, if image is present in remote registry
 			if !config.Rebuild {
@@ -66,10 +66,11 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 				log.Info().Str("syntax", syntax).Interface("platform", platform.Platform("/")).Str("image", imageReference).Msg("building container image")
 
 				var buildArgs []string
-				buildArgs = append(buildArgs, `buildah bud`)
+				buildArgs = append(buildArgs, `buildah build`)
 				buildArgs = append(buildArgs, `--platform `+platform.Platform("/"))
 				buildArgs = append(buildArgs, `-f `+filepath.Base(containerFile))
 				buildArgs = append(buildArgs, `-t `+"oci-archive:"+containerArchiveFile)
+				buildArgs = append(buildArgs, `--layers`) // cache layers
 
 				// options
 				if config.NoCache {
@@ -78,11 +79,6 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 				if config.Squash {
 					buildArgs = append(buildArgs, `--squash`) // squash, excluding the base layer
 				}
-
-				// download cache
-				downloadCache := ctx.Paths.NamedCache("buildah-download/" + platform.OS + "-" + platform.Arch)
-				log.Debug().Str("source", downloadCache).Msg("mounting external cache for /cache")
-				buildArgs = append(buildArgs, `-v `+downloadCache+`:/cache`)
 
 				// labels (oci annotations: https://github.com/opencontainers/image-spec/blob/main/annotations.md)
 				buildArgs = append(buildArgs, `--annotation "org.opencontainers.image.source=`+strings.TrimSuffix(ctx.Env["NCI_REPOSITORY_REMOTE"], ".git")+`"`)
@@ -110,7 +106,7 @@ func (action BuildahPackageActionStruct) Execute(ctx *api.ActionExecutionContext
 			}
 		} else if ctx.CurrentModule.BuildSystemSyntax == analyzerapi.ContainerBuildahScript {
 			platforms := getDockerfileTargetPlatforms(containerFileContent)
-			imageReference = getDockerfileTargetImage(containerFileContent, imageReference)
+			imageReference = getDockerfileTargetImageWithVersion(containerFileContent, imageReference)
 			log.Info().Interface("platforms", platforms).Str("image", imageReference).Msg("building container image")
 
 			// build each image and add to manifest

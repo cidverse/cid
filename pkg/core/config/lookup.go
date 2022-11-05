@@ -42,6 +42,9 @@ type BinaryExecutionCandidate struct {
 	// ImageCache holds information about caching for containers
 	ImageCache []ToolCacheDir
 
+	// Mounts
+	Mounts []ContainerMount
+
 	// Security
 	Security ToolSecurity
 }
@@ -62,6 +65,7 @@ func (c *CIDConfig) FindExecutionCandidates(binary string, constraint string, pr
 						Type:       ExecutionContainer,
 						Image:      entry.Image,
 						ImageCache: entry.Cache,
+						Mounts:     entry.Mounts,
 						Security:   entry.Security,
 					})
 				}

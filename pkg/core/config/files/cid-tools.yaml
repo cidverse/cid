@@ -53,11 +53,6 @@ localtools:
     lookup:
       - key: PATH
         version: 0.0.0
-  # buildah
-  - binary: ["buildah"]
-    lookup:
-      - key: PATH
-        version: 0.0.0
   # podman
   - binary: ["podman"]
     lookup:

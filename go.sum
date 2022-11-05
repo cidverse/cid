@@ -34,8 +34,8 @@ github.com/cavaliergopher/grab/v3 v3.0.1 h1:4z7TkBfmPjmLAAmkkAZNX/6QJ1nNFdv3SdIH
 github.com/cavaliergopher/grab/v3 v3.0.1/go.mod h1:1U/KNnD+Ft6JJiYoYBAimKH2XrYptb8Kl3DFGmsjpq4=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
-github.com/cidverse/cidverseutils v0.0.0-20220818230102-9d2a18677b1c h1:YuuUfvtjFnpEfPma36LCwOcWIFApZm0WcmnLhkNNdQE=
-github.com/cidverse/cidverseutils v0.0.0-20220818230102-9d2a18677b1c/go.mod h1:Wb6DFdoNGJgeBDDtJ4CJbnS3skGL/Dw4xm2EBunYfMw=
+github.com/cidverse/cidverseutils v0.0.0-20221104234928-602479ea4aad h1:HL4npgejcoBuaHPQfPpUTsrANP6PUN8kONAyJxCBYc4=
+github.com/cidverse/cidverseutils v0.0.0-20221104234928-602479ea4aad/go.mod h1:/AGIUatLGHcFgQrK9vC6LaHCn8n4L4PM2BYew9AyFQk=
 github.com/cidverse/normalizeci v1.1.1-0.20220915203509-f7f8ce189965 h1:DaxxERuC68+yhES3S//QyHMMfYRVqJcXQCnLDOxTA9w=
 github.com/cidverse/normalizeci v1.1.1-0.20220915203509-f7f8ce189965/go.mod h1:Io9DPuHiP877JqOGObA7SqQLWGjQl/SLHMgYxq/hxgg=
 github.com/cidverse/repoanalyzer v0.0.0-20221027184025-b504400a454f h1:FTGkw7vftnmWxX40hHd/QhnpJJ1RsvilxAetBQu9dww=

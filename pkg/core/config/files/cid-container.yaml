@@ -166,19 +166,22 @@ containerimages:
       - binary: hadolint
         version: 2.10.0
   # buildah
-  - image: quay.io/cidverse/buildah:1.26.4
+  - image: quay.io/cidverse/buildah:1.28.0
     provides:
       - binary: buildah
-        version: 1.26.4
+        version: 1.28.0
       - binary: buildah-script
-        version: 1.26.4
+        version: 1.28.0
     security:
-      capabilities:
-        - CAP_SETGID
-        - CAP_SETUID
+      privileged: true
+      #capabilities:
+      #  - CAP_SETGID
+      #  - CAP_SETUID
     cache:
       - id: libcontainers-storage
         dir: /var/lib/containers/storage
+      - id: container-auth
+        dir: /app/.auth
   # gitleaks
   - image: quay.io/cidverse/gitleaks:8.15.0
     provides:

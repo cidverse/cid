@@ -67,7 +67,7 @@ func getDockerfileTargetPlatforms(dockerfileContent string) []Platform {
 		} else if len(elementSections) == 3 {
 			platforms = append(platforms, Platform{strings.ToLower(elementSections[0]), strings.ToLower(elementSections[1]), strings.ToLower(elementSections[2])})
 		} else {
-			log.Warn().Str("platform", element).Msg("skipping invalid platform definition from dockerfile")
+			log.Debug().Str("platform", element).Msg("no platform definition in dockerfile, not building a multi-arch image")
 		}
 	}
 
@@ -78,7 +78,7 @@ func getDockerfileTargetPlatforms(dockerfileContent string) []Platform {
 	return platforms
 }
 
-func getDockerfileTargetImage(dockerfileContent string, suggestedName string) string {
+func getDockerfileTargetImageWithVersion(dockerfileContent string, suggestedName string) string {
 	image := parseLine(dockerfileContent, "# image=")
 	ver := ""
 

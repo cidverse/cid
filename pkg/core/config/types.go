@@ -7,6 +7,7 @@ type ToolBinary struct {
 
 type ToolSecurity struct {
 	Capabilities []string `yaml:"capabilities"`
+	Privileged   bool     `yaml:"privileged"`
 }
 
 type ToolContainerImage struct {
@@ -15,6 +16,9 @@ type ToolContainerImage struct {
 	Cache    []ToolCacheDir `yaml:"cache"`
 	Security ToolSecurity   `yaml:"security"`
 	User     string         `yaml:"user"`
+
+	// Mounts
+	Mounts []ContainerMount `yaml:"mounts,omitempty"`
 }
 
 type ToolLocal struct {
@@ -35,6 +39,11 @@ type ToolCacheDir struct {
 	ID            string
 	ContainerPath string `yaml:"dir"`
 	MountType     string `yaml:"type"`
+}
+
+type ContainerMount struct {
+	Src  string `yaml:"src"`
+	Dest string `yaml:"dest"`
 }
 
 // CIDConfig is the full stuct of the configuration file

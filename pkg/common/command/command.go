@@ -105,14 +105,22 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 		projectDir := vcsrepository.FindRepositoryDirectory(workDir)
 
 		containerExec.SetImage(candidate.Image)
-		containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: cihelper.ToUnixPath(projectDir), Target: cihelper.ToUnixPath(projectDir)})
+		containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: projectDir, Target: projectDir})
 		containerExec.SetWorkingDirectory(cihelper.ToUnixPath(workDir))
 		containerExec.SetEntrypoint("unset")
-		containerExec.SetCommand(strings.Join(cmdArgs, " "))
+		containerExec.SetCommand(cihelper.ToUnixPathArgs(strings.Join(cmdArgs, " ")))
 
 		// security
-		for _, cap := range candidate.Security.Capabilities {
-			containerExec.AddCapability(cap)
+		if candidate.Security.Privileged {
+			containerExec.SetPrivileged(true)
+		}
+		for _, capability := range candidate.Security.Capabilities {
+			containerExec.AddCapability(capability)
+		}
+
+		// mounts
+		for _, mount := range candidate.Mounts {
+			containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: mount.Src, Target: mount.Dest})
 		}
 
 		// add env + sort by key
@@ -124,16 +132,12 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 
 		// cache
 		for _, c := range candidate.ImageCache {
+			// support mounting volumes (auto created if not present) or directories
 			cacheDir := path.Join(os.TempDir(), "cid", c.ID)
 			_ = os.MkdirAll(cacheDir, 0777)
 			_ = os.Chmod(cacheDir, 0777)
 
-			// support mounting volumes (auto created if not present) or directories
-			if c.MountType == "volume" {
-				containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: c.ID, Target: c.ContainerPath})
-			} else {
-				containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: cihelper.ToUnixPath(cacheDir), Target: c.ContainerPath})
-			}
+			containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: cacheDir, Target: c.ContainerPath})
 		}
 
 		containerCmd, containerCmdErr := containerExec.GetRunCommand(containerExec.DetectRuntime())
@@ -141,8 +145,8 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 			return containerCmdErr
 		}
 
-		log.Debug().Msg("container-exec: " + cihelper.ToUnixPathArgs(containerCmd))
-		containerCmdArgs := strings.SplitN(cihelper.ToUnixPathArgs(containerCmd), " ", 2)
+		log.Debug().Msg("container-exec: " + containerCmd)
+		containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
 		return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdout, stderr)
 	default:
 		log.Fatal().Interface("type", candidate.Type).Msg("execution type is not supported!")
