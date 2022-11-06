@@ -188,15 +188,15 @@ containerimages:
       - binary: gitleaks
         version: 8.15.0
   # syft
-  - image: quay.io/cidverse/syft:0.59.0
+  - image: quay.io/cidverse/syft:0.60.3
     provides:
       - binary: syft
-        version: 0.59.0
+        version: 0.60.3
   # grype
-  - image: quay.io/cidverse/grype:0.51.0
+  - image: quay.io/cidverse/grype:0.52.0
     provides:
       - binary: grype
-        version: 0.51.0
+        version: 0.52.0
     cache:
       - id: grype-cache
         dir: /app/.cache/grype
@@ -220,6 +220,10 @@ containerimages:
     provides:
       - binary: rke
         version: 1.3.15
+  - image: quay.io/cidverse/rke2:1.25.3
+    provides:
+      - binary: rke2
+        version: 1.25.3
   # reposync
   - image: quay.io/cidverse/reposync:0.2.0
     provides:
