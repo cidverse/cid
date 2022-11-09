@@ -17,7 +17,7 @@ require (
 	github.com/jinzhu/configor v1.2.1
 	github.com/mattn/go-colorable v0.1.13
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
-	github.com/otiai10/copy v1.7.0
+	github.com/otiai10/copy v1.9.0
 	github.com/rs/zerolog v1.28.0
 	github.com/samber/lo v1.33.0
 	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
