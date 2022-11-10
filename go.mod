@@ -10,7 +10,7 @@ require (
 	github.com/cidverse/repoanalyzer v0.0.0-20221027184025-b504400a454f
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.12.5
-	github.com/google/go-containerregistry v0.12.0
+	github.com/google/go-containerregistry v0.12.1
 	github.com/google/uuid v1.3.0
 	github.com/gosimple/slug v1.13.1
 	github.com/hashicorp/go-version v1.6.0
