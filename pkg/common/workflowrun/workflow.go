@@ -179,14 +179,9 @@ func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowActi
 		// execute
 		actionExecutor := executor.FindExecutorByType(string(catalogAction.Type))
 		if actionExecutor != nil {
-			if actionExecutor.Check(ctx, &localState, catalogAction, action) {
-				err := actionExecutor.Execute(ctx, &localState, catalogAction, action)
-				if err != nil {
-					log.Fatal().Err(err).Str("action", action.ID).Msg("action error")
-					return
-				}
-			} else {
-				log.Debug().Str("action", action.ID).Msg("requirements not fulfilled, not running action")
+			err := actionExecutor.Execute(ctx, &localState, catalogAction, action)
+			if err != nil {
+				log.Fatal().Err(err).Str("action", action.ID).Msg("action error")
 				return
 			}
 		} else {

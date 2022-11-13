@@ -5,9 +5,9 @@ go 1.19
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.4.10
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/cidverse/cidverseutils v0.0.0-20221104234928-602479ea4aad
+	github.com/cidverse/cidverseutils v0.0.0-20221113204718-76239efa5ad2
 	github.com/cidverse/normalizeci v1.1.1-0.20220915203509-f7f8ce189965
-	github.com/cidverse/repoanalyzer v0.0.0-20221027184025-b504400a454f
+	github.com/cidverse/repoanalyzer v0.0.0-20221119194603-55da7a32c60a
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.12.5
 	github.com/google/go-containerregistry v0.12.1
@@ -15,11 +15,13 @@ require (
 	github.com/gosimple/slug v1.13.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/jinzhu/configor v1.2.1
+	github.com/labstack/echo/v4 v4.9.1
 	github.com/mattn/go-colorable v0.1.13
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/otiai10/copy v1.9.0
 	github.com/rs/zerolog v1.28.0
 	github.com/samber/lo v1.35.0
+	github.com/sethvargo/go-password v0.2.0
 	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
@@ -50,6 +52,7 @@ require (
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.11.1 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-github/v35 v35.3.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
@@ -60,6 +63,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
+	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -72,15 +76,17 @@ require (
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/valyala/fasttemplate v1.2.1 // indirect
 	github.com/xanzy/go-gitlab v0.73.1 // indirect
 	github.com/xanzy/ssh-agent v0.3.2 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
-	golang.org/x/exp v0.0.0-20221026153819-32f3d567a233 // indirect
-	golang.org/x/mod v0.6.0 // indirect
+	golang.org/x/exp v0.0.0-20221114191408-850992195362 // indirect
+	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/oauth2 v0.1.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
 	golang.org/x/tools v0.2.0 // indirect

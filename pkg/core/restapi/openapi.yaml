@@ -1,0 +1,361 @@
+openapi: 3.0.1
+info:
+  title: CID Workflow and Action API
+  license:
+    name: MIT
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: info
+    description: Information
+  - name: file
+    description: File Operations
+  - name: command
+    description: Command Operations
+paths:
+  # info api
+  /health:
+    get:
+      tags:
+        - info
+      summary: simple healthcheck
+      operationId: health
+      responses:
+        200:
+          description: healthcheck result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Healthcheck'
+  /project:
+    get:
+      tags:
+        - info
+      summary: query information about the current project
+      operationId: projectInformation
+      responses:
+        200:
+          description: project information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectInformation'
+  /env:
+    get:
+      tags:
+        - info
+      summary: query the environment (NCI variables and variables have been granted explicit access to)
+      operationId: projectEnv
+      responses:
+        200:
+          description: project env
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectEnv'
+  /module:
+    get:
+      tags:
+        - info
+      summary: query modules
+      operationId: modules
+      responses:
+        200:
+          description: project modules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectModuleList'
+  /module/current:
+    get:
+      tags:
+        - info
+      summary: query current module (only available for module scoped actions)
+      operationId: currentModule
+      responses:
+        200:
+          description: current module
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectModule'
+        400:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  # file api
+  /files/list:
+    get:
+      tags:
+        - file
+      summary: List files
+      operationId: listFiles
+      parameters:
+        - name: path
+          in: query
+          description: filter by path
+          required: false
+          example: src/main/java
+          schema:
+            type: string
+        - name: extensions
+          in: query
+          description: filter by file extension(s)
+          required: false
+          example: [java, kt]
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: file list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileList'
+  /files/read:
+    get:
+      tags:
+        - file
+      summary: Read file content
+      operationId: readFiles
+      parameters:
+        - name: path
+          in: query
+          description: full path to the files
+          required: false
+          example: [src/main/java/Main.java, src/main/java/Main.kt]
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: list with file content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileContentList'
+  /files/write:
+    post:
+      tags:
+        - file
+      summary: Write file content
+      operationId: writeFile
+      parameters:
+        - name: file
+          in: query
+          description: full path to the file
+          required: true
+          example: src/main/java/Main.java
+          schema:
+            type: string
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        201:
+          description: Null response
+          content: {}
+  # command api
+  /command/execute:
+    post:
+      tags:
+        - command
+      summary: Executes a command
+      operationId: executeCommand
+      parameters:
+        - name: workdir
+          in: query
+          description: working directory
+          required: false
+          example: /frontend
+          schema:
+            type: string
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: npm install
+      responses:
+        201:
+          description: Null response
+          content: {}
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        status:
+          type: number
+          example: 400
+        title:
+          type: string
+          example: error title
+        detail:
+          type: string
+          example: error details
+    Healthcheck:
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: string
+          example: up
+    ProjectInformation:
+      type: object
+      properties:
+        project-dir:
+          type: string
+          description: project root directory
+          example: /projects/my-project
+        work-dir:
+          type: string
+          description: current working directory
+          example: /projects/my-project
+        user-id:
+          type: string
+          description: user id
+          example: 1000
+        user-group-id:
+          type: string
+          description: group id
+          example: 1000
+        user-login-name:
+          type: string
+          description: login name of the current user
+          example: root
+        user-display-name:
+          type: string
+          description: display name of the current user
+          example: root
+    ProjectEnv:
+      type: object
+      additionalProperties:
+        type: string
+    ProjecDependency:
+      type: object
+      properties:
+        type:
+          type: string
+          example: gomod
+        id:
+          type: string
+          example: github.com/google/uuid
+        version:
+          type: string
+          example: v1.3.0
+    ProjectModule:
+      type: object
+      properties:
+        project-dir:
+          type: string
+          description: project root directory
+          example: /projects/my-project
+        module-dir:
+          type: string
+          description: module root directory
+          example: /projects/my-project
+        discovery:
+          type: array
+          items:
+            type: string
+            example: "file~/projects/my-project/Dockerfile"
+          description: module detected based on
+        name:
+          type: string
+          description: module name
+          example: my-project
+        slug:
+          type: string
+          description: module name
+          example: my-project
+        build-system:
+          type: string
+          description: module name
+          example: container
+        build-system-syntax:
+          type: string
+          description: module name
+          example: containerfile
+        language:
+          type: object
+          additionalProperties:
+            type: string
+          description: module name
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjecDependency'
+          description: module name
+        submodules:
+          description: submodules
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectModule'
+        files:
+          type: array
+          items:
+            type: string
+            example: "/projects/my-project/Dockerfile"
+          description: all files in the project directory
+    ProjectModuleList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProjectModule'
+    File:
+      required:
+        - path
+      type: object
+      properties:
+        file:
+          type: string
+          description: full path to the file
+          example: src/main/java/Main.java
+        directory:
+          type: string
+          description: directory
+          example: src/main/java
+        file_name:
+          type: string
+          description: file name
+          example: Main.java
+        file_extension:
+          type: string
+          description: file extension
+          example: java
+    FileList:
+      type: array
+      items:
+        $ref: '#/components/schemas/File'
+    FileContent:
+      required:
+        - path
+        - format
+        - content
+      type: object
+      properties:
+        path:
+          type: string
+          description: full path to the file
+          example: src/main.py
+        format:
+          type: string
+          description: format of the content (plain/base64)
+          example: plain
+        content:
+          type: string
+          description: full content of the file
+          example: print("Goodbye, World!")
+    FileContentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FileContent'

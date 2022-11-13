@@ -3,6 +3,7 @@ package command
 import (
 	"bytes"
 	"errors"
+	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/samber/lo"
 	"io"
 	"os"
@@ -15,7 +16,6 @@ import (
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
-	"github.com/cidverse/cidverseutils/pkg/container_runtime"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
@@ -75,6 +75,20 @@ func RunCommandAndGetOutput(command string, env map[string]string, workDir strin
 	return resultBuff.String(), nil
 }
 
+// RunAPICommand gets called from actions or the api to execute commands
+func RunAPICommand(command string, env map[string]string, workDir string, capture bool) (stdout string, stderr string, err error) {
+	var stdoutBuff bytes.Buffer
+	var stderrBuff bytes.Buffer
+
+	if capture {
+		err = runCommand(command, env, workDir, &stdoutBuff, &stderrBuff)
+	} else {
+		err = runCommand(command, env, workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
+	}
+
+	return strings.TrimSuffix(stdoutBuff.String(), "\r\n"), strings.TrimSuffix(stderrBuff.String(), "\r\n"), err
+}
+
 func runCommand(command string, env map[string]string, workDir string, stdout io.Writer, stderr io.Writer) error {
 	cmdArgs := strings.SplitN(command, " ", 2)
 	originalBinary := cmdArgs[0]
@@ -100,14 +114,13 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 	case config.ExecutionExec:
 		return RunSystemCommandPassThru(candidate.File, cmdPayload, env, workDir, stdout, stderr)
 	case config.ExecutionContainer:
-		containerExec := container_runtime.Container{}
+		containerExec := containerruntime.Container{}
 
 		projectDir := vcsrepository.FindRepositoryDirectory(workDir)
 
 		containerExec.SetImage(candidate.Image)
-		containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: projectDir, Target: projectDir})
+		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: projectDir})
 		containerExec.SetWorkingDirectory(cihelper.ToUnixPath(workDir))
-		containerExec.SetEntrypoint("unset")
 		containerExec.SetCommand(cihelper.ToUnixPathArgs(strings.Join(cmdArgs, " ")))
 
 		// security
@@ -120,7 +133,7 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 
 		// mounts
 		for _, mount := range candidate.Mounts {
-			containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: mount.Src, Target: mount.Dest})
+			containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: mount.Src, Target: mount.Dest})
 		}
 
 		// add env + sort by key
@@ -137,7 +150,7 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 			_ = os.MkdirAll(cacheDir, 0777)
 			_ = os.Chmod(cacheDir, 0777)
 
-			containerExec.AddVolume(container_runtime.ContainerMount{MountType: "directory", Source: cacheDir, Target: c.ContainerPath})
+			containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: cacheDir, Target: c.ContainerPath})
 		}
 
 		containerCmd, containerCmdErr := containerExec.GetRunCommand(containerExec.DetectRuntime())

@@ -18,19 +18,7 @@ func (e Executor) GetVersion() string {
 }
 
 func (e Executor) GetType() string {
-	return "builtin-golang"
-}
-
-func (e Executor) Check(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *config.Action, action *config.WorkflowAction) bool {
-	// actionType: builtin
-	builtinAction := commonapi.BuiltinActions[catalogAction.Name]
-	if builtinAction != nil {
-		return true
-	} else {
-		log.Error().Str("action", action.ID).Str("executorName", e.GetName()).Str("executorVersion", e.GetVersion()).Str("executorType", e.GetType()).Msg("action is not registered")
-	}
-
-	return false
+	return string(config.ActionTypeBuiltinGolang)
 }
 
 func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *config.Action, action *config.WorkflowAction) error {

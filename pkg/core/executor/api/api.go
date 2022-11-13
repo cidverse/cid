@@ -17,9 +17,6 @@ type ActionExecutor interface {
 	// GetType returns the action type which needs to match the config action type to activate this implementation
 	GetType() string
 
-	// Check will evaluate if the action should be executed
-	Check(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *config.Action, action *config.WorkflowAction) bool
-
 	// Execute will run the action
 	Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *config.Action, action *config.WorkflowAction) error
 }
