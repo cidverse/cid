@@ -38,7 +38,7 @@ func Setup(projectDir string, modules []*analyzerapi.ProjectModule, currentModul
 	e.GET("/file/write", handlers.fileWrite)
 
 	// command routes
-	e.POST("/command/run", handlers.commandExecute)
+	e.POST("/command", handlers.commandExecute)
 	// TODO: (advanced) exec command as async task (+ get command status / log output / send stdin input)
 
 	return e

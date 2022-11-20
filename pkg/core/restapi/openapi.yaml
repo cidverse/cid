@@ -164,30 +164,24 @@ paths:
           description: Null response
           content: {}
   # command api
-  /command/execute:
+  /command:
     post:
       tags:
         - command
       summary: Executes a command
       operationId: executeCommand
-      parameters:
-        - name: workdir
-          in: query
-          description: working directory
-          required: false
-          example: /frontend
-          schema:
-            type: string
       requestBody:
         content:
-          text/plain:
+          application/json:
             schema:
-              type: string
-              example: npm install
+              $ref: '#/components/schemas/ExecuteCommand'
       responses:
-        201:
-          description: Null response
-          content: {}
+        200:
+          description: command execution result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecuteCommandResult'
 components:
   schemas:
     Error:
@@ -241,7 +235,7 @@ components:
       type: object
       additionalProperties:
         type: string
-    ProjecDependency:
+    ProjectDependency:
       type: object
       properties:
         type:
@@ -294,7 +288,7 @@ components:
         dependencies:
           type: array
           items:
-            $ref: '#/components/schemas/ProjecDependency'
+            $ref: '#/components/schemas/ProjectDependency'
           description: module name
         submodules:
           description: submodules
@@ -359,3 +353,45 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/FileContent'
+    ExecuteCommand:
+      type: object
+      properties:
+        command:
+          type: string
+          description: command
+          example: npm install
+        capture-output:
+          type: boolean
+          description: capture and return the output (stdout and stderr will be passed thru if not set)
+          example: false
+        work-dir:
+          type: string
+          description: directory to execute the command in (default = project root)
+          example: /projects/my-project
+    ExecuteCommandResult:
+      type: object
+      properties:
+        code:
+          type: number
+          description: command exit code
+          example: 1
+        command:
+          type: string
+          description: the command being executed
+          example: npm install
+        dir:
+          type: string
+          description: directory the command is executed in
+          example: /projects/my-project
+        error:
+          type: string
+          description: error message
+          example: exit status 1
+        stdout:
+          type: string
+          description: standard output (if capture-output was request, empty otherwise)
+          example: ""
+        stderr:
+          type: string
+          description: error output (if capture-output was request, empty otherwise)
+          example: ""
