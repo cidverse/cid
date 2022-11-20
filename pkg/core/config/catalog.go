@@ -16,6 +16,7 @@ type ActionType string
 const (
 	ActionTypeBuiltinGolang ActionType = "builtin-golang"
 	ActionTypeContainer     ActionType = "container"
+	ActionTypeGitHubAction  ActionType = "githubaction"
 )
 
 type ActionAccess struct {

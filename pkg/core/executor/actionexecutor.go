@@ -4,12 +4,14 @@ import (
 	"github.com/cidverse/cid/pkg/core/executor/api"
 	"github.com/cidverse/cid/pkg/core/executor/builtin"
 	"github.com/cidverse/cid/pkg/core/executor/containeraction"
+	"github.com/cidverse/cid/pkg/core/executor/githubaction"
 )
 
 func GetExecutors() []api.ActionExecutor {
 	var executors []api.ActionExecutor
 	executors = append(executors, builtin.Executor{})
 	executors = append(executors, containeraction.Executor{})
+	executors = append(executors, githubaction.Executor{})
 	return executors
 }
 
