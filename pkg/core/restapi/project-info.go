@@ -12,14 +12,14 @@ func (hc handlerConfig) projectInformation(c echo.Context) error {
 	currentUser, _ := user.Current()
 
 	res := map[string]interface{}{
-		"project-dir":       hc.projectDir,
-		"work-dir":          filesystem.GetWorkingDirectory(),
-		"user-id":           currentUser.Uid,
-		"user-group-id":     currentUser.Gid,
-		"user-login-name":   currentUser.Username,
-		"user-display-name": currentUser.Name,
-		"path-dist":         "",
-		"path-temp":         "",
+		"project_dir":       hc.projectDir,
+		"work_dir":          filesystem.GetWorkingDirectory(),
+		"user_id":           currentUser.Uid,
+		"user_group_id":     currentUser.Gid,
+		"user_login_name":   currentUser.Username,
+		"user_display_name": currentUser.Name,
+		"path_dist":         "",
+		"path_temp":         "",
 	}
 
 	return c.JSON(http.StatusOK, res)

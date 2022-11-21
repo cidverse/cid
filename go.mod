@@ -7,7 +7,7 @@ require (
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/cidverse/cidverseutils v0.0.0-20221113204718-76239efa5ad2
 	github.com/cidverse/normalizeci v1.1.1-0.20220915203509-f7f8ce189965
-	github.com/cidverse/repoanalyzer v0.0.0-20221119194603-55da7a32c60a
+	github.com/cidverse/repoanalyzer v0.0.0-20221121150321-89c5ea246bbd
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.12.5
 	github.com/google/go-containerregistry v0.12.1

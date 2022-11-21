@@ -8,9 +8,9 @@ import (
 )
 
 type executeRequest struct {
-	WorkDir       string `json:"work-dir"`
+	WorkDir       string `json:"work_dir"`
 	Command       string `json:"command"`
-	CaptureOutput bool   `json:"capture-output"`
+	CaptureOutput bool   `json:"capture_output"`
 }
 
 // commandExecute runs a command in the project directory (blocking until the command exits, returns the response code)

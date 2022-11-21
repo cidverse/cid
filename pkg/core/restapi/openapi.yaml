@@ -207,29 +207,37 @@ components:
     ProjectInformation:
       type: object
       properties:
-        project-dir:
+        project_dir:
           type: string
           description: project root directory
           example: /projects/my-project
-        work-dir:
+        work_dir:
           type: string
           description: current working directory
           example: /projects/my-project
-        user-id:
+        user_id:
           type: string
           description: user id
           example: 1000
-        user-group-id:
+        user_group_id:
           type: string
           description: group id
           example: 1000
-        user-login-name:
+        user_login_name:
           type: string
           description: login name of the current user
           example: root
-        user-display-name:
+        user_display_name:
           type: string
           description: display name of the current user
+          example: root
+        path_temp:
+          type: string
+          description: path to store temporary files in
+          example: root
+        path_dist:
+          type: string
+          description: path to store artifacts
           example: root
     ProjectEnv:
       type: object
@@ -250,11 +258,11 @@ components:
     ProjectModule:
       type: object
       properties:
-        project-dir:
+        project_dir:
           type: string
           description: project root directory
           example: /projects/my-project
-        module-dir:
+        module_dir:
           type: string
           description: module root directory
           example: /projects/my-project
@@ -272,11 +280,11 @@ components:
           type: string
           description: module name
           example: my-project
-        build-system:
+        build_system:
           type: string
           description: module name
           example: container
-        build-system-syntax:
+        build_system_syntax:
           type: string
           description: module name
           example: containerfile
@@ -360,11 +368,11 @@ components:
           type: string
           description: command
           example: npm install
-        capture-output:
+        capture_output:
           type: boolean
           description: capture and return the output (stdout and stderr will be passed thru if not set)
           example: false
-        work-dir:
+        work_dir:
           type: string
           description: directory to execute the command in (default = project root)
           example: /projects/my-project

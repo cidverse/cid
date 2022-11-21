@@ -38,8 +38,8 @@ github.com/cidverse/cidverseutils v0.0.0-20221113204718-76239efa5ad2 h1:B28UM2Ey
 github.com/cidverse/cidverseutils v0.0.0-20221113204718-76239efa5ad2/go.mod h1:e98T26mVsOjQ5xY6cOj0PF/Dk0EHovROZdq/dqbB5LE=
 github.com/cidverse/normalizeci v1.1.1-0.20220915203509-f7f8ce189965 h1:DaxxERuC68+yhES3S//QyHMMfYRVqJcXQCnLDOxTA9w=
 github.com/cidverse/normalizeci v1.1.1-0.20220915203509-f7f8ce189965/go.mod h1:Io9DPuHiP877JqOGObA7SqQLWGjQl/SLHMgYxq/hxgg=
-github.com/cidverse/repoanalyzer v0.0.0-20221119194603-55da7a32c60a h1:djpHb/x11THxH5evhKyF7dtbulBZ9RJxY80uIybxbE8=
-github.com/cidverse/repoanalyzer v0.0.0-20221119194603-55da7a32c60a/go.mod h1:aOgE749yajcjGet6F/jnlRYeiE4dl4Kqw/XHOMP1biM=
+github.com/cidverse/repoanalyzer v0.0.0-20221121150321-89c5ea246bbd h1:G4WE+alcIqQuq2l0cl3RjyoITvTA8sgib1AwQNpMnyU=
+github.com/cidverse/repoanalyzer v0.0.0-20221121150321-89c5ea246bbd/go.mod h1:aOgE749yajcjGet6F/jnlRYeiE4dl4Kqw/XHOMP1biM=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cloudflare/circl v1.1.0/go.mod h1:prBCrKB9DV4poKZY1l9zBXg2QJY7mvgRvtMxxK7fi4I=
 github.com/cloudflare/circl v1.2.0 h1:NheeISPSUcYftKlfrLuOo4T62FkmD4t4jviLfFFYaec=
@@ -223,8 +223,6 @@ github.com/rs/zerolog v1.28.0/go.mod h1:NILgTygv/Uej1ra5XxGf82ZFSLk58MFGAUS2o6us
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 h1:OkMGxebDjyw0ULyrTYWeN0UNCCkmCWfjPnIA2W6oviI=
 github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06/go.mod h1:+ePHsJ1keEjQtpvf9HHw0f4ZeJ0TLRsxhunSI2hYJSs=
-github.com/samber/lo v1.34.0 h1:1ZqcyX4642t1E/4gKEfA7ycqSYMqsKYN09AVZbME+aQ=
-github.com/samber/lo v1.34.0/go.mod h1:HLeWcJRRyLKp3+/XBJvOrerCQn9mhdKMHyd7IRlgeQ8=
 github.com/samber/lo v1.35.0 h1:GlT8CV1GE+v97Y7MLF1wXvX6mjoxZ+hi61tj/ZcQwY0=
 github.com/samber/lo v1.35.0/go.mod h1:HLeWcJRRyLKp3+/XBJvOrerCQn9mhdKMHyd7IRlgeQ8=
 github.com/sergi/go-diff v1.1.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
