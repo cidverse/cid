@@ -6,7 +6,7 @@ import (
 )
 
 // moduleCurrent returns information about the current module if the action is module-scoped (config)
-func (hc handlerConfig) moduleCurrent(c echo.Context) error {
+func (hc *handlerConfig) moduleCurrent(c echo.Context) error {
 	if hc.currentModule == nil {
 		return c.JSON(http.StatusBadRequest, apiError{
 			Status:  400,

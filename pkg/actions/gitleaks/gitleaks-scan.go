@@ -6,7 +6,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 )
 
 type ScanStruct struct{}
@@ -22,7 +21,7 @@ func (action ScanStruct) GetDetails(ctx *api.ActionExecutionContext) api.ActionD
 
 // Check evaluates if the action should be executed or not
 func (action ScanStruct) Check(ctx *api.ActionExecutionContext) bool {
-	return vcsrepository.GetVCSRepositoryType(ctx.ProjectDir) == "git" && ctx.Env["GITLEAKS_ENABLED"] == "true"
+	return ctx.Env["GITLEAKS_ENABLED"] == "true"
 }
 
 // Execute runs the action

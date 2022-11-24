@@ -1,6 +1,7 @@
 package workflowrun
 
 import (
+	"encoding/json"
 	"github.com/cidverse/cid/pkg/core/executor"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer"
@@ -116,8 +117,8 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env
 	ctx := api.GetActionContext(modules, projectDir, env, &catalogAction.Access)
 
 	// serialize action config for pass-thru
-	configAsYaml, _ := yaml.Marshal(&action.Config)
-	ctx.Config = string(configAsYaml)
+	configAsJSON, _ := json.Marshal(&action.Config)
+	ctx.Config = string(configAsJSON)
 
 	// project-scoped actions
 	if catalogAction.Scope == config.ActionScopeProject {

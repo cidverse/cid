@@ -2,6 +2,7 @@ package container
 
 import (
 	"embed"
+	"github.com/oriser/regroup"
 	"path/filepath"
 	"strings"
 
@@ -80,9 +81,22 @@ func getDockerfileTargetPlatforms(dockerfileContent string) []Platform {
 
 func getDockerfileTargetImageWithVersion(dockerfileContent string, suggestedName string) string {
 	image := parseLine(dockerfileContent, "# image=")
+	tagRegex := parseLine(dockerfileContent, "# tag-regex=")
 	ver := ""
 
-	if len(image) > 0 {
+	if len(tagRegex) > 0 {
+		expr := regroup.MustCompile(tagRegex)
+
+		match, matchErr := expr.Groups(dockerfileContent)
+		if matchErr == nil {
+			ver = match["major"] + "." + match["minor"] + "." + match["patch"]
+			if match["build"] != "" {
+				ver = ver + "." + match["build"]
+			}
+		} else {
+			log.Err(matchErr).Msg("failed to match")
+		}
+	} else if len(image) > 0 {
 		for _, line := range strings.Split(strings.TrimSuffix(dockerfileContent, "\n"), "\n") {
 			if strings.Contains(line, "ARG ") && strings.Contains(line, "_VERSION") {
 				args := strings.SplitN(line, "=", 2)

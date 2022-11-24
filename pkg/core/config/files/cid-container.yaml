@@ -112,10 +112,10 @@ containerimages:
       - id: helm-repository
         dir: /app/.cache/helm/repository
   # upx
-  - image: quay.io/cidverse/upx:3.96
+  - image: quay.io/cidverse/upx:4.0.1
     provides:
       - binary: upx
-        version: 3.96.0
+        version: 4.0.1
   # gitguardian ggshield
   - image: quay.io/cidverse/ggshield:1.13.6
     provides:
@@ -183,20 +183,20 @@ containerimages:
       - id: container-auth
         dir: /app/.auth
   # gitleaks
-  - image: quay.io/cidverse/gitleaks:8.15.0
+  - image: quay.io/cidverse/gitleaks:8.15.1
     provides:
       - binary: gitleaks
-        version: 8.15.0
+        version: 8.15.1
   # syft
-  - image: quay.io/cidverse/syft:0.60.3
+  - image: quay.io/cidverse/syft:0.62.0
     provides:
       - binary: syft
-        version: 0.60.3
+        version: 0.62.0
   # grype
-  - image: quay.io/cidverse/grype:0.52.0
+  - image: quay.io/cidverse/grype:0.53.0
     provides:
       - binary: grype
-        version: 0.52.0
+        version: 0.53.0
     cache:
       - id: grype-cache
         dir: /app/.cache/grype
@@ -234,3 +234,8 @@ containerimages:
     provides:
       - binary: techdocs-cli
         version: 1.2.2
+  # native-image
+  - image: quay.io/cidverse/native-image:22.3.0
+    provides:
+      - binary: native-image
+        version: 22.3.0

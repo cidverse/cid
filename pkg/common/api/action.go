@@ -44,7 +44,7 @@ type ActionExecutionContext struct {
 	// WorkDir holds the current working directory
 	WorkDir string
 
-	// Config holds the yaml configuration passed to this action
+	// Config holds the json configuration passed to this action
 	Config string
 
 	// Args holds the arguments passed to the action

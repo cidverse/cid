@@ -1,15 +1,15 @@
 package commitanalyser
 
 import (
+	"github.com/cidverse/normalizeci/pkg/vcsrepository/vcsapi"
 	"regexp"
 
 	"github.com/cidverse/cid/pkg/core/version"
-	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/oriser/regroup"
 	"github.com/rs/zerolog/log"
 )
 
-func DeterminateNextReleaseVersion(commits []vcsrepository.Commit, commitPatternList []string, rules []CommitVersionRule, previousVersionStr string) (string, error) {
+func DeterminateNextReleaseVersion(commits []vcsapi.Commit, commitPatternList []string, rules []CommitVersionRule, previousVersionStr string) (string, error) {
 	var releaseTypes = []version.ReleaseType{version.ReleaseNone}
 
 	var commitExpr []*regexp.Regexp

@@ -6,7 +6,7 @@ import (
 )
 
 // healthCheck returns a simple up status
-func (hc handlerConfig) healthCheck(c echo.Context) error {
+func (hc *handlerConfig) healthCheck(c echo.Context) error {
 	res := map[string]interface{}{
 		"status": "up",
 	}

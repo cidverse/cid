@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-
 	hashicorpVersion "github.com/hashicorp/go-version"
 	"github.com/rs/zerolog/log"
 )

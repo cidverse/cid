@@ -9,6 +9,8 @@ servers:
 tags:
   - name: info
     description: Information
+  - name: vcs
+    description: VCS Operations
   - name: file
     description: File Operations
   - name: command
@@ -28,6 +30,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Healthcheck'
+  /log:
+    post:
+      tags:
+        - info
+      summary: logs a message
+      operationId: log
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogMessageRequest'
+      responses:
+        201:
+          description: Null response
+          content: {}
   /project:
     get:
       tags:
@@ -41,6 +58,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectInformation'
+  /config/current:
+    get:
+      tags:
+        - info
+      summary: query the config for the currently running action
+      operationId: configCurrent
+      responses:
+        200:
+          description: config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionConfig'
   /env:
     get:
       tags:
@@ -86,6 +116,79 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  # vcs api
+  /vcs/commit:
+    get:
+      tags:
+        - vcs
+      summary: vcs commits
+      operationId: vcsCommits
+      parameters:
+        - name: changes
+          in: path
+          description: include changes in response
+          required: false
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: query commits
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VCSCommitList'
+  /vcs/commit/{hash}:
+    get:
+      tags:
+        - vcs
+      summary: vcs commits
+      operationId: vcsCommits
+      parameters:
+        - name: hash
+          in: path
+          description: commit hash
+          required: true
+          schema:
+            type: string
+        - name: changes
+          in: path
+          description: include changes in response
+          required: false
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: query commits
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VCSCommit'
+  /vcs/tag:
+    get:
+      tags:
+        - vcs
+      summary: vcs tags
+      operationId: getTags
+      responses:
+        200:
+          description: query tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VCSTagList'
+  /vcs/release:
+    get:
+      tags:
+        - vcs
+      summary: vcs releases
+      operationId: getReleases
+      responses:
+        200:
+          description: query releases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VCSReleaseList'
   # file api
   /files/list:
     get:
@@ -204,41 +307,68 @@ components:
         status:
           type: string
           example: up
-    ProjectInformation:
+    LogMessageRequest:
+      required:
+        - level
+        - message
       type: object
       properties:
+        level:
+          type: string
+          example: debug
+        message:
+          type: string
+          example: hello world
+        context:
+          type: object
+          description: dynamic key value properties / log context
+          additionalProperties:
+            $ref: '#/components/schemas/AnyValue'
+    ActionConfig:
+      type: object
+      properties:
+        debug:
+          type: boolean
+          description: enables debug logs for the action / logic
+          default: false
+        log:
+          type: object
+          description: "requested loglevel for specific components, prefixes: bin-"
+          additionalProperties:
+            type: string
         project_dir:
           type: string
           description: project root directory
-          example: /projects/my-project
-        work_dir:
+          example: /projects/my-project/
+        temp_dir:
           type: string
-          description: current working directory
-          example: /projects/my-project
-        user_id:
+          description: temp directory
+          example: /projects/my-project/.tmp
+        artifact_dir:
+          type: string
+          description: artifact directory
+          example: /projects/my-project/.dist
+        host_name:
+          type: string
+          description: hostname
+          example: localhost
+        host_user_id:
           type: string
           description: user id
           example: 1000
-        user_group_id:
-          type: string
-          description: group id
-          example: 1000
-        user_login_name:
+        host_user_name:
           type: string
           description: login name of the current user
           example: root
-        user_display_name:
+        host_group_id:
           type: string
-          description: display name of the current user
-          example: root
-        path_temp:
-          type: string
-          description: path to store temporary files in
-          example: root
-        path_dist:
-          type: string
-          description: path to store artifacts
-          example: root
+          description: group id
+          example: 1000
+        config:
+          type: object
+          description: dynamic configuration options for the action
+          additionalProperties:
+            $ref: '#/components/schemas/AnyValue'
     ProjectEnv:
       type: object
       additionalProperties:
@@ -313,6 +443,88 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ProjectModule'
+    # vcs
+    VCSCommitList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VCSCommit'
+    VCSCommit:
+      type: object
+      properties:
+        hash_short:
+          type: string
+          description: vcs commit hash (short)
+          example: 67504dd
+        hash:
+          type: string
+          description: vcs commit hash (long)
+          example: 67504dddb336879afa6470fb041071b7db23075c
+        message:
+          type: string
+          description: message
+          example: "feat: initial commit"
+        description:
+          type: string
+          description: description
+          example: ""
+        author:
+          $ref: '#/components/schemas/VCSTag'
+        committer:
+          $ref: '#/components/schemas/VCSTag'
+        tags:
+          $ref: '#/components/schemas/VCSTagList'
+        authored_at:
+          type: date
+          description: authored at
+          example: "2022-11-21T23:55:08+01:00"
+        committed_at:
+          type: date
+          description: committed at
+          example: "2022-11-21T23:55:08+01:00"
+    VCSAuthor:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name
+          example: Firstname Lastname
+        email:
+          type: string
+          description: email
+          example: noreply@examplee.com
+    VCSTagList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VCSTag'
+    VCSTag:
+      type: object
+      properties:
+        type:
+          type: string
+          description: type of the tag
+          example: tag
+        value:
+          type: string
+          description: name of the tag
+          example: v1.0.0
+        hash:
+          type: string
+          description: vcs hash of the tag
+          example: e7fccc74858e1e59225d9998e86949572b9c4332
+    VCSReleaseList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VCSRelease'
+    VCSRelease:
+      type: object
+      properties:
+        version:
+          type: string
+          description: version
+          example: 1.0.0
+        ref:
+          $ref: '#/components/schemas/VCSTag'
+    # files
     File:
       required:
         - path
@@ -367,15 +579,21 @@ components:
         command:
           type: string
           description: command
+          required: true
           example: npm install
         capture_output:
           type: boolean
           description: capture and return the output (stdout and stderr will be passed thru if not set)
-          example: false
+          default: false
         work_dir:
           type: string
           description: directory to execute the command in (default = project root)
           example: /projects/my-project
+        env:
+          type: object
+          additionalProperties:
+            type: string
+          description: directory to execute the command in (default = project root)
     ExecuteCommandResult:
       type: object
       properties:
@@ -403,3 +621,5 @@ components:
           type: string
           description: error output (if capture-output was request, empty otherwise)
           example: ""
+    AnyValue:
+      description: 'Can be anything: string, number, array, object, etc., including `null`'

@@ -8,13 +8,14 @@ import (
 )
 
 type executeRequest struct {
-	WorkDir       string `json:"work_dir"`
-	Command       string `json:"command"`
-	CaptureOutput bool   `json:"capture_output"`
+	WorkDir       string            `json:"work_dir"`
+	Command       string            `json:"command"`
+	CaptureOutput bool              `json:"capture_output"`
+	Env           map[string]string `json:"env"`
 }
 
 // commandExecute runs a command in the project directory (blocking until the command exits, returns the response code)
-func (hc handlerConfig) commandExecute(c echo.Context) error {
+func (hc *handlerConfig) commandExecute(c echo.Context) error {
 	var req executeRequest
 	err := c.Bind(&req)
 	if err != nil {
@@ -31,10 +32,21 @@ func (hc handlerConfig) commandExecute(c echo.Context) error {
 		execDir = req.WorkDir
 	}
 
+	// command env
+	var commandEnv = make(map[string]string)
+	for k, v := range hc.env {
+		commandEnv[k] = v
+	}
+	if req.Env != nil {
+		for k, v := range req.Env {
+			commandEnv[k] = v
+		}
+	}
+
 	// execute
 	exitCode := 0
 	var errorMessage = ""
-	stdout, stderr, cmdErr := command.RunAPICommand(req.Command, hc.env, execDir, req.CaptureOutput)
+	stdout, stderr, cmdErr := command.RunAPICommand(req.Command, commandEnv, execDir, req.CaptureOutput)
 	exitErr, isExitError := cmdErr.(*exec.ExitError)
 	if isExitError {
 		exitCode = exitErr.ExitCode()

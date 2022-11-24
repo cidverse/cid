@@ -3,32 +3,31 @@ catalog:
   actions:
     # golang
     - repository: central
-      name: golang-run
-      type: builtin-golang
-      description: |
-        Start your project locally.
-      version: 1.0
+      name: go-build
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run go-build
       scope: module
       rules:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "gomod"
     - repository: central
-      name: golang-build
-      type: builtin-golang
+      name: go-test
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run go-test
       scope: module
       rules:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "gomod"
     - repository: central
-      name: golang-test
-      type: builtin-golang
-      scope: module
-      rules:
-        - type: cel
-          expression: MODULE_BUILD_SYSTEM == "gomod"
-    - repository: central
-      name: golang-lint
-      type: builtin-golang
+      name: go-lint-golangci
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run go-lint-golangci
       scope: module
       rules:
         - type: cel

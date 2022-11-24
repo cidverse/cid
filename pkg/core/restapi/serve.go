@@ -8,29 +8,48 @@ import (
 	"net"
 )
 
-func Setup(projectDir string, modules []*analyzerapi.ProjectModule, currentModule *analyzerapi.ProjectModule, env map[string]string) *echo.Echo {
+type APIConfig struct {
+	ProjectDir    string
+	Modules       []*analyzerapi.ProjectModule
+	CurrentModule *analyzerapi.ProjectModule
+	Env           map[string]string
+	ActionConfig  string
+}
+
+func Setup(config APIConfig) *echo.Echo {
 	// config
 	e := echo.New()
 	e.HideBanner = true
+	e.HidePort = true
 	handlers := handlerConfig{
-		projectDir:    projectDir,
-		modules:       modules,
-		currentModule: currentModule,
-		env:           env,
+		projectDir:    config.ProjectDir,
+		modules:       config.Modules,
+		currentModule: config.CurrentModule,
+		env:           config.Env,
+		actionConfig:  config.ActionConfig,
 	}
 
 	// middlewares
-	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	// e.Use(middleware.Logger())
 
 	// generic routes
 	e.GET("/health", handlers.healthCheck)
+	e.POST("/log", handlers.logMessage)
+
+	// config
+	e.GET("/config/current", handlers.configCurrent)
 
 	// project routes
-	e.GET("/project", handlers.projectInformation)
 	e.GET("/env", handlers.projectEnv)
 	e.GET("/module", handlers.moduleList)
 	e.GET("/module/current", handlers.moduleCurrent)
+
+	// vcs
+	e.GET("/vcs/commit", handlers.vcsCommits)
+	e.GET("/vcs/commit/:hash", handlers.vcsCommitByHash)
+	e.GET("/vcs/tag", handlers.vcsTags)
+	e.GET("/vcs/release", handlers.vcsReleases)
 
 	// file routes (scoped to project dir, read-write rules per action)
 	e.GET("/file/list", handlers.fileList)

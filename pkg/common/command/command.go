@@ -92,7 +92,10 @@ func RunAPICommand(command string, env map[string]string, workDir string, captur
 func runCommand(command string, env map[string]string, workDir string, stdout io.Writer, stderr io.Writer) error {
 	cmdArgs := strings.SplitN(command, " ", 2)
 	originalBinary := cmdArgs[0]
-	cmdPayload := cmdArgs[1]
+	cmdPayload := ""
+	if len(cmdArgs) == 2 {
+		cmdPayload = cmdArgs[1]
+	}
 
 	// find version constraint from config
 	cmdConstraint := ">= 0.0.0"
@@ -119,7 +122,7 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 		projectDir := vcsrepository.FindRepositoryDirectory(workDir)
 
 		containerExec.SetImage(candidate.Image)
-		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: projectDir})
+		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: cihelper.ToUnixPath(projectDir)})
 		containerExec.SetWorkingDirectory(cihelper.ToUnixPath(workDir))
 		containerExec.SetCommand(cihelper.ToUnixPathArgs(strings.Join(cmdArgs, " ")))
 

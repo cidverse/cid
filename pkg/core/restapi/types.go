@@ -5,10 +5,12 @@ import (
 )
 
 type handlerConfig struct {
-	projectDir    string
-	modules       []*analyzerapi.ProjectModule
-	currentModule *analyzerapi.ProjectModule
-	env           map[string]string
+	projectDir          string
+	containerProjectDir string
+	modules             []*analyzerapi.ProjectModule
+	currentModule       *analyzerapi.ProjectModule
+	env                 map[string]string
+	actionConfig        string
 }
 
 // apiError, see https://www.rfc-editor.org/rfc/rfc7807

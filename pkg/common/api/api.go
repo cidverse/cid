@@ -2,21 +2,16 @@ package api
 
 import (
 	"encoding/base64"
-	"errors"
-	"fmt"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/cidverse/cid/pkg/common/commitanalyser"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/secret"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/common"
-	"github.com/cidverse/normalizeci/pkg/ncispec"
 	ncimain "github.com/cidverse/normalizeci/pkg/normalizeci"
-	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
 )
@@ -56,10 +51,12 @@ func GetCIDEnvironment(configEnv map[string]string, projectDirectory string) map
 
 	// customization
 	// - suggested release version
-	enrichErr := EnrichEnvironment(projectDirectory, string(config.Current.Conventions.Branching), env)
-	if enrichErr != nil {
-		log.Err(enrichErr).Msg("failed to enrich project context")
-	}
+	/*
+		enrichErr := EnrichEnvironment(projectDirectory, string(config.Current.Conventions.Branching), env)
+		if enrichErr != nil {
+			log.Err(enrichErr).Msg("failed to enrich project context")
+		}
+	*/
 
 	return env
 }
@@ -77,6 +74,7 @@ func GetFullEnvironment(configEnv map[string]string, projectDirectory string) ma
 }
 
 // EnrichEnvironment enriches the environment with CID variables / release information
+/*
 func EnrichEnvironment(projectDirectory string, branchingConvention string, env map[string]string) error {
 	// determinate release version
 	commits, commitsErr := vcsrepository.FindCommitsBetweenRefs(projectDirectory, env[ncispec.NCI_COMMIT_SHA], env["NCI_LASTRELEASE_REF_VCS"])
@@ -118,6 +116,7 @@ func EnrichEnvironment(projectDirectory string, branchingConvention string, env 
 
 	return nil
 }
+*/
 
 // ReplacePlaceholders replaces all placeholders within the string - ie. {NCI_COMMIT_COUNT}
 func ReplacePlaceholders(input string, env map[string]string) string {

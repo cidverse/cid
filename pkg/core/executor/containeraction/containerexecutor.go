@@ -2,20 +2,20 @@ package containeraction
 
 import (
 	"context"
+	"encoding/json"
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/cidverse/cidverseutils/pkg/cihelper"
 	_ "github.com/cidverse/cidverseutils/pkg/cihelper"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
-	"os"
 	"path"
 	"runtime"
 	"strconv"
-	"strings"
 )
 
 type Executor struct{}
@@ -38,8 +38,21 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	socketFile := path.Join(ctx.Paths.Temp, "my.socket")
 	secret := generateSecret()
 
+	// pass config
+	var actionConfig string
+	if len(ctx.Config) > 0 {
+		actionConfigJSON, _ := json.Marshal(action.Config)
+		actionConfig = string(actionConfigJSON)
+	}
+
 	// listen
-	apiEngine := restapi.Setup(ctx.ProjectDir, ctx.Modules, ctx.CurrentModule, ctx.Env)
+	apiEngine := restapi.Setup(restapi.APIConfig{
+		ProjectDir:    ctx.ProjectDir,
+		Modules:       ctx.Modules,
+		CurrentModule: ctx.CurrentModule,
+		Env:           ctx.Env,
+		ActionConfig:  actionConfig,
+	})
 	restapi.SecureWithAPIKey(apiEngine, secret)
 	go func() {
 		if runtime.GOOS == "windows" {
@@ -61,6 +74,12 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	containerExec := containerruntime.Container{}
 	containerExec.SetImage(catalogAction.Container.Image)
 	containerExec.SetCommand(insertCommandVariables(catalogAction.Container.Command, *catalogAction))
+	containerExec.AddVolume(containerruntime.ContainerMount{
+		MountType: "directory",
+		Source:    ctx.ProjectDir,
+		Target:    cihelper.ToUnixPath(ctx.ProjectDir),
+	})
+	containerExec.SetWorkingDirectory(cihelper.ToUnixPath(ctx.ProjectDir))
 
 	if runtime.GOOS == "windows" {
 		// windows does not support unix sockets
@@ -82,6 +101,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		return containerCmdErr
 	}
 
-	containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
-	return command.RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], nil, "", os.Stdout, os.Stderr)
+	log.Debug().Str("action", catalogAction.Name).Msg("container command for action: " + containerCmd)
+	_, err := command.RunCommandAndGetOutput(containerCmd, nil, "")
+	return err
 }

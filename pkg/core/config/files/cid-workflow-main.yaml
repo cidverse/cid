@@ -5,7 +5,7 @@ workflows:
     stages:
       - name: build
         actions:
-          - id: central/golang-build
+          - id: central/go-build
             config:
               # cross-platform build
               platform:
@@ -23,7 +23,7 @@ workflows:
           - id: central/techdocs-build
       - name: test
         actions:
-          - id: central/golang-test
+          - id: central/go-test
           - id: central/java-test
           - id: central/helm-test
       - name: package
@@ -36,7 +36,7 @@ workflows:
               rebuild: true
       - name: lint
         actions:
-          - id: central/golang-lint
+          - id: central/go-lint-golangci
           - id: central/python-lint
           - id: central/helm-lint
       - name: scan

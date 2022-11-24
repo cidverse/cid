@@ -48,7 +48,13 @@ cid api --type http --listen localhost:7400`,
 		}
 
 		// start api
-		apiEngine := restapi.Setup(projectDir, modules, currentModule, env)
+		apiEngine := restapi.Setup(restapi.APIConfig{
+			ProjectDir:    projectDir,
+			Modules:       modules,
+			CurrentModule: currentModule,
+			Env:           env,
+			ActionConfig:  ``,
+		})
 		if len(secret) > 0 {
 			restapi.SecureWithAPIKey(apiEngine, secret)
 		}

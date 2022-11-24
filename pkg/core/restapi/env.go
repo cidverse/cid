@@ -1,12 +1,13 @@
 package restapi
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 // projectEnv returns the available env for this action
-func (hc handlerConfig) projectEnv(c echo.Context) error {
+func (hc *handlerConfig) projectEnv(c echo.Context) error {
 	if hc.env == nil {
 		return c.JSON(http.StatusBadRequest, apiError{
 			Status:  400,
