@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"strings"
 
 	"github.com/cidverse/cid/pkg/app"
@@ -20,10 +21,11 @@ var xCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// find project directory and load config
 		projectDir := api.FindProjectDir()
+		workDir, _ := os.Getwd()
 		cfg := app.Load(projectDir)
 		env := api.GetCIDEnvironment(cfg.Env, projectDir)
 
 		// print environment
-		command.RunCommand(strings.Join(args, " "), env, projectDir)
+		command.RunCommand(strings.Join(args, " "), env, workDir)
 	},
 }
