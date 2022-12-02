@@ -1,10 +1,11 @@
 package restapi
 
 import (
-	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"os/exec"
+
+	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/labstack/echo/v4"
 )
 
 type executeRequest struct {
@@ -28,7 +29,7 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 
 	// configuration
 	execDir := hc.projectDir
-	if len(req.WorkDir) > 0 {
+	if req.WorkDir != "" {
 		execDir = req.WorkDir
 	}
 
@@ -46,7 +47,7 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 	// execute
 	exitCode := 0
 	var errorMessage = ""
-	stdout, stderr, cmdErr := command.RunAPICommand(req.Command, commandEnv, execDir, req.CaptureOutput)
+	stdout, stderr, cmdErr := command.RunAPICommand(req.Command, commandEnv, hc.projectDir, execDir, req.CaptureOutput)
 	exitErr, isExitError := cmdErr.(*exec.ExitError)
 	if isExitError {
 		exitCode = exitErr.ExitCode()

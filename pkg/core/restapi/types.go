@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
@@ -9,6 +10,7 @@ type handlerConfig struct {
 	containerProjectDir string
 	modules             []*analyzerapi.ProjectModule
 	currentModule       *analyzerapi.ProjectModule
+	currentAction       *config.Action
 	env                 map[string]string
 	actionConfig        string
 }

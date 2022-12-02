@@ -3,8 +3,6 @@ package command
 import (
 	"bytes"
 	"errors"
-	"github.com/cidverse/cidverseutils/pkg/containerruntime"
-	"github.com/samber/lo"
 	"io"
 	"os"
 	"os/exec"
@@ -12,6 +10,9 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+
+	"github.com/cidverse/cidverseutils/pkg/containerruntime"
+	"github.com/samber/lo"
 
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/config"
@@ -52,7 +53,7 @@ func GetCommandVersion(binary string) (string, error) {
 
 // RunCommand runs a required command and forwards all output to console, but will panic/exit if the command fails
 func RunCommand(command string, env map[string]string, workDir string) {
-	err := runCommand(command, env, workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
+	err := runCommand(command, env, "", workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
 	if err != nil {
 		log.Fatal().Err(err).Str("command", command).Msg("failed to execute command")
 	}
@@ -60,14 +61,14 @@ func RunCommand(command string, env map[string]string, workDir string) {
 
 // RunOptionalCommand runs a command and forwards all output to console
 func RunOptionalCommand(command string, env map[string]string, workDir string) error {
-	return runCommand(command, env, workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
+	return runCommand(command, env, "", workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
 }
 
 // RunCommandAndGetOutput runs a command and returns the full response / command output
 func RunCommandAndGetOutput(command string, env map[string]string, workDir string) (string, error) {
 	var resultBuff bytes.Buffer
 
-	err := runCommand(command, env, workDir, &resultBuff, &resultBuff)
+	err := runCommand(command, env, "", workDir, &resultBuff, &resultBuff)
 	if err != nil {
 		return "", err
 	}
@@ -76,20 +77,20 @@ func RunCommandAndGetOutput(command string, env map[string]string, workDir strin
 }
 
 // RunAPICommand gets called from actions or the api to execute commands
-func RunAPICommand(command string, env map[string]string, workDir string, capture bool) (stdout string, stderr string, err error) {
+func RunAPICommand(command string, env map[string]string, projectDir string, workDir string, capture bool) (stdout string, stderr string, err error) {
 	var stdoutBuff bytes.Buffer
 	var stderrBuff bytes.Buffer
 
 	if capture {
-		err = runCommand(command, env, workDir, &stdoutBuff, &stderrBuff)
+		err = runCommand(command, env, projectDir, workDir, &stdoutBuff, &stderrBuff)
 	} else {
-		err = runCommand(command, env, workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
+		err = runCommand(command, env, projectDir, workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
 	}
 
 	return strings.TrimSuffix(stdoutBuff.String(), "\r\n"), strings.TrimSuffix(stderrBuff.String(), "\r\n"), err
 }
 
-func runCommand(command string, env map[string]string, workDir string, stdout io.Writer, stderr io.Writer) error {
+func runCommand(command string, env map[string]string, projectDir string, workDir string, stdout io.Writer, stderr io.Writer) error {
 	cmdArgs := strings.SplitN(command, " ", 2)
 	originalBinary := cmdArgs[0]
 	cmdPayload := ""
@@ -119,7 +120,9 @@ func runCommand(command string, env map[string]string, workDir string, stdout io
 	case config.ExecutionContainer:
 		containerExec := containerruntime.Container{}
 
-		projectDir := vcsrepository.FindRepositoryDirectory(workDir)
+		if projectDir == "" {
+			projectDir = vcsrepository.FindRepositoryDirectory(workDir)
+		}
 
 		containerExec.SetImage(candidate.Image)
 		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: cihelper.ToUnixPath(projectDir)})
@@ -189,11 +192,11 @@ func RunSystemCommandPassThru(file string, args string, env map[string]string, w
 	cmd.Stderr = stderr
 	err := cmd.Run()
 	if err != nil {
-		log.Debug().Err(err).Str("file", file).Str("args", args).Msg("command execution failed")
+		log.Debug().Err(err).Str("command_result", "error").Msg(file + " " + args)
 		return err
 	}
 
-	log.Debug().Str("file", file).Str("args", args).Msg("command execution OK")
+	log.Debug().Str("command_result", "ok").Msg(file + " " + args)
 	return nil
 }
 

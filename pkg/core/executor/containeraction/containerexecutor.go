@@ -3,6 +3,10 @@ package containeraction
 import (
 	"context"
 	"encoding/json"
+	"path"
+	"runtime"
+	"strconv"
+
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/core/config"
@@ -13,9 +17,6 @@ import (
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
-	"path"
-	"runtime"
-	"strconv"
 )
 
 type Executor struct{}
@@ -50,6 +51,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		ProjectDir:    ctx.ProjectDir,
 		Modules:       ctx.Modules,
 		CurrentModule: ctx.CurrentModule,
+		CurrentAction: catalogAction,
 		Env:           ctx.Env,
 		ActionConfig:  actionConfig,
 	})

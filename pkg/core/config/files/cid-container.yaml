@@ -1,38 +1,10 @@
 # container image catalog
 containerimages:
   # golang
-  - image: docker.io/golang:1.19.1-alpine
+  - image: quay.io/cidverse/build-go:1.19.3
     provides:
       - binary: go
-        version: 1.19.1
-    cache:
-      - id: go-pkg
-        dir: /go/pkg
-  - image: docker.io/golang:1.18.6-alpine
-    provides:
-      - binary: go
-        version: 1.18.6
-    cache:
-      - id: go-pkg
-        dir: /go/pkg
-  - image: docker.io/golang:1.17.13-alpine
-    provides:
-      - binary: go
-        version: 1.17.13
-    cache:
-      - id: go-pkg
-        dir: /go/pkg
-  - image: docker.io/golang:1.16.15-alpine
-    provides:
-      - binary: go
-        version: 1.16.15
-    cache:
-      - id: go-pkg
-        dir: /go/pkg
-  - image: docker.io/golang:1.15.15-alpine
-    provides:
-      - binary: go
-        version: 1.15.15
+        version: 1.19.3
     cache:
       - id: go-pkg
         dir: /go/pkg
@@ -234,6 +206,19 @@ containerimages:
     provides:
       - binary: techdocs-cli
         version: 1.2.2
+  # mkdocs
+  - image: quay.io/cidverse/mkdocs:1.4.2
+    provides:
+      - binary: mkdocs
+        version: 1.4.2
+  # pipenv
+  - image: quay.io/cidverse/pipenv:2022.11.30
+    provides:
+      - binary: pipenv
+        version: 2022.11.30
+    cache:
+      - id: pipenv-virtualenvs
+        dir: /app/.local/share/virtualenvs
   # native-image
   - image: quay.io/cidverse/native-image:22.3.0
     provides:

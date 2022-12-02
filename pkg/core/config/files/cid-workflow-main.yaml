@@ -20,6 +20,7 @@ workflows:
           - id: central/node-build
           - id: central/hugo-build
           - id: central/helm-build
+          - id: central/mkdocs-build
           - id: central/techdocs-build
       - name: test
         actions:
@@ -75,6 +76,7 @@ workflows:
         actions:
           - id: central/container-publish
           - id: central/helm-publish-nexus
+          - id: central/techdocs-publish
           #- id: central/repo-tag-create
           #- id: central/repo-release-github
           #- id: central/java-publish

@@ -23,28 +23,22 @@ catalog:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "gomod"
     - repository: central
-      name: go-lint-golangci
+      name: go-lint
       type: container
       container:
         image: quay.io/cidverse/cid-actions-go:latest
-        command: central run go-lint-golangci
+        command: central run go-lint
       scope: module
       rules:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "gomod"
     # java
     - repository: central
-      name: java-run
-      type: builtin-golang
-      scope: module
-      rules:
-        - type: cel
-          expression: MODULE_BUILD_SYSTEM == "gradle"
-        - type: cel
-          expression: MODULE_BUILD_SYSTEM == "maven"
-    - repository: central
       name: java-build
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run java-build
       scope: module
       rules:
         - type: cel
@@ -53,7 +47,10 @@ catalog:
           expression: MODULE_BUILD_SYSTEM == "maven"
     - repository: central
       name: java-test
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run java-test
       scope: module
       rules:
         - type: cel
@@ -62,7 +59,10 @@ catalog:
           expression: MODULE_BUILD_SYSTEM == "maven"
     - repository: central
       name: java-publish
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run java-publish
       scope: module
       rules:
         - type: cel
@@ -71,8 +71,11 @@ catalog:
           expression: MODULE_BUILD_SYSTEM == "maven"
     # python
     - repository: central
-      name: python-run
-      type: builtin-golang
+      name: python-build
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run python-build
       scope: module
       rules:
         - type: cel
@@ -82,8 +85,11 @@ catalog:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "setup.py"
     - repository: central
-      name: python-build
-      type: builtin-golang
+      name: python-test
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run python-test
       scope: module
       rules:
         - type: cel
@@ -94,7 +100,10 @@ catalog:
           expression: MODULE_BUILD_SYSTEM == "setup.py"
     - repository: central
       name: python-lint
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run python-lint
       scope: module
       rules:
         - type: cel
@@ -106,7 +115,20 @@ catalog:
     # node
     - repository: central
       name: node-build
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run node-build
+      scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "npm"
+    - repository: central
+      name: node-test
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run node-test
       scope: module
       rules:
         - type: cel
@@ -142,30 +164,73 @@ catalog:
           expression: MODULE_BUILD_SYSTEM == "helm" && ENV["HELM_NEXUS_URL"] != ""
     # hugo
     - repository: central
-      name: hugo-run
-      type: builtin-golang
+      name: hugo-start
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run hugo-start
       scope: module
       rules:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "hugo"
     - repository: central
       name: hugo-build
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run hugo-build
       scope: module
       rules:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "hugo"
+    # mkdocs
     - repository: central
-      name: hugo-test
-      type: builtin-golang
+      name: mkdocs-start
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run mkdocs-start
       scope: module
       rules:
         - type: cel
-          expression: MODULE_BUILD_SYSTEM == "hugo"
+          expression: MODULE_BUILD_SYSTEM == "mkdocs" && MODULE_BUILD_SYSTEM_SYNTAX == "default"
+    - repository: central
+      name: mkdocs-build
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run mkdocs-build
+      scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "mkdocs" && MODULE_BUILD_SYSTEM_SYNTAX == "default"
     # techdocs
     - repository: central
+      name: techdocs-start
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run techdocs-start
+      scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "mkdocs" && MODULE_BUILD_SYSTEM_SYNTAX == "mkdocs-techdocs"
+    - repository: central
       name: techdocs-build
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run techdocs-build
+      scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "mkdocs" && MODULE_BUILD_SYSTEM_SYNTAX == "mkdocs-techdocs"
+    - repository: central
+      name: techdocs-publish
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run techdocs-publish
       scope: module
       rules:
         - type: cel
@@ -173,7 +238,10 @@ catalog:
     # optimization
     - repository: central
       name: upx-optimize
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run upx-optimize
       scope: module
       rules:
         - type: cel
@@ -221,7 +289,10 @@ catalog:
     #  scope: project
     - repository: central
       name: gitguardian-scan
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run ggshield-scan
       scope: project
       rules:
         - type: cel
@@ -231,7 +302,10 @@ catalog:
           - GITGUARDIAN_.*
     - repository: central
       name: sonarqube-scan
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run sonarqube-scan
       scope: project
       rules:
         - type: cel

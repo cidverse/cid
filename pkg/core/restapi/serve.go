@@ -1,17 +1,20 @@
 package restapi
 
 import (
+	"net"
+
+	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
-	"net"
 )
 
 type APIConfig struct {
 	ProjectDir    string
 	Modules       []*analyzerapi.ProjectModule
 	CurrentModule *analyzerapi.ProjectModule
+	CurrentAction *config.Action
 	Env           map[string]string
 	ActionConfig  string
 }
@@ -25,6 +28,7 @@ func Setup(config APIConfig) *echo.Echo {
 		projectDir:    config.ProjectDir,
 		modules:       config.Modules,
 		currentModule: config.CurrentModule,
+		currentAction: config.CurrentAction,
 		env:           config.Env,
 		actionConfig:  config.ActionConfig,
 	}
