@@ -1,10 +1,12 @@
 package restapi
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"net/http"
 )
 
 type logRequest struct {
@@ -42,7 +44,12 @@ func (hc *handlerConfig) logMessage(c echo.Context) error {
 			ev.Interface(k, v)
 		}
 	}
-	ev.Msg(req.Message)
+
+	msgPrefix := ""
+	if hc.currentAction != nil {
+		msgPrefix = fmt.Sprintf("[%s] ", hc.currentAction.Name)
+	}
+	ev.Msg(msgPrefix + req.Message)
 
 	return c.JSON(http.StatusNoContent, nil)
 }
