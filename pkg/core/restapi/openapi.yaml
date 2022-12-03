@@ -594,6 +594,11 @@ components:
           additionalProperties:
             type: string
           description: directory to execute the command in (default = project root)
+        ports:
+          type: array
+          description: expose container ports
+          items:
+            type: number
     ExecuteCommandResult:
       type: object
       properties:

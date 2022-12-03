@@ -77,17 +77,99 @@ func RunCommandAndGetOutput(command string, env map[string]string, workDir strin
 }
 
 // RunAPICommand gets called from actions or the api to execute commands
-func RunAPICommand(command string, env map[string]string, projectDir string, workDir string, capture bool) (stdout string, stderr string, err error) {
-	var stdoutBuff bytes.Buffer
-	var stderrBuff bytes.Buffer
-
+func RunAPICommand(command string, env map[string]string, projectDir string, workDir string, capture bool, ports []int) (stdout string, stderr string, err error) {
+	var stdoutWriter io.Writer
+	var stderrWriter io.Writer
+	var stdoutBuffer bytes.Buffer
+	var stderrBuffer bytes.Buffer
 	if capture {
-		err = runCommand(command, env, projectDir, workDir, &stdoutBuff, &stderrBuff)
+		stdoutWriter = protectoutput.NewProtectedWriter(nil, &stdoutBuffer)
+		stderrWriter = protectoutput.NewProtectedWriter(nil, &stderrBuffer)
 	} else {
-		err = runCommand(command, env, projectDir, workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
+		stdoutWriter = protectoutput.NewProtectedWriter(os.Stdout, nil)
+		stderrWriter = protectoutput.NewProtectedWriter(os.Stderr, nil)
 	}
 
-	return strings.TrimSuffix(stdoutBuff.String(), "\r\n"), strings.TrimSuffix(stderrBuff.String(), "\r\n"), err
+	// identify command
+	args := strings.SplitN(command, " ", 2)
+	binary := args[0]
+
+	// find version constraint from config
+	cmdConstraint := ">= 0.0.0"
+	if value, ok := config.Current.Dependencies[binary]; ok {
+		cmdConstraint = value
+	}
+
+	// find execution options
+	candidates := config.Current.FindExecutionCandidates(binary, cmdConstraint, config.ExecutionContainer, config.PreferHighest)
+	for _, candidate := range candidates {
+		// only process type ExecutionContainer
+		if candidate.Type != config.ExecutionContainer {
+			continue
+		}
+
+		containerExec := containerruntime.Container{}
+		containerExec.SetImage(candidate.Image)
+		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: cihelper.ToUnixPath(projectDir)})
+		containerExec.SetWorkingDirectory(cihelper.ToUnixPath(workDir))
+		containerExec.SetCommand(cihelper.ToUnixPathArgs(strings.Join(args, " ")))
+
+		// security
+		if candidate.Security.Privileged {
+			containerExec.SetPrivileged(true)
+		}
+		for _, capability := range candidate.Security.Capabilities {
+			containerExec.AddCapability(capability)
+		}
+
+		// mounts
+		for _, mount := range candidate.Mounts {
+			containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: mount.Src, Target: mount.Dest})
+		}
+
+		// add env + sort by key
+		sortedEnvKeys := lo.Keys(env)
+		sort.Strings(sortedEnvKeys)
+		for _, key := range sortedEnvKeys {
+			containerExec.AddEnvironmentVariable(key, env[key])
+		}
+
+		// cache
+		for _, c := range candidate.ImageCache {
+			// support mounting volumes (auto created if not present) or directories
+			cacheDir := path.Join(os.TempDir(), "cid", c.ID)
+			_ = os.MkdirAll(cacheDir, os.ModePerm)
+			_ = os.Chmod(cacheDir, os.ModePerm)
+
+			containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: cacheDir, Target: c.ContainerPath})
+		}
+
+		// ports
+		for _, port := range ports {
+			if IsFreePort(port) {
+				containerExec.AddContainerPort(containerruntime.ContainerPort{Source: port, Target: port})
+			} else {
+				freePort, _ := GetFreePort()
+				containerExec.AddContainerPort(containerruntime.ContainerPort{Source: freePort, Target: port})
+			}
+		}
+
+		// generate and execute command
+		containerCmd, containerCmdErr := containerExec.GetRunCommand(containerExec.DetectRuntime())
+		if containerCmdErr != nil {
+			return "", "", errors.New("failed to generate command: " + containerCmdErr.Error())
+		}
+
+		containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
+		err := RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdoutWriter, stderrWriter)
+		if err != nil {
+			return "", "", errors.New("command failed: " + err.Error())
+		}
+
+		return strings.TrimSuffix(stdoutBuffer.String(), "\r\n"), strings.TrimSuffix(stderrBuffer.String(), "\r\n"), nil
+	}
+
+	return "", "", errors.New("no method to execute command: " + binary)
 }
 
 func runCommand(command string, env map[string]string, projectDir string, workDir string, stdout io.Writer, stderr io.Writer) error {

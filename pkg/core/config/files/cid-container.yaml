@@ -219,6 +219,8 @@ containerimages:
     cache:
       - id: pipenv-virtualenvs
         dir: /app/.local/share/virtualenvs
+      - id: pipenv-cache
+        dir: /app/.cache/pipenv
   # native-image
   - image: quay.io/cidverse/native-image:22.3.0
     provides:
