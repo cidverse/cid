@@ -3,8 +3,6 @@ package app
 import (
 	_ "github.com/cidverse/cid/pkg/actions/java"
 	_ "github.com/cidverse/cid/pkg/actions/repo"
-	_ "github.com/cidverse/cid/pkg/actions/sonarqube"
-	_ "github.com/cidverse/cid/pkg/actions/trivy"
 	"github.com/cidverse/cid/pkg/core/config"
 )
 
