@@ -3,6 +3,8 @@ package restapi
 import (
 	"net/http"
 	"os/exec"
+	"strings"
+	"time"
 
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/labstack/echo/v4"
@@ -48,7 +50,7 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 	// execute
 	exitCode := 0
 	var errorMessage = ""
-	stdout, stderr, cmdErr := command.RunAPICommand(req.Command, commandEnv, hc.projectDir, execDir, req.CaptureOutput, req.Ports)
+	stdout, stderr, cmdErr := command.RunAPICommand(replaceCommandPlaceholders(req.Command, hc.env), commandEnv, hc.projectDir, execDir, req.CaptureOutput, req.Ports)
 	exitErr, isExitError := cmdErr.(*exec.ExitError)
 	if isExitError {
 		exitCode = exitErr.ExitCode()
@@ -69,4 +71,17 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, res)
+}
+
+// replace placeholders in command
+func replaceCommandPlaceholders(input string, env map[string]string) string {
+	// timestamp
+	input = strings.ReplaceAll(input, "${TIMESTAMP_RFC3339}", time.Now().Format(time.RFC3339))
+
+	// env
+	for k, v := range env {
+		input = strings.ReplaceAll(input, "${"+k+"}", v)
+	}
+
+	return input
 }

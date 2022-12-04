@@ -138,12 +138,12 @@ containerimages:
       - binary: hadolint
         version: 2.10.0
   # buildah
-  - image: quay.io/cidverse/buildah:1.28.0
+  - image: quay.io/cidverse/buildah:1.28.2
     provides:
       - binary: buildah
-        version: 1.28.0
+        version: 1.28.2
       - binary: buildah-script
-        version: 1.28.0
+        version: 1.28.2
     security:
       privileged: true
       #capabilities:
@@ -221,6 +221,14 @@ containerimages:
         dir: /app/.local/share/virtualenvs
       - id: pipenv-cache
         dir: /app/.cache/pipenv
+  # poetry
+  - image: quay.io/cidverse/poetry:1.2.2
+    provides:
+      - binary: poetry
+        version: 1.2.2
+    cache:
+      - id: poetry-cache
+        dir: /app/.cache
   # native-image
   - image: quay.io/cidverse/native-image:22.3.0
     provides:

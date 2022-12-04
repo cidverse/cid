@@ -1,10 +1,11 @@
 package sonarqube
 
 import (
-	"github.com/cidverse/cid/pkg/core/state"
-	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"path/filepath"
 	"strings"
+
+	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 

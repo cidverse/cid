@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"path"
 	"runtime"
 	"sort"
 	"strings"
@@ -136,12 +135,7 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 
 		// cache
 		for _, c := range candidate.ImageCache {
-			// support mounting volumes (auto created if not present) or directories
-			cacheDir := path.Join(os.TempDir(), "cid", c.ID)
-			_ = os.MkdirAll(cacheDir, os.ModePerm)
-			_ = os.Chmod(cacheDir, os.ModePerm)
-
-			containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: cacheDir, Target: c.ContainerPath})
+			containerExec.AddVolume(containerruntime.ContainerMount{MountType: "volume", Source: "cid-cache-" + c.ID, Target: c.ContainerPath})
 		}
 
 		// ports
@@ -161,7 +155,7 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 		}
 
 		containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
-		err := RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdoutWriter, stderrWriter)
+		err := RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, "", stdoutWriter, stderrWriter)
 		if err != nil {
 			return "", "", errors.New("command failed: " + err.Error())
 		}
@@ -233,12 +227,7 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 
 		// cache
 		for _, c := range candidate.ImageCache {
-			// support mounting volumes (auto created if not present) or directories
-			cacheDir := path.Join(os.TempDir(), "cid", c.ID)
-			_ = os.MkdirAll(cacheDir, 0777)
-			_ = os.Chmod(cacheDir, 0777)
-
-			containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: cacheDir, Target: c.ContainerPath})
+			containerExec.AddVolume(containerruntime.ContainerMount{MountType: "volume", Source: "cid-cache-" + c.ID, Target: c.ContainerPath})
 		}
 
 		containerCmd, containerCmdErr := containerExec.GetRunCommand(containerExec.DetectRuntime())

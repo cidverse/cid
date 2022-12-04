@@ -1,9 +1,6 @@
 package app
 
 import (
-	_ "github.com/cidverse/cid/pkg/actions/container"
-	_ "github.com/cidverse/cid/pkg/actions/golang"
-	_ "github.com/cidverse/cid/pkg/actions/helm"
 	_ "github.com/cidverse/cid/pkg/actions/java"
 	_ "github.com/cidverse/cid/pkg/actions/repo"
 	_ "github.com/cidverse/cid/pkg/actions/sonarqube"

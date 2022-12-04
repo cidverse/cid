@@ -30,7 +30,7 @@ workflows:
       - name: package
         actions:
           - id: central/upx-optimize
-          - id: central/container-package-buildah
+          - id: central/buildah-build
             config:
               no-cache: false
               squash: true
@@ -74,7 +74,7 @@ workflows:
                   title: Breaking Changes
       - name: publish
         actions:
-          - id: central/container-publish
+          - id: central/buildah-publish
           - id: central/helm-publish-nexus
           - id: central/techdocs-publish
           #- id: central/repo-tag-create

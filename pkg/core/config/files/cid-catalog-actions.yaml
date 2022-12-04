@@ -248,22 +248,21 @@ catalog:
           expression: ENV["UPX_ENABLED"] == "true"
     # container
     - repository: central
-      name: container-package-buildah
-      type: builtin-golang
+      name: buildah-build
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run buildah-build
       scope: module
       rules:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "container" && (MODULE_BUILD_SYSTEM_SYNTAX == "buildah-script" || MODULE_BUILD_SYSTEM_SYNTAX == "containerfile")
     - repository: central
-      name: container-package-docker
-      type: builtin-golang
-      scope: module
-      rules:
-        - type: cel
-          expression: MODULE_BUILD_SYSTEM == "container" && MODULE_BUILD_SYSTEM_SYNTAX == "containerfile"
-    - repository: central
-      name: container-publish
-      type: builtin-golang
+      name: buildah-publish
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run buildah-publish
       scope: module
       rules:
         - type: cel
@@ -333,13 +332,6 @@ catalog:
       access:
         env:
           - GRYPE_.*
-    - repository: central
-      name: dependencycheck-scan
-      type: builtin-golang
-      scope: project
-      rules:
-        - type: cel
-          expression: ENV["OWASP_DEPENDENCYCHECK_ENABLED"] == "true"
     # publish
     - repository: central
       name: repo-tag-create
