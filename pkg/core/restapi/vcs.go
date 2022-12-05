@@ -1,18 +1,37 @@
 package restapi
 
 import (
+	"net/http"
+	"sort"
+	"strconv"
+
 	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/cidverse/normalizeci/pkg/vcsrepository/vcsapi"
 	"github.com/hashicorp/go-version"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
-	"net/http"
-	"sort"
-	"strconv"
 )
 
 // projectInformation returns all available information about the current project
 func (hc *handlerConfig) vcsCommits(c echo.Context) error {
+	fromRef, err := vcsapi.NewVCSRefFromString(c.QueryParam("from"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, apiError{
+			Status:  400,
+			Title:   "parameter has a invalid value: from",
+			Details: err.Error(),
+		})
+	}
+
+	toRef, err := vcsapi.NewVCSRefFromString(c.QueryParam("to"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, apiError{
+			Status:  400,
+			Title:   "parameter has a invalid value: from",
+			Details: err.Error(),
+		})
+	}
+
 	includeChanges := c.QueryParam("changes")
 	limit := 0
 	if c.QueryParam("limit") != "" {
@@ -36,7 +55,7 @@ func (hc *handlerConfig) vcsCommits(c echo.Context) error {
 		})
 	}
 
-	commits, commitsErr := client.FindCommitsBetween(nil, nil, includeChanges == "true", limit)
+	commits, commitsErr := client.FindCommitsBetween(fromRef, toRef, includeChanges == "true", limit)
 	if commitsErr != nil {
 		log.Err(commitsErr).Msg("failed to query commits")
 	}
