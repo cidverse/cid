@@ -3,9 +3,11 @@ package containeraction
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"path"
 	"runtime"
 	"strconv"
+	"time"
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
@@ -15,6 +17,7 @@ import (
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
 	_ "github.com/cidverse/cidverseutils/pkg/cihelper"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 )
@@ -36,7 +39,7 @@ func (e Executor) GetType() string {
 func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *config.Action, action *config.WorkflowAction) error {
 	// properties
 	apiPort := strconv.Itoa(findAvailablePort())
-	socketFile := path.Join(ctx.Paths.Temp, "my.socket")
+	socketFile := path.Join(ctx.Paths.Temp, "api-"+uuid.New().String()+".socket")
 	secret := generateSecret()
 
 	// pass config
@@ -71,6 +74,15 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 			log.Fatal().Err(err).Msg("failed to shutdown rest api")
 		}
 	}(apiEngine, context.Background())
+
+	defer func() {
+		if _, err := os.Stat(socketFile); err == nil {
+			_ = os.Remove(socketFile)
+		}
+	}()
+
+	// wait a short moment for the unix socket to be created / the api endpoint to be ready
+	time.Sleep(100 * time.Millisecond)
 
 	// configure container
 	containerExec := containerruntime.Container{}

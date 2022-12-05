@@ -1,53 +1,5 @@
 # local tools
 localtools:
-  # golang
-  - binary: ["go", "gofmt"]
-    lookup:
-      - key: GOROOT_1_19
-        version: 1.19.0
-      - key: GOROOT_1_18
-        version: 1.18.0
-      - key: GOROOT_1_17
-        version: 1.17.0
-      - key: GOROOT_1_16
-        version: 1.16.0
-      - key: GOROOT_1_15
-        version: 1.15.0
-      - key: GOROOT_1_14
-        version: 1.14.0
-      - key: GOROOT_1_13
-        version: 1.13.0
-      - key: GOROOT_1_12
-        version: 1.12.0
-    lookup-suffixes: ["_X64"]
-    path: /bin
-  # java
-  - binary: ["java"]
-    lookup:
-      - key: JAVA_HOME_18
-        version: 18.0.0
-      - key: JAVA_HOME_17
-        version: 17.0.0
-      - key: JAVA_HOME_16
-        version: 16.0.0
-      - key: JAVA_HOME_15
-        version: 15.0.0
-      - key: JAVA_HOME_14
-        version: 14.0.0
-      - key: JAVA_HOME_13
-        version: 13.0.0
-      - key: JAVA_HOME_12
-        version: 12.0.0
-      - key: JAVA_HOME_11
-        version: 11.0.0
-      - key: JAVA_HOME_10
-        version: 10.0.0
-      - key: JAVA_HOME_9
-        version: 9.0.0
-      - key: JAVA_HOME_8
-        version: 8.0.0
-    lookup-suffixes: ["_X64"]
-    path: /bin
   # docker
   - binary: ["docker"]
     lookup:
@@ -55,11 +7,6 @@ localtools:
         version: 0.0.0
   # podman
   - binary: ["podman"]
-    lookup:
-      - key: PATH
-        version: 0.0.0
-  # git
-  - binary: ["git"]
     lookup:
       - key: PATH
         version: 0.0.0
