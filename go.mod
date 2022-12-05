@@ -9,7 +9,7 @@ require (
 	github.com/cidverse/normalizeci v1.1.1-0.20221126003148-62eb9edb3587
 	github.com/cidverse/repoanalyzer v0.0.0-20221204134141-9ca9b7deee8f
 	github.com/google/cel-go v0.12.5
-	github.com/google/uuid v1.1.2
+	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/labstack/echo/v4 v4.9.1
