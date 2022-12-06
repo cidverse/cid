@@ -7,6 +7,7 @@ import (
 	"path"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
@@ -39,7 +40,7 @@ func (e Executor) GetType() string {
 func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *config.Action, action *config.WorkflowAction) error {
 	// properties
 	apiPort := strconv.Itoa(findAvailablePort())
-	socketFile := path.Join(ctx.Paths.Temp, "api-"+uuid.New().String()+".socket")
+	socketFile := path.Join(ctx.Paths.Temp, strings.ReplaceAll(uuid.New().String(), "-", "")+".socket")
 	secret := generateSecret()
 
 	// pass config
