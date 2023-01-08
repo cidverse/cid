@@ -192,30 +192,30 @@ containerimages:
     provides:
       - binary: rke
         version: 1.3.15
-  - image: quay.io/cidverse/rke2:1.25.3
+  - image: quay.io/cidverse/rke2:1.26.0
     provides:
       - binary: rke2
-        version: 1.25.3
+        version: 1.26.0
   # reposync
   - image: quay.io/cidverse/reposync:0.2.0
     provides:
       - binary: reposync
         version: 0.2.0
   # techdocs-cli
-  - image: quay.io/cidverse/techdocscli:1.2.2
+  - image: quay.io/cidverse/techdocscli:1.2.4
     provides:
       - binary: techdocs-cli
-        version: 1.2.2
+        version: 1.2.4
   # mkdocs
   - image: quay.io/cidverse/mkdocs:1.4.2
     provides:
       - binary: mkdocs
         version: 1.4.2
   # pipenv
-  - image: quay.io/cidverse/pipenv:2022.11.30
+  - image: quay.io/cidverse/pipenv:2022.12.19
     provides:
       - binary: pipenv
-        version: 2022.11.30
+        version: 2022.12.19
     cache:
       - id: pipenv-virtualenvs
         dir: /app/.local/share/virtualenvs
@@ -234,3 +234,8 @@ containerimages:
     provides:
       - binary: native-image
         version: 22.3.0
+  # runpodctl
+  - image: quay.io/cidverse/runpodctl:1.7.0
+    provides:
+      - binary: runpodctl
+        version: 1.7.0

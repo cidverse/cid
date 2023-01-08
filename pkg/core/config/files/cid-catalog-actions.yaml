@@ -136,28 +136,40 @@ catalog:
     # helm
     - repository: central
       name: helm-build
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run helm-build
       scope: module
       rules:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "helm"
     - repository: central
       name: helm-test
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run helm-test
       scope: module
       rules:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "helm"
     - repository: central
       name: helm-lint
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run helm-lint
       scope: module
       rules:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "helm"
     - repository: central
       name: helm-publish-nexus
-      type: builtin-golang
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run helm-publish-nexus
       scope: module
       rules:
         - type: cel
@@ -268,24 +280,6 @@ catalog:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "container" && (MODULE_BUILD_SYSTEM_SYNTAX == "buildah-script" || MODULE_BUILD_SYSTEM_SYNTAX == "containerfile")
     # scanner
-    #- repository: central
-    #  name: trivy-fs-scan
-    #  type: builtin-golang
-    #  scope: project
-    - repository: central
-      name: fossa-source-scan
-      type: builtin-golang
-      scope: project
-      rules:
-        - type: cel
-          expression: ENV["FOSSA_API_KEY"] != "" && NCI_COMMIT_REF_TYPE == "branch"
-      access:
-        env:
-          - FOSSA_.*
-    #- repository: central
-    #  name: gitleaks-scan
-    #  type: builtin-golang
-    #  scope: project
     - repository: central
       name: gitguardian-scan
       type: container
@@ -312,36 +306,3 @@ catalog:
       access:
         env:
           - SONAR_.*
-    - repository: central
-      name: syft-container-sbom
-      type: builtin-golang
-      scope: module
-      rules:
-        - type: cel
-          expression: MODULE_BUILD_SYSTEM == "container"
-      access:
-        env:
-          - SYFT_.*
-    - repository: central
-      name: grype-scan-sbom
-      type: builtin-golang
-      scope: module
-      rules:
-        - type: cel
-          expression: MODULE_BUILD_SYSTEM == "container" && NCI_COMMIT_REF_TYPE == "branch"
-      access:
-        env:
-          - GRYPE_.*
-    # publish
-    - repository: central
-      name: repo-tag-create
-      type: builtin-golang
-      scope: project
-    - repository: central
-      name: repo-changelog-generate
-      type: builtin-golang
-      scope: project
-    - repository: central
-      name: repo-release-github
-      type: builtin-golang
-      scope: project
