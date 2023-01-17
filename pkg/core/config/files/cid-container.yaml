@@ -155,20 +155,20 @@ containerimages:
       - id: container-auth
         dir: /app/.auth
   # gitleaks
-  - image: quay.io/cidverse/gitleaks:8.15.1
+  - image: quay.io/cidverse/gitleaks:8.15.2
     provides:
       - binary: gitleaks
-        version: 8.15.1
+        version: 8.15.2
   # syft
-  - image: quay.io/cidverse/syft:0.62.0
+  - image: quay.io/cidverse/syft:0.66.1
     provides:
       - binary: syft
-        version: 0.62.0
+        version: 0.66.1
   # grype
-  - image: quay.io/cidverse/grype:0.53.0
+  - image: quay.io/cidverse/grype:0.55.0
     provides:
       - binary: grype
-        version: 0.53.0
+        version: 0.55.0
     cache:
       - id: grype-cache
         dir: /app/.cache/grype
@@ -178,10 +178,10 @@ containerimages:
       - binary: cosign
         version: 1.13.1
   # rekor
-  - image: quay.io/cidverse/rekor:1.0.0
+  - image: quay.io/cidverse/rekor:1.0.1
     provides:
       - binary: rekor
-        version: 1.0.0
+        version: 1.0.1
   # hugo
   - image: quay.io/cidverse/hugo:0.104.3
     provides:
@@ -235,7 +235,12 @@ containerimages:
       - binary: native-image
         version: 22.3.0
   # runpodctl
-  - image: quay.io/cidverse/runpodctl:1.7.0
+  - image: quay.io/cidverse/runpodctl:1.8.0
     provides:
       - binary: runpodctl
-        version: 1.7.0
+        version: 1.8.0
+  # gosec
+  - image: quay.io/cidverse/gosec:2.14.0
+    provides:
+      - binary: gosec
+        version: 2.14.0

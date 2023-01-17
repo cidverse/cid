@@ -4,7 +4,6 @@ go 1.19
 
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.5.0
-	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/cidverse/cidverseutils v0.0.0-20221229152821-89f52e66da84
 	github.com/cidverse/normalizeci v1.1.1-0.20230108115010-877d89341479
 	github.com/cidverse/repoanalyzer v0.0.0-20221231215221-00add2d77790
@@ -15,7 +14,6 @@ require (
 	github.com/labstack/echo/v4 v4.10.0
 	github.com/mattn/go-colorable v0.1.13
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
-	github.com/otiai10/copy v1.9.0
 	github.com/rs/zerolog v1.28.0
 	github.com/samber/lo v1.37.0
 	github.com/sethvargo/go-password v0.2.0
