@@ -1,11 +1,14 @@
 package containeraction
 
 import (
+	"net"
+	"os"
+	"strings"
+
+	"github.com/bwmarrin/snowflake"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/rs/zerolog/log"
 	"github.com/sethvargo/go-password/password"
-	"net"
-	"strings"
 )
 
 func insertCommandVariables(input string, action config.Action) string {
@@ -45,4 +48,27 @@ func findAvailablePort() int {
 	}(listener)
 
 	return listener.Addr().(*net.TCPAddr).Port
+}
+
+func createPath(dir string) {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err := os.MkdirAll(dir, os.FileMode(0777))
+		if err != nil {
+			log.Warn().Str("path", dir).Msg("failed to create directory")
+		}
+	}
+}
+
+func generateBuildId() string {
+	snowflake.Epoch = 1672527600000
+	node, _ := snowflake.NewNode(1)
+	id := node.Generate()
+	return id.String()
+}
+
+func generateJobId() string {
+	snowflake.Epoch = 1672527600000
+	node, _ := snowflake.NewNode(1)
+	id := node.Generate()
+	return id.String()
 }

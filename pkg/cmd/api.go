@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"path/filepath"
+
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/restapi"
+	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
@@ -47,13 +50,22 @@ cid api --type http --listen localhost:7400`,
 			currentModule = modules[currentModuleID]
 		}
 
+		// state
+		stateFile := filepath.Join(projectDir, ".tmp", "state.json")
+		localState := state.GetStateFromFile(stateFile)
+
 		// start api
 		apiEngine := restapi.Setup(restapi.APIConfig{
+			BuildID:       "0",
+			JobID:         "0",
 			ProjectDir:    projectDir,
 			Modules:       modules,
 			CurrentModule: currentModule,
 			Env:           env,
 			ActionConfig:  ``,
+			State:         &localState,
+			TempDir:       filepath.Join(projectDir, ".tmp"),
+			ArtifactDir:   filepath.Join(projectDir, ".dist"),
 		})
 		if len(secret) > 0 {
 			restapi.SecureWithAPIKey(apiEngine, secret)

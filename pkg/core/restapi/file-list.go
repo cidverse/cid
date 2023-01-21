@@ -1,8 +1,9 @@
 package restapi
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 // fileList retrieves a list of all files

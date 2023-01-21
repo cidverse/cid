@@ -13,6 +13,8 @@ tags:
     description: VCS Operations
   - name: file
     description: File Operations
+  - name: artifact
+    description: Artifact Operations
   - name: command
     description: Command Operations
 paths:
@@ -266,6 +268,92 @@ paths:
         201:
           description: Null response
           content: {}
+  # file api
+  /artifact:
+    get:
+      tags:
+        - artifact
+      summary: List Artifacts
+      operationId: artifactList
+      responses:
+        200:
+          description: file list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtifactList'
+    post:
+      tags:
+        - artifact
+      summary: Uploads a Artifact
+      operationId: artifactUpload
+      parameters:
+        - name: file
+          in: query
+          description: full path to the file
+          required: true
+          example: src/main/java/Main.java
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File (if multiple files should be archived)
+                type:
+                  type: string
+                  description: Artifact Type (binary, report)
+                format:
+                  type: string
+                  description: Content Format (Sarif, Syft SBOM, ...)
+                format_version:
+                  type: string
+                  description: Content Format Version
+      responses:
+        201:
+          description: Null response
+          content: {}
+  /artifact/download:
+    get:
+      tags:
+        - artifact
+      summary: Download Artifact
+      operationId: artifactDownload
+      parameters:
+        - name: module
+          in: query
+          description: module slug (or root for project scoped artifacts)
+          required: true
+          example: root
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: artifact type
+          required: true
+          example: binary
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: file name
+          required: true
+          example: report.sarif
+          schema:
+            type: string
+      responses:
+        200:
+          description: file list
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
   # command api
   /command:
     post:

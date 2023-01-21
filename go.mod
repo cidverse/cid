@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.5.0
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20221229152821-89f52e66da84
 	github.com/cidverse/normalizeci v1.1.1-0.20230108115010-877d89341479
 	github.com/cidverse/repoanalyzer v0.0.0-20221231215221-00add2d77790
@@ -20,15 +21,15 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/thoas/go-funk v0.9.3
-	google.golang.org/genproto v0.0.0-20221027153422-115e99e71e1c
+	google.golang.org/genproto v0.0.0-20230119192704-9d59e20e5cd1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	github.com/BurntSushi/toml v1.1.0 // indirect
+	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/Microsoft/go-winio v0.6.0 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20221026131551-cf6655e29de4 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20230117203413-a47887b8f098 // indirect
 	github.com/ProtonMail/go-mime v0.0.0-20221031134845-8fd9bc37cf08 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
@@ -43,7 +44,7 @@ require (
 	github.com/go-playground/validator/v10 v10.11.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-github/v49 v49.0.0 // indirect
+	github.com/google/go-github/v49 v49.1.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gosimple/slug v1.13.1 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
@@ -60,16 +61,16 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 // indirect
-	github.com/sergi/go-diff v1.2.0 // indirect
+	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/skeema/knownhosts v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stoewer/go-strcase v1.2.0 // indirect
+	github.com/stoewer/go-strcase v1.2.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/xanzy/go-gitlab v0.77.0 // indirect
+	github.com/xanzy/go-gitlab v0.78.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
-	golang.org/x/exp v0.0.0-20230105202349-8879d0199aa3 // indirect
+	golang.org/x/exp v0.0.0-20230118134722-a68e582fa157 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/oauth2 v0.4.0 // indirect

@@ -1,8 +1,9 @@
 package restapi
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 // fileWrite writes the content into the specified file, dirs and files will be created if not present

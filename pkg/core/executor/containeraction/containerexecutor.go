@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -42,6 +43,8 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	apiPort := strconv.Itoa(findAvailablePort())
 	socketFile := path.Join(ctx.Paths.Temp, strings.ReplaceAll(uuid.New().String(), "-", "")+".socket")
 	secret := generateSecret()
+	buildID := generateBuildId()
+	jobID := generateJobId()
 
 	// pass config
 	var actionConfig string
@@ -52,12 +55,17 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 
 	// listen
 	apiEngine := restapi.Setup(restapi.APIConfig{
+		BuildID:       buildID,
+		JobID:         jobID,
 		ProjectDir:    ctx.ProjectDir,
 		Modules:       ctx.Modules,
 		CurrentModule: ctx.CurrentModule,
 		CurrentAction: catalogAction,
 		Env:           ctx.Env,
 		ActionConfig:  actionConfig,
+		State:         localState,
+		TempDir:       filepath.Join(ctx.ProjectDir, ".tmp"),
+		ArtifactDir:   filepath.Join(ctx.ProjectDir, ".dist"),
 	})
 	restapi.SecureWithAPIKey(apiEngine, secret)
 	go func() {
@@ -76,14 +84,24 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		}
 	}(apiEngine, context.Background())
 
-	defer func() {
-		if _, err := os.Stat(socketFile); err == nil {
-			_ = os.Remove(socketFile)
-		}
-	}()
+	if runtime.GOOS != "windows" {
+		defer func() {
+			if _, err := os.Stat(socketFile); err == nil {
+				_ = os.Remove(socketFile)
+			}
+		}()
+	}
 
 	// wait a short moment for the unix socket to be created / the api endpoint to be ready
 	time.Sleep(100 * time.Millisecond)
+
+	// create temp dir for action
+	tempDir := path.Join(ctx.Paths.Temp, jobID)
+	createPath(tempDir)
+	defer func() {
+		log.Debug().Str("dir", tempDir).Msg("cleaning up temp dir")
+		_ = os.RemoveAll(tempDir)
+	}()
 
 	// configure container
 	containerExec := containerruntime.Container{}

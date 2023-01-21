@@ -1,8 +1,9 @@
 package restapi
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 // fileRead retrieves the content of a file (omitting secrets)

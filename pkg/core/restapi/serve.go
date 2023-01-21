@@ -3,21 +3,10 @@ package restapi
 import (
 	"net"
 
-	"github.com/cidverse/cid/pkg/core/config"
-	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
 )
-
-type APIConfig struct {
-	ProjectDir    string
-	Modules       []*analyzerapi.ProjectModule
-	CurrentModule *analyzerapi.ProjectModule
-	CurrentAction *config.Action
-	Env           map[string]string
-	ActionConfig  string
-}
 
 func Setup(config APIConfig) *echo.Echo {
 	// config
@@ -25,12 +14,17 @@ func Setup(config APIConfig) *echo.Echo {
 	e.HideBanner = true
 	e.HidePort = true
 	handlers := handlerConfig{
+		buildID:       config.BuildID,
+		jobID:         config.JobID,
 		projectDir:    config.ProjectDir,
 		modules:       config.Modules,
 		currentModule: config.CurrentModule,
 		currentAction: config.CurrentAction,
 		env:           config.Env,
 		actionConfig:  config.ActionConfig,
+		state:         config.State,
+		tempDir:       config.TempDir,
+		artifactDir:   config.ArtifactDir,
 	}
 
 	// middlewares
@@ -54,6 +48,11 @@ func Setup(config APIConfig) *echo.Echo {
 	e.GET("/vcs/commit/:hash", handlers.vcsCommitByHash)
 	e.GET("/vcs/tag", handlers.vcsTags)
 	e.GET("/vcs/release", handlers.vcsReleases)
+
+	// artifacts
+	e.GET("/artifact", handlers.artifactList)
+	e.GET("/artifact/download", handlers.artifactDownload)
+	e.POST("/artifact", handlers.artifactUpload)
 
 	// file routes (scoped to project dir, read-write rules per action)
 	e.GET("/file/list", handlers.fileList)
