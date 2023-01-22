@@ -155,10 +155,10 @@ containerimages:
       - id: container-auth
         dir: /app/.auth
   # gitleaks
-  - image: quay.io/cidverse/gitleaks:8.15.2
+  - image: quay.io/cidverse/gitleaks:8.15.3
     provides:
       - binary: gitleaks
-        version: 8.15.2
+        version: 8.15.3
   # syft
   - image: quay.io/cidverse/syft:0.66.1
     provides:

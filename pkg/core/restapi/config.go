@@ -30,7 +30,7 @@ func (hc *handlerConfig) configCurrent(c echo.Context) error {
 		// paths
 		"project_dir":  cihelper.ToUnixPath(hc.projectDir),
 		"artifact_dir": cihelper.ToUnixPath(filepath.Join(hc.projectDir, ".dist")),
-		"temp_dir":     cihelper.ToUnixPath(filepath.Join(hc.projectDir, ".tmp")),
+		"temp_dir":     cihelper.ToUnixPath(filepath.Join(hc.projectDir, ".tmp", hc.jobID)),
 		// dynamic config
 		"config": hc.actionConfig,
 	}

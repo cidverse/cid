@@ -294,6 +294,13 @@ catalog:
         env:
           - GITGUARDIAN_.*
     - repository: central
+      name: gitleaks-scan
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run gitleaks-scan
+      scope: project
+    - repository: central
       name: sonarqube-scan
       type: container
       container:

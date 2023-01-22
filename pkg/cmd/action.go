@@ -13,6 +13,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/workflowrun"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/rules"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -81,6 +82,10 @@ var actionRunCmd = &cobra.Command{
 
 		// pass action
 		action := cfg.FindAction(actionName)
+		if action == nil {
+			log.Error().Str("action", actionName).Msg("action is not known")
+			os.Exit(1)
+		}
 		act := config.WorkflowAction{
 			ID:     action.Repository + "/" + action.Name,
 			Rules:  []config.WorkflowRule{},
