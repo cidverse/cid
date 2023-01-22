@@ -42,6 +42,8 @@ workflows:
           - id: central/helm-lint
       - name: scan
         actions:
+          - id: central/gitleaks-scan
+          - id: central/gosec-scan
           - id: central/fossa-source-scan
           - id: central/sonarqube-scan
       - name: report

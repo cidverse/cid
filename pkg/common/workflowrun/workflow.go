@@ -2,11 +2,12 @@ package workflowrun
 
 import (
 	"encoding/json"
+	"path/filepath"
+	"time"
+
 	"github.com/cidverse/cid/pkg/core/executor"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer"
-	"path/filepath"
-	"time"
 
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/config"
@@ -163,7 +164,7 @@ func runWorkflowAction(catalogAction *config.Action, action *config.WorkflowActi
 	start := time.Now()
 	ruleContext := rules.GetRuleContext(ctx.Env)
 	if rules.AnyRuleMatches(action.Rules, ruleContext) {
-		stateFile := filepath.Join(ctx.Paths.Temp, "state.json")
+		stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
 
 		// state: retrieve/init
 		localState := state.GetStateFromFile(stateFile)

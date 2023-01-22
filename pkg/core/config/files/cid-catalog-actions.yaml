@@ -293,6 +293,7 @@ catalog:
       access:
         env:
           - GITGUARDIAN_.*
+    # gitleaks
     - repository: central
       name: gitleaks-scan
       type: container
@@ -300,6 +301,18 @@ catalog:
         image: quay.io/cidverse/cid-actions-go:latest
         command: central run gitleaks-scan
       scope: project
+    # gosec
+    - repository: central
+      name: gosec-scan
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run gosec-scan
+      scope: module
+      rules:
+        - type: cel
+          expression: MODULE_BUILD_SYSTEM == "gomod"
+    # sonarqube
     - repository: central
       name: sonarqube-scan
       type: container
