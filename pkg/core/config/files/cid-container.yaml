@@ -244,3 +244,8 @@ containerimages:
     provides:
       - binary: gosec
         version: 2.14.0
+  # semgrep
+  - image: quay.io/cidverse/semgrep:1.5.1
+    provides:
+      - binary: semgrep
+        version: 1.5.1
