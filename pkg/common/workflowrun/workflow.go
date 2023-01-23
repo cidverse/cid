@@ -114,6 +114,9 @@ func RunWorkflowStage(cfg *config.CIDConfig, stage *config.WorkflowStage, env ma
 func RunWorkflowAction(cfg *config.CIDConfig, action *config.WorkflowAction, env map[string]string, projectDir string, modulesFilter []string) {
 	log.Debug().Str("action", action.ID).Msg("action start")
 	catalogAction := cfg.FindAction(action.ID)
+	if catalogAction == nil {
+		log.Fatal().Str("action_id", action.ID).Msg("workflow configuration error, referencing actions that do not exist")
+	}
 	modules := repoanalyzer.AnalyzeProject(projectDir, filesystem.GetWorkingDirectory())
 	ctx := api.GetActionContext(modules, projectDir, env, &catalogAction.Access)
 

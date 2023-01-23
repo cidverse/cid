@@ -312,6 +312,17 @@ catalog:
       rules:
         - type: cel
           expression: MODULE_BUILD_SYSTEM == "gomod"
+    # semgrep
+    - repository: central
+      name: semgrep-scan
+      type: container
+      container:
+        image: quay.io/cidverse/cid-actions-go:latest
+        command: central run semgrep-scan
+      scope: project
+      access:
+        env:
+          - SEMGREP_.*
     # sonarqube
     - repository: central
       name: sonarqube-scan

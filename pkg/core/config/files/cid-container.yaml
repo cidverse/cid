@@ -249,3 +249,6 @@ containerimages:
     provides:
       - binary: semgrep
         version: 1.5.1
+    cache:
+      - id: semgrep-cache
+        dir: /app/.cache/semgrep-cache
