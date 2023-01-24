@@ -3,12 +3,12 @@ package commitanalyser
 import (
 	"testing"
 
-	"github.com/cidverse/normalizeci/pkg/vcsrepository"
+	"github.com/cidverse/normalizeci/pkg/vcsrepository/vcsapi"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDeterminateNextReleaseVersionBreaking(t *testing.T) {
-	var commits = []vcsrepository.Commit{
+	var commits = []vcsapi.Commit{
 		{
 			Message:     `fix!: resolves a issue`,
 			Description: ``,
@@ -20,7 +20,7 @@ func TestDeterminateNextReleaseVersionBreaking(t *testing.T) {
 }
 
 func TestDeterminateNextReleaseVersionFeature(t *testing.T) {
-	var commits = []vcsrepository.Commit{
+	var commits = []vcsapi.Commit{
 		{
 			Message:     `feat: adds new feature`,
 			Description: ``,
@@ -36,7 +36,7 @@ func TestDeterminateNextReleaseVersionFeature(t *testing.T) {
 }
 
 func TestDeterminateNextReleaseVersionFix(t *testing.T) {
-	var commits = []vcsrepository.Commit{
+	var commits = []vcsapi.Commit{
 		{
 			Message:     `fix: resolves a issue`,
 			Description: ``,
