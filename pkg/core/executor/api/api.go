@@ -2,7 +2,7 @@ package api
 
 import (
 	commonapi "github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/core/config"
+	"github.com/cidverse/cid/pkg/core/registry"
 	"github.com/cidverse/cid/pkg/core/state"
 )
 
@@ -18,5 +18,5 @@ type ActionExecutor interface {
 	GetType() string
 
 	// Execute will run the action
-	Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *config.Action, action *config.WorkflowAction) error
+	Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *registry.Action, action *registry.WorkflowAction) error
 }

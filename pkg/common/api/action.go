@@ -1,12 +1,14 @@
 package api
 
 import (
-	"github.com/cidverse/cid/pkg/core/state"
-	"github.com/samber/lo"
 	"os/user"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/samber/lo"
 
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
@@ -98,7 +100,7 @@ func RegisterBuiltinAction(action ActionStep) {
 }
 
 // GetActionContext gets the action context, this operation is expensive and should only be called once per execution
-func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, env map[string]string, access *config.ActionAccess) ActionExecutionContext {
+func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, env map[string]string, access *registry.ActionAccess) ActionExecutionContext {
 	finalEnv := make(map[string]string)
 	fullEnv := lo.Assign(env, common.GetMachineEnvironment())
 

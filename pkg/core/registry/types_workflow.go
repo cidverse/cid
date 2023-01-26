@@ -1,4 +1,4 @@
-package config
+package registry
 
 import (
 	"github.com/cidverse/repoanalyzer/analyzerapi"
@@ -29,33 +29,10 @@ type WorkflowStage struct {
 }
 
 type Workflow struct {
-	Name   string          `required:"true" yaml:"name,omitempty"`
-	Rules  []WorkflowRule  `yaml:"rules,omitempty"`
-	Stages []WorkflowStage `yaml:"stages,omitempty"`
-}
-
-// FindWorkflow finds a workflow by name
-func (c *CIDConfig) FindWorkflow(name string) *Workflow {
-	for _, w := range c.Workflows {
-		if w.Name == name {
-			return &w
-		}
-	}
-
-	return nil
-}
-
-// FindAction finds an action by id
-func (c *CIDConfig) FindAction(name string) *Action {
-	// exact match
-	for i := range c.Catalog.Actions {
-		a := c.Catalog.Actions[i]
-		if a.Repository+"/"+a.Name == name {
-			return &a
-		}
-	}
-
-	return nil
+	Repository string          `yaml:"repository,omitempty"`
+	Name       string          `required:"true" yaml:"name,omitempty"`
+	Rules      []WorkflowRule  `yaml:"rules,omitempty"`
+	Stages     []WorkflowStage `yaml:"stages,omitempty"`
 }
 
 // ActionCount returns the total count of actions across all stages

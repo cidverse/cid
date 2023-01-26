@@ -3,6 +3,7 @@ package config
 import (
 	"embed"
 
+	"github.com/cidverse/cid/pkg/core/registry"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/jinzhu/configor"
 	"github.com/rs/zerolog/log"
@@ -30,9 +31,13 @@ func LoadConfig(projectDirectory string) *CIDConfig {
 	// internal config
 	unmarshalNoError("files/cid-main.yaml", yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-main.yaml")), &cfg))
 	unmarshalNoError("files/cid-tools.yaml", yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-tools.yaml")), &cfg))
-	unmarshalNoError("files/cid-container.yaml", yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-container.yaml")), &cfg))
-	unmarshalNoError("files/cid-catalog-actions.yaml", yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-catalog-actions.yaml")), &cfg))
-	unmarshalNoError("files/cid-workflow-main.yaml", yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-workflow-main.yaml")), &cfg))
+
+	// default os cache dir
+	data := registry.LoadRegistries()
+	log.Info().Int("images", len(data.ContainerImages)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Msg("imported config from cid registries")
+	cfg.Registry.ContainerImages = append(cfg.Registry.ContainerImages, data.ContainerImages...)
+	cfg.Registry.Actions = append(cfg.Registry.Actions, data.Actions...)
+	cfg.Registry.Workflows = append(cfg.Registry.Workflows, data.Workflows...)
 
 	// load project config
 	if filesystem.FileExists(projectDirectory + "/cid.yml") {

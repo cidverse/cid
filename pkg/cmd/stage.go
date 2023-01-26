@@ -40,7 +40,7 @@ var stageListCmd = &cobra.Command{
 		// print list
 		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
 		_, _ = fmt.Fprintln(w, "WORKFLOW\tSTAGE\tRULES\tACTIONS")
-		for _, wf := range cfg.Workflows {
+		for _, wf := range cfg.Registry.Workflows {
 			for _, stage := range wf.Stages {
 				_, _ = fmt.Fprintln(w, wf.Name+"\t"+
 					stage.Name+"\t"+

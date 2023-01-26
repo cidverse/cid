@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"text/tabwriter"
 
-	"github.com/cidverse/cid/pkg/core/config"
+	"github.com/cidverse/cid/pkg/core/registry"
 
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
@@ -49,7 +49,7 @@ var workflowListCmd = &cobra.Command{
 		// print list
 		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
 		_, _ = fmt.Fprintln(w, "WORKFLOW\tRULES\tSTAGES\tACTIONS")
-		for _, workflow := range cfg.Workflows {
+		for _, workflow := range cfg.Registry.Workflows {
 			_, _ = fmt.Fprintln(w, workflow.Name+"\t"+
 				rules.EvaluateRulesAsText(workflow.Rules, rules.GetRuleContext(env))+"\t"+
 				strconv.Itoa(len(workflow.Stages))+"\t"+
@@ -78,13 +78,13 @@ var workflowRunCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
-		var wf *config.Workflow
+		var wf *registry.Workflow
 		if len(args) == 0 {
 			// evaluate rules to pick workflow
-			wf = workflowrun.FirstWorkflowMatchingRules(cfg.Workflows, env)
+			wf = workflowrun.FirstWorkflowMatchingRules(cfg.Registry.Workflows, env)
 		} else if len(args) == 1 {
 			// find workflow
-			wf = cfg.FindWorkflow(args[0])
+			wf = cfg.Registry.FindWorkflow(args[0])
 		}
 
 		if wf == nil {

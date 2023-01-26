@@ -1,8 +1,4 @@
-package config
-
-type Catalog struct {
-	Actions []Action `json:"actions"`
-}
+package registry
 
 type ActionScope string
 
@@ -14,9 +10,8 @@ const (
 type ActionType string
 
 const (
-	ActionTypeBuiltinGolang ActionType = "builtin-golang"
-	ActionTypeContainer     ActionType = "container"
-	ActionTypeGitHubAction  ActionType = "githubaction"
+	ActionTypeContainer    ActionType = "container"
+	ActionTypeGitHubAction ActionType = "githubaction"
 )
 
 type ActionAccess struct {
@@ -29,14 +24,14 @@ type ContainerAction struct {
 }
 
 type Action struct {
-	Repository  string          `required:"true" yaml:"repository"`
+	Repository  string          `yaml:"repository,omitempty"`
 	Name        string          `required:"true" yaml:"name"`
 	Enabled     bool            `default:"true" yaml:"enabled,omitempty"`
 	Type        ActionType      `required:"true" yaml:"type"`
 	Container   ContainerAction `yaml:"container,omitempty"` // Container contains the configuration for containerized actions
-	Description string          `yaml:"description"`
-	Version     string          `yaml:"version"`
+	Description string          `yaml:"description,omitempty"`
+	Version     string          `yaml:"version,omitempty"`
 	Scope       ActionScope     `required:"true" yaml:"scope"`
 	Rules       []WorkflowRule  `yaml:"rules,omitempty"`
-	Access      ActionAccess    `yaml:"access"`
+	Access      ActionAccess    `yaml:"access,omitempty"`
 }
