@@ -15,7 +15,7 @@ require (
 	github.com/labstack/echo/v4 v4.10.0
 	github.com/mattn/go-colorable v0.1.13
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
-	github.com/rs/zerolog v1.28.0
+	github.com/rs/zerolog v1.29.0
 	github.com/samber/lo v1.37.0
 	github.com/sethvargo/go-password v0.2.0
 	github.com/spf13/cobra v1.6.1
