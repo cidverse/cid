@@ -141,6 +141,23 @@ func evalRuleCEL(rule registry.WorkflowRule, evalContext map[string]interface{})
 				}),
 			),
 		),
+		cel.Function("getMapValue",
+			cel.Overload("getMapValue_map",
+				[]*cel.Type{cel.MapType(cel.StringType, cel.StringType), cel.StringType},
+				cel.StringType,
+				cel.BinaryBinding(func(lhs, rhs ref.Val) ref.Val {
+					mapVal, err := lhs.ConvertToNative(reflect.TypeOf(map[string]string{}))
+					if err != nil {
+						return types.NewErr(err.Error())
+					}
+					if value, ok := mapVal.(map[string]string)[string(rhs.(types.String))]; ok {
+						return types.String(value)
+					} else {
+						return types.String("")
+					}
+				}),
+			),
+		),
 	)
 	if celConfigErr != nil {
 		log.Fatal().Err(celConfigErr).Msg("failed to initialize CEL environment")
