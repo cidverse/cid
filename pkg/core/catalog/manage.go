@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog/log"
@@ -11,7 +12,9 @@ import (
 )
 
 type Source struct {
-	URL string `yaml:"url"`
+	URL       string `yaml:"url"`
+	AddedAt   string `yaml:"added_at"`
+	UpdatedAt string `yaml:"updated_at"`
 }
 
 func getUserConfigDirectory() string {
@@ -36,7 +39,7 @@ func LoadSources() map[string]Source {
 
 	// file doesn't exist yet, init with main repo
 	if _, err := os.Stat(file); os.IsNotExist(err) {
-		sources["central"] = Source{URL: "https://raw.githubusercontent.com/cidverse/catalog/main/cid-index.yaml"}
+		sources["central"] = Source{URL: "https://raw.githubusercontent.com/cidverse/catalog/main/cid-index.yaml", AddedAt: time.Now().Format(time.RFC3339), UpdatedAt: time.Now().Format(time.RFC3339)}
 		return sources
 	}
 
@@ -53,11 +56,9 @@ func LoadSources() map[string]Source {
 	return sources
 }
 
-func LoadCatalogs() Config {
+func LoadCatalogs(sources map[string]Source) Config {
 	var cfg Config
-
-	sources := LoadSources()
-	for name, _ := range sources {
+	for name := range sources {
 		file := filepath.Join(getUserConfigDirectory(), "repo.d", name+".yaml")
 
 		if _, err := os.Stat(file); os.IsNotExist(err) {
@@ -113,7 +114,7 @@ func saveSources(data map[string]Source) {
 
 func AddCatalog(name string, url string) {
 	sources := LoadSources()
-	sources[name] = Source{URL: url}
+	sources[name] = Source{URL: url, AddedAt: time.Now().Format(time.RFC3339), UpdatedAt: time.Now().Format(time.RFC3339)}
 	saveSources(sources)
 }
 
@@ -127,7 +128,9 @@ func UpdateAllCatalogs() {
 	sources := LoadSources()
 	for name, source := range sources {
 		UpdateCatalog(name, source)
+		source.UpdatedAt = time.Now().Format(time.RFC3339)
 	}
+	saveSources(sources)
 }
 func UpdateCatalog(name string, source Source) {
 	dir := filepath.Join(getUserConfigDirectory(), "repo.d")

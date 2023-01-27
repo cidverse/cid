@@ -48,9 +48,10 @@ var catalogListCmd = &cobra.Command{
 		registries := catalog.LoadSources()
 		// print list
 		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
-		_, _ = fmt.Fprintln(w, "NAME\tURL")
+		_, _ = fmt.Fprintln(w, "NAME\tURL\tAdded\tUpdated\tWorkflows\tActions\tImages")
 		for key, source := range registries {
-			_, _ = fmt.Fprintln(w, key+"\t"+source.URL)
+			data := catalog.LoadCatalogs(map[string]catalog.Source{key: source})
+			_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%d\t%d\n", key, source.URL, source.AddedAt, source.UpdatedAt, len(data.Workflows), len(data.Actions), len(data.ContainerImages))
 		}
 		_ = w.Flush()
 	},

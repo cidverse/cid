@@ -33,7 +33,7 @@ func LoadConfig(projectDirectory string) *CIDConfig {
 	unmarshalNoError("files/cid-tools.yaml", yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-tools.yaml")), &cfg))
 
 	// default os cache dir
-	data := catalog.LoadCatalogs()
+	data := catalog.LoadCatalogs(catalog.LoadSources())
 	log.Info().Int("images", len(data.ContainerImages)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Msg("imported config from cid registries")
 	cfg.Registry.ContainerImages = append(cfg.Registry.ContainerImages, data.ContainerImages...)
 	cfg.Registry.Actions = append(cfg.Registry.Actions, data.Actions...)
