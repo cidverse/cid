@@ -1,7 +1,7 @@
 package restapi
 
 import (
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
@@ -12,7 +12,7 @@ type APIConfig struct {
 	ProjectDir    string
 	Modules       []*analyzerapi.ProjectModule
 	CurrentModule *analyzerapi.ProjectModule
-	CurrentAction *registry.Action
+	CurrentAction *catalog.Action
 	Env           map[string]string
 	ActionConfig  string
 	State         *state.ActionStateContext
@@ -27,7 +27,7 @@ type handlerConfig struct {
 	containerProjectDir string
 	modules             []*analyzerapi.ProjectModule
 	currentModule       *analyzerapi.ProjectModule
-	currentAction       *registry.Action
+	currentAction       *catalog.Action
 	env                 map[string]string
 	actionConfig        string
 	state               *state.ActionStateContext

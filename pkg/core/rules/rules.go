@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/thoas/go-funk"
 
@@ -26,7 +26,7 @@ const ModuleBuildSystemSyntax = "MODULE_BUILD_SYSTEM_SYNTAX"
 const ModuleFiles = "MODULE_FILES"
 
 // AnyRuleMatches will return true if at least one rule matches, if no rules are provided this always returns true
-func AnyRuleMatches(rules []registry.WorkflowRule, evalContext map[string]interface{}) bool {
+func AnyRuleMatches(rules []catalog.WorkflowRule, evalContext map[string]interface{}) bool {
 	result := 0
 
 	if len(rules) == 0 {
@@ -43,14 +43,14 @@ func AnyRuleMatches(rules []registry.WorkflowRule, evalContext map[string]interf
 }
 
 // EvaluateRulesAsText will check all rules and returns the count of matching rules in the following format: 2/5
-func EvaluateRulesAsText(rules []registry.WorkflowRule, evalContext map[string]interface{}) string {
+func EvaluateRulesAsText(rules []catalog.WorkflowRule, evalContext map[string]interface{}) string {
 	matching := EvaluateRules(rules, evalContext)
 
 	return strconv.Itoa(matching) + "/" + strconv.Itoa(len(rules))
 }
 
 // EvaluateRules will check all rules and returns the count of matching rules
-func EvaluateRules(rules []registry.WorkflowRule, evalContext map[string]interface{}) int {
+func EvaluateRules(rules []catalog.WorkflowRule, evalContext map[string]interface{}) int {
 	result := 0
 
 	for _, rule := range rules {
@@ -63,10 +63,10 @@ func EvaluateRules(rules []registry.WorkflowRule, evalContext map[string]interfa
 }
 
 // EvaluateRule will evaluate a WorkflowRule and return the result
-func EvaluateRule(rule registry.WorkflowRule, evalContext map[string]interface{}) bool {
+func EvaluateRule(rule catalog.WorkflowRule, evalContext map[string]interface{}) bool {
 	log.Debug().Str("type", string(rule.Type)).Str("expression", rule.Expression).Msg("evaluating rule")
 
-	if rule.Type == "" || rule.Type == registry.WorkflowExpressionCEL {
+	if rule.Type == "" || rule.Type == catalog.WorkflowExpressionCEL {
 		return evalRuleCEL(rule, evalContext)
 	}
 
@@ -104,7 +104,7 @@ var (
 	stringListType = reflect.TypeOf([]string{})
 )
 
-func evalRuleCEL(rule registry.WorkflowRule, evalContext map[string]interface{}) bool {
+func evalRuleCEL(rule catalog.WorkflowRule, evalContext map[string]interface{}) bool {
 	if rule.Expression == "" {
 		return false
 	}

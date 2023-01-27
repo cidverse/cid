@@ -1,4 +1,4 @@
-package registry
+package catalog
 
 import (
 	"strings"
@@ -24,8 +24,11 @@ func ProcessRegistry(registry *Config) *Config {
 			}
 
 			for _, tag := range tags {
-				version := tagToVersion(tag.Tag)
+				if strings.HasPrefix(tag.Tag, "sha256-") {
+					continue
+				}
 
+				version := tagToVersion(tag.Tag)
 				image := sourceImage
 				image.Image = strings.ReplaceAll(image.Image, "${{TAG}}", tag.Tag)
 				var providedBinary []ProvidedBinary

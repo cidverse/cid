@@ -11,7 +11,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/common/workflowrun"
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -50,7 +50,7 @@ var actionListCmd = &cobra.Command{
 		_, _ = fmt.Fprintln(w, "REPOSITORY\tACTION\tTYPE\tSCOPE\tRULES\tDESCRIPTION")
 		for _, action := range cfg.Registry.Actions {
 			ruleEvaluation := "?/" + strconv.Itoa(len(action.Rules))
-			if action.Scope == registry.ActionScopeProject {
+			if action.Scope == catalog.ActionScopeProject {
 				ruleEvaluation = rules.EvaluateRulesAsText(action.Rules, rules.GetRuleContext(env))
 			}
 
@@ -86,9 +86,9 @@ var actionRunCmd = &cobra.Command{
 			log.Error().Str("action", actionName).Msg("action is not known")
 			os.Exit(1)
 		}
-		act := registry.WorkflowAction{
+		act := catalog.WorkflowAction{
 			ID:     action.Repository + "/" + action.Name,
-			Rules:  []registry.WorkflowRule{},
+			Rules:  []catalog.WorkflowRule{},
 			Config: nil,
 			Module: nil,
 		}

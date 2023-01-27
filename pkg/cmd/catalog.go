@@ -6,23 +6,23 @@ import (
 	"text/tabwriter"
 
 	"github.com/cidverse/cid/pkg/common/protectoutput"
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	rootCmd.AddCommand(registryRootCmd)
-	registryRootCmd.AddCommand(registryAddCmd)
-	registryRootCmd.AddCommand(registryListCmd)
-	registryRootCmd.AddCommand(registryRemoveCmd)
-	registryRootCmd.AddCommand(registryUpdateCmd)
-	registryRootCmd.AddCommand(registryProcessFileCmd)
-	registryProcessFileCmd.Flags().StringP("input", "i", "", "input directory")
+	rootCmd.AddCommand(catalogRootCmd)
+	catalogRootCmd.AddCommand(catalogAddCmd)
+	catalogRootCmd.AddCommand(catalogListCmd)
+	catalogRootCmd.AddCommand(catalogRemoveCmd)
+	catalogRootCmd.AddCommand(catalogUpdateCmd)
+	catalogRootCmd.AddCommand(catalogProcessFileCmd)
+	catalogProcessFileCmd.Flags().StringP("input", "i", "", "input directory")
 }
 
-var registryRootCmd = &cobra.Command{
-	Use:     "registry",
+var catalogRootCmd = &cobra.Command{
+	Use:     "catalog",
 	Aliases: []string{},
 	Run: func(cmd *cobra.Command, args []string) {
 		_ = cmd.Help()
@@ -30,22 +30,22 @@ var registryRootCmd = &cobra.Command{
 	},
 }
 
-var registryAddCmd = &cobra.Command{
+var catalogAddCmd = &cobra.Command{
 	Use:     "add",
 	Aliases: []string{},
 	Short:   "add registry",
 	Run: func(cmd *cobra.Command, args []string) {
-		registry.AddRegistry(args[0], args[1])
+		catalog.AddCatalog(args[0], args[1])
 		log.Info().Str("name", args[0]).Str("url", args[1]).Msg("added registry")
 	},
 }
 
-var registryListCmd = &cobra.Command{
+var catalogListCmd = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{},
 	Short:   "list registries",
 	Run: func(cmd *cobra.Command, args []string) {
-		registries := registry.LoadSources()
+		registries := catalog.LoadSources()
 		// print list
 		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
 		_, _ = fmt.Fprintln(w, "NAME\tURL")
@@ -56,35 +56,35 @@ var registryListCmd = &cobra.Command{
 	},
 }
 
-var registryRemoveCmd = &cobra.Command{
+var catalogRemoveCmd = &cobra.Command{
 	Use:     "remove",
 	Aliases: []string{},
 	Short:   "remove registry",
 	Run: func(cmd *cobra.Command, args []string) {
-		registry.RemoveRegistry(args[0])
+		catalog.RemoveCatalog(args[0])
 		log.Info().Str("name", args[0]).Msg("removed registry")
 	},
 }
 
-var registryUpdateCmd = &cobra.Command{
+var catalogUpdateCmd = &cobra.Command{
 	Use:     "update",
 	Aliases: []string{},
 	Short:   "update registries",
 	Run: func(cmd *cobra.Command, args []string) {
-		registries := registry.LoadSources()
+		registries := catalog.LoadSources()
 
 		if len(args) > 0 {
 			name := args[0]
 			log.Info().Str("name", name).Msg("updating registry")
-			registry.UpdateRegistry(name, registries[name])
+			catalog.UpdateCatalog(name, registries[name])
 		} else {
 			log.Info().Int("count", len(registries)).Msg("updating all registries")
-			registry.UpdateAllRegistries()
+			catalog.UpdateAllCatalogs()
 		}
 	},
 }
 
-var registryProcessFileCmd = &cobra.Command{
+var catalogProcessFileCmd = &cobra.Command{
 	Use:     "process",
 	Aliases: []string{},
 	Short:   "preprocess a registry configuration file",
@@ -93,16 +93,16 @@ var registryProcessFileCmd = &cobra.Command{
 		dir, _ := cmd.Flags().GetString("input")
 
 		// parse
-		fileRegistry, err := registry.LoadFromDirectory(dir)
+		fileRegistry, err := catalog.LoadFromDirectory(dir)
 		if err != nil {
 			log.Fatal().Str("file", dir).Err(err).Msg("failed to parse registry file")
 		}
 
 		// process
-		fileRegistry = registry.ProcessRegistry(fileRegistry)
+		fileRegistry = catalog.ProcessRegistry(fileRegistry)
 
 		// store output
-		err = registry.SaveToFile(fileRegistry, dir+"/cid-index.yaml")
+		err = catalog.SaveToFile(fileRegistry, dir+"/cid-index.yaml")
 		if err != nil {
 			log.Fatal().Str("file", dir).Err(err).Msg("failed to save registry file")
 		}

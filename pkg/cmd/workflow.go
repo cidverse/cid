@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"text/tabwriter"
 
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
@@ -78,7 +78,7 @@ var workflowRunCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
-		var wf *registry.Workflow
+		var wf *catalog.Workflow
 		if len(args) == 0 {
 			// evaluate rules to pick workflow
 			wf = workflowrun.FirstWorkflowMatchingRules(cfg.Registry.Workflows, env)

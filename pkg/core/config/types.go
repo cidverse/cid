@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 )
 
 type ToolBinary struct {
@@ -37,5 +37,5 @@ type CIDConfig struct {
 	LocalTools []ToolLocal `yaml:"localtools,omitempty"`
 
 	// Registry holding all known images, actions, workflows, ...
-	Registry registry.Config `yaml:"registry,omitempty"`
+	Registry catalog.Config `yaml:"registry,omitempty"`
 }

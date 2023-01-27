@@ -2,7 +2,7 @@ package githubaction
 
 import (
 	commonapi "github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/state"
 )
 
@@ -17,9 +17,9 @@ func (e Executor) GetVersion() string {
 }
 
 func (e Executor) GetType() string {
-	return string(registry.ActionTypeGitHubAction)
+	return string(catalog.ActionTypeGitHubAction)
 }
 
-func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *registry.Action, action *registry.WorkflowAction) error {
+func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, action *catalog.WorkflowAction) error {
 	return nil
 }

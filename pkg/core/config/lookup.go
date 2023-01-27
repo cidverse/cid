@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"sort"
 
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/version"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/common"
@@ -41,13 +41,13 @@ type BinaryExecutionCandidate struct {
 	Image string
 
 	// ImageCache holds information about caching for containers
-	ImageCache []registry.ImageCache
+	ImageCache []catalog.ImageCache
 
 	// Mounts
-	Mounts []registry.ContainerMount
+	Mounts []catalog.ContainerMount
 
 	// Security
-	Security registry.Security
+	Security catalog.Security
 }
 
 // FindExecutionCandidates returns a full list of all available execution options for the specified binary
@@ -154,7 +154,7 @@ func (c *CIDConfig) FindExecutionCandidates(binary string, constraint string, pr
 }
 
 // FindImageOfBinary retrieves information about the container image for the specified binary fulfilling the constraint
-func (c *CIDConfig) FindImageOfBinary(binary string, constraint string) *registry.ContainerImage {
+func (c *CIDConfig) FindImageOfBinary(binary string, constraint string) *catalog.ContainerImage {
 	// lookup
 	for _, entry := range c.Registry.ContainerImages {
 		for _, provided := range entry.Provides {

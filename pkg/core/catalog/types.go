@@ -1,4 +1,4 @@
-package registry
+package catalog
 
 // Config is a registry configuration with placeholders
 type Config struct {

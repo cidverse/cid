@@ -1,4 +1,4 @@
-package registry
+package catalog
 
 import (
 	"github.com/cidverse/repoanalyzer/analyzerapi"

@@ -1,4 +1,4 @@
-package registry
+package catalog
 
 import (
 	"os"
@@ -36,7 +36,7 @@ func LoadSources() map[string]Source {
 
 	// file doesn't exist yet, init with main repo
 	if _, err := os.Stat(file); os.IsNotExist(err) {
-		sources["central"] = Source{URL: "https://raw.githubusercontent.com/cidverse/registry/main/cid-index.yaml"}
+		sources["central"] = Source{URL: "https://raw.githubusercontent.com/cidverse/catalog/main/cid-index.yaml"}
 		return sources
 	}
 
@@ -53,7 +53,7 @@ func LoadSources() map[string]Source {
 	return sources
 }
 
-func LoadRegistries() Config {
+func LoadCatalogs() Config {
 	var cfg Config
 
 	sources := LoadSources()
@@ -111,25 +111,25 @@ func saveSources(data map[string]Source) {
 	}
 }
 
-func AddRegistry(name string, url string) {
+func AddCatalog(name string, url string) {
 	sources := LoadSources()
 	sources[name] = Source{URL: url}
 	saveSources(sources)
 }
 
-func RemoveRegistry(name string) {
+func RemoveCatalog(name string) {
 	sources := LoadSources()
 	delete(sources, name)
 	saveSources(sources)
 }
 
-func UpdateAllRegistries() {
+func UpdateAllCatalogs() {
 	sources := LoadSources()
 	for name, source := range sources {
-		UpdateRegistry(name, source)
+		UpdateCatalog(name, source)
 	}
 }
-func UpdateRegistry(name string, source Source) {
+func UpdateCatalog(name string, source Source) {
 	dir := filepath.Join(getUserConfigDirectory(), "repo.d")
 	_ = os.MkdirAll(dir, os.ModePerm)
 

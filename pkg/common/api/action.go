@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/samber/lo"
 
@@ -100,7 +100,7 @@ func RegisterBuiltinAction(action ActionStep) {
 }
 
 // GetActionContext gets the action context, this operation is expensive and should only be called once per execution
-func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, env map[string]string, access *registry.ActionAccess) ActionExecutionContext {
+func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, env map[string]string, access *catalog.ActionAccess) ActionExecutionContext {
 	finalEnv := make(map[string]string)
 	fullEnv := lo.Assign(env, common.GetMachineEnvironment())
 

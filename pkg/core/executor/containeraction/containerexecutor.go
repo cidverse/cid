@@ -14,7 +14,7 @@ import (
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
@@ -36,10 +36,10 @@ func (e Executor) GetVersion() string {
 }
 
 func (e Executor) GetType() string {
-	return string(registry.ActionTypeContainer)
+	return string(catalog.ActionTypeContainer)
 }
 
-func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *registry.Action, action *registry.WorkflowAction) error {
+func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, action *catalog.WorkflowAction) error {
 	// properties
 	apiPort := strconv.Itoa(findAvailablePort())
 	socketFile := path.Join(ctx.Paths.Temp, strings.ReplaceAll(uuid.New().String(), "-", "")+".socket")

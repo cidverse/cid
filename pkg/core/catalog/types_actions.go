@@ -1,4 +1,4 @@
-package registry
+package catalog
 
 type ActionScope string
 

@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/executor"
-	"github.com/cidverse/cid/pkg/core/registry"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer"
 
@@ -20,7 +20,7 @@ import (
 )
 
 // IsWorkflowExecutable returns true if the workflow is executable (enabled + at least one rule matches)
-func IsWorkflowExecutable(w *registry.Workflow, env map[string]string) bool {
+func IsWorkflowExecutable(w *catalog.Workflow, env map[string]string) bool {
 	matchingRules := rules.EvaluateRules(w.Rules, rules.GetRuleContext(env))
 
 	if len(w.Rules) == 0 || matchingRules > 0 {
@@ -31,7 +31,7 @@ func IsWorkflowExecutable(w *registry.Workflow, env map[string]string) bool {
 }
 
 // IsStageExecutable returns true if the stage is executable (enabled + at least one rule matches)
-func IsStageExecutable(s *registry.WorkflowStage, env map[string]string) bool {
+func IsStageExecutable(s *catalog.WorkflowStage, env map[string]string) bool {
 	matchingRules := rules.EvaluateRules(s.Rules, rules.GetRuleContext(env))
 
 	if len(s.Rules) == 0 || matchingRules > 0 {
@@ -42,7 +42,7 @@ func IsStageExecutable(s *registry.WorkflowStage, env map[string]string) bool {
 }
 
 // IsActionExecutable returns true if the action is executable (enabled + at least one rule matches)
-func IsActionExecutable(a *registry.Action, env map[string]string) bool {
+func IsActionExecutable(a *catalog.Action, env map[string]string) bool {
 	matchingRules := rules.EvaluateRules(a.Rules, rules.GetRuleContext(env))
 
 	if len(a.Rules) == 0 || matchingRules > 0 {
@@ -53,7 +53,7 @@ func IsActionExecutable(a *registry.Action, env map[string]string) bool {
 }
 
 // FirstWorkflowMatchingRules returns the first workflow that matches at least one rule
-func FirstWorkflowMatchingRules(workflows []registry.Workflow, env map[string]string) *registry.Workflow {
+func FirstWorkflowMatchingRules(workflows []catalog.Workflow, env map[string]string) *catalog.Workflow {
 	// select workflow
 	log.Info().Msg("evaluating all workflows")
 	for _, wf := range workflows {
@@ -74,7 +74,7 @@ func FirstWorkflowMatchingRules(workflows []registry.Workflow, env map[string]st
 	return nil
 }
 
-func RunWorkflow(cfg *config.CIDConfig, wf *registry.Workflow, env map[string]string, projectDir string, stagesFilter []string, modulesFilter []string) {
+func RunWorkflow(cfg *config.CIDConfig, wf *catalog.Workflow, env map[string]string, projectDir string, stagesFilter []string, modulesFilter []string) {
 	log.Debug().Str("workflow", wf.Name).Msg("workflow start")
 	start := time.Now()
 	ruleContext := rules.GetRuleContext(env)
@@ -95,7 +95,7 @@ func RunWorkflow(cfg *config.CIDConfig, wf *registry.Workflow, env map[string]st
 	}
 }
 
-func RunWorkflowStage(cfg *config.CIDConfig, stage *registry.WorkflowStage, env map[string]string, projectDir string, modulesFilter []string) {
+func RunWorkflowStage(cfg *config.CIDConfig, stage *catalog.WorkflowStage, env map[string]string, projectDir string, modulesFilter []string) {
 	log.Debug().Str("stage", stage.Name).Msg("stage start")
 	start := time.Now()
 	ruleContext := rules.GetRuleContext(env)
@@ -112,7 +112,7 @@ func RunWorkflowStage(cfg *config.CIDConfig, stage *registry.WorkflowStage, env 
 	}
 }
 
-func RunWorkflowAction(cfg *config.CIDConfig, action *registry.WorkflowAction, env map[string]string, projectDir string, modulesFilter []string) {
+func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, env map[string]string, projectDir string, modulesFilter []string) {
 	log.Debug().Str("action", action.ID).Msg("action start")
 	catalogAction := cfg.Registry.FindAction(action.ID)
 	if catalogAction == nil {
@@ -126,7 +126,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *registry.WorkflowAction, e
 	ctx.Config = string(configAsJSON)
 
 	// project-scoped actions
-	if catalogAction.Scope == registry.ActionScopeProject {
+	if catalogAction.Scope == catalog.ActionScopeProject {
 		ruleContext := rules.GetRuleContext(ctx.Env)
 		ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
 		log.Debug().Str("Trace", action.ID).Bool("rules_match", ruleMatch).Msg("check action rules")
@@ -136,7 +136,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *registry.WorkflowAction, e
 	}
 
 	// module-scoped actions
-	if catalogAction.Scope == registry.ActionScopeModule {
+	if catalogAction.Scope == catalog.ActionScopeModule {
 		// for each module
 		for _, m := range ctx.Modules {
 			moduleRef := *m
@@ -164,7 +164,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *registry.WorkflowAction, e
 	log.Debug().Str("action", action.ID).Msg("action end")
 }
 
-func runWorkflowAction(catalogAction *registry.Action, action *registry.WorkflowAction, ctx *api.ActionExecutionContext) {
+func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAction, ctx *api.ActionExecutionContext) {
 	start := time.Now()
 	ruleContext := rules.GetRuleContext(ctx.Env)
 	if rules.AnyRuleMatches(action.Rules, ruleContext) {

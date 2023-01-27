@@ -1,4 +1,4 @@
-package registry
+package catalog
 
 type ContainerImage struct {
 	Repository string           `yaml:"repository,omitempty"`

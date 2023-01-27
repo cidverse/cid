@@ -6,12 +6,12 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/snowflake"
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/rs/zerolog/log"
 	"github.com/sethvargo/go-password/password"
 )
 
-func insertCommandVariables(input string, action registry.Action) string {
+func insertCommandVariables(input string, action catalog.Action) string {
 	input = strings.Replace(input, "{REPOSITORY}", action.Repository, -1)
 	input = strings.Replace(input, "{ACTION}", action.Name, -1)
 	return input

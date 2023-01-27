@@ -3,7 +3,7 @@ package config
 import (
 	"embed"
 
-	"github.com/cidverse/cid/pkg/core/registry"
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/jinzhu/configor"
 	"github.com/rs/zerolog/log"
@@ -33,7 +33,7 @@ func LoadConfig(projectDirectory string) *CIDConfig {
 	unmarshalNoError("files/cid-tools.yaml", yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-tools.yaml")), &cfg))
 
 	// default os cache dir
-	data := registry.LoadRegistries()
+	data := catalog.LoadCatalogs()
 	log.Info().Int("images", len(data.ContainerImages)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Msg("imported config from cid registries")
 	cfg.Registry.ContainerImages = append(cfg.Registry.ContainerImages, data.ContainerImages...)
 	cfg.Registry.Actions = append(cfg.Registry.Actions, data.Actions...)
