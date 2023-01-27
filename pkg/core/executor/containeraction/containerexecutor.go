@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -129,6 +130,17 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		containerExec.AddEnvironmentVariable("CID_API_SOCKET", socketFile)
 	}
 	containerExec.AddEnvironmentVariable("CID_API_SECRET", secret)
+
+	// catalogAction access
+	if len(catalogAction.Access.Env) > 0 {
+		for k, v := range ctx.Env {
+			for _, pattern := range catalogAction.Access.Env {
+				if regexp.MustCompile(pattern).MatchString(k) {
+					containerExec.AddEnvironmentVariable(k, v)
+				}
+			}
+		}
+	}
 
 	containerCmd, containerCmdErr := containerExec.GetRunCommand(containerExec.DetectRuntime())
 	if containerCmdErr != nil {
