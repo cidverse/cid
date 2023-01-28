@@ -13,9 +13,30 @@ import (
 // artifactList lists all generated reports
 func (hc *handlerConfig) artifactList(c echo.Context) error {
 	var result = make([]state.ActionArtifact, 0)
+	module := c.QueryParam("module")
+	artifactType := c.QueryParam("type")
+	name := c.QueryParam("name")
+	format := c.QueryParam("format")
+	formatVersion := c.QueryParam("format_version")
 
 	// filter artifacts
 	for _, artifact := range hc.state.Artifacts {
+		if len(module) > 0 && module != artifact.Module {
+			continue
+		}
+		if len(artifactType) > 0 && artifactType != string(artifact.Type) {
+			continue
+		}
+		if len(name) > 0 && name != artifact.Name {
+			continue
+		}
+		if len(format) > 0 && format != artifact.Format {
+			continue
+		}
+		if len(formatVersion) > 0 && formatVersion != artifact.FormatVersion {
+			continue
+		}
+
 		result = append(result, artifact)
 	}
 

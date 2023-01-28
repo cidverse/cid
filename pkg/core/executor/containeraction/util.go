@@ -52,7 +52,7 @@ func findAvailablePort() int {
 
 func createPath(dir string) {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		err := os.MkdirAll(dir, os.FileMode(0777))
+		err := os.MkdirAll(dir, os.ModePerm)
 		if err != nil {
 			log.Warn().Str("path", dir).Msg("failed to create directory")
 		}

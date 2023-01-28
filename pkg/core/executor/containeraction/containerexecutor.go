@@ -97,7 +97,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	time.Sleep(100 * time.Millisecond)
 
 	// create temp dir for action
-	tempDir := path.Join(ctx.Paths.Temp, jobID)
+	tempDir := filepath.Join(ctx.Paths.Temp, jobID)
 	createPath(tempDir)
 	log.Debug().Str("dir", tempDir).Msg("creating temp dir")
 	defer func() {

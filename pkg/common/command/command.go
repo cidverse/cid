@@ -247,7 +247,7 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 
 // RunSystemCommandPassThru runs a command and forwards all output to current console session
 func RunSystemCommandPassThru(file string, args string, env map[string]string, workDir string, stdout io.Writer, stderr io.Writer) error {
-	log.Debug().Str("file", file).Str("args", args).Str("workdir", workDir).Msg("command exec")
+	log.Trace().Str("file", file).Str("args", args).Str("workdir", workDir).Msg("command exec")
 
 	// Run Command
 	cmd, cmdErr := GetPlatformSpecificCommand(runtime.GOOS, file, args, workDir)
@@ -263,11 +263,11 @@ func RunSystemCommandPassThru(file string, args string, env map[string]string, w
 	cmd.Stderr = stderr
 	err := cmd.Run()
 	if err != nil {
-		log.Debug().Err(err).Str("command_result", "error").Msg(file + " " + args)
+		log.Trace().Err(err).Str("command_result", "error").Msg(file + " " + args)
 		return err
 	}
 
-	log.Debug().Str("command_result", "ok").Msg(file + " " + args)
+	log.Trace().Str("command_result", "ok").Msg(file + " " + args)
 	return nil
 }
 
