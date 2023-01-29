@@ -16,6 +16,7 @@ type executeRequest struct {
 	CaptureOutput bool              `json:"capture_output"`
 	Env           map[string]string `json:"env"`
 	Ports         []int             `json:"ports"`
+	Constraint    string            `json:"constraint"`
 }
 
 // commandExecute runs a command in the project directory (blocking until the command exits, returns the response code)
@@ -50,7 +51,7 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 	// execute
 	exitCode := 0
 	var errorMessage = ""
-	stdout, stderr, cmdErr := command.RunAPICommand(replaceCommandPlaceholders(req.Command, hc.env), commandEnv, hc.projectDir, execDir, req.CaptureOutput, req.Ports)
+	stdout, stderr, cmdErr := command.RunAPICommand(replaceCommandPlaceholders(req.Command, hc.env), commandEnv, hc.projectDir, execDir, req.CaptureOutput, req.Ports, req.Constraint)
 	exitErr, isExitError := cmdErr.(*exec.ExitError)
 	if isExitError {
 		exitCode = exitErr.ExitCode()

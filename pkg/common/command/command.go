@@ -64,19 +64,20 @@ func RunOptionalCommand(command string, env map[string]string, workDir string) e
 }
 
 // RunCommandAndGetOutput runs a command and returns the full response / command output
-func RunCommandAndGetOutput(command string, env map[string]string, workDir string) (string, error) {
-	var resultBuff bytes.Buffer
+func RunCommandAndGetOutput(command string, env map[string]string, workDir string) (string, string, error) {
+	var stdoutBuff bytes.Buffer
+	var stderrBuff bytes.Buffer
 
-	err := runCommand(command, env, "", workDir, &resultBuff, &resultBuff)
+	err := runCommand(command, env, "", workDir, &stdoutBuff, &stderrBuff)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return resultBuff.String(), nil
+	return stdoutBuff.String(), stderrBuff.String(), nil
 }
 
 // RunAPICommand gets called from actions or the api to execute commands
-func RunAPICommand(command string, env map[string]string, projectDir string, workDir string, capture bool, ports []int) (stdout string, stderr string, err error) {
+func RunAPICommand(command string, env map[string]string, projectDir string, workDir string, capture bool, ports []int, userProvidedConstraint string) (stdout string, stderr string, err error) {
 	var stdoutWriter io.Writer
 	var stderrWriter io.Writer
 	var stdoutBuffer bytes.Buffer
@@ -95,8 +96,13 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 
 	// find version constraint from config
 	cmdConstraint := ">= 0.0.0"
+	// constraint from config
 	if value, ok := config.Current.Dependencies[binary]; ok {
 		cmdConstraint = value
+	}
+	// user provided constraint
+	if len(userProvidedConstraint) > 0 {
+		cmdConstraint = userProvidedConstraint
 	}
 
 	// find execution options
@@ -155,7 +161,7 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 		}
 
 		containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
-		err := RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, "", stdoutWriter, stderrWriter)
+		err := RunSystemCommand(containerCmdArgs[0], containerCmdArgs[1], env, "", stdoutWriter, stderrWriter)
 		if err != nil {
 			return "", "", errors.New("command failed: " + err.Error())
 		}
@@ -192,7 +198,7 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 	candidate := candidates[0]
 	switch candidate.Type {
 	case config.ExecutionExec:
-		return RunSystemCommandPassThru(candidate.File, cmdPayload, env, workDir, stdout, stderr)
+		return RunSystemCommand(candidate.File, cmdPayload, env, workDir, stdout, stderr)
 	case config.ExecutionContainer:
 		containerExec := containerruntime.Container{}
 
@@ -237,7 +243,7 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 
 		log.Debug().Msg("container-exec: " + containerCmd)
 		containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
-		return RunSystemCommandPassThru(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdout, stderr)
+		return RunSystemCommand(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdout, stderr)
 	default:
 		log.Fatal().Interface("type", candidate.Type).Msg("execution type is not supported!")
 	}
@@ -245,8 +251,8 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 	return nil
 }
 
-// RunSystemCommandPassThru runs a command and forwards all output to current console session
-func RunSystemCommandPassThru(file string, args string, env map[string]string, workDir string, stdout io.Writer, stderr io.Writer) error {
+// RunSystemCommand runs a command and forwards all output to current console session
+func RunSystemCommand(file string, args string, env map[string]string, workDir string, stdout io.Writer, stderr io.Writer) error {
 	log.Trace().Str("file", file).Str("args", args).Str("workdir", workDir).Msg("command exec")
 
 	// Run Command

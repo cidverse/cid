@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -147,6 +148,15 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		return containerCmdErr
 	}
 	log.Debug().Str("action", catalogAction.Name).Msg("container command for action: " + containerCmd)
-	_, err := command.RunCommandAndGetOutput(containerCmd, nil, "")
-	return err
+	stdout, stderr, cmdErr := command.RunCommandAndGetOutput(containerCmd, nil, "")
+	exitErr, isExitError := cmdErr.(*exec.ExitError)
+	if isExitError {
+		log.Error().Int("exit_code", exitErr.ExitCode()).Str("message", exitErr.Error()).Str("stdout", stdout).Str("stderr", stderr).Msg("command failed")
+		return cmdErr
+	} else if cmdErr != nil {
+		log.Error().Int("exit_code", 1).Str("message", exitErr.Error()).Str("stdout", stdout).Str("stderr", stderr).Msg("command failed")
+		return cmdErr
+	}
+
+	return nil
 }
