@@ -34,7 +34,7 @@ func LoadConfig(projectDirectory string) *CIDConfig {
 
 	// default os cache dir
 	data := catalog.LoadCatalogs(catalog.LoadSources())
-	log.Info().Int("images", len(data.ContainerImages)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Msg("imported config from cid registries")
+	log.Info().Int("images", len(data.ContainerImages)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Msg("loaded catalogs")
 	cfg.Registry.ContainerImages = append(cfg.Registry.ContainerImages, data.ContainerImages...)
 	cfg.Registry.Actions = append(cfg.Registry.Actions, data.Actions...)
 	cfg.Registry.Workflows = append(cfg.Registry.Workflows, data.Workflows...)

@@ -30,5 +30,6 @@ func FindTags(repositoryURL string) ([]ImageTag, error) {
 	for _, tag := range tagList {
 		tags = append(tags, ImageTag{Repository: repositoryURL, Tag: tag})
 	}
+
 	return tags, nil
 }

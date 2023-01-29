@@ -12,6 +12,7 @@ require (
 	github.com/google/cel-go v0.13.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-version v1.6.0
+	github.com/in-toto/in-toto-golang v0.5.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/labstack/echo/v4 v4.10.0
 	github.com/mattn/go-colorable v0.1.13
@@ -22,7 +23,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/thoas/go-funk v0.9.3
-	google.golang.org/genproto v0.0.0-20230119192704-9d59e20e5cd1
+	google.golang.org/genproto v0.0.0-20230127162408-596548ed4efa
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.0.0
 )
