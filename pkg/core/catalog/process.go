@@ -41,6 +41,8 @@ func ProcessRegistry(registry *Config) *Config {
 				image.Provides = providedBinary
 				result.ContainerImages = append(result.ContainerImages, image)
 			}
+		} else {
+			result.ContainerImages = append(result.ContainerImages, sourceImage)
 		}
 	}
 

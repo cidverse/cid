@@ -159,6 +159,7 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 		if containerCmdErr != nil {
 			return "", "", errors.New("failed to generate command: " + containerCmdErr.Error())
 		}
+		log.Debug().Msg("running command via api: " + containerCmd)
 
 		containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
 		err := RunSystemCommand(containerCmdArgs[0], containerCmdArgs[1], env, "", stdoutWriter, stderrWriter)
