@@ -62,7 +62,7 @@ func LoadCatalogs(sources map[string]Source) Config {
 		file := filepath.Join(getUserConfigDirectory(), "repo.d", name+".yaml")
 
 		if _, err := os.Stat(file); os.IsNotExist(err) {
-			log.Warn().Str("file", file).Msg("cache for registry is missing, please run `cid registry update`")
+			log.Warn().Str("file", file).Msg("cache for registry is missing, please run `cid catalog update`")
 			continue
 		}
 

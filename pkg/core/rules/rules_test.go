@@ -3,13 +3,13 @@ package rules
 import (
 	"testing"
 
-	"github.com/cidverse/cid/pkg/core/config"
+	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCELExpression(t *testing.T) {
-	rule := config.WorkflowRule{
-		Type:       config.WorkflowExpressionCEL,
+	rule := catalog.WorkflowRule{
+		Type:       catalog.WorkflowExpressionCEL,
 		Expression: "KEY == \"VALUE\"",
 	}
 
