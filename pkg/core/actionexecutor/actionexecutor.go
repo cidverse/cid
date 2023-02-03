@@ -1,9 +1,9 @@
-package executor
+package actionexecutor
 
 import (
-	"github.com/cidverse/cid/pkg/core/executor/api"
-	"github.com/cidverse/cid/pkg/core/executor/containeraction"
-	"github.com/cidverse/cid/pkg/core/executor/githubaction"
+	"github.com/cidverse/cid/pkg/core/actionexecutor/api"
+	"github.com/cidverse/cid/pkg/core/actionexecutor/containeraction"
+	"github.com/cidverse/cid/pkg/core/actionexecutor/githubaction"
 )
 
 func GetExecutors() []api.ActionExecutor {

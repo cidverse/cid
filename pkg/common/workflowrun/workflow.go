@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/cidverse/cid/pkg/core/actionexecutor"
 	"github.com/cidverse/cid/pkg/core/catalog"
-	"github.com/cidverse/cid/pkg/core/executor"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer"
 
@@ -183,7 +183,7 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		filesystem.CreateDirectory(ctx.Paths.Artifact)
 
 		// execute
-		actionExecutor := executor.FindExecutorByType(string(catalogAction.Type))
+		actionExecutor := actionexecutor.FindExecutorByType(string(catalogAction.Type))
 		if actionExecutor != nil {
 			err := actionExecutor.Execute(ctx, &localState, catalogAction, action)
 			if err != nil {

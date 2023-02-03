@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
+	"github.com/cidverse/cidverseutils/pkg/network"
 	"github.com/samber/lo"
 
 	"github.com/cidverse/cid/pkg/common/protectoutput"
@@ -146,10 +147,10 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 
 		// ports
 		for _, port := range ports {
-			if IsFreePort(port) {
+			if network.IsFreePort(port) {
 				containerExec.AddContainerPort(containerruntime.ContainerPort{Source: port, Target: port})
 			} else {
-				freePort, _ := GetFreePort()
+				freePort, _ := network.GetFreePort()
 				containerExec.AddContainerPort(containerruntime.ContainerPort{Source: freePort, Target: port})
 			}
 		}
@@ -263,7 +264,16 @@ func RunSystemCommand(file string, args string, env map[string]string, workDir s
 		return cmdErr
 	}
 
-	cmd.Env = getFullEnvFromMap(env)
+	var commandEnv = make(map[string]string)
+	for _, line := range os.Environ() {
+		// TODO: maybe only PATH is enough? commandEnv["PATH"] = os.Getenv("PATH")
+		z := strings.SplitN(line, "=", 2)
+		commandEnv[z[0]] = z[1]
+	}
+	for k, v := range env {
+		commandEnv[k] = v
+	}
+	cmd.Env = cihelper.ConvertEnvMapToStringSlice(commandEnv)
 	cmd.Dir = workDir
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = stdout
