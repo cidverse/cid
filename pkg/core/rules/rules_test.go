@@ -192,7 +192,68 @@ func TestEvaluateRule(t *testing.T) {
 				Expression: `data.name == "my-name"`,
 			},
 			evalContext: map[string]interface{}{
-				"count": 10,
+				"data": map[string]string{
+					"name": "my-name",
+				},
+			},
+			expectedResult: true,
+		},
+		{
+			rule: catalog.WorkflowRule{
+				Type:       catalog.WorkflowExpressionCEL,
+				Expression: `contains(data, "hello")`,
+			},
+			evalContext: map[string]interface{}{
+				"data": []string{
+					"hello",
+					"world",
+				},
+			},
+			expectedResult: true,
+		},
+		{
+			rule: catalog.WorkflowRule{
+				Type:       catalog.WorkflowExpressionCEL,
+				Expression: `contains(data, "test")`,
+			},
+			evalContext: map[string]interface{}{
+				"data": []string{
+					"hello",
+					"world",
+				},
+			},
+			expectedResult: false,
+		},
+		{
+			rule: catalog.WorkflowRule{
+				Type:       catalog.WorkflowExpressionCEL,
+				Expression: `getMapValue(data, "name") == "my-name"`,
+			},
+			evalContext: map[string]interface{}{
+				"data": map[string]string{
+					"name": "my-name",
+				},
+			},
+			expectedResult: true,
+		},
+		{
+			rule: catalog.WorkflowRule{
+				Type:       catalog.WorkflowExpressionCEL,
+				Expression: `getMapValue(data, "any") == ""`,
+			},
+			evalContext: map[string]interface{}{
+				"data": map[string]string{
+					"name": "my-name",
+				},
+			},
+			expectedResult: true,
+		},
+		{
+			rule: catalog.WorkflowRule{
+				Type:       catalog.WorkflowExpressionCEL,
+				Expression: `hasPrefix(data.name, "my")`,
+			},
+			evalContext: map[string]interface{}{
 				"data": map[string]string{
 					"name": "my-name",
 				},

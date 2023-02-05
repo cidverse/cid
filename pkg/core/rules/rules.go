@@ -158,6 +158,15 @@ func evalRuleCEL(rule catalog.WorkflowRule, evalContext map[string]interface{}) 
 				}),
 			),
 		),
+		cel.Function("hasPrefix",
+			cel.Overload("hasPrefix_string",
+				[]*cel.Type{cel.StringType, cel.StringType},
+				cel.BoolType,
+				cel.BinaryBinding(func(lhs, rhs ref.Val) ref.Val {
+					return types.Bool(strings.HasPrefix(string(lhs.(types.String)), string(rhs.(types.String))))
+				}),
+			),
+		),
 	)
 	if celConfigErr != nil {
 		log.Fatal().Err(celConfigErr).Msg("failed to initialize CEL environment")
