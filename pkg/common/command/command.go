@@ -71,7 +71,7 @@ func RunCommandAndGetOutput(command string, env map[string]string, workDir strin
 
 	err := runCommand(command, env, "", workDir, &stdoutBuff, &stderrBuff)
 	if err != nil {
-		return "", "", err
+		return stdoutBuff.String(), stderrBuff.String(), err
 	}
 
 	return stdoutBuff.String(), stderrBuff.String(), nil

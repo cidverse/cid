@@ -30,5 +30,11 @@ func (hc *handlerConfig) moduleCurrent(c echo.Context) error {
 	}
 	module.Discovery = discovery
 
+	var files = make([]string, len(module.Files))
+	for _, file := range module.Files {
+		files = append(files, cihelper.ToUnixPath(file))
+	}
+	module.Files = files
+
 	return c.JSON(http.StatusOK, module)
 }
