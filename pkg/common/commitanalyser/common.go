@@ -1,10 +1,11 @@
 package commitanalyser
 
 import (
-	"github.com/cidverse/normalizeci/pkg/vcsrepository/vcsapi"
 	"regexp"
 
-	"github.com/cidverse/cid/pkg/core/version"
+	"github.com/cidverse/cidverseutils/pkg/version"
+	"github.com/cidverse/normalizeci/pkg/vcsrepository/vcsapi"
+
 	"github.com/oriser/regroup"
 	"github.com/rs/zerolog/log"
 )

@@ -5,7 +5,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/cidverse/cid/pkg/core/version"
+	"github.com/cidverse/cidverseutils/pkg/version"
 	"github.com/spf13/cobra"
 )
 

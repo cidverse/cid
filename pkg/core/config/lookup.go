@@ -8,8 +8,8 @@ import (
 	"sort"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
-	"github.com/cidverse/cid/pkg/core/version"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/cidverseutils/pkg/version"
 	"github.com/cidverse/normalizeci/pkg/common"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
