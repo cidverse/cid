@@ -6,13 +6,12 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.5.2
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20230205160052-0e24a0956dbf
-	github.com/cidverse/normalizeci v1.1.1-0.20230205221618-ea1e92a46780
+	github.com/cidverse/normalizeci v1.1.1-0.20230206231221-04e8a6f67724
 	github.com/cidverse/repoanalyzer v0.0.0-20230202233411-9948d63a1cb5
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.13.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-version v1.6.0
-	github.com/in-toto/in-toto-golang v0.6.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/labstack/echo/v4 v4.10.0
 	github.com/mattn/go-colorable v0.1.13

@@ -28,8 +28,8 @@ github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgIS
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
 github.com/cidverse/cidverseutils v0.0.0-20230205160052-0e24a0956dbf h1:FxVqn7n+XeuORSILUjVKk2HElDpacS/S+akhYay1te0=
 github.com/cidverse/cidverseutils v0.0.0-20230205160052-0e24a0956dbf/go.mod h1:EA4AFIHu3JXI9o6oyviofn+OjtqOGICEu6VWjNc7Pms=
-github.com/cidverse/normalizeci v1.1.1-0.20230205221618-ea1e92a46780 h1:zJ66C9QjHmgniUeeuECTklxcrp5unH9CbyfjM7mt1eE=
-github.com/cidverse/normalizeci v1.1.1-0.20230205221618-ea1e92a46780/go.mod h1:ZHFkhGvOLE5wg1qlVvjk7nVnAwTXS6jkp7w2eGAZO9A=
+github.com/cidverse/normalizeci v1.1.1-0.20230206231221-04e8a6f67724 h1:buP9bLnrU04edBMSRTM2muw64ppoMrUx+CSkuW88x/8=
+github.com/cidverse/normalizeci v1.1.1-0.20230206231221-04e8a6f67724/go.mod h1:ZHFkhGvOLE5wg1qlVvjk7nVnAwTXS6jkp7w2eGAZO9A=
 github.com/cidverse/repoanalyzer v0.0.0-20230202233411-9948d63a1cb5 h1:tpEqV5p/Bf3sQ83qpH/8ZVlwVFT5K5tUcSvk9VS6ms4=
 github.com/cidverse/repoanalyzer v0.0.0-20230202233411-9948d63a1cb5/go.mod h1:E5km8f8wxy/Mf7eMdB6X/9sqJQSIdQ8a4jRT3jbjlzA=
 github.com/cloudflare/circl v1.1.0/go.mod h1:prBCrKB9DV4poKZY1l9zBXg2QJY7mvgRvtMxxK7fi4I=
@@ -97,8 +97,6 @@ github.com/hashicorp/go-version v1.6.0 h1:feTTfFNnjP967rlCxM/I9g701jU+RN74YKx2mO
 github.com/hashicorp/go-version v1.6.0/go.mod h1:fltr4n8CU8Ke44wwGCBoEymUuxUHl09ZGVZPK5anwXA=
 github.com/imdario/mergo v0.3.13 h1:lFzP57bqS/wsqKssCGmtLAb8A0wKjLGrve2q3PPVcBk=
 github.com/imdario/mergo v0.3.13/go.mod h1:4lJ1jqUDcsbIECGy0RUJAXNIhg+6ocWgb1ALK2O4oXg=
-github.com/in-toto/in-toto-golang v0.6.0 h1:1s7cyzb5zGyzKPLgFsi4sC0o3EA24HLKlne8BrnOrSc=
-github.com/in-toto/in-toto-golang v0.6.0/go.mod h1:NaFLcsxtvZgbwQpyHwK8MlDXN9b+NuOMXqeIqxzfBoA=
 github.com/inconshreveable/mousetrap v1.0.1/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
