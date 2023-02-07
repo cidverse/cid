@@ -132,6 +132,14 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	}
 	containerExec.AddEnvironmentVariable("CID_API_SECRET", secret)
 
+	// proxy
+	containerExec.AddEnvironmentVariable("HTTP_PROXY", os.Getenv("HTTP_PROXY"))
+	containerExec.AddEnvironmentVariable("HTTPS_PROXY", os.Getenv("HTTPS_PROXY"))
+	containerExec.AddEnvironmentVariable("NO_PROXY", os.Getenv("NO_PROXY"))
+	containerExec.AddEnvironmentVariable("http_proxy", os.Getenv("HTTP_PROXY"))
+	containerExec.AddEnvironmentVariable("https_proxy", os.Getenv("HTTPS_PROXY"))
+	containerExec.AddEnvironmentVariable("no_proxy", os.Getenv("NO_PROXY"))
+
 	// catalogAction access
 	if len(catalogAction.Access.Env) > 0 {
 		for k, v := range ctx.Env {
