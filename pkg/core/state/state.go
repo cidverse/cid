@@ -23,6 +23,14 @@ type ActionArtifact struct {
 	FormatVersion string             `json:"format_version"`
 }
 
+// AuditEvents contains information about all steps that were part of the build and deployment process
+type AuditEvents struct {
+	Type    string `json:"type"`
+	Name    string `json:"name"`
+	Version string `json:"version"`
+	Payload string `json:"payload"`
+}
+
 // ActionStateContext holds state information about executed actions / results (ie. generated artifacts)
 type ActionStateContext struct {
 	// Version of the serialized action state
@@ -33,4 +41,7 @@ type ActionStateContext struct {
 
 	// Artifacts
 	Artifacts map[string]ActionArtifact `json:"artifacts"`
+
+	// Steps holds a list of all steps that were part of the pipeline
+	AuditLog []AuditEvents `json:"audit_events"`
 }

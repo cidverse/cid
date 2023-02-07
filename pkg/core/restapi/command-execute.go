@@ -2,11 +2,13 @@ package restapi
 
 import (
 	"net/http"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/labstack/echo/v4"
 )
 
@@ -57,8 +59,14 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 	// execute
 	exitCode := 0
 	var errorMessage = ""
-	stdout, stderr, cmdErr := command.RunAPICommand(replaceCommandPlaceholders(req.Command, hc.env), commandEnv, hc.projectDir, execDir, req.CaptureOutput, req.Ports, req.Constraint)
+	stdout, stderr, binary, version, cmdErr := command.RunAPICommand(replaceCommandPlaceholders(req.Command, hc.env), commandEnv, hc.projectDir, execDir, req.CaptureOutput, req.Ports, req.Constraint)
 	exitErr, isExitError := cmdErr.(*exec.ExitError)
+	hc.state.AuditLog = append(hc.state.AuditLog, state.AuditEvents{
+		Type:    "command",
+		Name:    binary,
+		Version: version,
+		Payload: replaceCommandPlaceholders(req.Command, hc.env),
+	})
 	if isExitError {
 		exitCode = exitErr.ExitCode()
 		errorMessage = exitErr.Error()

@@ -78,7 +78,7 @@ func RunCommandAndGetOutput(command string, env map[string]string, workDir strin
 }
 
 // RunAPICommand gets called from actions or the api to execute commands
-func RunAPICommand(command string, env map[string]string, projectDir string, workDir string, capture bool, ports []int, userProvidedConstraint string) (stdout string, stderr string, err error) {
+func RunAPICommand(command string, env map[string]string, projectDir string, workDir string, capture bool, ports []int, userProvidedConstraint string) (stdout string, stderr string, bin string, version string, err error) {
 	var stdoutWriter io.Writer
 	var stderrWriter io.Writer
 	var stdoutBuffer bytes.Buffer
@@ -158,20 +158,20 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 		// generate and execute command
 		containerCmd, containerCmdErr := containerExec.GetRunCommand(containerExec.DetectRuntime())
 		if containerCmdErr != nil {
-			return "", "", errors.New("failed to generate command: " + containerCmdErr.Error())
+			return "", "", binary, candidate.Version, errors.New("failed to generate command: " + containerCmdErr.Error())
 		}
 		log.Debug().Msg("running command via api: " + containerCmd)
 
 		containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
 		err := RunSystemCommand(containerCmdArgs[0], containerCmdArgs[1], env, "", stdoutWriter, stderrWriter)
 		if err != nil {
-			return "", "", errors.New("command failed: " + err.Error())
+			return "", "", binary, candidate.Version, errors.New("command failed: " + err.Error())
 		}
 
-		return strings.TrimSuffix(stdoutBuffer.String(), "\r\n"), strings.TrimSuffix(stderrBuffer.String(), "\r\n"), nil
+		return strings.TrimSuffix(stdoutBuffer.String(), "\r\n"), strings.TrimSuffix(stderrBuffer.String(), "\r\n"), binary, candidate.Version, nil
 	}
 
-	return "", "", errors.New("no method to execute command: " + binary)
+	return "", "", binary, "", errors.New("no method to execute command: " + binary)
 }
 
 func runCommand(command string, env map[string]string, projectDir string, workDir string, stdout io.Writer, stderr io.Writer) error {
