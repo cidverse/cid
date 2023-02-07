@@ -28,8 +28,8 @@ github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgIS
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
 github.com/cidverse/cidverseutils v0.0.0-20230205160052-0e24a0956dbf h1:FxVqn7n+XeuORSILUjVKk2HElDpacS/S+akhYay1te0=
 github.com/cidverse/cidverseutils v0.0.0-20230205160052-0e24a0956dbf/go.mod h1:EA4AFIHu3JXI9o6oyviofn+OjtqOGICEu6VWjNc7Pms=
-github.com/cidverse/normalizeci v1.1.1-0.20230206231221-04e8a6f67724 h1:buP9bLnrU04edBMSRTM2muw64ppoMrUx+CSkuW88x/8=
-github.com/cidverse/normalizeci v1.1.1-0.20230206231221-04e8a6f67724/go.mod h1:ZHFkhGvOLE5wg1qlVvjk7nVnAwTXS6jkp7w2eGAZO9A=
+github.com/cidverse/normalizeci v1.1.1-0.20230207185150-67efec8774f0 h1:ETdVSgdKjKgL/lftGhMHGCQ5I2m+rwlyZchgGJAHhgM=
+github.com/cidverse/normalizeci v1.1.1-0.20230207185150-67efec8774f0/go.mod h1:ZHFkhGvOLE5wg1qlVvjk7nVnAwTXS6jkp7w2eGAZO9A=
 github.com/cidverse/repoanalyzer v0.0.0-20230202233411-9948d63a1cb5 h1:tpEqV5p/Bf3sQ83qpH/8ZVlwVFT5K5tUcSvk9VS6ms4=
 github.com/cidverse/repoanalyzer v0.0.0-20230202233411-9948d63a1cb5/go.mod h1:E5km8f8wxy/Mf7eMdB6X/9sqJQSIdQ8a4jRT3jbjlzA=
 github.com/cloudflare/circl v1.1.0/go.mod h1:prBCrKB9DV4poKZY1l9zBXg2QJY7mvgRvtMxxK7fi4I=
@@ -249,8 +249,8 @@ golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.2.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.3.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.4.0 h1:Zr2JFtRQNX3BCZ8YtxRE9hNJYC8J6I1MVbMg6owUp18=
-golang.org/x/sys v0.4.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.5.0 h1:MUK/U/4lj1t1oPg0HfuXDN/Z1wv31ZJ/YcPiGccS4DU=
+golang.org/x/sys v0.5.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
 golang.org/x/term v0.0.0-20220722155259-a9ba230a4035/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=

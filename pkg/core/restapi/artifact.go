@@ -1,10 +1,12 @@
 package restapi
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/labstack/echo/v4"
@@ -82,6 +84,7 @@ func (hc *handlerConfig) artifactUpload(c echo.Context) error {
 	hc.state.Artifacts[moduleSlug+"/"+file.Filename] = state.ActionArtifact{
 		BuildID:       hc.buildID,
 		JobID:         hc.jobID,
+		ArtifactID:    fmt.Sprintf("%s|%s|%s", moduleSlug, fileType, file.Filename),
 		Module:        moduleSlug,
 		Type:          state.ActionArtifactType(fileType),
 		Name:          file.Filename,
@@ -94,9 +97,23 @@ func (hc *handlerConfig) artifactUpload(c echo.Context) error {
 
 // artifactDownload uploads a report (typically from code scanning)
 func (hc *handlerConfig) artifactDownload(c echo.Context) error {
+	id := c.QueryParam("id")
 	moduleSlug := c.QueryParam("module")
 	fileType := c.QueryParam("type")
 	name := c.QueryParam("name")
+
+	// module is required, default to root
+	if moduleSlug == "" {
+		moduleSlug = "root"
+	}
+
+	// if set, use id
+	if len(id) > 0 {
+		parts := strings.SplitN(id, "|", 3)
+		moduleSlug = parts[0]
+		fileType = parts[1]
+		name = parts[2]
+	}
 
 	artifactFile := path.Join(hc.artifactDir, moduleSlug, fileType, name)
 	return c.File(artifactFile)

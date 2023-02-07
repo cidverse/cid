@@ -15,6 +15,7 @@ const (
 type ActionArtifact struct {
 	BuildID       string             `json:"build_id"`
 	JobID         string             `json:"job_id"`
+	ArtifactID    string             `json:"artifact_id"`
 	Module        string             `json:"module"`
 	Type          ActionArtifactType `json:"type"`
 	Name          string             `json:"name"`
