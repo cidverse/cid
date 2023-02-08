@@ -140,9 +140,11 @@ func (c *CIDConfig) FindExecutionCandidates(binary string, constraint string, pr
 
 		// compare by version
 		if preferVersion == PreferHighest {
-			return version.Compare(options[i].Version, options[j].Version) > 0
+			result, _ := version.Compare(options[i].Version, options[j].Version)
+			return result > 0
 		} else {
-			return version.Compare(options[i].Version, options[j].Version) < 0
+			result, _ := version.Compare(options[i].Version, options[j].Version)
+			return result < 0
 		}
 	})
 

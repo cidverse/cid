@@ -2,7 +2,6 @@ package restapi
 
 import (
 	"net/http"
-	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -41,12 +40,6 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 
 	// command env
 	var commandEnv = make(map[string]string)
-	commandEnv["HTTP_PROXY"] = os.Getenv("HTTP_PROXY")
-	commandEnv["HTTPS_PROXY"] = os.Getenv("HTTPS_PROXY")
-	commandEnv["NO_PROXY"] = os.Getenv("NO_PROXY")
-	commandEnv["http_proxy"] = os.Getenv("HTTP_PROXY")
-	commandEnv["https_proxy"] = os.Getenv("HTTPS_PROXY")
-	commandEnv["no_proxy"] = os.Getenv("NO_PROXY")
 	for k, v := range hc.env {
 		commandEnv[k] = v
 	}

@@ -155,6 +155,10 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 			}
 		}
 
+		// enterprise (proxy, ca-certs)
+		ApplyProxyConfiguration(&containerExec)
+		ApplyCertConfiguration(&containerExec)
+
 		// generate and execute command
 		containerCmd, containerCmdErr := containerExec.GetRunCommand(containerExec.DetectRuntime())
 		if containerCmdErr != nil {

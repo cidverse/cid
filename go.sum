@@ -26,8 +26,8 @@ github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5/go.mod h1:wHh0iHkY
 github.com/bwesterb/go-ristretto v1.2.0/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=
 github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgISZN0=
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
-github.com/cidverse/cidverseutils v0.0.0-20230205160052-0e24a0956dbf h1:FxVqn7n+XeuORSILUjVKk2HElDpacS/S+akhYay1te0=
-github.com/cidverse/cidverseutils v0.0.0-20230205160052-0e24a0956dbf/go.mod h1:EA4AFIHu3JXI9o6oyviofn+OjtqOGICEu6VWjNc7Pms=
+github.com/cidverse/cidverseutils v0.0.0-20230208185206-be183c16a909 h1:G41bKv5rc8jBiKY21ohBJHGf7nBYY7ZwkRaeTzDsvT8=
+github.com/cidverse/cidverseutils v0.0.0-20230208185206-be183c16a909/go.mod h1:PhiLiRO4nG+tzuBRSgbiwKhy6W9GLhWG42d2BrjCy3s=
 github.com/cidverse/normalizeci v1.1.1-0.20230207185150-67efec8774f0 h1:ETdVSgdKjKgL/lftGhMHGCQ5I2m+rwlyZchgGJAHhgM=
 github.com/cidverse/normalizeci v1.1.1-0.20230207185150-67efec8774f0/go.mod h1:ZHFkhGvOLE5wg1qlVvjk7nVnAwTXS6jkp7w2eGAZO9A=
 github.com/cidverse/repoanalyzer v0.0.0-20230202233411-9948d63a1cb5 h1:tpEqV5p/Bf3sQ83qpH/8ZVlwVFT5K5tUcSvk9VS6ms4=
