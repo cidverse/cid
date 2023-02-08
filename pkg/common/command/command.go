@@ -114,11 +114,19 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 			continue
 		}
 
+		// overwrite binary for alias use-case
+		args[0] = candidate.Binary
+
 		containerExec := containerruntime.Container{}
 		containerExec.SetImage(candidate.Image)
 		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: cihelper.ToUnixPath(projectDir)})
 		containerExec.SetWorkingDirectory(cihelper.ToUnixPath(workDir))
 		containerExec.SetCommand(cihelper.ToUnixPathArgs(strings.Join(args, " ")))
+
+		// entrypoint
+		if candidate.Entrypoint != nil {
+			containerExec.SetEntrypoint(*candidate.Entrypoint)
+		}
 
 		// security
 		if candidate.Security.Privileged {
@@ -212,10 +220,18 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 			projectDir = vcsrepository.FindRepositoryDirectory(workDir)
 		}
 
+		// overwrite binary for alias use-case
+		cmdArgs[0] = candidate.Binary
+
 		containerExec.SetImage(candidate.Image)
 		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: cihelper.ToUnixPath(projectDir)})
 		containerExec.SetWorkingDirectory(cihelper.ToUnixPath(workDir))
 		containerExec.SetCommand(cihelper.ToUnixPathArgs(strings.Join(cmdArgs, " ")))
+
+		// entrypoint
+		if candidate.Entrypoint != nil {
+			containerExec.SetEntrypoint(*candidate.Entrypoint)
+		}
 
 		// security
 		if candidate.Security.Privileged {

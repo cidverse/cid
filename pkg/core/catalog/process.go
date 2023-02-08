@@ -36,6 +36,7 @@ func ProcessRegistry(registry *Config) *Config {
 					providedBinary = append(providedBinary, ProvidedBinary{
 						Binary:  p.Binary,
 						Version: strings.ReplaceAll(p.Version, "${{VERSION}}", version),
+						Alias:   p.Alias,
 					})
 				}
 				image.Provides = providedBinary

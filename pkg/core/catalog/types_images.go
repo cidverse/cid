@@ -7,14 +7,16 @@ type ContainerImage struct {
 	Cache      []ImageCache     `yaml:"cache,omitempty"`
 	Security   Security         `yaml:"security,omitempty"`
 	User       string           `yaml:"user,omitempty"`
+	Entrypoint *string          `yaml:"entrypoint,omitempty"`
 
 	Mounts []ContainerMount `yaml:"mounts,omitempty"` // Mounts
 	Source ImageSource      `yaml:"source,omitempty"` // Source
 }
 
 type ProvidedBinary struct {
-	Binary  string `yaml:"binary"`
-	Version string `yaml:"version"`
+	Binary  string   `yaml:"binary"`
+	Version string   `yaml:"version"`
+	Alias   []string `yaml:"alias,omitempty"`
 }
 
 type Security struct {

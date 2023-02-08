@@ -48,6 +48,9 @@ type BinaryExecutionCandidate struct {
 
 	// Security
 	Security catalog.Security
+
+	// Entrypoint overwrites the container entrypoint
+	Entrypoint *string
 }
 
 // FindExecutionCandidates returns a full list of all available execution options for the specified binary
@@ -57,17 +60,18 @@ func (c *CIDConfig) FindExecutionCandidates(binary string, constraint string, pr
 	// container
 	for _, entry := range c.Registry.ContainerImages {
 		for _, provided := range entry.Provides {
-			if binary == provided.Binary {
+			if binary == provided.Binary || funk.Contains(provided.Alias, binary) {
 				log.Trace().Str("version", provided.Version).Str("constraint", constraint).Str("binary", binary).Str("image", entry.Image).Msg("checking version constraint")
 				if version.FulfillsConstraint(provided.Version, constraint) {
 					options = append(options, BinaryExecutionCandidate{
-						Binary:     binary,
+						Binary:     provided.Binary,
 						Version:    provided.Version,
 						Type:       ExecutionContainer,
 						Image:      entry.Image,
 						ImageCache: entry.Cache,
 						Mounts:     entry.Mounts,
 						Security:   entry.Security,
+						Entrypoint: entry.Entrypoint,
 					})
 				}
 			}
@@ -160,7 +164,7 @@ func (c *CIDConfig) FindImageOfBinary(binary string, constraint string) *catalog
 	// lookup
 	for _, entry := range c.Registry.ContainerImages {
 		for _, provided := range entry.Provides {
-			if binary == provided.Binary {
+			if binary == provided.Binary || funk.Contains(provided.Alias, binary) {
 				log.Trace().Str("version", provided.Version).Str("constraint", constraint).Str("binary", binary).Str("image", entry.Image).Msg("checking version constraint")
 				if version.FulfillsConstraint(provided.Version, constraint) {
 					return &entry
