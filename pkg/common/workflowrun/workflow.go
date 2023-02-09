@@ -168,6 +168,7 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 	start := time.Now()
 	ruleContext := rules.GetRuleContext(ctx.Env)
 	if rules.AnyRuleMatches(action.Rules, ruleContext) {
+		log.Info().Str("action", action.ID).Msg("action start")
 		stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
 
 		// state: retrieve/init

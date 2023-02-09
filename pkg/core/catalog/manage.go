@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/cidverse/cid/pkg/core/global"
+	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
@@ -19,7 +19,7 @@ type Source struct {
 
 func LoadSources() map[string]Source {
 	sources := make(map[string]Source)
-	file := filepath.Join(global.GetUserConfigDirectory(), "repositories.yaml")
+	file := filepath.Join(util.GetUserConfigDirectory(), "repositories.yaml")
 
 	// file doesn't exist yet, init with main repo
 	if _, err := os.Stat(file); os.IsNotExist(err) {
@@ -43,7 +43,7 @@ func LoadSources() map[string]Source {
 func LoadCatalogs(sources map[string]Source) Config {
 	var cfg Config
 	for name := range sources {
-		file := filepath.Join(global.GetUserConfigDirectory(), "repo.d", name+".yaml")
+		file := filepath.Join(util.GetUserConfigDirectory(), "repo.d", name+".yaml")
 
 		if _, err := os.Stat(file); os.IsNotExist(err) {
 			log.Warn().Str("file", file).Msg("cache for registry is missing, please run `cid catalog update`")
@@ -83,7 +83,7 @@ func LoadCatalogs(sources map[string]Source) Config {
 }
 
 func saveSources(data map[string]Source) {
-	file := filepath.Join(global.GetUserConfigDirectory(), "repositories.yaml")
+	file := filepath.Join(util.GetUserConfigDirectory(), "repositories.yaml")
 
 	out, err := yaml.Marshal(data)
 	if err != nil {
@@ -117,7 +117,7 @@ func UpdateAllCatalogs() {
 	saveSources(sources)
 }
 func UpdateCatalog(name string, source Source) {
-	dir := filepath.Join(global.GetUserConfigDirectory(), "repo.d")
+	dir := filepath.Join(util.GetUserConfigDirectory(), "repo.d")
 	_ = os.MkdirAll(dir, os.ModePerm)
 
 	// download

@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cidverse/cid/pkg/core/global"
+	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 )
 
@@ -20,9 +20,8 @@ func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
 
 func ApplyCertConfiguration(containerExec *containerruntime.Container) {
 	files := []string{
-		filepath.Join(global.GetUserConfigDirectory(), "ca-bundle.crt"),
-		"/etc/pki/tls/certs/ca-bundle.crt",
-		"/etc/ssl/certs/ca-certificates.crt",
+		filepath.Join(util.GetUserConfigDirectory(), "ca-extra.crt"),
+		"/etc/pki/tls/certs/ca-extra.crt",
 	}
 
 	for _, file := range files {
@@ -37,13 +36,7 @@ func ApplyCertMount(containerExec *containerruntime.Container, bundleFile string
 	containerExec.AddVolume(containerruntime.ContainerMount{
 		MountType: "directory",
 		Source:    bundleFile,
-		Target:    "/etc/pki/tls/certs/ca-bundle.crt",
-		Mode:      containerruntime.ReadMode,
-	})
-	containerExec.AddVolume(containerruntime.ContainerMount{
-		MountType: "directory",
-		Source:    bundleFile,
-		Target:    "/etc/ssl/certs/ca-certificates.crt",
+		Target:    "/etc/pki/tls/certs/ca-extra.crt",
 		Mode:      containerruntime.ReadMode,
 	})
 }
