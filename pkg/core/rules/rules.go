@@ -141,6 +141,22 @@ func evalRuleCEL(rule catalog.WorkflowRule, evalContext map[string]interface{}) 
 				}),
 			),
 		),
+		cel.Function("containsKey",
+			cel.Overload("containsKey_map",
+				[]*cel.Type{cel.MapType(cel.StringType, cel.StringType), cel.StringType},
+				cel.StringType,
+				cel.BinaryBinding(func(lhs, rhs ref.Val) ref.Val {
+					mapVal, err := lhs.ConvertToNative(reflect.TypeOf(map[string]string{}))
+					if err != nil {
+						return types.NewErr(err.Error())
+					}
+					if _, ok := mapVal.(map[string]string)[string(rhs.(types.String))]; ok {
+						return types.Bool(true)
+					}
+					return types.Bool(false)
+				}),
+			),
+		),
 		cel.Function("getMapValue",
 			cel.Overload("getMapValue_map",
 				[]*cel.Type{cel.MapType(cel.StringType, cel.StringType), cel.StringType},

@@ -260,6 +260,18 @@ func TestEvaluateRule(t *testing.T) {
 			},
 			expectedResult: true,
 		},
+		{
+			rule: catalog.WorkflowRule{
+				Type:       catalog.WorkflowExpressionCEL,
+				Expression: `containsKey(data, "name")`,
+			},
+			evalContext: map[string]interface{}{
+				"data": map[string]string{
+					"name": "my-name",
+				},
+			},
+			expectedResult: true,
+		},
 	}
 
 	for _, test := range tests {
