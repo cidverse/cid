@@ -51,6 +51,9 @@ type BinaryExecutionCandidate struct {
 
 	// Entrypoint overwrites the container entrypoint
 	Entrypoint *string
+
+	// Certs holds information to mount ca certificates into the containers
+	Certs []catalog.ImageCerts `yaml:"certs,omitempty"`
 }
 
 // FindExecutionCandidates returns a full list of all available execution options for the specified binary
@@ -72,6 +75,7 @@ func (c *CIDConfig) FindExecutionCandidates(binary string, constraint string, pr
 						Mounts:     entry.Mounts,
 						Security:   entry.Security,
 						Entrypoint: entry.Entrypoint,
+						Certs:      entry.Certs,
 					})
 				}
 			}

@@ -26,10 +26,10 @@ github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5/go.mod h1:wHh0iHkY
 github.com/bwesterb/go-ristretto v1.2.0/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=
 github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgISZN0=
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
-github.com/cidverse/cidverseutils v0.0.0-20230208185206-be183c16a909 h1:G41bKv5rc8jBiKY21ohBJHGf7nBYY7ZwkRaeTzDsvT8=
-github.com/cidverse/cidverseutils v0.0.0-20230208185206-be183c16a909/go.mod h1:PhiLiRO4nG+tzuBRSgbiwKhy6W9GLhWG42d2BrjCy3s=
-github.com/cidverse/normalizeci v1.1.1-0.20230209220402-5601f903fe3e h1:Kw7Gxl/6SplRS02HZZ3Johuxzrtdvo8oqOTDrEHHT8w=
-github.com/cidverse/normalizeci v1.1.1-0.20230209220402-5601f903fe3e/go.mod h1:U8g3sdMPFknW8/rS1s7Y1vgJq9BDQjC/st2FWIaHqxM=
+github.com/cidverse/cidverseutils v0.0.0-20230210162702-0a8542860508 h1:8SPMnR0oVrCbGCNS31a8gIyn/Mv7LoAhqqdEzROmam4=
+github.com/cidverse/cidverseutils v0.0.0-20230210162702-0a8542860508/go.mod h1:PhiLiRO4nG+tzuBRSgbiwKhy6W9GLhWG42d2BrjCy3s=
+github.com/cidverse/normalizeci v1.1.1-0.20230210162453-f51bb3491a81 h1:pBA1hN/NaRwRSmh253njqigu86MMdd6073MHqwvwWkk=
+github.com/cidverse/normalizeci v1.1.1-0.20230210162453-f51bb3491a81/go.mod h1:K/wwV8K5oJv76yqkiR2bA0rFeB6mgqAWssnTxM3C9vA=
 github.com/cidverse/repoanalyzer v0.0.0-20230209174421-a07ae4f444e1 h1:VP0QHBe0tbQO6OvNRWfasoNo/QsI1HNmmfNz3/bD2t0=
 github.com/cidverse/repoanalyzer v0.0.0-20230209174421-a07ae4f444e1/go.mod h1:m1vNLg2hfB1dtDq4FiWyDr0VcnvfDQdSEE07mIj841M=
 github.com/cloudflare/circl v1.1.0/go.mod h1:prBCrKB9DV4poKZY1l9zBXg2QJY7mvgRvtMxxK7fi4I=
@@ -184,8 +184,8 @@ github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyC
 github.com/valyala/fasttemplate v1.2.1/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
 github.com/valyala/fasttemplate v1.2.2 h1:lxLXG0uE3Qnshl9QyaK6XJxMXlQZELvChBOCmQD0Loo=
 github.com/valyala/fasttemplate v1.2.2/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
-github.com/xanzy/go-gitlab v0.79.1 h1:ZmEei8RZYlqk4D7nYrWWZqywmKBOd7vmPMlJbueZXUU=
-github.com/xanzy/go-gitlab v0.79.1/go.mod h1:DlByVTSXhPsJMYL6+cm8e8fTJjeBmhrXdC/yvkKKt6M=
+github.com/xanzy/go-gitlab v0.80.0 h1:2d6RwUrI3ZC2Xh9urnqiiHCLzWNndrGtje3yByZubdQ=
+github.com/xanzy/go-gitlab v0.80.0/go.mod h1:DlByVTSXhPsJMYL6+cm8e8fTJjeBmhrXdC/yvkKKt6M=
 github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM=
 github.com/xanzy/ssh-agent v0.3.3/go.mod h1:6dzNDKs0J9rVPHPhaGCukekBHKqfl+L3KghI1Bc68Uw=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=

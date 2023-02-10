@@ -6,6 +6,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
+	"github.com/cidverse/cidverseutils/pkg/filesystem"
 )
 
 func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
@@ -18,25 +19,45 @@ func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
 	containerExec.AddEnvironmentVariable("no_proxy", os.Getenv("NO_PROXY"))
 }
 
-func ApplyCertConfiguration(containerExec *containerruntime.Container) {
-	files := []string{
-		filepath.Join(util.GetUserConfigDirectory(), "ca-extra.crt"),
-		"/etc/pki/tls/certs/ca-extra.crt",
+// GetCertFileByType returns the cert file by type (ca-bundle, java-keystore)
+func GetCertFileByType(certFileType string) string {
+	var files []string
+
+	if certFileType == "ca-bundle" {
+		files = append(files, filepath.Join(util.GetUserConfigDirectory(), "certs", "ca-bundle.crt"))
+		files = append(files, "/etc/pki/tls/certs/ca-bundle.crt")
+		files = append(files, "/etc/ssl/certs/ca-certificates.crt")
+	} else if certFileType == "java-keystore" {
+		files = append(files, filepath.Join(util.GetUserConfigDirectory(), "certs", "keystore.jks"))
 	}
 
 	for _, file := range files {
 		if _, err := os.Stat(file); err == nil {
-			ApplyCertMount(containerExec, file)
-			break
+			return file
 		}
 	}
+
+	return ""
 }
 
-func ApplyCertMount(containerExec *containerruntime.Container, bundleFile string) {
-	containerExec.AddVolume(containerruntime.ContainerMount{
-		MountType: "directory",
-		Source:    bundleFile,
-		Target:    "/etc/pki/tls/certs/ca-extra.crt",
-		Mode:      containerruntime.ReadMode,
-	})
+func ApplyCertMount(containerExec *containerruntime.Container, certFile string, containerCertFile string) {
+	if certFile != "" {
+		customCertDir := os.Getenv("CID_CERT_MOUNT_DIR")
+		if customCertDir != "" {
+			// Copy certFile into customCertDir
+			_ = os.MkdirAll(customCertDir, os.ModePerm)
+			certDestinationFile := filepath.Join(customCertDir, filepath.Base(certFile))
+			_ = filesystem.CopyFile(certFile, certDestinationFile)
+
+			// Overwrite certFile with new path of file in customCertDir
+			certFile = certDestinationFile
+		}
+
+		containerExec.AddVolume(containerruntime.ContainerMount{
+			MountType: "directory",
+			Source:    certFile,
+			Target:    containerCertFile,
+			Mode:      containerruntime.ReadMode,
+		})
+	}
 }

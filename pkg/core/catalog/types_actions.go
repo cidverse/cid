@@ -19,8 +19,9 @@ type ActionAccess struct {
 }
 
 type ContainerAction struct {
-	Image   string `yaml:"image"`   // Image is the full image reference including the registry
-	Command string `yaml:"command"` // Command is the command that should be executed in the container image to start the action.
+	Image   string       `yaml:"image"`   // Image is the full image reference including the registry
+	Command string       `yaml:"command"` // Command is the command that should be executed in the container image to start the action.
+	Certs   []ImageCerts `yaml:"certs,omitempty"`
 }
 
 type Action struct {

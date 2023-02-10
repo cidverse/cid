@@ -8,6 +8,7 @@ type ContainerImage struct {
 	Security   Security         `yaml:"security,omitempty"`
 	User       string           `yaml:"user,omitempty"`
 	Entrypoint *string          `yaml:"entrypoint,omitempty"`
+	Certs      []ImageCerts     `yaml:"certs,omitempty"`
 
 	Mounts []ContainerMount `yaml:"mounts,omitempty"` // Mounts
 	Source ImageSource      `yaml:"source,omitempty"` // Source
@@ -32,6 +33,11 @@ type ImageCache struct {
 	ID            string `yaml:"id"`
 	ContainerPath string `yaml:"dir"`
 	MountType     string `yaml:"type,omitempty"`
+}
+
+type ImageCerts struct {
+	Type          string `yaml:"type"`
+	ContainerPath string `yaml:"dir"`
 }
 
 type ImageSource struct {

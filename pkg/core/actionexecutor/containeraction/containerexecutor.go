@@ -134,7 +134,9 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 
 	// enterprise (proxy, ca-certs)
 	command.ApplyProxyConfiguration(&containerExec)
-	command.ApplyCertConfiguration(&containerExec)
+	for _, cert := range catalogAction.Container.Certs {
+		command.ApplyCertMount(&containerExec, command.GetCertFileByType(cert.Type), cert.ContainerPath)
+	}
 
 	// catalogAction access
 	if len(catalogAction.Access.Env) > 0 {

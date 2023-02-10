@@ -5,8 +5,8 @@ go 1.19
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.5.2
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/cidverse/cidverseutils v0.0.0-20230208185206-be183c16a909
-	github.com/cidverse/normalizeci v1.1.1-0.20230209220402-5601f903fe3e
+	github.com/cidverse/cidverseutils v0.0.0-20230210162702-0a8542860508
+	github.com/cidverse/normalizeci v1.1.1-0.20230210162453-f51bb3491a81
 	github.com/cidverse/repoanalyzer v0.0.0-20230209174421-a07ae4f444e1
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.13.0
@@ -71,7 +71,7 @@ require (
 	github.com/stoewer/go-strcase v1.2.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/xanzy/go-gitlab v0.79.1 // indirect
+	github.com/xanzy/go-gitlab v0.80.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/exp v0.0.0-20230206171751-46f607a40771 // indirect
