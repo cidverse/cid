@@ -14,10 +14,10 @@ Please follow the instructions in our documentation to get started: https://cidv
 
 ## Contributing
 
-We welcome contributions to the project, be it new features, bug fixes, or even small enhancements. Please have a look at our [contribution guide](https://cidverse.github.io/contribution/).
+We welcome contributions to the project, be it new features, bug fixes, or even small enhancements.
+Please have a look at our [contribution guide](https://cidverse.github.io/contribution/).
 
 By contributing, you are expected to abide by our [code of conduct](https://cidverse.github.io/contribution/coc/) and agree to the license below.
-Thank you again for your interest!
 
 ## License
 
