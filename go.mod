@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.5.2
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/cidverse/cidverseutils v0.0.0-20230210162702-0a8542860508
+	github.com/cidverse/cidverseutils v0.0.0-20230212184034-e92b7dd985f1
 	github.com/cidverse/normalizeci v1.1.1-0.20230210162453-f51bb3491a81
 	github.com/cidverse/repoanalyzer v0.0.0-20230209174421-a07ae4f444e1
 	github.com/go-resty/resty/v2 v2.7.0
