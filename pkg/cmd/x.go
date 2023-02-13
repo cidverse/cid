@@ -7,6 +7,7 @@ import (
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +34,10 @@ var xCmd = &cobra.Command{
 			env[parts[0]] = parts[1]
 		}
 
-		// print environment
-		command.RunCommand(strings.Join(args, " "), env, workDir)
+		// execute command
+		_, _, _, _, err := command.RunAPICommand(strings.Join(args, " "), env, projectDir, workDir, false, nil, "")
+		if err != nil {
+			log.Fatal().Err(err).Msg("command failed")
+		}
 	},
 }
