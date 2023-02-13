@@ -76,10 +76,12 @@ func EvaluateRule(rule catalog.WorkflowRule, evalContext map[string]interface{})
 
 func GetRuleContext(env map[string]string) map[string]interface{} {
 	return map[string]interface{}{
-		ncispec.NCI_COMMIT_REF_PATH: env[ncispec.NCI_COMMIT_REF_PATH],
-		ncispec.NCI_COMMIT_REF_TYPE: env[ncispec.NCI_COMMIT_REF_TYPE],
-		ncispec.NCI_COMMIT_REF_NAME: env[ncispec.NCI_COMMIT_REF_NAME],
-		"ENV":                       env,
+		ncispec.NCI_COMMIT_REF_PATH:        env[ncispec.NCI_COMMIT_REF_PATH],
+		ncispec.NCI_COMMIT_REF_TYPE:        env[ncispec.NCI_COMMIT_REF_TYPE],
+		ncispec.NCI_COMMIT_REF_NAME:        env[ncispec.NCI_COMMIT_REF_NAME],
+		ncispec.NCI_REPOSITORY_HOST_TYPE:   env[ncispec.NCI_REPOSITORY_HOST_TYPE],
+		ncispec.NCI_REPOSITORY_HOST_SERVER: env[ncispec.NCI_REPOSITORY_HOST_SERVER],
+		"ENV":                              env,
 	}
 }
 

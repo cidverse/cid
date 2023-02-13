@@ -1,6 +1,7 @@
 package command
 
 import (
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -17,6 +18,21 @@ func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
 	containerExec.AddEnvironmentVariable("http_proxy", os.Getenv("HTTP_PROXY"))
 	containerExec.AddEnvironmentVariable("https_proxy", os.Getenv("HTTPS_PROXY"))
 	containerExec.AddEnvironmentVariable("no_proxy", os.Getenv("NO_PROXY"))
+
+	if len(os.Getenv("HTTP_PROXY")) > 0 {
+		proxyURL, err := url.Parse(os.Getenv("HTTP_PROXY"))
+		if err == nil {
+			containerExec.AddEnvironmentVariable("HTTP_PROXY_HOST", proxyURL.Hostname())
+			containerExec.AddEnvironmentVariable("HTTP_PROXY_PORT", proxyURL.Port())
+		}
+	}
+	if len(os.Getenv("HTTPS_PROXY")) > 0 {
+		proxyURL, err := url.Parse(os.Getenv("HTTPS_PROXY"))
+		if err == nil {
+			containerExec.AddEnvironmentVariable("HTTPS_PROXY_HOST", proxyURL.Hostname())
+			containerExec.AddEnvironmentVariable("HTTPS_PROXY_PORT", proxyURL.Port())
+		}
+	}
 }
 
 // GetCertFileByType returns the cert file by type (ca-bundle, java-keystore)
