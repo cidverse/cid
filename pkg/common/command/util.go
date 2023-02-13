@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
@@ -19,11 +20,15 @@ func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
 	containerExec.AddEnvironmentVariable("https_proxy", os.Getenv("HTTPS_PROXY"))
 	containerExec.AddEnvironmentVariable("no_proxy", os.Getenv("NO_PROXY"))
 
+	// jvm
+	var javaProxyOpts []string
 	if len(os.Getenv("HTTP_PROXY")) > 0 {
 		proxyURL, err := url.Parse(os.Getenv("HTTP_PROXY"))
 		if err == nil {
 			containerExec.AddEnvironmentVariable("HTTP_PROXY_HOST", proxyURL.Hostname())
 			containerExec.AddEnvironmentVariable("HTTP_PROXY_PORT", proxyURL.Port())
+			javaProxyOpts = append(javaProxyOpts, "-Dhttp.proxyHost="+proxyURL.Hostname())
+			javaProxyOpts = append(javaProxyOpts, "-Dhttp.proxyPort="+proxyURL.Port())
 		}
 	}
 	if len(os.Getenv("HTTPS_PROXY")) > 0 {
@@ -31,7 +36,12 @@ func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
 		if err == nil {
 			containerExec.AddEnvironmentVariable("HTTPS_PROXY_HOST", proxyURL.Hostname())
 			containerExec.AddEnvironmentVariable("HTTPS_PROXY_PORT", proxyURL.Port())
+			javaProxyOpts = append(javaProxyOpts, "-Dhttps.proxyHost="+proxyURL.Hostname())
+			javaProxyOpts = append(javaProxyOpts, "-Dhttps.proxyPort="+proxyURL.Port())
 		}
+	}
+	if len(javaProxyOpts) > 0 {
+		containerExec.AddEnvironmentVariable("_JAVA_OPTIONS", strings.Join(javaProxyOpts, " "))
 	}
 }
 
