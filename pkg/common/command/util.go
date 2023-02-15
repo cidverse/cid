@@ -29,6 +29,7 @@ func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
 			containerExec.AddEnvironmentVariable("HTTP_PROXY_PORT", proxyURL.Port())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttp.proxyHost="+proxyURL.Hostname())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttp.proxyPort="+proxyURL.Port())
+			javaProxyOpts = append(javaProxyOpts, "-Dhttp.nonProxyHosts="+convertNoProxyForJava(os.Getenv("NO_PROXY")))
 		}
 	}
 	if len(os.Getenv("HTTPS_PROXY")) > 0 {
@@ -38,6 +39,7 @@ func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
 			containerExec.AddEnvironmentVariable("HTTPS_PROXY_PORT", proxyURL.Port())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttps.proxyHost="+proxyURL.Hostname())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttps.proxyPort="+proxyURL.Port())
+			javaProxyOpts = append(javaProxyOpts, "-Dhttps.nonProxyHosts="+convertNoProxyForJava(os.Getenv("NO_PROXY")))
 		}
 	}
 	if len(javaProxyOpts) > 0 {
@@ -86,4 +88,8 @@ func ApplyCertMount(containerExec *containerruntime.Container, certFile string, 
 			Mode:      containerruntime.ReadMode,
 		})
 	}
+}
+
+func convertNoProxyForJava(input string) string {
+	return strings.Replace(input, ",", "|", -1)
 }
