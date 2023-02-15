@@ -1,7 +1,6 @@
 package containeraction
 
 import (
-	"net"
 	"os"
 	"strings"
 
@@ -37,19 +36,6 @@ func generateSecret() string {
 	return secret
 }
 
-func findAvailablePort() int {
-	listener, err := net.Listen("tcp", ":0")
-	if err != nil {
-		panic(err)
-	}
-
-	defer func(listener net.Listener) {
-		_ = listener.Close()
-	}(listener)
-
-	return listener.Addr().(*net.TCPAddr).Port
-}
-
 func createPath(dir string) {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		err := os.MkdirAll(dir, os.ModePerm)
@@ -59,14 +45,7 @@ func createPath(dir string) {
 	}
 }
 
-func generateBuildId() string {
-	snowflake.Epoch = 1672527600000
-	node, _ := snowflake.NewNode(1)
-	id := node.Generate()
-	return id.String()
-}
-
-func generateJobId() string {
+func generateSnowflakeId() string {
 	snowflake.Epoch = 1672527600000
 	node, _ := snowflake.NewNode(1)
 	id := node.Generate()

@@ -22,10 +22,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const AnyVersionConstraint = ">= 0.0.0"
+
 // GetCommandVersion returns the version of an executable
 func GetCommandVersion(binary string) (string, error) {
 	// find version constraint from config
-	binaryVersionConstraint := ">= 0.0.0"
+	binaryVersionConstraint := AnyVersionConstraint
 	if value, ok := config.Current.Dependencies[binary]; ok {
 		binaryVersionConstraint = value
 	}
@@ -96,7 +98,7 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 	binary := args[0]
 
 	// find version constraint from config
-	cmdConstraint := ">= 0.0.0"
+	cmdConstraint := AnyVersionConstraint
 	// constraint from config
 	if value, ok := config.Current.Dependencies[binary]; ok {
 		cmdConstraint = value
@@ -197,7 +199,7 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 	}
 
 	// find version constraint from config
-	cmdConstraint := ">= 0.0.0"
+	cmdConstraint := AnyVersionConstraint
 	if value, ok := config.Current.Dependencies[originalBinary]; ok {
 		cmdConstraint = value
 	}

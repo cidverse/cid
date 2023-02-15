@@ -144,7 +144,6 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 
 			// customize context
 			ctx.CurrentModule = &moduleRef
-			api.UpdateContext(&ctx)
 
 			// check module filter
 			if len(modulesFilter) > 0 && !funk.Contains(modulesFilter, moduleRef.Name) {

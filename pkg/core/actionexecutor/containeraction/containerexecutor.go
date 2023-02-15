@@ -21,6 +21,7 @@ import (
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
 	_ "github.com/cidverse/cidverseutils/pkg/cihelper"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
+	"github.com/cidverse/cidverseutils/pkg/network"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
@@ -41,12 +42,18 @@ func (e Executor) GetType() string {
 }
 
 func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, action *catalog.WorkflowAction) error {
-	// properties
-	apiPort := strconv.Itoa(findAvailablePort())
+	// api (port or socket)
+	freePort, err := network.GetFreePort()
+	if err != nil {
+		log.Fatal().Err(err).Msg("no free ports available")
+	}
+	apiPort := strconv.Itoa(freePort)
 	socketFile := path.Join(ctx.Paths.Temp, strings.ReplaceAll(uuid.New().String(), "-", "")+".socket")
+
+	// properties
 	secret := generateSecret()
-	buildID := generateBuildId()
-	jobID := generateJobId()
+	buildID := generateSnowflakeId()
+	jobID := generateSnowflakeId()
 
 	// pass config
 	var actionConfig string

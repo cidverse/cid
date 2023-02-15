@@ -68,23 +68,6 @@ type ActionExecutionContext struct {
 	CurrentModule *analyzerapi.ProjectModule
 }
 
-// UpdateContext will update the context
-func UpdateContext(ctx *ActionExecutionContext) {
-	if ctx.CurrentModule.Slug != "" {
-		ctx.Paths = config.PathConfig{
-			Artifact: filepath.Join(ctx.ProjectDir, ".dist"),
-			Temp:     filepath.Join(ctx.ProjectDir, ".tmp"),
-			Cache:    "",
-		}
-	} else {
-		ctx.Paths = config.PathConfig{
-			Artifact: filepath.Join(ctx.ProjectDir, ".dist"),
-			Temp:     filepath.Join(ctx.ProjectDir, ".tmp"),
-			Cache:    "",
-		}
-	}
-}
-
 // CoverageReport contains a generic coverage report
 type CoverageReport struct {
 	Language string

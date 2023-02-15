@@ -84,11 +84,11 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 // replace placeholders in command
 func replaceCommandPlaceholders(input string, env map[string]string) string {
 	// timestamp
-	input = strings.ReplaceAll(input, "${TIMESTAMP_RFC3339}", time.Now().Format(time.RFC3339))
+	input = strings.ReplaceAll(input, "{TIMESTAMP_RFC3339}", time.Now().Format(time.RFC3339))
 
 	// env
 	for k, v := range env {
-		input = strings.ReplaceAll(input, "${"+k+"}", v)
+		input = strings.ReplaceAll(input, "{"+k+"}", v)
 	}
 
 	return input
