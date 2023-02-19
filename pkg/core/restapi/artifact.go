@@ -1,6 +1,8 @@
 package restapi
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"net/http"
@@ -80,6 +82,17 @@ func (hc *handlerConfig) artifactUpload(c echo.Context) error {
 		return err
 	}
 
+	// sha256 hash
+	srcHash, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer srcHash.Close()
+	hashFunc := sha256.New()
+	if _, err = io.Copy(hashFunc, srcHash); err != nil {
+		return err
+	}
+
 	// store into state
 	hc.state.Artifacts[moduleSlug+"/"+file.Filename] = state.ActionArtifact{
 		BuildID:       hc.buildID,
@@ -90,6 +103,7 @@ func (hc *handlerConfig) artifactUpload(c echo.Context) error {
 		Name:          file.Filename,
 		Format:        format,
 		FormatVersion: formatVersion,
+		SHA256:        hex.EncodeToString(hashFunc.Sum(nil)),
 	}
 
 	return nil

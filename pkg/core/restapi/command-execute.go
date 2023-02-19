@@ -60,6 +60,7 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 		Version: version,
 		Payload: replaceCommandPlaceholders(req.Command, hc.env),
 	})
+
 	if isExitError {
 		exitCode = exitErr.ExitCode()
 		errorMessage = exitErr.Error()

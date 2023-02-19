@@ -21,6 +21,7 @@ type ActionArtifact struct {
 	Name          string             `json:"name"`
 	Format        string             `json:"format"`
 	FormatVersion string             `json:"format_version"`
+	SHA256        string             `json:"sha256"`
 }
 
 // AuditEvents contains information about all steps that were part of the build and deployment process
