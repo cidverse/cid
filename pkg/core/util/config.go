@@ -24,7 +24,7 @@ func getWindowsUserConfigDirectory() string {
 
 func getUnixUserConfigDirectory() string {
 	homeDir, _ := os.UserHomeDir()
-	dir := filepath.Join(homeDir, ".cache", "cid")
+	dir := filepath.Join(homeDir, ".config", "cid")
 	_ = os.MkdirAll(dir, os.ModePerm)
 
 	return dir
