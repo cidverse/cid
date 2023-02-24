@@ -10,6 +10,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/rs/zerolog/log"
 )
 
 func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
@@ -48,10 +49,11 @@ func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
 func GetCertFileByType(certFileType string) string {
 	var files []string
 
+	// take host ca bundle
+	GetCABundleFromHost(filepath.Join(util.GetUserConfigDirectory(), "certs", "ca-bundle.crt"))
+
 	if certFileType == "ca-bundle" {
 		files = append(files, filepath.Join(util.GetUserConfigDirectory(), "certs", "ca-bundle.crt"))
-		files = append(files, "/etc/pki/tls/certs/ca-bundle.crt")
-		files = append(files, "/etc/ssl/certs/ca-certificates.crt")
 	} else if certFileType == "java-keystore" {
 		files = append(files, filepath.Join(util.GetUserConfigDirectory(), "certs", "keystore.jks"))
 	}
@@ -63,6 +65,51 @@ func GetCertFileByType(certFileType string) string {
 	}
 
 	return ""
+}
+
+// see https://go.dev/src/crypto/x509/root_linux.go for possible paths
+var caBundles = [][]string{
+	{"/etc/ssl/certs/ca-certificates.crt"},                                  // Debian/Ubuntu/Gentoo etc.
+	{"/etc/pki/tls/certs/ca-bundle.crt", "/etc/pki/tls/certs/ca-extra.crt"}, // RHEL
+	{"/etc/ssl/ca-bundle.pem"},                                              // OpenSUSE
+	{"/etc/pki/tls/cacert.pem"},                                             // OpenELEC
+	{"/etc/ssl/cert.pem"},                                                   // Alpine Linux
+}
+
+func GetCABundleFromHost(target string) {
+	if filesystem.FileExists(target) {
+		return
+	}
+
+	var found []string
+	var bundledCerts []byte
+	for _, bundle := range caBundles {
+		for _, path := range bundle {
+			if _, err := os.Stat(path); err == nil {
+				found = append(found, path)
+				cert, err := os.ReadFile(path)
+				if err != nil {
+					log.Fatal().Err(err).Str("file", path).Msg("failed to read bundle file")
+				}
+				bundledCerts = append(bundledCerts, cert...)
+			}
+		}
+		if len(found) > 0 {
+			break
+		}
+	}
+
+	if len(bundledCerts) == 0 {
+		log.Fatal().Msg("no CA bundle found")
+	}
+
+	_ = os.MkdirAll(filepath.Dir(target), os.ModePerm)
+	err := os.WriteFile(target, bundledCerts, os.ModePerm)
+	if err != nil {
+		log.Fatal().Err(err).Str("file", target).Msg("failed to write merged CA bundle file")
+	}
+
+	log.Info().Strs("files", found).Msg("ca certificates parsed and merged")
 }
 
 func ApplyCertMount(containerExec *containerruntime.Container, certFile string, containerCertFile string) {
