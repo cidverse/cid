@@ -26,8 +26,6 @@ func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
 	if len(os.Getenv("HTTP_PROXY")) > 0 {
 		proxyURL, err := url.Parse(os.Getenv("HTTP_PROXY"))
 		if err == nil {
-			containerExec.AddEnvironmentVariable("HTTP_PROXY_HOST", proxyURL.Hostname())
-			containerExec.AddEnvironmentVariable("HTTP_PROXY_PORT", proxyURL.Port())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttp.proxyHost="+proxyURL.Hostname())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttp.proxyPort="+proxyURL.Port())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttp.nonProxyHosts="+ConvertNoProxyForJava(os.Getenv("NO_PROXY")))
@@ -36,15 +34,13 @@ func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
 	if len(os.Getenv("HTTPS_PROXY")) > 0 {
 		proxyURL, err := url.Parse(os.Getenv("HTTPS_PROXY"))
 		if err == nil {
-			containerExec.AddEnvironmentVariable("HTTPS_PROXY_HOST", proxyURL.Hostname())
-			containerExec.AddEnvironmentVariable("HTTPS_PROXY_PORT", proxyURL.Port())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttps.proxyHost="+proxyURL.Hostname())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttps.proxyPort="+proxyURL.Port())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttps.nonProxyHosts="+ConvertNoProxyForJava(os.Getenv("NO_PROXY")))
 		}
 	}
 	if len(javaProxyOpts) > 0 {
-		containerExec.AddEnvironmentVariable("_JAVA_OPTIONS", strings.Join(javaProxyOpts, " "))
+		containerExec.AddEnvironmentVariable("CID_PROXY_JVM", strings.Join(javaProxyOpts, " "))
 	}
 }
 
@@ -105,5 +101,5 @@ func ReplaceCommandPlaceholders(input string, env map[string]string) string {
 }
 
 func ConvertNoProxyForJava(input string) string {
-	return strings.Replace(input, ",", "|", -1)
+	return strings.ReplaceAll(input, ",", "|")
 }

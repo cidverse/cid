@@ -55,10 +55,12 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 	stdout, stderr, binary, version, cmdErr := command.RunAPICommand(replaceCommandPlaceholders(req.Command, hc.env), commandEnv, hc.projectDir, execDir, req.CaptureOutput, req.Ports, req.Constraint)
 	exitErr, isExitError := cmdErr.(*exec.ExitError)
 	hc.state.AuditLog = append(hc.state.AuditLog, state.AuditEvents{
-		Type:    "command",
-		Name:    binary,
-		Version: version,
-		Payload: replaceCommandPlaceholders(req.Command, hc.env),
+		Timestamp: time.Now(),
+		Type:      "command",
+		Name:      binary,
+		Version:   version,
+		Uri:       "",
+		Payload:   replaceCommandPlaceholders(req.Command, hc.env),
 	})
 
 	if isExitError {

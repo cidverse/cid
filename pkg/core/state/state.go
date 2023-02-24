@@ -1,6 +1,8 @@
 package state
 
 import (
+	"time"
+
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
@@ -26,10 +28,12 @@ type ActionArtifact struct {
 
 // AuditEvents contains information about all steps that were part of the build and deployment process
 type AuditEvents struct {
-	Type    string `json:"type"`
-	Name    string `json:"name"`
-	Version string `json:"version"`
-	Payload string `json:"payload"`
+	Timestamp time.Time `json:"timestamp"`
+	Type      string    `json:"type"`
+	Name      string    `json:"name"`
+	Version   string    `json:"version"`
+	Uri       string    `json:"uri"`
+	Payload   string    `json:"payload"`
 }
 
 // ActionStateContext holds state information about executed actions / results (ie. generated artifacts)

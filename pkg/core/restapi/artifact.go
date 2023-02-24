@@ -1,16 +1,17 @@
 package restapi
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 
+	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/cidverse/cidverseutils/pkg/encoding"
 	"github.com/labstack/echo/v4"
 )
 
@@ -88,8 +89,8 @@ func (hc *handlerConfig) artifactUpload(c echo.Context) error {
 		return err
 	}
 	defer srcHash.Close()
-	hashFunc := sha256.New()
-	if _, err = io.Copy(hashFunc, srcHash); err != nil {
+	fileHash, err := encoding.SHA256Hash(srcHash)
+	if err != nil {
 		return err
 	}
 
@@ -103,7 +104,13 @@ func (hc *handlerConfig) artifactUpload(c echo.Context) error {
 		Name:          file.Filename,
 		Format:        format,
 		FormatVersion: formatVersion,
-		SHA256:        hex.EncodeToString(hashFunc.Sum(nil)),
+		SHA256:        fileHash,
+	}
+
+	// generate build provenance?
+	prov, err := strconv.ParseBool(c.FormValue("provenance"))
+	if err == nil && prov {
+		provenance.GenerateProvenance(hc.env, hc.state)
 	}
 
 	return nil

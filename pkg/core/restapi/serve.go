@@ -63,6 +63,9 @@ func Setup(config APIConfig) *echo.Echo {
 	e.POST("/command", handlers.commandExecute)
 	// TODO: (advanced) exec command as async task (+ get command status / log output / send stdin input)
 
+	// provenance
+	e.GET("/provenance", handlers.provenance)
+
 	return e
 }
 

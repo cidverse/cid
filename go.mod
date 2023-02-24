@@ -5,13 +5,14 @@ go 1.19
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.5.2
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/cidverse/cidverseutils v0.0.0-20230212184034-e92b7dd985f1
-	github.com/cidverse/normalizeci v1.1.1-0.20230216172051-1b9252473c70
+	github.com/cidverse/cidverseutils v0.0.0-20230220182032-4ef1992097c2
+	github.com/cidverse/normalizeci v1.1.1-0.20230224173446-33c78b046385
 	github.com/cidverse/repoanalyzer v0.0.0-20230210234941-138fb67a5fa0
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.13.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-version v1.6.0
+	github.com/in-toto/in-toto-golang v0.6.1-0.20230210144241-46b7827f7c66
 	github.com/jinzhu/configor v1.2.1
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/mattn/go-colorable v0.1.13
@@ -22,7 +23,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/thoas/go-funk v0.9.3
-	google.golang.org/genproto v0.0.0-20230216225411-c8e22ba71e44
+	google.golang.org/genproto v0.0.0-20230222225845-10f96fb3dbec
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.0.0
 )
@@ -46,7 +47,7 @@ require (
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-github/v50 v50.0.0 // indirect
+	github.com/google/go-github/v50 v50.1.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gosimple/slug v1.13.1 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
