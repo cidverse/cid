@@ -49,9 +49,9 @@ var workflowListCmd = &cobra.Command{
 
 		// print list
 		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
-		_, _ = fmt.Fprintln(w, "WORKFLOW\tRULES\tSTAGES\tACTIONS")
+		_, _ = fmt.Fprintln(w, "WORKFLOW\tVERSION\tRULES\tSTAGES\tACTIONS")
 		for _, workflow := range cfg.Registry.Workflows {
-			_, _ = fmt.Fprintln(w, workflow.Name+"\t"+
+			_, _ = fmt.Fprintln(w, workflow.Name+"\t"+workflow.Version+"\t"+
 				rules.EvaluateRulesAsText(workflow.Rules, rules.GetRuleContext(env))+"\t"+
 				strconv.Itoa(len(workflow.Stages))+"\t"+
 				strconv.Itoa(workflow.ActionCount()))
@@ -98,7 +98,7 @@ var workflowRunCmd = &cobra.Command{
 		provenance.Workflow = fmt.Sprintf("%s@%s", wf.Name, wf.Version)
 
 		// run
-		log.Info().Str("workflow", wf.Name).Msg("running workflow")
+		log.Info().Str("workflow", wf.Name).Str("workflow_version", wf.Version).Msg("running workflow")
 		workflowrun.RunWorkflow(cfg, wf, env, projectDir, stages, modules)
 	},
 }

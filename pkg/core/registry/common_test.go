@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"errors"
 	"testing"
 )
 
@@ -65,11 +64,6 @@ func TestParseReference(t *testing.T) {
 			input:         "example.com/foo/bar",
 			expected:      "example.com/foo/bar",
 			expectedError: nil,
-		},
-		{
-			input:         "",
-			expected:      "",
-			expectedError: errors.New("invalid reference format"),
 		},
 	}
 

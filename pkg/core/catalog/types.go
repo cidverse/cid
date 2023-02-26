@@ -1,5 +1,14 @@
 package catalog
 
+import (
+	"regexp"
+	"strings"
+
+	"github.com/rs/zerolog/log"
+)
+
+var workflowRegexp = regexp.MustCompile(`(?P<repo>\w+)/?(?P<workflow>\w+)@?(?P<version>[\w.]+)?`)
+
 // Config is a registry configuration with placeholders
 type Config struct {
 	// Actions
@@ -13,9 +22,9 @@ type Config struct {
 }
 
 // FindWorkflow finds a workflow by name
-func (r *Config) FindWorkflow(name string) *Workflow {
+func (r *Config) FindWorkflow(id string) *Workflow {
 	for _, w := range r.Workflows {
-		if w.Name == name {
+		if isMatchingWorkflow(id, &w) {
 			return &w
 		}
 	}
@@ -34,4 +43,28 @@ func (r *Config) FindAction(name string) *Action {
 	}
 
 	return nil
+}
+
+func isMatchingWorkflow(id string, workflow *Workflow) bool {
+	// parse id
+	if !strings.Contains(id, "/") {
+		id = "central/" + id
+	}
+	match := workflowRegexp.FindStringSubmatch(id)
+	if match == nil {
+		log.Fatal().Msg("invalid workflow name, please use the following format <repository>/<workflow>@<workflowVersion>")
+	}
+	repo := match[1]
+	name := match[2]
+	version := match[3]
+
+	if workflow.Repository == repo && workflow.Name == name {
+		if len(version) > 0 && workflow.Version == version {
+			return true
+		} else if version == "" {
+			return true
+		}
+	}
+
+	return false
 }
