@@ -21,7 +21,7 @@ type executeRequest struct {
 }
 
 // commandExecute runs a command in the project directory (blocking until the command exits, returns the response code)
-func (hc *handlerConfig) commandExecute(c echo.Context) error {
+func (hc *APIConfig) commandExecute(c echo.Context) error {
 	var req executeRequest
 	err := c.Bind(&req)
 	if err != nil {
@@ -33,14 +33,14 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 	}
 
 	// configuration
-	execDir := hc.projectDir
+	execDir := hc.ProjectDir
 	if req.WorkDir != "" {
 		execDir = req.WorkDir
 	}
 
 	// command env
 	var commandEnv = make(map[string]string)
-	for k, v := range hc.env {
+	for k, v := range hc.Env {
 		commandEnv[k] = v
 	}
 	if req.Env != nil {
@@ -52,15 +52,15 @@ func (hc *handlerConfig) commandExecute(c echo.Context) error {
 	// execute
 	exitCode := 0
 	var errorMessage = ""
-	stdout, stderr, binary, version, cmdErr := command.RunAPICommand(replaceCommandPlaceholders(req.Command, hc.env), commandEnv, hc.projectDir, execDir, req.CaptureOutput, req.Ports, req.Constraint)
+	stdout, stderr, binary, version, cmdErr := command.RunAPICommand(replaceCommandPlaceholders(req.Command, hc.Env), commandEnv, hc.ProjectDir, execDir, req.CaptureOutput, req.Ports, req.Constraint)
 	exitErr, isExitError := cmdErr.(*exec.ExitError)
-	hc.state.AuditLog = append(hc.state.AuditLog, state.AuditEvents{
+	hc.State.AuditLog = append(hc.State.AuditLog, state.AuditEvents{
 		Timestamp: time.Now(),
 		Type:      "command",
 		Name:      binary,
 		Version:   version,
 		Uri:       "",
-		Payload:   replaceCommandPlaceholders(req.Command, hc.env),
+		Payload:   replaceCommandPlaceholders(req.Command, hc.Env),
 	})
 
 	if isExitError {

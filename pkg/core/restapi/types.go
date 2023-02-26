@@ -20,21 +20,6 @@ type APIConfig struct {
 	ArtifactDir   string
 }
 
-type handlerConfig struct {
-	buildID             string
-	jobID               string
-	projectDir          string
-	containerProjectDir string
-	modules             []*analyzerapi.ProjectModule
-	currentModule       *analyzerapi.ProjectModule
-	currentAction       *catalog.Action
-	env                 map[string]string
-	actionConfig        string
-	state               *state.ActionStateContext
-	tempDir             string
-	artifactDir         string
-}
-
 // apiError, see https://www.rfc-editor.org/rfc/rfc7807
 type apiError struct {
 	Status  int    `json:"status"`

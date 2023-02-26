@@ -7,7 +7,7 @@ import (
 )
 
 // fileRead retrieves the content of a file (omitting secrets)
-func (hc *handlerConfig) fileRead(c echo.Context) error {
+func (hc *APIConfig) fileRead(c echo.Context) error {
 	return c.JSON(http.StatusInternalServerError, apiError{
 		Status:  500,
 		Title:   "not yet implemented",

@@ -9,8 +9,8 @@ import (
 )
 
 // moduleCurrent returns information about the current module if the action is module-scoped (config)
-func (hc *handlerConfig) moduleCurrent(c echo.Context) error {
-	if hc.currentModule == nil {
+func (hc *APIConfig) moduleCurrent(c echo.Context) error {
+	if hc.CurrentModule == nil {
 		return c.JSON(http.StatusBadRequest, apiError{
 			Status:  400,
 			Title:   "no current module when action is running in project scope",
@@ -18,7 +18,7 @@ func (hc *handlerConfig) moduleCurrent(c echo.Context) error {
 		})
 	}
 
-	var module = hc.currentModule
+	var module = hc.CurrentModule
 	module.RootDirectory = cihelper.ToUnixPath(module.RootDirectory)
 	module.Directory = cihelper.ToUnixPath(module.Directory)
 

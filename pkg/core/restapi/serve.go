@@ -8,24 +8,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Setup(config APIConfig) *echo.Echo {
+func Setup(handlers APIConfig) *echo.Echo {
 	// config
 	e := echo.New()
 	e.HideBanner = true
 	e.HidePort = true
-	handlers := handlerConfig{
-		buildID:       config.BuildID,
-		jobID:         config.JobID,
-		projectDir:    config.ProjectDir,
-		modules:       config.Modules,
-		currentModule: config.CurrentModule,
-		currentAction: config.CurrentAction,
-		env:           config.Env,
-		actionConfig:  config.ActionConfig,
-		state:         config.State,
-		tempDir:       config.TempDir,
-		artifactDir:   config.ArtifactDir,
-	}
 
 	// middlewares
 	e.Use(middleware.Recover())

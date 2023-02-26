@@ -14,6 +14,7 @@ var Workflow string
 
 func GenerateProvenance(env map[string]string, state *state.ActionStateContext) v1.ProvenancePredicate {
 	startedAt, _ := time.Parse(time.RFC3339, env["NCI_PIPELINE_JOB_STARTED_AT"])
+	finishedAt := time.Now().UTC()
 	prov := v1.ProvenancePredicate{}
 
 	// builder
@@ -56,7 +57,7 @@ func GenerateProvenance(env map[string]string, state *state.ActionStateContext) 
 		BuildMetadata: v1.BuildMetadata{
 			InvocationID: "",
 			StartedOn:    &startedAt,
-			FinishedOn:   nil,
+			FinishedOn:   &finishedAt,
 		},
 		Byproducts: nil,
 	}

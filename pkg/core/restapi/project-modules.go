@@ -9,9 +9,9 @@ import (
 )
 
 // projectInformation returns all available information about the current project
-func (hc *handlerConfig) moduleList(c echo.Context) error {
+func (hc *APIConfig) moduleList(c echo.Context) error {
 	var modules []analyzerapi.ProjectModule
-	for _, module := range hc.modules {
+	for _, module := range hc.Modules {
 		module.RootDirectory = cihelper.ToUnixPath(module.RootDirectory)
 		module.Directory = cihelper.ToUnixPath(module.Directory)
 

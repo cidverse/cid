@@ -11,7 +11,7 @@ import (
 )
 
 // configCurrent returns the configuration for the current action
-func (hc *handlerConfig) configCurrent(c echo.Context) error {
+func (hc *APIConfig) configCurrent(c echo.Context) error {
 	host, _ := os.Hostname()
 	currentUser, _ := user.Current()
 
@@ -28,11 +28,11 @@ func (hc *handlerConfig) configCurrent(c echo.Context) error {
 		"host_user_name": currentUser.Username,
 		"host_group_id":  currentUser.Gid,
 		// paths
-		"project_dir":  cihelper.ToUnixPath(hc.projectDir),
-		"artifact_dir": cihelper.ToUnixPath(filepath.Join(hc.projectDir, ".dist")),
-		"temp_dir":     cihelper.ToUnixPath(filepath.Join(hc.projectDir, ".tmp", hc.jobID)),
+		"project_dir":  cihelper.ToUnixPath(hc.ProjectDir),
+		"artifact_dir": cihelper.ToUnixPath(filepath.Join(hc.ProjectDir, ".dist")),
+		"temp_dir":     cihelper.ToUnixPath(filepath.Join(hc.ProjectDir, ".tmp", hc.JobID)),
 		// dynamic config
-		"config": hc.actionConfig,
+		"config": hc.ActionConfig,
 	}
 
 	return c.JSON(http.StatusOK, res)

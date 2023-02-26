@@ -1,22 +1,26 @@
 package restapi
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 
 	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/pkg/encoding"
+	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1.0"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
+	"github.com/thoas/go-funk"
 )
 
 // artifactList lists all generated reports
-func (hc *handlerConfig) artifactList(c echo.Context) error {
+func (hc *APIConfig) artifactList(c echo.Context) error {
 	var result = make([]state.ActionArtifact, 0)
 	module := c.QueryParam("module")
 	artifactType := c.QueryParam("type")
@@ -25,7 +29,7 @@ func (hc *handlerConfig) artifactList(c echo.Context) error {
 	formatVersion := c.QueryParam("format_version")
 
 	// filter artifacts
-	for _, artifact := range hc.state.Artifacts {
+	for _, artifact := range hc.State.Artifacts {
 		if len(module) > 0 && module != artifact.Module {
 			continue
 		}
@@ -49,7 +53,7 @@ func (hc *handlerConfig) artifactList(c echo.Context) error {
 }
 
 // artifactUpload uploads a report (typically from code scanning)
-func (hc *handlerConfig) artifactUpload(c echo.Context) error {
+func (hc *APIConfig) artifactUpload(c echo.Context) error {
 	moduleSlug := c.FormValue("module")
 	fileType := c.FormValue("type")
 	format := c.FormValue("format")
@@ -64,60 +68,39 @@ func (hc *handlerConfig) artifactUpload(c echo.Context) error {
 		moduleSlug = "root"
 	}
 
-	// target dir
-	targetDir := path.Join(hc.artifactDir, moduleSlug, fileType)
-	_ = os.MkdirAll(targetDir, os.FileMode(os.ModePerm))
-
-	// store file
+	// reader
 	src, err := file.Open()
 	if err != nil {
 		return err
 	}
 	defer src.Close()
-	dst, err := os.Create(path.Join(hc.artifactDir, moduleSlug, fileType, file.Filename))
-	if err != nil {
-		return err
-	}
-	defer dst.Close()
-	if _, err = io.Copy(dst, src); err != nil {
-		return err
-	}
 
-	// sha256 hash
-	srcHash, err := file.Open()
+	// store
+	err = hc.storeArtifact(moduleSlug, fileType, format, formatVersion, file.Filename, src)
 	if err != nil {
 		return err
-	}
-	defer srcHash.Close()
-	fileHash, err := encoding.SHA256Hash(srcHash)
-	if err != nil {
-		return err
-	}
-
-	// store into state
-	hc.state.Artifacts[moduleSlug+"/"+file.Filename] = state.ActionArtifact{
-		BuildID:       hc.buildID,
-		JobID:         hc.jobID,
-		ArtifactID:    fmt.Sprintf("%s|%s|%s", moduleSlug, fileType, file.Filename),
-		Module:        moduleSlug,
-		Type:          state.ActionArtifactType(fileType),
-		Name:          file.Filename,
-		Format:        format,
-		FormatVersion: formatVersion,
-		SHA256:        fileHash,
 	}
 
 	// generate build provenance?
-	prov, err := strconv.ParseBool(c.FormValue("provenance"))
-	if err == nil && prov {
-		provenance.GenerateProvenance(hc.env, hc.state)
+	if funk.Contains(provenance.FileTypes, fileType) {
+		log.Info().Str("artifact", file.Filename).Str("type", fileType).Msg("generating provenance for artifact")
+		prov := provenance.GenerateProvenance(hc.Env, hc.State)
+		provJSON, provErr := json.Marshal(prov)
+		if provErr != nil {
+			return provErr
+		}
+
+		err = hc.storeArtifact(moduleSlug, "attestation", "provenance", v1.PredicateSLSAProvenance, file.Filename, bytes.NewReader(provJSON))
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
 // artifactDownload uploads a report (typically from code scanning)
-func (hc *handlerConfig) artifactDownload(c echo.Context) error {
+func (hc *APIConfig) artifactDownload(c echo.Context) error {
 	id := c.QueryParam("id")
 	moduleSlug := c.QueryParam("module")
 	fileType := c.QueryParam("type")
@@ -136,6 +119,47 @@ func (hc *handlerConfig) artifactDownload(c echo.Context) error {
 		name = parts[2]
 	}
 
-	artifactFile := path.Join(hc.artifactDir, moduleSlug, fileType, name)
+	artifactFile := path.Join(hc.ArtifactDir, moduleSlug, fileType, name)
 	return c.File(artifactFile)
+}
+
+// storeArtifact stores an artifact on the local filesystem
+func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format string, formatVersion string, name string, content io.Reader) error {
+	var hashReader bytes.Buffer
+	contentReader := io.TeeReader(content, &hashReader)
+
+	// target dir
+	targetDir := path.Join(hc.ArtifactDir, moduleSlug, fileType)
+	_ = os.MkdirAll(targetDir, os.ModePerm)
+
+	// store file
+	dst, err := os.Create(path.Join(hc.ArtifactDir, moduleSlug, fileType, name))
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+	if _, err = io.Copy(dst, contentReader); err != nil {
+		return err
+	}
+
+	// sha256 hash
+	fileHash, err := encoding.SHA256Hash(&hashReader)
+	if err != nil {
+		return err
+	}
+
+	// store into state
+	hc.State.Artifacts[moduleSlug+"/"+name] = state.ActionArtifact{
+		BuildID:       hc.BuildID,
+		JobID:         hc.JobID,
+		ArtifactID:    fmt.Sprintf("%s|%s|%s", moduleSlug, fileType, name),
+		Module:        moduleSlug,
+		Type:          state.ActionArtifactType(fileType),
+		Name:          name,
+		Format:        format,
+		FormatVersion: formatVersion,
+		SHA256:        fileHash,
+	}
+
+	return nil
 }

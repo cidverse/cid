@@ -16,7 +16,7 @@ type logRequest struct {
 }
 
 // commandExecute runs a command in the project directory (blocking until the command exits, returns the response code)
-func (hc *handlerConfig) logMessage(c echo.Context) error {
+func (hc *APIConfig) logMessage(c echo.Context) error {
 	var req logRequest
 	err := c.Bind(&req)
 	if err != nil {
@@ -46,8 +46,8 @@ func (hc *handlerConfig) logMessage(c echo.Context) error {
 	}
 
 	msgPrefix := ""
-	if hc.currentAction != nil {
-		msgPrefix = fmt.Sprintf("[%s] ", hc.currentAction.Name)
+	if hc.CurrentAction != nil {
+		msgPrefix = fmt.Sprintf("[%s/%s] ", hc.CurrentAction.Repository, hc.CurrentAction.Name)
 	}
 	ev.Msg(msgPrefix + req.Message)
 

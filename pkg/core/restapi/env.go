@@ -7,8 +7,8 @@ import (
 )
 
 // projectEnv returns the available env for this action
-func (hc *handlerConfig) projectEnv(c echo.Context) error {
-	if hc.env == nil {
+func (hc *APIConfig) projectEnv(c echo.Context) error {
+	if hc.Env == nil {
 		return c.JSON(http.StatusBadRequest, apiError{
 			Status:  400,
 			Title:   "env is not accessible",
@@ -16,5 +16,5 @@ func (hc *handlerConfig) projectEnv(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, hc.env)
+	return c.JSON(http.StatusOK, hc.Env)
 }

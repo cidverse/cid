@@ -25,7 +25,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.2
 	github.com/thoas/go-funk v0.9.3
-	google.golang.org/genproto v0.0.0-20230222225845-10f96fb3dbec
+	google.golang.org/genproto v0.0.0-20230223222841-637eb2293923
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.0.0
 )

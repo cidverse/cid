@@ -13,7 +13,7 @@ import (
 )
 
 // projectInformation returns all available information about the current project
-func (hc *handlerConfig) vcsCommits(c echo.Context) error {
+func (hc *APIConfig) vcsCommits(c echo.Context) error {
 	fromRef, err := vcsapi.NewVCSRefFromString(c.QueryParam("from"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, apiError{
@@ -46,7 +46,7 @@ func (hc *handlerConfig) vcsCommits(c echo.Context) error {
 		}
 	}
 
-	client, clientErr := vcsrepository.GetVCSClient(hc.projectDir)
+	client, clientErr := vcsrepository.GetVCSClient(hc.ProjectDir)
 	if clientErr != nil {
 		return c.JSON(http.StatusInternalServerError, apiError{
 			Status:  500,
@@ -64,11 +64,11 @@ func (hc *handlerConfig) vcsCommits(c echo.Context) error {
 }
 
 // vcsCommitByHash retrieves information about a commit by hash
-func (hc *handlerConfig) vcsCommitByHash(c echo.Context) error {
+func (hc *APIConfig) vcsCommitByHash(c echo.Context) error {
 	vcsCommitHash := c.Param("hash")
 	includeChanges := c.QueryParam("changes")
 
-	client, clientErr := vcsrepository.GetVCSClient(hc.projectDir)
+	client, clientErr := vcsrepository.GetVCSClient(hc.ProjectDir)
 	if clientErr != nil {
 		return c.JSON(http.StatusInternalServerError, apiError{
 			Status:  500,
@@ -90,8 +90,8 @@ func (hc *handlerConfig) vcsCommitByHash(c echo.Context) error {
 }
 
 // vcsTags returns all tags
-func (hc *handlerConfig) vcsTags(c echo.Context) error {
-	client, clientErr := vcsrepository.GetVCSClient(hc.projectDir)
+func (hc *APIConfig) vcsTags(c echo.Context) error {
+	client, clientErr := vcsrepository.GetVCSClient(hc.ProjectDir)
 	if clientErr != nil {
 		return c.JSON(http.StatusInternalServerError, apiError{
 			Status:  500,
@@ -112,10 +112,10 @@ func (a ByVersion) Less(i, j int) bool { return a[i].Compare(a[j]) > 0 }
 func (a ByVersion) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 // vcsTags returns all tags
-func (hc *handlerConfig) vcsReleases(c echo.Context) error {
+func (hc *APIConfig) vcsReleases(c echo.Context) error {
 	releaseType := c.QueryParam("type")
 
-	client, clientErr := vcsrepository.GetVCSClient(hc.projectDir)
+	client, clientErr := vcsrepository.GetVCSClient(hc.ProjectDir)
 	if clientErr != nil {
 		return c.JSON(http.StatusInternalServerError, apiError{
 			Status:  500,

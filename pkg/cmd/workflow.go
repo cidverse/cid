@@ -98,7 +98,7 @@ var workflowRunCmd = &cobra.Command{
 		provenance.Workflow = fmt.Sprintf("%s@%s", wf.Name, wf.Version)
 
 		// run
-		log.Info().Str("repository", wf.Repository).Str("name", wf.Name).Str("workflow_version", wf.Version).Msg("running workflow")
+		log.Info().Str("repository", wf.Repository).Str("name", wf.Name).Str("version", wf.Version).Msg("running workflow")
 		workflowrun.RunWorkflow(cfg, wf, env, projectDir, stages, modules)
 	},
 }

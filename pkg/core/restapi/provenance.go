@@ -8,8 +8,8 @@ import (
 )
 
 // projectInformation returns all available information about the current project
-func (hc *handlerConfig) provenance(c echo.Context) error {
-	prov := provenance.GenerateProvenance(hc.env, hc.state)
+func (hc *APIConfig) provenance(c echo.Context) error {
+	prov := provenance.GenerateProvenance(hc.Env, hc.State)
 
 	return c.JSON(http.StatusOK, prov)
 }

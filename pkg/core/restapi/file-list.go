@@ -7,7 +7,7 @@ import (
 )
 
 // fileList retrieves a list of all files
-func (hc *handlerConfig) fileList(c echo.Context) error {
+func (hc *APIConfig) fileList(c echo.Context) error {
 	return c.JSON(http.StatusInternalServerError, apiError{
 		Status:  500,
 		Title:   "not yet implemented",
