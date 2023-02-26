@@ -1,9 +1,8 @@
 package config
 
 type ProjectConventions struct {
-	Branching        BranchingConventionType `default:"GitFlow"`
-	Commit           CommitConventionType    `default:"ConventionalCommits"`
-	PreReleaseSuffix string                  `default:"-rc.{NCI_LASTRELEASE_COMMIT_AFTER_COUNT}"`
+	Branching BranchingConventionType `default:"GitFlow"`
+	Commit    CommitConventionType    `default:"ConventionalCommits"`
 }
 
 type BranchingConventionType string

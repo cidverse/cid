@@ -13,4 +13,3 @@ mode: exec
 conventions:
   branching: GitFlow
   commit: ConventionalCommits
-  prereleasesuffix: "-rc.{NCI_LASTRELEASE_COMMIT_AFTER_COUNT}"

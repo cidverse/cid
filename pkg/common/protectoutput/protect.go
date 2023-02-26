@@ -22,7 +22,7 @@ func ProtectPhrase(phrase string) {
 // RedactProtectedPhrases redacts all protected phrases in the input string (replace with ***)
 func RedactProtectedPhrases(input string) string {
 	for _, phrase := range protectedPhrases {
-		input = strings.ReplaceAll(input, phrase, "***")
+		input = strings.ReplaceAll(input, phrase, "[MASKED]")
 	}
 
 	return input
