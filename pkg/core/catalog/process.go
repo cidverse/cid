@@ -3,22 +3,22 @@ package catalog
 import (
 	"strings"
 
-	"github.com/cidverse/cid/pkg/core/containerregistry"
+	"github.com/cidverse/cid/pkg/core/registry"
 	"github.com/rs/zerolog/log"
 )
 
-func ProcessRegistry(registry *Config) *Config {
+func ProcessCatalog(catalog *Config) *Config {
 	result := Config{}
 
 	// actions
-	for _, sourceAction := range registry.Actions { //nolint:gocritic
+	for _, sourceAction := range catalog.Actions { //nolint:gocritic
 		result.Actions = append(result.Actions, sourceAction)
 	}
 
 	// images
-	for _, sourceImage := range registry.ContainerImages { //nolint:gocritic
+	for _, sourceImage := range catalog.ContainerImages { //nolint:gocritic
 		if len(sourceImage.Source.RegistryURL) > 0 {
-			tags, err := containerregistry.FindTags(sourceImage.Source.RegistryURL)
+			tags, err := registry.FindTags(sourceImage.Source.RegistryURL)
 			if err != nil {
 				log.Fatal().Err(err).Str("repository", sourceImage.Source.RegistryURL).Msg("failed to query tags for repository")
 			}
@@ -49,7 +49,7 @@ func ProcessRegistry(registry *Config) *Config {
 	}
 
 	// workflows
-	for _, sourceWorkflow := range registry.Workflows { //nolint:gocritic
+	for _, sourceWorkflow := range catalog.Workflows { //nolint:gocritic
 		result.Workflows = append(result.Workflows, sourceWorkflow)
 	}
 

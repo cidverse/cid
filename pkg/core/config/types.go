@@ -36,6 +36,9 @@ type CIDConfig struct {
 	// LocalTools holds a list to lookup locally installed tools for command execution
 	LocalTools []ToolLocal `yaml:"localtools,omitempty"`
 
+	// CatalogSources
+	CatalogSources map[string]*catalog.Source `yaml:"catalog_sources,omitempty"`
+
 	// Registry holding all known images, actions, workflows, ...
 	Registry catalog.Config `yaml:"registry,omitempty"`
 }

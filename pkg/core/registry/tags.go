@@ -1,4 +1,4 @@
-package containerregistry
+package registry
 
 import (
 	"context"
@@ -13,13 +13,14 @@ type ImageTag struct {
 }
 
 func FindTags(repositoryURL string) ([]ImageTag, error) {
+	ctx := context.Background()
+
 	// query tags
 	repo, err := remote.NewRepository(repositoryURL)
 	if err != nil {
 		return []ImageTag{}, err
 	}
 
-	ctx := context.Background()
 	tagList, err := registry.Tags(ctx, repo)
 	if err != nil {
 		return []ImageTag{}, err

@@ -1,29 +1,32 @@
 package catalog
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/cidverse/cid/pkg/core/util"
+	"github.com/cidverse/cidverseutils/pkg/encoding"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
 
 type Source struct {
-	URL       string `yaml:"url"`
+	URI       string `yaml:"uri"`
 	AddedAt   string `yaml:"added_at"`
 	UpdatedAt string `yaml:"updated_at"`
+	SHA256    string `yaml:"sha256"`
 }
 
-func LoadSources() map[string]Source {
-	sources := make(map[string]Source)
+func LoadSources() map[string]*Source {
+	sources := make(map[string]*Source)
 	file := filepath.Join(util.GetUserConfigDirectory(), "repositories.yaml")
 
 	// file doesn't exist yet, init with main repo
 	if _, err := os.Stat(file); os.IsNotExist(err) {
-		sources["central"] = Source{URL: "https://raw.githubusercontent.com/cidverse/catalog/main/cid-index.yaml", AddedAt: time.Now().Format(time.RFC3339), UpdatedAt: time.Now().Format(time.RFC3339)}
+		sources["central"] = &Source{URI: "https://raw.githubusercontent.com/cidverse/catalog/main/cid-index.yaml", AddedAt: time.Now().Format(time.RFC3339), UpdatedAt: time.Now().Format(time.RFC3339)}
 		return sources
 	}
 
@@ -40,7 +43,7 @@ func LoadSources() map[string]Source {
 	return sources
 }
 
-func LoadCatalogs(sources map[string]Source) Config {
+func LoadCatalogs(sources map[string]*Source) Config {
 	var cfg Config
 	for name := range sources {
 		file := filepath.Join(util.GetUserConfigDirectory(), "repo.d", name+".yaml")
@@ -82,7 +85,7 @@ func LoadCatalogs(sources map[string]Source) Config {
 	return cfg
 }
 
-func saveSources(data map[string]Source) {
+func saveSources(data map[string]*Source) {
 	file := filepath.Join(util.GetUserConfigDirectory(), "repositories.yaml")
 
 	out, err := yaml.Marshal(data)
@@ -98,7 +101,7 @@ func saveSources(data map[string]Source) {
 
 func AddCatalog(name string, url string) {
 	sources := LoadSources()
-	sources[name] = Source{URL: url, AddedAt: time.Now().Format(time.RFC3339), UpdatedAt: time.Now().Format(time.RFC3339)}
+	sources[name] = &Source{URI: url, AddedAt: time.Now().Format(time.RFC3339), UpdatedAt: time.Now().Format(time.RFC3339)}
 	saveSources(sources)
 }
 
@@ -116,7 +119,7 @@ func UpdateAllCatalogs() {
 	}
 	saveSources(sources)
 }
-func UpdateCatalog(name string, source Source) {
+func UpdateCatalog(name string, source *Source) {
 	dir := filepath.Join(util.GetUserConfigDirectory(), "repo.d")
 	_ = os.MkdirAll(dir, os.ModePerm)
 
@@ -125,10 +128,17 @@ func UpdateCatalog(name string, source Source) {
 	client := resty.New()
 	resp, err := client.R().
 		SetOutput(file).
-		Get(source.URL)
+		Get(source.URI)
 	if err != nil {
-		log.Fatal().Err(err).Str("url", source.URL).Msg("failed to fetch registry index")
+		log.Fatal().Err(err).Str("uri", source.URI).Msg("failed to fetch registry index")
 	} else if resp.IsError() {
-		log.Fatal().Str("url", source.URL).Str("response_status", resp.Status()).Msg("failed to fetch registry index")
+		log.Fatal().Str("uri", source.URI).Str("response_status", resp.Status()).Msg("failed to fetch registry index")
 	}
+
+	// sha256 hash
+	fileHash, hashErr := encoding.SHA256Hash(bytes.NewReader(resp.Body()))
+	if hashErr != nil {
+		log.Fatal().Err(hashErr).Str("uri", source.URI).Msg("failed to calculate catalog hash")
+	}
+	source.SHA256 = fileHash
 }

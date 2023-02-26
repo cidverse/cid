@@ -48,10 +48,10 @@ var catalogListCmd = &cobra.Command{
 		registries := catalog.LoadSources()
 		// print list
 		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
-		_, _ = fmt.Fprintln(w, "NAME\tURL\tAdded\tUpdated\tWorkflows\tActions\tImages")
+		_, _ = fmt.Fprintln(w, "NAME\tURI\tAdded\tUpdated\tWorkflows\tActions\tImages\tHash")
 		for key, source := range registries {
-			data := catalog.LoadCatalogs(map[string]catalog.Source{key: source})
-			_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%d\t%d\n", key, source.URL, source.AddedAt, source.UpdatedAt, len(data.Workflows), len(data.Actions), len(data.ContainerImages))
+			data := catalog.LoadCatalogs(map[string]*catalog.Source{key: source})
+			_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%d\t%d\t%s\n", key, source.URI, source.AddedAt, source.UpdatedAt, len(data.Workflows), len(data.Actions), len(data.ContainerImages), source.SHA256[:7])
 		}
 		_ = w.Flush()
 	},
@@ -100,7 +100,7 @@ var catalogProcessFileCmd = &cobra.Command{
 		}
 
 		// process
-		fileRegistry = catalog.ProcessRegistry(fileRegistry)
+		fileRegistry = catalog.ProcessCatalog(fileRegistry)
 
 		// store output
 		err = catalog.SaveToFile(fileRegistry, dir+"/cid-index.yaml")

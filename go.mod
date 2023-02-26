@@ -13,9 +13,11 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/in-toto/in-toto-golang v0.6.1-0.20230210144241-46b7827f7c66
+	github.com/jarcoal/httpmock v1.3.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/mattn/go-colorable v0.1.13
+	github.com/opencontainers/image-spec v1.1.0-rc2
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/rs/zerolog v1.29.0
 	github.com/samber/lo v1.37.0
@@ -61,7 +63,6 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
 	github.com/pjbgf/sha1cd v0.2.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

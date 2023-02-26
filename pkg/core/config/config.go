@@ -33,7 +33,9 @@ func LoadConfig(projectDirectory string) *CIDConfig {
 	unmarshalNoError("files/cid-tools.yaml", yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-tools.yaml")), &cfg))
 
 	// default os cache dir
-	data := catalog.LoadCatalogs(catalog.LoadSources())
+	catalogSources := catalog.LoadSources()
+	cfg.CatalogSources = catalogSources
+	data := catalog.LoadCatalogs(catalogSources)
 	log.Info().Int("images", len(data.ContainerImages)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Msg("loaded catalogs")
 	cfg.Registry.ContainerImages = append(cfg.Registry.ContainerImages, data.ContainerImages...)
 	cfg.Registry.Actions = append(cfg.Registry.Actions, data.Actions...)

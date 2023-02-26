@@ -7,6 +7,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/provenance"
 
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
@@ -91,6 +92,10 @@ var workflowRunCmd = &cobra.Command{
 			log.Error().Str("workflow", args[0]).Msg("workflow does not exist")
 			return
 		}
+
+		// entrypoint
+		provenance.WorkflowSource = fmt.Sprintf("%s@%s", cfg.CatalogSources[wf.Repository].URI, cfg.CatalogSources[wf.Repository].SHA256)
+		provenance.Workflow = fmt.Sprintf("%s@%s", wf.Name, wf.Version)
 
 		// run
 		log.Info().Str("workflow", wf.Name).Msg("running workflow")
