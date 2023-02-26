@@ -23,7 +23,7 @@ require (
 	github.com/samber/lo v1.37.0
 	github.com/sethvargo/go-password v0.2.0
 	github.com/spf13/cobra v1.6.1
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	github.com/thoas/go-funk v0.9.3
 	google.golang.org/genproto v0.0.0-20230222225845-10f96fb3dbec
 	gopkg.in/yaml.v3 v3.0.1
