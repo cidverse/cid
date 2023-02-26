@@ -12,5 +12,5 @@ func TestNewProtectedWriter(t *testing.T) {
 
 	writer := NewProtectedWriter(nil, nil)
 	_, _ = writer.Write([]byte("this contains a secret: mySecret"))
-	assert.Equal(t, "this contains a secret: ***", lastProxyWrite)
+	assert.Equal(t, "this contains a secret: [MASKED]", lastProxyWrite)
 }

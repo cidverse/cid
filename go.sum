@@ -15,8 +15,9 @@ github.com/ProtonMail/go-mime v0.0.0-20221031134845-8fd9bc37cf08 h1:dS7r5z4iGS0q
 github.com/ProtonMail/go-mime v0.0.0-20221031134845-8fd9bc37cf08/go.mod h1:qRZgbeASl2a9OwmsV85aWwRqic0NHPh+9ewGAzb4cgM=
 github.com/ProtonMail/gopenpgp/v2 v2.5.2 h1:97SjlWNAxXl9P22lgwgrZRshQdiEfAht0g3ZoiA1GCw=
 github.com/ProtonMail/gopenpgp/v2 v2.5.2/go.mod h1:52qDaCnto6r+CoWbuU50T77XQt99lIs46HtHtvgFO3o=
-github.com/acomagu/bufpipe v1.0.3 h1:fxAGrHZTgQ9w5QqVItgzwj235/uYZYgbXitB+dLupOk=
 github.com/acomagu/bufpipe v1.0.3/go.mod h1:mxdxdup/WdsKVreO5GpW4+M/1CE2sMG4jeGJ2sYmHc4=
+github.com/acomagu/bufpipe v1.0.4 h1:e3H4WUzM3npvo5uv95QuJM3cQspFNtFBzvJ2oNjKIDQ=
+github.com/acomagu/bufpipe v1.0.4/go.mod h1:mxdxdup/WdsKVreO5GpW4+M/1CE2sMG4jeGJ2sYmHc4=
 github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be h1:9AeTilPcZAjCFIImctFaOjnTIavg87rW78vTPkQqLI8=
 github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be/go.mod h1:ySMOLuWl6zY27l47sB3qLNK6tF2fkHG55UZxx8oIVo4=
 github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 h1:yL7+Jz0jTC6yykIK/Wh74gnTJnrGr5AyrNMXuA0gves=
@@ -28,8 +29,8 @@ github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgIS
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
 github.com/cidverse/cidverseutils v0.0.0-20230220182032-4ef1992097c2 h1:PqTJs5ijkU1DYcQokQbaYmCJ8QyQYvKGnX+SYy46iE4=
 github.com/cidverse/cidverseutils v0.0.0-20230220182032-4ef1992097c2/go.mod h1:F7JcumwHOlii442FltkI0tOJe2RFvL3ugd60G/ai3kg=
-github.com/cidverse/normalizeci v1.1.1-0.20230224173446-33c78b046385 h1:6se2/zqvoPBfGBOYu1+s1WlWWruUW9r2ipXAbabKK0M=
-github.com/cidverse/normalizeci v1.1.1-0.20230224173446-33c78b046385/go.mod h1:Z3xxl5UgpRXX9fhzvykMxftl+3xJJ78fJoulsBcE1qo=
+github.com/cidverse/normalizeci v1.1.1-0.20230226203028-ccaf9f06c32f h1:8PriKzcbMSoh5cGFSJK+34s67lzK+9ON6vYblcUasWs=
+github.com/cidverse/normalizeci v1.1.1-0.20230226203028-ccaf9f06c32f/go.mod h1:ju+lS9GaAfZ4r+CSyDeRWXdikhmFDIjPzb7OJQjZVNw=
 github.com/cidverse/repoanalyzer v0.0.0-20230210234941-138fb67a5fa0 h1:KHvePzdz+HhAhx2ox+Lkcpfh0THGeJlZhg1xv15XI6k=
 github.com/cidverse/repoanalyzer v0.0.0-20230210234941-138fb67a5fa0/go.mod h1:m1vNLg2hfB1dtDq4FiWyDr0VcnvfDQdSEE07mIj841M=
 github.com/cloudflare/circl v1.1.0/go.mod h1:prBCrKB9DV4poKZY1l9zBXg2QJY7mvgRvtMxxK7fi4I=
@@ -142,8 +143,9 @@ github.com/opencontainers/image-spec v1.1.0-rc2 h1:2zx/Stx4Wc5pIPDvIxHXvXtQFW/7X
 github.com/opencontainers/image-spec v1.1.0-rc2/go.mod h1:3OVijpioIKYWTqjiG0zfF6wvoJ4fAXGbjdZuI2NgsRQ=
 github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263 h1:Qd1Ml+uEhpesT8Og0ysEhu5+DGhbhW+qxjapH8t1Kvs=
 github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263/go.mod h1:odkMeLkWS8G6+WP2z3Pn2vkzhPSvBtFhAUYTKXAtZMQ=
-github.com/pjbgf/sha1cd v0.2.3 h1:uKQP/7QOzNtKYH7UTohZLcjF5/55EnTw0jO/Ru4jZwI=
 github.com/pjbgf/sha1cd v0.2.3/go.mod h1:HOK9QrgzdHpbc2Kzip0Q1yi3M2MFGPADtR6HjG65m5M=
+github.com/pjbgf/sha1cd v0.3.0 h1:4D5XXmUUBUl/xQ6IjCkEAbqXskkq/4O7LmGn0AqMDs4=
+github.com/pjbgf/sha1cd v0.3.0/go.mod h1:nZ1rrWOcGJ5uZgEEVL1VUM9iRQiZvWdbZjkKyFzPPsI=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

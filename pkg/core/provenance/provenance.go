@@ -60,7 +60,7 @@ func GenerateProvenance(env map[string]string, state *state.ActionStateContext) 
 			BuilderDependencies: nil,
 		},
 		BuildMetadata: v1.BuildMetadata{
-			InvocationID: "",
+			InvocationID: fmt.Sprintf("%s-%s", env["NCI_PIPELINE_ID"], env["NCI_PIPELINE_ATTEMPT"]),
 			StartedOn:    &startedAt,
 			FinishedOn:   &finishedAt,
 		},

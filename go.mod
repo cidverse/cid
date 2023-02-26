@@ -6,7 +6,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.5.2
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20230220182032-4ef1992097c2
-	github.com/cidverse/normalizeci v1.1.1-0.20230224173446-33c78b046385
+	github.com/cidverse/normalizeci v1.1.1-0.20230226203028-ccaf9f06c32f
 	github.com/cidverse/repoanalyzer v0.0.0-20230210234941-138fb67a5fa0
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.13.0
@@ -36,7 +36,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.0 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8 // indirect
 	github.com/ProtonMail/go-mime v0.0.0-20221031134845-8fd9bc37cf08 // indirect
-	github.com/acomagu/bufpipe v1.0.3 // indirect
+	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
 	github.com/cloudflare/circl v1.3.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -63,7 +63,7 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/pjbgf/sha1cd v0.2.3 // indirect
+	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 // indirect
