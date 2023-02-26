@@ -48,7 +48,7 @@ func (r *Config) FindAction(name string) *Action {
 func isMatchingWorkflow(id string, workflow *Workflow) bool {
 	// parse id
 	if !strings.Contains(id, "/") {
-		id = "central/" + id
+		id = "cid/" + id
 	}
 	match := workflowRegexp.FindStringSubmatch(id)
 	if match == nil {

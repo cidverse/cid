@@ -66,7 +66,7 @@ func (hc *handlerConfig) artifactUpload(c echo.Context) error {
 
 	// target dir
 	targetDir := path.Join(hc.artifactDir, moduleSlug, fileType)
-	_ = os.MkdirAll(targetDir, os.FileMode(0700))
+	_ = os.MkdirAll(targetDir, os.FileMode(os.ModePerm))
 
 	// store file
 	src, err := file.Open()

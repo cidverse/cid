@@ -12,11 +12,13 @@ func ProcessCatalog(catalog *Config) *Config {
 
 	// actions
 	for _, sourceAction := range catalog.Actions { //nolint:gocritic
+		sourceAction.Repository = ""
 		result.Actions = append(result.Actions, sourceAction)
 	}
 
 	// images
 	for _, sourceImage := range catalog.ContainerImages { //nolint:gocritic
+		sourceImage.Repository = ""
 		if len(sourceImage.Source.RegistryURL) > 0 {
 			tags, err := registry.FindTags(sourceImage.Source.RegistryURL)
 			if err != nil {
@@ -50,6 +52,7 @@ func ProcessCatalog(catalog *Config) *Config {
 
 	// workflows
 	for _, sourceWorkflow := range catalog.Workflows { //nolint:gocritic
+		sourceWorkflow.Repository = ""
 		result.Workflows = append(result.Workflows, sourceWorkflow)
 	}
 

@@ -26,7 +26,7 @@ func LoadSources() map[string]*Source {
 
 	// file doesn't exist yet, init with main repo
 	if _, err := os.Stat(file); os.IsNotExist(err) {
-		sources["central"] = &Source{URI: "https://raw.githubusercontent.com/cidverse/catalog/main/cid-index.yaml", AddedAt: time.Now().Format(time.RFC3339), UpdatedAt: time.Now().Format(time.RFC3339)}
+		sources["cid"] = &Source{URI: "https://raw.githubusercontent.com/cidverse/catalog/main/cid-index.yaml", AddedAt: time.Now().Format(time.RFC3339), UpdatedAt: time.Now().Format(time.RFC3339), SHA256: ""}
 		return sources
 	}
 
