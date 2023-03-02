@@ -59,7 +59,7 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 		Type:      "command",
 		Name:      binary,
 		Version:   version,
-		Uri:       "",
+		URI:       "",
 		Payload:   replaceCommandPlaceholders(req.Command, hc.Env),
 	})
 

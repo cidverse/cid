@@ -32,7 +32,7 @@ type AuditEvents struct {
 	Type      string    `json:"type"`
 	Name      string    `json:"name"`
 	Version   string    `json:"version"`
-	Uri       string    `json:"uri"`
+	URI       string    `json:"uri"`
 	Payload   string    `json:"payload"`
 }
 
