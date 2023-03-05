@@ -28,12 +28,9 @@ type ActionArtifact struct {
 
 // AuditEvents contains information about all steps that were part of the build and deployment process
 type AuditEvents struct {
-	Timestamp time.Time `json:"timestamp"`
-	Type      string    `json:"type"`
-	Name      string    `json:"name"`
-	Version   string    `json:"version"`
-	URI       string    `json:"uri"`
-	Payload   string    `json:"payload"`
+	Timestamp time.Time         `json:"timestamp"`
+	Type      string            `json:"type"`
+	Payload   map[string]string `json:"payload"`
 }
 
 // ActionStateContext holds state information about executed actions / results (ie. generated artifacts)

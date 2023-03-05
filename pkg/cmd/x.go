@@ -35,7 +35,7 @@ var xCmd = &cobra.Command{
 		}
 
 		// execute command
-		_, _, _, _, err := command.RunAPICommand(strings.Join(args, " "), env, projectDir, workDir, false, nil, "")
+		_, _, _, err := command.RunAPICommand(strings.Join(args, " "), env, projectDir, workDir, false, nil, "")
 		if err != nil {
 			log.Fatal().Err(err).Msg("command failed")
 		}

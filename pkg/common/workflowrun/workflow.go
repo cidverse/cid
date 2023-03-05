@@ -2,6 +2,7 @@ package workflowrun
 
 import (
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 	"time"
 
@@ -173,6 +174,16 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		// state: retrieve/init
 		localState := state.GetStateFromFile(stateFile)
 		localState.Modules = ctx.Modules
+
+		// add action to log
+		localState.AuditLog = append(localState.AuditLog, state.AuditEvents{
+			Timestamp: time.Now(),
+			Type:      "action",
+			Payload: map[string]string{
+				"action": catalogAction.Repository + "/" + catalogAction.Name + "@" + catalogAction.Version,
+				"uri":    fmt.Sprintf("oci://%s", catalogAction.Container.Image),
+			},
+		})
 
 		// serialize action config for pass-thru
 		actConfig, _ := yaml.Marshal(&action.Config)

@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"fmt"
 	"net/http"
 	"os/exec"
 	"strings"
@@ -52,15 +53,17 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 	// execute
 	exitCode := 0
 	var errorMessage = ""
-	stdout, stderr, binary, version, cmdErr := command.RunAPICommand(replaceCommandPlaceholders(req.Command, hc.Env), commandEnv, hc.ProjectDir, execDir, req.CaptureOutput, req.Ports, req.Constraint)
+	stdout, stderr, candidate, cmdErr := command.RunAPICommand(replaceCommandPlaceholders(req.Command, hc.Env), commandEnv, hc.ProjectDir, execDir, req.CaptureOutput, req.Ports, req.Constraint)
 	exitErr, isExitError := cmdErr.(*exec.ExitError)
 	hc.State.AuditLog = append(hc.State.AuditLog, state.AuditEvents{
-		Timestamp: time.Now(),
+		Timestamp: time.Now().UTC(),
 		Type:      "command",
-		Name:      binary,
-		Version:   version,
-		URI:       "",
-		Payload:   replaceCommandPlaceholders(req.Command, hc.Env),
+		Payload: map[string]string{
+			"binary":  candidate.Binary,
+			"version": candidate.Version,
+			"uri":     fmt.Sprintf("oci://%s", candidate.Image),
+			"command": replaceCommandPlaceholders(req.Command, hc.Env),
+		},
 	})
 
 	if isExitError {
