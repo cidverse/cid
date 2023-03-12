@@ -10,10 +10,10 @@ import (
 	"path"
 	"strings"
 
+	"github.com/PhilippHeuer/in-toto-golang/in_toto/slsa_provenance/v1.0"
 	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/pkg/encoding"
-	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1.0"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
@@ -76,7 +76,7 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 	defer src.Close()
 
 	// store
-	err = hc.storeArtifact(moduleSlug, fileType, format, formatVersion, file.Filename, src)
+	fileHash, err := hc.storeArtifact(moduleSlug, fileType, format, formatVersion, file.Filename, src)
 	if err != nil {
 		return err
 	}
@@ -84,13 +84,14 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 	// generate build provenance?
 	if funk.Contains(provenance.FileTypes, fileType) {
 		log.Info().Str("artifact", file.Filename).Str("type", fileType).Msg("generating provenance for artifact")
-		prov := provenance.GenerateProvenance(hc.Env, hc.State)
+		prov := provenance.GenerateInTotoPredicate(file.Filename, fileHash, hc.Env, hc.State)
+
 		provJSON, provErr := json.Marshal(prov)
 		if provErr != nil {
 			return provErr
 		}
 
-		err = hc.storeArtifact(moduleSlug, "attestation", "provenance", v1.PredicateSLSAProvenance, file.Filename, bytes.NewReader(provJSON))
+		_, err = hc.storeArtifact(moduleSlug, "attestation", "provenance", v1.PredicateSLSAProvenance, file.Filename, bytes.NewReader(provJSON))
 		if err != nil {
 			return err
 		}
@@ -124,7 +125,7 @@ func (hc *APIConfig) artifactDownload(c echo.Context) error {
 }
 
 // storeArtifact stores an artifact on the local filesystem
-func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format string, formatVersion string, name string, content io.Reader) error {
+func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format string, formatVersion string, name string, content io.Reader) (string, error) {
 	var hashReader bytes.Buffer
 	contentReader := io.TeeReader(content, &hashReader)
 
@@ -135,17 +136,17 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 	// store file
 	dst, err := os.Create(path.Join(hc.ArtifactDir, moduleSlug, fileType, name))
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer dst.Close()
 	if _, err = io.Copy(dst, contentReader); err != nil {
-		return err
+		return "", err
 	}
 
 	// sha256 hash
 	fileHash, err := encoding.SHA256Hash(&hashReader)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// store into state
@@ -161,5 +162,5 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 		SHA256:        fileHash,
 	}
 
-	return nil
+	return fileHash, nil
 }

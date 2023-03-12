@@ -23,7 +23,7 @@ type ToolLocalLookup struct {
 	Version string // version
 }
 
-// CIDConfig is the full stuct of the configuration file
+// CIDConfig is the full struct of the configuration file
 type CIDConfig struct {
 	Paths       PathConfig
 	Mode        ExecutionType `default:"PREFER_LOCAL"`
