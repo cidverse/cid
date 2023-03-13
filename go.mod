@@ -28,7 +28,7 @@ require (
 	github.com/thoas/go-funk v0.9.3
 	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4
 	gopkg.in/yaml.v3 v3.0.1
-	oras.land/oras-go/v2 v2.0.0
+	oras.land/oras-go/v2 v2.0.1
 )
 
 require (
