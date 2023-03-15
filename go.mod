@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/PhilippHeuer/in-toto-golang v0.0.0-20230312174602-51eebe404f7f
-	github.com/ProtonMail/gopenpgp/v2 v2.5.2
+	github.com/ProtonMail/gopenpgp/v2 v2.6.0
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20230220182032-4ef1992097c2
 	github.com/cidverse/normalizeci v1.1.1-0.20230309235853-827bdbcd100f
