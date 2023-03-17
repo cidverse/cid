@@ -334,4 +334,6 @@ oras.land/oras-go/v2 v2.0.0 h1:+LRAz92WF7AvYQsQjPEAIw3Xb2zPPhuydjpi4pIHmc0=
 oras.land/oras-go/v2 v2.0.0/go.mod h1:iVExH1NxrccIxjsiq17L91WCZ4KIw6jVQyCLsZsu1gc=
 oras.land/oras-go/v2 v2.0.1 h1:fdnzCXT6yBQziJNJrCqaUPd6Ww7j6M0qLrtFA80tTeM=
 oras.land/oras-go/v2 v2.0.1/go.mod h1:PWnWc/Kyyg7wUTUsDHshrsJkzuxXzreeMd6NrfdnFSo=
+oras.land/oras-go/v2 v2.0.2 h1:3aSQdJ7EUC0ft2e9PjJB9Jzastz5ojPA4LzZ3Q4YbUc=
+oras.land/oras-go/v2 v2.0.2/go.mod h1:PWnWc/Kyyg7wUTUsDHshrsJkzuxXzreeMd6NrfdnFSo=
 rsc.io/pdf v0.1.1/go.mod h1:n8OzWcQ6Sp37PL01nO98y4iUCRdTGarVfzxY20ICaU4=
