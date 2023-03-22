@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/PhilippHeuer/in-toto-golang v0.0.0-20230312174602-51eebe404f7f
-	github.com/ProtonMail/gopenpgp/v2 v2.6.0
+	github.com/ProtonMail/gopenpgp/v2 v2.6.1
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20230220182032-4ef1992097c2
 	github.com/cidverse/normalizeci v1.1.1-0.20230309235853-827bdbcd100f
@@ -35,8 +35,8 @@ require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/Microsoft/go-winio v0.6.0 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8 // indirect
-	github.com/ProtonMail/go-mime v0.0.0-20221031134845-8fd9bc37cf08 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20230321155629-9a39f2531310 // indirect
+	github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
 	github.com/cloudflare/circl v1.3.2 // indirect
