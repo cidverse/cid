@@ -28,8 +28,8 @@ github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgIS
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
 github.com/cidverse/cidverseutils v0.0.0-20230322232014-2758105886d6 h1:eecZunOBlVCzYcxzIsFF6pdi8CqwXAHaHSa6ao73Ye4=
 github.com/cidverse/cidverseutils v0.0.0-20230322232014-2758105886d6/go.mod h1:dmw7MVgNTY8Qg29TXiqm5aar4k0pJjpEqqGwZi115NY=
-github.com/cidverse/normalizeci v1.1.1-0.20230320063559-f77d38cb3287 h1:05IoUOfcA+dgLN/nNWob2syrimubD2wbobDgG6SK8j8=
-github.com/cidverse/normalizeci v1.1.1-0.20230320063559-f77d38cb3287/go.mod h1:DeqoroA3v0y/31xQNioqzb6+P+yofmU54a6X79/l/4Q=
+github.com/cidverse/normalizeci/pkg v0.0.0-20230324215131-23d821d62461 h1:kjDBia1uGYnF14X+VuLudLaGuw/GLcLcLTvqQbN5Oy8=
+github.com/cidverse/normalizeci/pkg v0.0.0-20230324215131-23d821d62461/go.mod h1:hGbgeLNpfTQkyo1LaaLATXYo3nTJIA08omqs2ah4QEs=
 github.com/cidverse/repoanalyzer v0.0.0-20230304172651-0e0e53b403f4 h1:BkhxJ6M8oxJZYDiJSVZ7XwXE1/u74xyZ3KUy6e3pZ+M=
 github.com/cidverse/repoanalyzer v0.0.0-20230304172651-0e0e53b403f4/go.mod h1:gcmg09wuibs/30Y5e/PzYFbVvU9wnNJT+yqnIS2/NkM=
 github.com/cloudflare/circl v1.1.0/go.mod h1:prBCrKB9DV4poKZY1l9zBXg2QJY7mvgRvtMxxK7fi4I=
@@ -96,8 +96,8 @@ github.com/hashicorp/go-retryablehttp v0.7.2/go.mod h1:Jy/gPYAdjqffZ/yFGCFV2doI5
 github.com/hashicorp/go-version v1.6.0 h1:feTTfFNnjP967rlCxM/I9g701jU+RN74YKx2mOkIeek=
 github.com/hashicorp/go-version v1.6.0/go.mod h1:fltr4n8CU8Ke44wwGCBoEymUuxUHl09ZGVZPK5anwXA=
 github.com/imdario/mergo v0.3.13/go.mod h1:4lJ1jqUDcsbIECGy0RUJAXNIhg+6ocWgb1ALK2O4oXg=
-github.com/imdario/mergo v0.3.14 h1:fOqeC1+nCuuk6PKQdg9YmosXX7Y7mHX6R/0ZldI9iHo=
-github.com/imdario/mergo v0.3.14/go.mod h1:WBLT9ZmE3lPoWsEzCh9LPo3TiwVN+ZKEjmz+hD27ysY=
+github.com/imdario/mergo v0.3.15 h1:M8XP7IuFNsqUx6VPK2P9OSmsYsI/YFaGil0uD21V3dM=
+github.com/imdario/mergo v0.3.15/go.mod h1:WBLT9ZmE3lPoWsEzCh9LPo3TiwVN+ZKEjmz+hD27ysY=
 github.com/in-toto/in-toto-golang v0.7.0 h1:sSTxj28v8vEx7d7KB7pWfS5bkR9qB+6Zuee0cwW5v94=
 github.com/in-toto/in-toto-golang v0.7.0/go.mod h1:uL5siwLtGflIjlgOPh5j+GBKulIy+UL+LVDpe5d1AeM=
 github.com/inconshreveable/mousetrap v1.0.1/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
@@ -179,6 +179,7 @@ github.com/stoewer/go-strcase v1.2.1 h1:/1JWd+AcWPzkcGLEmjUCka99YqGOtTnp1H/wcP+u
 github.com/stoewer/go-strcase v1.2.1/go.mod h1:fAH5hQ5pehh+j3nZfvwdk2RgEgQjAoM8wodgtPmh1xo=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
+github.com/stretchr/objx v0.5.0 h1:1zr/of2m5FGMsad5YfcqgdqdWrIhu+EBEJRhR1U7z/c=
 github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=

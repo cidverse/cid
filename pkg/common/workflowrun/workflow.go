@@ -168,7 +168,11 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 	start := time.Now()
 	ruleContext := rules.GetRuleContext(ctx.Env)
 	if rules.AnyRuleMatches(action.Rules, ruleContext) {
-		log.Info().Str("action", action.ID).Msg("action start")
+		currentModule := "root"
+		if ctx.CurrentModule != nil {
+			currentModule = ctx.CurrentModule.Slug
+		}
+		log.Info().Str("action", action.ID).Str("module", currentModule).Msg("action start")
 		stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
 
 		// state: retrieve/init
@@ -209,7 +213,7 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		state.PersistStateToFile(stateFile, localState)
 
 		// complete
-		log.Info().Str("action", action.ID).Str("duration", time.Since(start).String()).Msg("action completed")
+		log.Info().Str("action", action.ID).Str("duration", time.Since(start).String()).Str("module", currentModule).Msg("action completed")
 	} else {
 		log.Debug().Str("action", action.ID).Msg("no workflow rule matches, not running action")
 	}

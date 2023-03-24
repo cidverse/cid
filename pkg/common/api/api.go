@@ -9,6 +9,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/secret"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/normalizeci/pkg/common"
+	"github.com/cidverse/normalizeci/pkg/ncispec"
 	ncimain "github.com/cidverse/normalizeci/pkg/normalizeci"
 	"github.com/rs/zerolog/log"
 )
@@ -25,7 +26,8 @@ func FindProjectDir() string {
 
 // GetCIDEnvironment returns the normalized ci variables
 func GetCIDEnvironment(configEnv map[string]string, projectDirectory string) map[string]string {
-	env := ncimain.RunDefaultNormalization()
+	spec := ncimain.Normalize()
+	env := ncispec.ToMap(spec)
 	for key := range env {
 		if !strings.HasPrefix(key, "NCI") {
 			delete(env, key)

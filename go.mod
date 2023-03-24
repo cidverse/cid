@@ -1,13 +1,13 @@
 module github.com/cidverse/cid
 
-go 1.19
+go 1.20
 
 require (
 	github.com/PhilippHeuer/in-toto-golang v0.0.0-20230312174602-51eebe404f7f
 	github.com/ProtonMail/gopenpgp/v2 v2.6.1
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20230322232014-2758105886d6
-	github.com/cidverse/normalizeci v1.1.1-0.20230320063559-f77d38cb3287
+	github.com/cidverse/normalizeci/pkg v0.0.0-20230324215131-23d821d62461
 	github.com/cidverse/repoanalyzer v0.0.0-20230304172651-0e0e53b403f4
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.13.0
@@ -56,7 +56,7 @@ require (
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.2 // indirect
-	github.com/imdario/mergo v0.3.14 // indirect
+	github.com/imdario/mergo v0.3.15 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
