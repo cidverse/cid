@@ -7,7 +7,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.6.1
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20230322232014-2758105886d6
-	github.com/cidverse/normalizeci/pkg v0.0.0-20230324215131-23d821d62461
+	github.com/cidverse/normalizeci/pkg v0.0.0-20230325154901-0b79e53dad6f
 	github.com/cidverse/repoanalyzer v0.0.0-20230304172651-0e0e53b403f4
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.13.0

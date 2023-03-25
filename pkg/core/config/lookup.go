@@ -10,7 +10,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/cidverseutils/pkg/version"
-	"github.com/cidverse/normalizeci/pkg/common"
+	"github.com/cidverse/normalizeci/pkg/normalizer/common"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
 )

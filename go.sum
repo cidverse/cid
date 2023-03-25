@@ -28,8 +28,8 @@ github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgIS
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
 github.com/cidverse/cidverseutils v0.0.0-20230322232014-2758105886d6 h1:eecZunOBlVCzYcxzIsFF6pdi8CqwXAHaHSa6ao73Ye4=
 github.com/cidverse/cidverseutils v0.0.0-20230322232014-2758105886d6/go.mod h1:dmw7MVgNTY8Qg29TXiqm5aar4k0pJjpEqqGwZi115NY=
-github.com/cidverse/normalizeci/pkg v0.0.0-20230324215131-23d821d62461 h1:kjDBia1uGYnF14X+VuLudLaGuw/GLcLcLTvqQbN5Oy8=
-github.com/cidverse/normalizeci/pkg v0.0.0-20230324215131-23d821d62461/go.mod h1:hGbgeLNpfTQkyo1LaaLATXYo3nTJIA08omqs2ah4QEs=
+github.com/cidverse/normalizeci/pkg v0.0.0-20230325154901-0b79e53dad6f h1:hBTaFmajlDQFekpXboBcGX/aXcXmnw/D/oeRagiFvXg=
+github.com/cidverse/normalizeci/pkg v0.0.0-20230325154901-0b79e53dad6f/go.mod h1:+bv+OyKxUx0QksAp9MPPH26FqyamikvH4ibruWMDTr0=
 github.com/cidverse/repoanalyzer v0.0.0-20230304172651-0e0e53b403f4 h1:BkhxJ6M8oxJZYDiJSVZ7XwXE1/u74xyZ3KUy6e3pZ+M=
 github.com/cidverse/repoanalyzer v0.0.0-20230304172651-0e0e53b403f4/go.mod h1:gcmg09wuibs/30Y5e/PzYFbVvU9wnNJT+yqnIS2/NkM=
 github.com/cloudflare/circl v1.1.0/go.mod h1:prBCrKB9DV4poKZY1l9zBXg2QJY7mvgRvtMxxK7fi4I=
