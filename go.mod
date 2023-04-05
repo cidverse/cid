@@ -10,7 +10,7 @@ require (
 	github.com/cidverse/normalizeci/pkg v0.0.0-20230325154901-0b79e53dad6f
 	github.com/cidverse/repoanalyzer v0.0.0-20230304172651-0e0e53b403f4
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/google/cel-go v0.13.0
+	github.com/google/cel-go v0.14.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/in-toto/in-toto-golang v0.7.1
@@ -39,6 +39,7 @@ require (
 	github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
+	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230305170008-8188dc5388df // indirect
 	github.com/cloudflare/circl v1.3.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
