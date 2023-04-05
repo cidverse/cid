@@ -13,7 +13,7 @@ require (
 	github.com/google/cel-go v0.13.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-version v1.6.0
-	github.com/in-toto/in-toto-golang v0.7.0
+	github.com/in-toto/in-toto-golang v0.7.1
 	github.com/jarcoal/httpmock v1.3.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/labstack/echo/v4 v4.10.2
