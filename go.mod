@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/PhilippHeuer/in-toto-golang v0.0.0-20230312174602-51eebe404f7f
-	github.com/ProtonMail/gopenpgp/v2 v2.6.1
+	github.com/ProtonMail/gopenpgp/v2 v2.7.0
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20230322232014-2758105886d6
 	github.com/cidverse/normalizeci/pkg v0.0.0-20230325154901-0b79e53dad6f
