@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/PhilippHeuer/in-toto-golang/in_toto/slsa_provenance/v1.0"
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/normalizeci/pkg/ncispec"
 	intoto "github.com/in-toto/in-toto-golang/in_toto"
 	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/common"
+	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1.0"
 )
 
 var WorkflowSource string
@@ -24,17 +24,17 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 	prov := v1.ProvenancePredicate{}
 
 	// builder
-	var resolvedDependencies []v1.ArtifactReference
-	resolvedDependencies = append(resolvedDependencies, v1.ArtifactReference{
+	var resolvedDependencies []v1.ResourceDescriptor
+	resolvedDependencies = append(resolvedDependencies, v1.ResourceDescriptor{
 		URI: fmt.Sprintf("%s+%s@%s", nci.RepositoryKind, nci.RepositoryRemote, nci.CommitRefType),
 		Digest: common.DigestSet{
 			"sha1": nci.CommitSha,
 		},
 	})
-	resolvedDependencies = append(resolvedDependencies, v1.ArtifactReference{
+	resolvedDependencies = append(resolvedDependencies, v1.ResourceDescriptor{
 		URI:              fmt.Sprintf("%s:%s", nci.WorkerType, nci.WorkerOS),
 		Digest:           nil,
-		LocalName:        "",
+		Name:             "",
 		DownloadLocation: "",
 		MediaType:        "",
 	})
@@ -52,7 +52,7 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 			"cid-workflow":        Workflow,
 			"source":              fmt.Sprintf("%s+%s@%s", nci.RepositoryKind, nci.RepositoryRemote, nci.CommitRefName),
 		},
-		SystemParameters:     systemParameters,
+		InternalParameters:   systemParameters,
 		ResolvedDependencies: resolvedDependencies,
 	}
 

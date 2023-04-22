@@ -10,10 +10,10 @@ import (
 	"path"
 	"strings"
 
-	"github.com/PhilippHeuer/in-toto-golang/in_toto/slsa_provenance/v1.0"
 	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/pkg/encoding"
+	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1.0"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
