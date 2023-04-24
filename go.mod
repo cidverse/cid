@@ -6,7 +6,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.7.1
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20230322232014-2758105886d6
-	github.com/cidverse/normalizeci/pkg v0.0.0-20230422101458-97c1831939a8
+	github.com/cidverse/normalizeci/pkg v0.0.0-20230424165527-5c1707aa2b24
 	github.com/cidverse/repoanalyzer v0.0.0-20230413161115-4a1696ae921c
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.14.0
@@ -49,7 +49,7 @@ require (
 	github.com/go-playground/validator/v10 v10.12.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/go-github/v51 v51.0.0 // indirect
+	github.com/google/go-github/v52 v52.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gosimple/slug v1.13.1 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect

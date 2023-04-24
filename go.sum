@@ -12,8 +12,6 @@ github.com/ProtonMail/go-crypto v0.0.0-20230417170513-8ee5748c52b5 h1:QXMwHM/lB4
 github.com/ProtonMail/go-crypto v0.0.0-20230417170513-8ee5748c52b5/go.mod h1:8TI4H3IbrackdNgv+92dI+rhpCaLqM0IfpgCgenFvRE=
 github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f h1:tCbYj7/299ekTTXpdwKYF8eBlsYsDVoggDAuAjoK66k=
 github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f/go.mod h1:gcr0kNtGBqin9zDW9GOHcVntrwnjrK+qdJ06mWYBybw=
-github.com/ProtonMail/gopenpgp/v2 v2.7.0 h1:TUH6csU8OpRtA5EKU8yoAXn8M5Inh2T4Y086lKFFyS8=
-github.com/ProtonMail/gopenpgp/v2 v2.7.0/go.mod h1:/BU5gfAVwqyd8EfC3Eu7zmuhwYQpKs+cGD8M//iiaxs=
 github.com/ProtonMail/gopenpgp/v2 v2.7.1 h1:Awsg7MPc2gD3I7IFac2qE3Gdls0lZW8SzrFZ3k1oz0s=
 github.com/ProtonMail/gopenpgp/v2 v2.7.1/go.mod h1:/BU5gfAVwqyd8EfC3Eu7zmuhwYQpKs+cGD8M//iiaxs=
 github.com/acomagu/bufpipe v1.0.4 h1:e3H4WUzM3npvo5uv95QuJM3cQspFNtFBzvJ2oNjKIDQ=
@@ -29,8 +27,8 @@ github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgIS
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
 github.com/cidverse/cidverseutils v0.0.0-20230322232014-2758105886d6 h1:eecZunOBlVCzYcxzIsFF6pdi8CqwXAHaHSa6ao73Ye4=
 github.com/cidverse/cidverseutils v0.0.0-20230322232014-2758105886d6/go.mod h1:dmw7MVgNTY8Qg29TXiqm5aar4k0pJjpEqqGwZi115NY=
-github.com/cidverse/normalizeci/pkg v0.0.0-20230422101458-97c1831939a8 h1:vj8/tf/I5v2rG1aJps0CDrxLn0zckI2NVccwp6P3bHQ=
-github.com/cidverse/normalizeci/pkg v0.0.0-20230422101458-97c1831939a8/go.mod h1:YYF33B9nU7l1tUVqEJsK+anQQUcAawtHN0f4hhl26MU=
+github.com/cidverse/normalizeci/pkg v0.0.0-20230424165527-5c1707aa2b24 h1:g0NLr5GulDR3PUy+4/g4Yo9E19tTx6vrmKSDL3kIKvA=
+github.com/cidverse/normalizeci/pkg v0.0.0-20230424165527-5c1707aa2b24/go.mod h1:6/rJjGMd8xh/IYTFl0Y4mfyV5PEx0Ss4EsbfdLRFDlw=
 github.com/cidverse/repoanalyzer v0.0.0-20230413161115-4a1696ae921c h1:UJImQqkgm3DqUxr8AUj6InsPjXYhk/yJxPGcEliEI0o=
 github.com/cidverse/repoanalyzer v0.0.0-20230413161115-4a1696ae921c/go.mod h1:rZ2P5bs/udCi+YLiSF22bAZjZ1HTwV9HEFLf4iBT7Yw=
 github.com/cloudflare/circl v1.1.0/go.mod h1:prBCrKB9DV4poKZY1l9zBXg2QJY7mvgRvtMxxK7fi4I=
@@ -78,8 +76,8 @@ github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
-github.com/google/go-github/v51 v51.0.0 h1:KCjsbgPV28VoRftdP+K2mQL16jniUsLAJknsOVKwHyU=
-github.com/google/go-github/v51 v51.0.0/go.mod h1:kZj/rn/c1lSUbr/PFWl2hhusPV7a5XNYKcwPrd5L3Us=
+github.com/google/go-github/v52 v52.0.0 h1:uyGWOY+jMQ8GVGSX8dkSwCzlehU3WfdxQ7GweO/JP7M=
+github.com/google/go-github/v52 v52.0.0/go.mod h1:WJV6VEEUPuMo5pXqqa2ZCZEdbQqua4zAk2MZTIo+m+4=
 github.com/google/go-querystring v1.1.0 h1:AnCroh3fv4ZBgVIf1Iwtovgjaw/GiKJo8M8yD/fhyJ8=
 github.com/google/go-querystring v1.1.0/go.mod h1:Kcdr2DB4koayq7X8pmAG4sNG59So17icRSOU623lUBU=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
