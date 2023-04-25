@@ -9,7 +9,7 @@ import (
 	"github.com/cidverse/normalizeci/pkg/ncispec"
 	intoto "github.com/in-toto/in-toto-golang/in_toto"
 	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/common"
-	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1.0"
+	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1"
 )
 
 var WorkflowSource string
@@ -57,7 +57,7 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 	}
 
 	// run details
-	prov.RunDetails = v1.ProvenanaceRunDetails{
+	prov.RunDetails = v1.ProvenanceRunDetails{
 		Builder: v1.Builder{
 			ID:                  fmt.Sprintf("https://github.com/cidverse/cid@%s", "0.0.0"),
 			Version:             nil,
