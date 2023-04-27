@@ -3,6 +3,7 @@ package catalog
 type ContainerImage struct {
 	Repository string           `yaml:"repository,omitempty"`
 	Image      string           `yaml:"image"`
+	Digest     string           `yaml:"digest,omitempty"`
 	Provides   []ProvidedBinary `yaml:"provides"`
 	Cache      []ImageCache     `yaml:"cache,omitempty"`
 	Security   Security         `yaml:"security,omitempty"`

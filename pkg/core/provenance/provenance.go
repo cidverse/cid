@@ -32,12 +32,31 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 		},
 	})
 	resolvedDependencies = append(resolvedDependencies, v1.ResourceDescriptor{
-		URI:              fmt.Sprintf("%s:%s", nci.WorkerType, nci.WorkerOS),
-		Digest:           nil,
-		Name:             "",
-		DownloadLocation: "",
-		MediaType:        "",
+		URI:  fmt.Sprintf("%s:%s:%s", nci.WorkerType, nci.WorkerOS, nci.WorkerVersion),
+		Name: fmt.Sprintf("%s:%s", nci.WorkerType, nci.WorkerOS),
 	})
+
+	for _, record := range state.AuditLog {
+		if record.Type == "action" {
+			resolvedDependencies = append(resolvedDependencies, v1.ResourceDescriptor{
+				URI: record.Payload["uri"],
+				Digest: map[string]string{
+					"sha1": record.Payload["digest"],
+				},
+				Name:      record.Payload["action"],
+				MediaType: "application/vnd.oci.image.index.v1+json",
+			})
+		} else if record.Type == "command" {
+			resolvedDependencies = append(resolvedDependencies, v1.ResourceDescriptor{
+				URI: record.Payload["uri"],
+				Digest: map[string]string{
+					"sha1": record.Payload["digest"],
+				},
+				Name:      record.Payload["binary"],
+				MediaType: "application/vnd.oci.image.index.v1+json",
+			})
+		}
+	}
 
 	var systemParameters = map[string]string{
 		"RUNNER": fmt.Sprintf("%s:%s", nci.WorkerType, nci.WorkerOS),
@@ -60,7 +79,7 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 	prov.RunDetails = v1.ProvenanceRunDetails{
 		Builder: v1.Builder{
 			ID:                  fmt.Sprintf("https://github.com/cidverse/cid@%s", "0.0.0"),
-			Version:             nil,
+			Version:             map[string]string{},
 			BuilderDependencies: nil,
 		},
 		BuildMetadata: v1.BuildMetadata{

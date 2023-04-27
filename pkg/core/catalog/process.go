@@ -33,6 +33,7 @@ func ProcessCatalog(catalog *Config) *Config {
 				version := tagToVersion(tag.Tag)
 				image := sourceImage
 				image.Image = strings.ReplaceAll(image.Image, "${{TAG}}", tag.Tag)
+				image.Digest = tag.Digest
 				var providedBinary []ProvidedBinary
 				for _, p := range image.Provides {
 					providedBinary = append(providedBinary, ProvidedBinary{
