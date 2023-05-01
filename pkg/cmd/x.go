@@ -14,6 +14,7 @@ import (
 func init() {
 	rootCmd.AddCommand(xCmd)
 	xCmd.Flags().StringArrayP("env", "e", []string{}, "append to command environment")
+	xCmd.Flags().IntSliceP("port", "p", []int{}, "ports to expose")
 }
 
 var xCmd = &cobra.Command{
@@ -34,8 +35,11 @@ var xCmd = &cobra.Command{
 			env[parts[0]] = parts[1]
 		}
 
+		// ports
+		ports, _ := cmd.Flags().GetIntSlice("port")
+
 		// execute command
-		_, _, _, err := command.RunAPICommand(strings.Join(args, " "), env, projectDir, workDir, false, nil, "")
+		_, _, _, err := command.RunAPICommand(strings.Join(args, " "), env, projectDir, workDir, false, ports, "")
 		if err != nil {
 			log.Fatal().Err(err).Msg("command failed")
 		}
