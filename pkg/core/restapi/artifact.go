@@ -8,10 +8,15 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/cidverse/cid/pkg/core/util"
+	"github.com/cidverse/cidverseutils/pkg/archive/tar"
+	"github.com/cidverse/cidverseutils/pkg/archive/zip"
 	"github.com/cidverse/cidverseutils/pkg/encoding"
 	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1"
 	"github.com/labstack/echo/v4"
@@ -54,18 +59,15 @@ func (hc *APIConfig) artifactList(c echo.Context) error {
 
 // artifactUpload uploads a report (typically from code scanning)
 func (hc *APIConfig) artifactUpload(c echo.Context) error {
-	moduleSlug := c.FormValue("module")
+	moduleSlug := util.GetStringOrDefault(c.FormValue("module"), "root")
 	fileType := c.FormValue("type")
 	format := c.FormValue("format")
 	formatVersion := c.FormValue("format_version")
+	extractFile := util.GetStringOrDefault(c.FormValue("extract_file"), "false")
+	extractFileBool, _ := strconv.ParseBool(extractFile)
 	file, err := c.FormFile("file")
 	if err != nil {
 		return err
-	}
-
-	// module is required, default to root
-	if moduleSlug == "" {
-		moduleSlug = "root"
 	}
 
 	// reader
@@ -76,7 +78,7 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 	defer src.Close()
 
 	// store
-	fileHash, err := hc.storeArtifact(moduleSlug, fileType, format, formatVersion, file.Filename, src)
+	fileHash, err := hc.storeArtifact(moduleSlug, fileType, format, formatVersion, file.Filename, src, extractFileBool)
 	if err != nil {
 		return err
 	}
@@ -91,7 +93,7 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 			return provErr
 		}
 
-		_, err = hc.storeArtifact(moduleSlug, "attestation", "provenance", v1.PredicateSLSAProvenance, file.Filename, bytes.NewReader(provJSON))
+		_, err = hc.storeArtifact(moduleSlug, "attestation", "provenance", v1.PredicateSLSAProvenance, file.Filename, bytes.NewReader(provJSON), false)
 		if err != nil {
 			return err
 		}
@@ -125,16 +127,17 @@ func (hc *APIConfig) artifactDownload(c echo.Context) error {
 }
 
 // storeArtifact stores an artifact on the local filesystem
-func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format string, formatVersion string, name string, content io.Reader) (string, error) {
+func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format string, formatVersion string, name string, content io.Reader, extract bool) (string, error) {
 	var hashReader bytes.Buffer
 	contentReader := io.TeeReader(content, &hashReader)
 
 	// target dir
 	targetDir := path.Join(hc.ArtifactDir, moduleSlug, fileType)
+	targetFile := path.Join(targetDir, name)
 	_ = os.MkdirAll(targetDir, os.ModePerm)
 
 	// store file
-	dst, err := os.Create(path.Join(hc.ArtifactDir, moduleSlug, fileType, name))
+	dst, err := os.Create(targetFile)
 	if err != nil {
 		return "", err
 	}
@@ -160,6 +163,25 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 		Format:        format,
 		FormatVersion: formatVersion,
 		SHA256:        fileHash,
+	}
+
+	// allow to extract assets (github pages, gitlab pages, etc.)
+	if extract {
+		extractTargetDir := path.Join(targetDir, strings.TrimSuffix(name, filepath.Ext(name)))
+		_ = os.MkdirAll(extractTargetDir, os.ModePerm)
+
+		log.Debug().Str("target_dir", extractTargetDir).Str("format", format).Msg("extracting artifact archive")
+		if format == "tar" {
+			err := tar.Extract(targetFile, extractTargetDir)
+			if err != nil {
+				return "", err
+			}
+		} else if format == "zip" {
+			err := zip.Extract(targetFile, extractTargetDir)
+			if err != nil {
+				return "", err
+			}
+		}
 	}
 
 	return fileHash, nil

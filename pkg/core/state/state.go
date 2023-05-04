@@ -11,6 +11,7 @@ type ActionArtifactType string
 const (
 	ActionArtifactTypeBinary ActionArtifactType = "binary"
 	ActionArtifactTypeReport ActionArtifactType = "report"
+	ActionArtifactTypeHTML   ActionArtifactType = "html"
 )
 
 // ActionArtifact contains information about generated artifacts

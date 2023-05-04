@@ -10,7 +10,6 @@ import (
 type ImageTag struct {
 	Repository string `json:"repository"`
 	Tag        string `json:"tag"`
-	Digest     string `json:"digest"`
 }
 
 func FindTags(repositoryURL string) ([]ImageTag, error) {
@@ -30,7 +29,7 @@ func FindTags(repositoryURL string) ([]ImageTag, error) {
 	// add tags to list
 	tags := make([]ImageTag, 0, len(tagList))
 	for _, tag := range tagList {
-		tags = append(tags, ImageTag{Repository: repositoryURL, Tag: tag, Digest: ""})
+		tags = append(tags, ImageTag{Repository: repositoryURL, Tag: tag})
 	}
 
 	return tags, nil

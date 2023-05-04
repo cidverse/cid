@@ -32,8 +32,20 @@ func ProcessCatalog(catalog *Config) *Config {
 
 				version := tagToVersion(tag.Tag)
 				image := sourceImage
+
+				// overwrite image
 				image.Image = strings.ReplaceAll(image.Image, "${{TAG}}", tag.Tag)
-				image.Digest = tag.Digest
+
+				// find digest
+				/*
+					// TODO: make this toggleable
+					digest, err := registry.GetArtifactDigest(image.Image)
+					if err != nil {
+						log.Warn().Err(err).Str("repository", sourceImage.Source.RegistryURL).Str("image", image.Image).Msg("failed to query digest for image")
+					}
+					image.Digest = digest
+				*/
+
 				var providedBinary []ProvidedBinary
 				for _, p := range image.Provides {
 					providedBinary = append(providedBinary, ProvidedBinary{

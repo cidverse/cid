@@ -14,6 +14,14 @@ func GetUserConfigDirectory() string {
 	return getUnixUserConfigDirectory()
 }
 
+func GetStringOrDefault(value string, defaultValue string) string {
+	if value == "" {
+		return defaultValue
+	}
+
+	return value
+}
+
 func getWindowsUserConfigDirectory() string {
 	cacheDir, _ := os.UserCacheDir()
 	dir := filepath.Join(cacheDir, "cid")
