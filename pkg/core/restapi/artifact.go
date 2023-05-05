@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cidverse/cid/pkg/core/expression"
 	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/core/util"
@@ -27,31 +28,28 @@ import (
 // artifactList lists all generated reports
 func (hc *APIConfig) artifactList(c echo.Context) error {
 	var result = make([]state.ActionArtifact, 0)
-	module := c.QueryParam("module")
-	artifactType := c.QueryParam("type")
-	name := c.QueryParam("name")
-	format := c.QueryParam("format")
-	formatVersion := c.QueryParam("format_version")
+
+	// query expression
+	expr := util.GetStringOrDefault(c.QueryParam("query"), "true")
 
 	// filter artifacts
+	log.Debug().Str("query", expr).Msg("querying artifact list")
 	for _, artifact := range hc.State.Artifacts {
-		if len(module) > 0 && module != artifact.Module {
-			continue
-		}
-		if len(artifactType) > 0 && artifactType != string(artifact.Type) {
-			continue
-		}
-		if len(name) > 0 && name != artifact.Name {
-			continue
-		}
-		if len(format) > 0 && format != artifact.Format {
-			continue
-		}
-		if len(formatVersion) > 0 && formatVersion != artifact.FormatVersion {
-			continue
+		add, err := expression.EvalBooleanExpression(expr, map[string]interface{}{
+			"id":             artifact.ArtifactID,
+			"module":         artifact.Module,
+			"artifact_type":  artifact.Type,
+			"name":           artifact.Name,
+			"format":         artifact.Format,
+			"format_version": artifact.FormatVersion,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to evaluate query [%s]: %w", expr, err)
 		}
 
-		result = append(result, artifact)
+		if add {
+			result = append(result, artifact)
+		}
 	}
 
 	return c.JSON(http.StatusOK, result)
@@ -153,7 +151,7 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 		JobID:         hc.JobID,
 		ArtifactID:    fmt.Sprintf("%s|%s|%s", moduleSlug, fileType, name),
 		Module:        moduleSlug,
-		Type:          state.ActionArtifactType(fileType),
+		Type:          fileType,
 		Name:          name,
 		Format:        format,
 		FormatVersion: formatVersion,

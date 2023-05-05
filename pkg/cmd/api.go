@@ -51,7 +51,7 @@ cid api --type http --listen localhost:7400`,
 		}
 
 		// state
-		stateFile := filepath.Join(projectDir, ".tmp", "state.json")
+		stateFile := filepath.Join(projectDir, ".dist", "state.json")
 		localState := state.GetStateFromFile(stateFile)
 
 		// start api

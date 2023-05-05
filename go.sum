@@ -27,8 +27,8 @@ github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgIS
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
 github.com/cidverse/cidverseutils v0.0.0-20230502162205-0dc75f0de724 h1:gs7j1sdbJiYhoH94iPUvi6uGsT2ckXxx9/sUI2qx2Z8=
 github.com/cidverse/cidverseutils v0.0.0-20230502162205-0dc75f0de724/go.mod h1:U0fETHkZhDcPfUSArfxwYQiw7SisClXg+A6clzCtAPk=
-github.com/cidverse/normalizeci/pkg v0.0.0-20230429230237-a053c51d5243 h1:qGLV/65nhcoa+kzPYyq3spFkvFmxKqqt0ixGutgwYzE=
-github.com/cidverse/normalizeci/pkg v0.0.0-20230429230237-a053c51d5243/go.mod h1:S14bio6rMUkKq8ZHkcSAQooRha3dx8BBOEU3Y+FRNm8=
+github.com/cidverse/normalizeci/pkg v0.0.0-20230505191432-f917440ef88d h1:mn1bQuo91x+fWwhguN5tbA8xmV07vkxs2arLYo+Y6us=
+github.com/cidverse/normalizeci/pkg v0.0.0-20230505191432-f917440ef88d/go.mod h1:uk713+/Rz5nEb1qE/aT9kEZcyJe3Os+HzEeZ+Vf/4Uw=
 github.com/cidverse/repoanalyzer v0.0.0-20230413161115-4a1696ae921c h1:UJImQqkgm3DqUxr8AUj6InsPjXYhk/yJxPGcEliEI0o=
 github.com/cidverse/repoanalyzer v0.0.0-20230413161115-4a1696ae921c/go.mod h1:rZ2P5bs/udCi+YLiSF22bAZjZ1HTwV9HEFLf4iBT7Yw=
 github.com/cloudflare/circl v1.1.0/go.mod h1:prBCrKB9DV4poKZY1l9zBXg2QJY7mvgRvtMxxK7fi4I=
@@ -70,8 +70,6 @@ github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5y
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
 github.com/golang/protobuf v1.5.3 h1:KhyjKVUg7Usr/dYsdSqoFveMYd5ko72D+zANwlG1mmg=
 github.com/golang/protobuf v1.5.3/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiuN0vRsmY=
-github.com/google/cel-go v0.15.0 h1:OLNhWn8gPWnQz78aSp8RWjCV4sMVHciQqHj53adYUGU=
-github.com/google/cel-go v0.15.0/go.mod h1:YzWEoI07MC/a/wj9in8GeVatqfypkldgBlwXh9bCwqY=
 github.com/google/cel-go v0.15.1 h1:iTgVZor2x9okXtmTrqO8cg4uvqIeaBcWhXtruaWFMYQ=
 github.com/google/cel-go v0.15.1/go.mod h1:YzWEoI07MC/a/wj9in8GeVatqfypkldgBlwXh9bCwqY=
 github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=

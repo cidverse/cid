@@ -6,25 +6,17 @@ import (
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
-type ActionArtifactType string
-
-const (
-	ActionArtifactTypeBinary ActionArtifactType = "binary"
-	ActionArtifactTypeReport ActionArtifactType = "report"
-	ActionArtifactTypeHTML   ActionArtifactType = "html"
-)
-
 // ActionArtifact contains information about generated artifacts
 type ActionArtifact struct {
-	BuildID       string             `json:"build_id"`
-	JobID         string             `json:"job_id"`
-	ArtifactID    string             `json:"artifact_id"`
-	Module        string             `json:"module"`
-	Type          ActionArtifactType `json:"type"`
-	Name          string             `json:"name"`
-	Format        string             `json:"format"`
-	FormatVersion string             `json:"format_version"`
-	SHA256        string             `json:"sha256"`
+	BuildID       string `json:"build_id"`
+	JobID         string `json:"job_id"`
+	ArtifactID    string `json:"id"`
+	Module        string `json:"module"`
+	Type          string `json:"type"`
+	Name          string `json:"name"`
+	Format        string `json:"format"`
+	FormatVersion string `json:"format_version"`
+	SHA256        string `json:"sha256"`
 }
 
 // AuditEvents contains information about all steps that were part of the build and deployment process
