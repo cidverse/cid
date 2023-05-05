@@ -10,8 +10,14 @@ on:
     tags:
       - 'v*.*.*'
     paths-ignore:
-      - ".gitignore"
-      - ".editorconfig"
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.editorconfig'
+      - 'renovate.json'
+  pull_request:
+    branches:
+      - 'main'
 
 jobs:
   check:

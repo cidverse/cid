@@ -105,14 +105,9 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 // artifactDownload uploads a report (typically from code scanning)
 func (hc *APIConfig) artifactDownload(c echo.Context) error {
 	id := c.QueryParam("id")
-	moduleSlug := c.QueryParam("module")
+	moduleSlug := util.GetStringOrDefault(c.FormValue("module"), "root")
 	fileType := c.QueryParam("type")
 	name := c.QueryParam("name")
-
-	// module is required, default to root
-	if moduleSlug == "" {
-		moduleSlug = "root"
-	}
 
 	// if set, use id
 	if len(id) > 0 {
