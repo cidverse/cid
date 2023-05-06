@@ -27,13 +27,12 @@ import (
 
 // artifactList lists all generated reports
 func (hc *APIConfig) artifactList(c echo.Context) error {
-	var result = make([]state.ActionArtifact, 0)
-
-	// query expression
+	// parameters
 	expr := util.GetStringOrDefault(c.QueryParam("query"), "true")
+	log.Debug().Str("query", expr).Msg("[API] artifact list query")
 
 	// filter artifacts
-	log.Debug().Str("query", expr).Msg("querying artifact list")
+	var result = make([]state.ActionArtifact, 0)
 	for _, artifact := range hc.State.Artifacts {
 		add, err := expression.EvalBooleanExpression(expr, map[string]interface{}{
 			"id":             artifact.ArtifactID,
@@ -67,6 +66,7 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	log.Debug().Str("module", moduleSlug).Str("type", fileType).Str("format", format).Str("format_version", formatVersion).Str("extract_file", extractFile).Msg("[API] artifact upload")
 
 	// reader
 	src, err := file.Open()
@@ -103,19 +103,18 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 // artifactDownload uploads a report (typically from code scanning)
 func (hc *APIConfig) artifactDownload(c echo.Context) error {
 	id := c.QueryParam("id")
-	moduleSlug := util.GetStringOrDefault(c.FormValue("module"), "root")
-	fileType := c.QueryParam("type")
-	name := c.QueryParam("name")
+	log.Debug().Str("id", id).Msg("[API] artifact download")
 
-	// if set, use id
-	if len(id) > 0 {
-		parts := strings.SplitN(id, "|", 3)
-		moduleSlug = parts[0]
-		fileType = parts[1]
-		name = parts[2]
+	artifact, present := hc.State.Artifacts[id]
+	if !present {
+		return c.JSON(http.StatusBadRequest, apiError{
+			Status:  404,
+			Title:   "artifact not found",
+			Details: fmt.Sprintf("artifact with id [%s] not found", id),
+		})
 	}
 
-	artifactFile := path.Join(hc.ArtifactDir, moduleSlug, fileType, name)
+	artifactFile := path.Join(hc.ArtifactDir, artifact.Module, artifact.Type, artifact.Name)
 	return c.File(artifactFile)
 }
 

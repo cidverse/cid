@@ -9,7 +9,9 @@ import (
 
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 )
 
 type executeRequest struct {
@@ -32,12 +34,8 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 			Details: "bad request, " + err.Error(),
 		})
 	}
-
-	// configuration
-	execDir := hc.ProjectDir
-	if req.WorkDir != "" {
-		execDir = req.WorkDir
-	}
+	execDir := util.GetStringOrDefault(req.WorkDir, hc.ProjectDir)
+	log.Debug().Str("work_dir", execDir).Str("constraint", req.Constraint).Str("command", req.Command).Interface("env", req.Env).Msg("[API] execute command")
 
 	// command env
 	var commandEnv = make(map[string]string)
