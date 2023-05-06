@@ -146,7 +146,7 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 	}
 
 	// store into state
-	hc.State.Artifacts[moduleSlug+"/"+name] = state.ActionArtifact{
+	hc.State.Artifacts[fmt.Sprintf("%s|%s|%s", moduleSlug, fileType, name)] = state.ActionArtifact{
 		BuildID:       hc.BuildID,
 		JobID:         hc.JobID,
 		ArtifactID:    fmt.Sprintf("%s|%s|%s", moduleSlug, fileType, name),
