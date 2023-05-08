@@ -15,7 +15,15 @@ const (
 )
 
 type ActionAccess struct {
-	Env []string `yaml:"env"`
+	Env []EnvAccess `yaml:"env"`
+}
+
+type EnvAccess struct {
+	Value       string `yaml:"value"`       // Value of the property
+	Pattern     bool   `yaml:"pattern"`     // Pattern is a flag to indicate if the value is a regular expression
+	Description string `yaml:"description"` // Description of the property
+	Required    bool   `yaml:"required"`    // Required is a flag to indicate if the property is required
+	Internal    bool   `yaml:"internal"`    // Internal is a flag to indicates if the property should be documented
 }
 
 type ContainerAction struct {

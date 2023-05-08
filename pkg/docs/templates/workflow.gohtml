@@ -1,0 +1,13 @@
+# {{ .Name }}
+
+{{ .Description }}
+
+{{ range .Stages }}
+## {{.Name}}
+
+### Steps
+
+{{ range .Actions }}
+- {{ .ID }}
+{{ end }}
+{{ end }}

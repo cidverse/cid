@@ -1,0 +1,27 @@
+# {{ .Name }}
+
+{{ .Description }}
+
+## Rules
+
+{{ if .Rules -}}
+One or multiple of the following rules must be satisfied for the action to be executed.
+
+{{ range .Rules -}}
+- {{.Expression}}
+{{- end -}}
+{{- else }}
+This action will always be executed.
+{{- end }}
+
+## Configuration
+
+{{ if .Rules -}}
+| Property | Description |
+|---|---|
+{{ range .Access.Env -}}
+| {{ .Value }} | {{ .Description }} |
+{{ end -}}
+{{- else }}
+No configuration is required.
+{{- end }}

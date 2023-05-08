@@ -29,11 +29,12 @@ type WorkflowStage struct {
 }
 
 type Workflow struct {
-	Repository string          `yaml:"repository,omitempty"`
-	Name       string          `required:"true" yaml:"name,omitempty"`
-	Version    string          `yaml:"version,omitempty"`
-	Rules      []WorkflowRule  `yaml:"rules,omitempty"`
-	Stages     []WorkflowStage `yaml:"stages,omitempty"`
+	Repository  string          `yaml:"repository,omitempty"`
+	Name        string          `required:"true" yaml:"name,omitempty"`
+	Description string          `yaml:"description,omitempty"`
+	Version     string          `yaml:"version,omitempty"`
+	Rules       []WorkflowRule  `yaml:"rules,omitempty"`
+	Stages      []WorkflowStage `yaml:"stages,omitempty"`
 }
 
 // ActionCount returns the total count of actions across all stages
