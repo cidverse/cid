@@ -1,0 +1,10 @@
+# Action Catalog
+
+A full catalog of all the actions available, organized by category.
+
+{{ range $key, $value := .Categories }}
+## {{ $key }}
+{{ range $value }}
+- [{{ .Name }}]({{ .Name }}.md)
+{{- end }}
+{{ end }}

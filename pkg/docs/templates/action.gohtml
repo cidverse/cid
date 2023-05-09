@@ -6,21 +6,20 @@
 
 {{ if .Rules -}}
 One or multiple of the following rules must be satisfied for the action to be executed.
-
-{{ range .Rules -}}
-- {{.Expression}}
-{{- end -}}
+{{ range .Rules }}
+- `{{.Expression}}`
+{{- end }}
 {{- else }}
 This action will always be executed.
 {{- end }}
 
 ## Configuration
 
-{{ if .Rules -}}
+{{ if and .Access .Access.Env -}}
 | Property | Description |
 |---|---|
 {{ range .Access.Env -}}
-| {{ .Value }} | {{ .Description }} |
+| `{{ .Value }}`{{ if .Required }}*{{ end }} | {{ .Description }} |
 {{ end -}}
 {{- else }}
 No configuration is required.

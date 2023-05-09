@@ -28,7 +28,7 @@ var docsCmd = &cobra.Command{
 		catalogSources := catalog.LoadSources()
 		data := catalog.LoadCatalogs(catalogSources)
 
-		// workflows
+		// docs: workflows
 		for _, workflow := range data.Workflows {
 			out, err := docs.GenerateWorkflow(workflow)
 			if err != nil {
@@ -37,6 +37,9 @@ var docsCmd = &cobra.Command{
 
 			filesystem.SaveFileText(path.Join(outputDir, "workflows", fmt.Sprintf("%s.md", workflow.Name)), out)
 		}
+
+		// docs: actions
+		var actions []catalog.Action
 		for _, action := range data.Actions {
 			if strings.HasSuffix(action.Name, "-start") {
 				continue
@@ -48,6 +51,14 @@ var docsCmd = &cobra.Command{
 			}
 
 			filesystem.SaveFileText(path.Join(outputDir, "actions", fmt.Sprintf("%s.md", action.Name)), out)
+			actions = append(actions, action)
 		}
+
+		// docs: action index
+		out, err := docs.GenerateActionIndex(actions)
+		if err != nil {
+			log.Fatal().Err(err).Msg("failed to generate action index page")
+		}
+		filesystem.SaveFileText(path.Join(outputDir, "actions", "index.md"), out)
 	},
 }

@@ -35,6 +35,7 @@ type ContainerAction struct {
 type Action struct {
 	Repository  string          `yaml:"repository,omitempty"`
 	Name        string          `required:"true" yaml:"name"`
+	Category    string          `yaml:"category,omitempty"`
 	Enabled     bool            `default:"true" yaml:"enabled,omitempty"`
 	Type        ActionType      `required:"true" yaml:"type"`
 	Container   ContainerAction `yaml:"container,omitempty"` // Container contains the configuration for containerized actions

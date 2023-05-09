@@ -3,11 +3,9 @@
 {{ .Description }}
 
 {{ range .Stages }}
-## {{.Name}}
+## Stage: {{.Name}}
 
-### Steps
-
-{{ range .Actions }}
-- {{ .ID }}
-{{ end }}
-{{ end }}
+{{ range .Actions -}}
+- [{{ slice .ID 4}}](../actions/{{ slice .ID 4}}.md)
+{{ end -}}
+{{- end -}}
