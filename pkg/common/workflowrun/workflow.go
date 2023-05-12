@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/cidverse/cid/pkg/core/actionexecutor"
@@ -173,10 +174,9 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 			currentModule = ctx.CurrentModule.Slug
 		}
 		log.Info().Str("action", action.ID).Str("module", currentModule).Msg("action start")
-		stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
 
 		// state: retrieve/init
-		localState := state.GetStateFromFile(stateFile)
+		localState := state.GetStateFromDirectory(ctx.Paths.Artifact)
 		localState.Modules = ctx.Modules
 
 		// add action to log
@@ -210,6 +210,10 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		}
 
 		// state: store
+		stateFile := filepath.Join(ctx.Paths.Artifact, "state.json")
+		if !strings.HasPrefix(ctx.Env["NCI_SERVICE_SLUG"], "local") {
+			stateFile = filepath.Join(ctx.Paths.Artifact, fmt.Sprintf("state-%s.json", ctx.Env["NCI_PIPELINE_JOB_ID"]))
+		}
 		state.PersistStateToFile(stateFile, localState)
 
 		// complete

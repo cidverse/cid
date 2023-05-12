@@ -19,7 +19,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
-	_ "github.com/cidverse/cidverseutils/pkg/cihelper"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/cidverse/cidverseutils/pkg/network"
 	"github.com/google/uuid"
