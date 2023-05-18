@@ -8,11 +8,11 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/cidverse/normalizeci/pkg/normalizer/api"
 	"github.com/samber/lo"
 
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
-	"github.com/cidverse/normalizeci/pkg/normalizer/common"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
@@ -85,7 +85,7 @@ func RegisterBuiltinAction(action ActionStep) {
 // GetActionContext gets the action context, this operation is expensive and should only be called once per execution
 func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, env map[string]string, access *catalog.ActionAccess) ActionExecutionContext {
 	finalEnv := make(map[string]string)
-	fullEnv := lo.Assign(env, common.GetMachineEnvironment())
+	fullEnv := lo.Assign(env, api.GetMachineEnvironment())
 
 	// user
 	currentUser, _ := user.Current()

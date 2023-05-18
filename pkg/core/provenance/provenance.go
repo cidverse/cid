@@ -6,7 +6,8 @@ import (
 
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/state"
-	"github.com/cidverse/normalizeci/pkg/ncispec"
+	"github.com/cidverse/normalizeci/pkg/envstruct"
+	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
 	intoto "github.com/in-toto/in-toto-golang/in_toto"
 	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/common"
 	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1"
@@ -16,9 +17,10 @@ var WorkflowSource string
 var Workflow string
 
 func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v1.ProvenancePredicate {
-	nci := ncispec.OfMap(env)
+	var nci nci.Spec
+	envstruct.EnvMapToStruct(&nci, env)
 
-	startedAt, _ := time.Parse(time.RFC3339, nci.PipelineJobStartedAt)
+	startedAt, _ := time.Parse(time.RFC3339, nci.Pipeline.JobStartedAt)
 	startedAt = startedAt.UTC()
 	finishedAt := time.Now().UTC()
 	prov := v1.ProvenancePredicate{}
@@ -26,14 +28,14 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 	// builder
 	var resolvedDependencies []v1.ResourceDescriptor
 	resolvedDependencies = append(resolvedDependencies, v1.ResourceDescriptor{
-		URI: fmt.Sprintf("%s+%s@%s", nci.RepositoryKind, nci.RepositoryRemote, nci.CommitRefType),
+		URI: fmt.Sprintf("%s+%s@%s", nci.Repository.Kind, nci.Repository.Remote, nci.Commit.RefType),
 		Digest: common.DigestSet{
-			"sha1": nci.CommitSha,
+			"sha1": nci.Commit.Hash,
 		},
 	})
 	resolvedDependencies = append(resolvedDependencies, v1.ResourceDescriptor{
-		URI:  fmt.Sprintf("%s:%s:%s", nci.WorkerType, nci.WorkerOS, nci.WorkerVersion),
-		Name: fmt.Sprintf("%s:%s", nci.WorkerType, nci.WorkerOS),
+		URI:  fmt.Sprintf("%s:%s:%s", nci.Worker.Type, nci.Worker.OS, nci.Worker.Version),
+		Name: fmt.Sprintf("%s:%s", nci.Worker.Type, nci.Worker.OS),
 	})
 
 	for _, record := range state.AuditLog {
@@ -59,7 +61,7 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 	}
 
 	var systemParameters = map[string]string{
-		"RUNNER": fmt.Sprintf("%s:%s", nci.WorkerType, nci.WorkerOS),
+		"RUNNER": fmt.Sprintf("%s:%s", nci.Worker.Type, nci.Worker.OS),
 	}
 	for k, v := range env {
 		systemParameters[protectoutput.RedactProtectedPhrases(k)] = protectoutput.RedactProtectedPhrases(v)
@@ -69,7 +71,7 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 		ExternalParameters: map[string]string{
 			"cid-workflow-source": WorkflowSource,
 			"cid-workflow":        Workflow,
-			"source":              fmt.Sprintf("%s+%s@%s", nci.RepositoryKind, nci.RepositoryRemote, nci.CommitRefName),
+			"source":              fmt.Sprintf("%s+%s@%s", nci.Repository.Kind, nci.Repository.Remote, nci.Commit.RefName),
 		},
 		InternalParameters:   systemParameters,
 		ResolvedDependencies: resolvedDependencies,
@@ -83,7 +85,7 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 			BuilderDependencies: nil,
 		},
 		BuildMetadata: v1.BuildMetadata{
-			InvocationID: fmt.Sprintf("%s-%s", nci.PipelineId, nci.PipelineAttempt),
+			InvocationID: fmt.Sprintf("%s-%s", nci.Pipeline.Id, nci.Pipeline.Attempt),
 			StartedOn:    &startedAt,
 			FinishedOn:   &finishedAt,
 		},

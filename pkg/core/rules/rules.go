@@ -6,7 +6,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/expression"
-	"github.com/cidverse/normalizeci/pkg/ncispec"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 )
@@ -68,12 +67,12 @@ func EvaluateRule(rule catalog.WorkflowRule, evalContext map[string]interface{})
 
 func GetRuleContext(env map[string]string) map[string]interface{} {
 	return map[string]interface{}{
-		ncispec.NCI_COMMIT_REF_PATH:        env[ncispec.NCI_COMMIT_REF_PATH],
-		ncispec.NCI_COMMIT_REF_TYPE:        env[ncispec.NCI_COMMIT_REF_TYPE],
-		ncispec.NCI_COMMIT_REF_NAME:        env[ncispec.NCI_COMMIT_REF_NAME],
-		ncispec.NCI_REPOSITORY_HOST_TYPE:   env[ncispec.NCI_REPOSITORY_HOST_TYPE],
-		ncispec.NCI_REPOSITORY_HOST_SERVER: env[ncispec.NCI_REPOSITORY_HOST_SERVER],
-		"ENV":                              env,
+		"NCI_COMMIT_REF_PATH":        env["NCI_COMMIT_REF_PATH"],
+		"NCI_COMMIT_REF_TYPE":        env["NCI_COMMIT_REF_TYPE"],
+		"NCI_COMMIT_REF_NAME":        env["NCI_COMMIT_REF_NAME"],
+		"NCI_REPOSITORY_HOST_TYPE":   env["NCI_REPOSITORY_HOST_TYPE"],
+		"NCI_REPOSITORY_HOST_SERVER": env["NCI_REPOSITORY_HOST_SERVER"],
+		"ENV":                        env,
 	}
 }
 

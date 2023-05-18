@@ -10,7 +10,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/cidverseutils/pkg/version"
-	"github.com/cidverse/normalizeci/pkg/normalizer/common"
+	"github.com/cidverse/normalizeci/pkg/normalizer/api"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
 )
@@ -83,7 +83,7 @@ func (c *CIDConfig) FindExecutionCandidates(binary string, constraint string, pr
 	}
 
 	// exec
-	env := common.GetMachineEnvironment()
+	env := api.GetMachineEnvironment()
 	for _, entry := range c.LocalTools {
 		if funk.Contains(entry.Binary, binary) {
 			for _, lookup := range entry.Lookup {
@@ -183,7 +183,7 @@ func (c *CIDConfig) FindImageOfBinary(binary string, constraint string) *catalog
 // FindPathOfBinary retrieves information about the local path of the specified binary fulfilling the constraint
 func (c *CIDConfig) FindPathOfBinary(binary string, constraint string) *ToolLocal {
 	// lookup
-	env := common.GetMachineEnvironment()
+	env := api.GetMachineEnvironment()
 	for _, entry := range c.LocalTools {
 		if funk.Contains(entry.Binary, binary) {
 			for _, lookup := range entry.Lookup {
