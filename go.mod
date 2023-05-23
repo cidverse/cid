@@ -5,11 +5,11 @@ go 1.20
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.7.1
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/cidverse/cidverseutils v0.0.0-20230520132146-ba6b8806e1fc
+	github.com/cidverse/cidverseutils v0.0.0-20230523213644-75f1ca60e520
 	github.com/cidverse/normalizeci v1.1.1-0.20230518180652-855bbba6f724
-	github.com/cidverse/repoanalyzer v0.0.0-20230506222947-3d733f1cdd8a
+	github.com/cidverse/repoanalyzer v0.0.0-20230520183347-41eb72278eff
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/google/cel-go v0.15.2
+	github.com/google/cel-go v0.15.3
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/in-toto/in-toto-golang v0.9.0
@@ -41,13 +41,15 @@ require (
 	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
-	github.com/go-git/gcfg v1.5.0 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
+	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.4.1 // indirect
-	github.com/go-git/go-git/v5 v5.6.1 // indirect
+	github.com/go-git/go-git/v5 v5.7.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.13.0 // indirect
+	github.com/go-playground/validator/v10 v10.14.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-github/v52 v52.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
@@ -61,7 +63,7 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
-	github.com/mattn/go-isatty v0.0.18 // indirect
+	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -78,7 +80,7 @@ require (
 	github.com/xanzy/go-gitlab v0.83.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
-	golang.org/x/exp v0.0.0-20230519143937-03e91628a987 // indirect
+	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
 	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/oauth2 v0.8.0 // indirect

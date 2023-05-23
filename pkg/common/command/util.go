@@ -16,29 +16,39 @@ import (
 
 func ApplyProxyConfiguration(containerExec *containerruntime.Container) {
 	// proxy
-	containerExec.AddEnvironmentVariable("HTTP_PROXY", os.Getenv("HTTP_PROXY"))
-	containerExec.AddEnvironmentVariable("HTTPS_PROXY", os.Getenv("HTTPS_PROXY"))
-	containerExec.AddEnvironmentVariable("NO_PROXY", os.Getenv("NO_PROXY"))
-	containerExec.AddEnvironmentVariable("http_proxy", os.Getenv("HTTP_PROXY"))
-	containerExec.AddEnvironmentVariable("https_proxy", os.Getenv("HTTPS_PROXY"))
-	containerExec.AddEnvironmentVariable("no_proxy", os.Getenv("NO_PROXY"))
+	httpProxy := os.Getenv("HTTP_PROXY")
+	httpsProxy := os.Getenv("HTTPS_PROXY")
+	noProxy := os.Getenv("NO_PROXY")
+
+	if httpProxy != "" {
+		containerExec.AddEnvironmentVariable("HTTP_PROXY", httpProxy)
+		containerExec.AddEnvironmentVariable("http_proxy", httpProxy)
+	}
+	if httpsProxy != "" {
+		containerExec.AddEnvironmentVariable("HTTPS_PROXY", httpsProxy)
+		containerExec.AddEnvironmentVariable("https_proxy", httpsProxy)
+	}
+	if noProxy != "" {
+		containerExec.AddEnvironmentVariable("NO_PROXY", noProxy)
+		containerExec.AddEnvironmentVariable("no_proxy", noProxy)
+	}
 
 	// jvm
 	var javaProxyOpts []string
-	if len(os.Getenv("HTTP_PROXY")) > 0 {
-		proxyURL, err := url.Parse(os.Getenv("HTTP_PROXY"))
+	if httpProxy != "" {
+		proxyURL, err := url.Parse(httpProxy)
 		if err == nil {
 			javaProxyOpts = append(javaProxyOpts, "-Dhttp.proxyHost="+proxyURL.Hostname())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttp.proxyPort="+proxyURL.Port())
-			javaProxyOpts = append(javaProxyOpts, "-Dhttp.nonProxyHosts="+ConvertNoProxyForJava(os.Getenv("NO_PROXY")))
+			javaProxyOpts = append(javaProxyOpts, "-Dhttp.nonProxyHosts="+ConvertNoProxyForJava(noProxy))
 		}
 	}
-	if len(os.Getenv("HTTPS_PROXY")) > 0 {
-		proxyURL, err := url.Parse(os.Getenv("HTTPS_PROXY"))
+	if httpsProxy != "" {
+		proxyURL, err := url.Parse(httpsProxy)
 		if err == nil {
 			javaProxyOpts = append(javaProxyOpts, "-Dhttps.proxyHost="+proxyURL.Hostname())
 			javaProxyOpts = append(javaProxyOpts, "-Dhttps.proxyPort="+proxyURL.Port())
-			javaProxyOpts = append(javaProxyOpts, "-Dhttps.nonProxyHosts="+ConvertNoProxyForJava(os.Getenv("NO_PROXY")))
+			javaProxyOpts = append(javaProxyOpts, "-Dhttps.nonProxyHosts="+ConvertNoProxyForJava(noProxy))
 		}
 	}
 	if len(javaProxyOpts) > 0 {
