@@ -1,7 +1,6 @@
 package containeraction
 
 import (
-	"os"
 	"strings"
 
 	"github.com/bwmarrin/snowflake"
@@ -34,15 +33,6 @@ func generateSecret() string {
 	}
 
 	return secret
-}
-
-func createPath(dir string) {
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		err := os.MkdirAll(dir, os.ModePerm)
-		if err != nil {
-			log.Warn().Str("path", dir).Msg("failed to create directory")
-		}
-	}
 }
 
 func generateSnowflakeId() string {

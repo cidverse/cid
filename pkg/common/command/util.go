@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cidverse/cid/pkg/core/cidconst"
 	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
@@ -67,15 +68,6 @@ func GetCertFileByType(certFileType string) string {
 	return ""
 }
 
-// see https://go.dev/src/crypto/x509/root_linux.go for possible paths
-var caBundles = [][]string{
-	{"/etc/ssl/certs/ca-certificates.crt"},                                  // Debian/Ubuntu/Gentoo etc.
-	{"/etc/pki/tls/certs/ca-bundle.crt", "/etc/pki/tls/certs/ca-extra.crt"}, // RHEL
-	{"/etc/ssl/ca-bundle.pem"},                                              // OpenSUSE
-	{"/etc/pki/tls/cacert.pem"},                                             // OpenELEC
-	{"/etc/ssl/cert.pem"},                                                   // Alpine Linux
-}
-
 func GetCABundleFromHost(target string) {
 	if filesystem.FileExists(target) {
 		return
@@ -83,7 +75,7 @@ func GetCABundleFromHost(target string) {
 
 	var found []string
 	var bundledCerts []byte
-	for _, bundle := range caBundles {
+	for _, bundle := range cidconst.CaBundles {
 		for _, path := range bundle {
 			if _, err := os.Stat(path); err == nil {
 				found = append(found, path)

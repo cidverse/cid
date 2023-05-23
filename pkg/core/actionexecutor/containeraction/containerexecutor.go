@@ -16,8 +16,10 @@ import (
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/cidconst"
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/cidverse/cidverseutils/pkg/network"
@@ -47,7 +49,6 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		log.Fatal().Err(err).Msg("no free ports available")
 	}
 	apiPort := strconv.Itoa(freePort)
-	socketFile := path.Join(ctx.Paths.Temp, strings.ReplaceAll(uuid.New().String(), "-", "")+".socket")
 
 	// properties
 	secret := generateSecret()
@@ -61,6 +62,20 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		actionConfig = string(actionConfigJSON)
 	}
 
+	// create temp dir
+	tempDir, err := os.MkdirTemp("", "cid-job-")
+	if err != nil {
+		log.Fatal().Err(err).Msg("Error creating temporary directory")
+	}
+	log.Debug().Str("dir", tempDir).Msg("using temp dir")
+	defer func() {
+		log.Debug().Str("dir", tempDir).Msg("cleaning up temp dir")
+		_ = os.RemoveAll(tempDir)
+	}()
+
+	// create socket file
+	socketFile := path.Join(tempDir, strings.ReplaceAll(uuid.New().String(), "-", "")+".socket")
+
 	// listen
 	apiEngine := restapi.Setup(restapi.APIConfig{
 		BuildID:       buildID,
@@ -72,7 +87,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		Env:           ctx.Env,
 		ActionConfig:  actionConfig,
 		State:         localState,
-		TempDir:       filepath.Join(ctx.ProjectDir, ".tmp"),
+		TempDir:       tempDir,
 		ArtifactDir:   filepath.Join(ctx.ProjectDir, ".dist"),
 	})
 	restapi.SecureWithAPIKey(apiEngine, secret)
@@ -92,49 +107,43 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		}
 	}(apiEngine, context.Background())
 
-	if runtime.GOOS != "windows" {
-		defer func() {
-			if _, err := os.Stat(socketFile); err == nil {
-				_ = os.Remove(socketFile)
-			}
-		}()
-	}
-
 	// wait a short moment for the unix socket to be created / the api endpoint to be ready
 	time.Sleep(100 * time.Millisecond)
 
-	// create temp dir for action
-	tempDir := filepath.Join(ctx.Paths.Temp, jobID)
-	createPath(tempDir)
-	log.Debug().Str("dir", tempDir).Msg("creating temp dir")
-	defer func() {
-		log.Debug().Str("dir", tempDir).Msg("cleaning up temp dir")
-		_ = os.RemoveAll(tempDir)
-	}()
-
 	// configure container
-	containerExec := containerruntime.Container{}
-	containerExec.SetImage(catalogAction.Container.Image)
-	containerExec.SetCommand(insertCommandVariables(catalogAction.Container.Command, *catalogAction))
+	containerExec := containerruntime.Container{
+		Image:            catalogAction.Container.Image,
+		WorkingDirectory: cihelper.ToUnixPath(ctx.ProjectDir),
+		Command:          insertCommandVariables(catalogAction.Container.Command, *catalogAction),
+		User:             util.GetContainerUser(),
+	}
+
+	// mount project dir
 	containerExec.AddVolume(containerruntime.ContainerMount{
 		MountType: "directory",
 		Source:    ctx.ProjectDir,
 		Target:    cihelper.ToUnixPath(ctx.ProjectDir),
 	})
-	containerExec.SetWorkingDirectory(cihelper.ToUnixPath(ctx.ProjectDir))
+
+	// mount temp dir
+	containerExec.AddVolume(containerruntime.ContainerMount{
+		MountType: "directory",
+		Source:    tempDir,
+		Target:    cidconst.TempPathInContainer,
+	})
 
 	if runtime.GOOS == "windows" {
 		// windows does not support unix sockets
-		containerExec.SetUserArgs("--net host")
+		containerExec.UserArgs = "--net host"
 		containerExec.AddEnvironmentVariable("CID_API_ADDR", "http://host.docker.internal:"+apiPort)
 	} else {
 		// socket-based sharing of the api is more secure than sharing the host network
 		containerExec.AddVolume(containerruntime.ContainerMount{
 			MountType: "directory",
 			Source:    socketFile,
-			Target:    socketFile,
+			Target:    cidconst.SocketPathInContainer,
 		})
-		containerExec.AddEnvironmentVariable("CID_API_SOCKET", socketFile)
+		containerExec.AddEnvironmentVariable("CID_API_SOCKET", cidconst.SocketPathInContainer)
 	}
 	containerExec.AddEnvironmentVariable("CID_API_SECRET", secret)
 
@@ -148,7 +157,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	if len(catalogAction.Access.Env) > 0 {
 		for k, v := range ctx.Env {
 			for _, access := range catalogAction.Access.Env {
-				if access.Pattern == true && regexp.MustCompile(access.Value).MatchString(k) {
+				if access.Pattern && regexp.MustCompile(access.Value).MatchString(k) {
 					containerExec.AddEnvironmentVariable(k, v)
 				} else if access.Value == k {
 					containerExec.AddEnvironmentVariable(k, v)

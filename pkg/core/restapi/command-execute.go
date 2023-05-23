@@ -51,7 +51,17 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 	// execute
 	exitCode := 0
 	var errorMessage = ""
-	stdout, stderr, candidate, cmdErr := command.RunAPICommand(replaceCommandPlaceholders(req.Command, hc.Env), commandEnv, hc.ProjectDir, execDir, req.CaptureOutput, req.Ports, req.Constraint)
+	stdout, stderr, candidate, cmdErr := command.RunAPICommand(command.APICommandExecute{
+		Command:                replaceCommandPlaceholders(req.Command, hc.Env),
+		Env:                    commandEnv,
+		ProjectDir:             hc.ProjectDir,
+		WorkDir:                execDir,
+		TempDir:                hc.TempDir,
+		Capture:                req.CaptureOutput,
+		Ports:                  req.Ports,
+		UserProvidedConstraint: req.Constraint,
+		Stdin:                  nil,
+	})
 	exitErr, isExitError := cmdErr.(*exec.ExitError)
 	hc.State.AuditLog = append(hc.State.AuditLog, state.AuditEvents{
 		Timestamp: time.Now().UTC(),

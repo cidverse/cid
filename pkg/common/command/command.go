@@ -6,10 +6,13 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
 
+	"github.com/cidverse/cid/pkg/core/cidconst"
+	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/cidverse/cidverseutils/pkg/network"
 	"github.com/samber/lo"
@@ -79,13 +82,25 @@ func RunCommandAndGetOutput(command string, env map[string]string, workDir strin
 	return stdoutBuff.String(), stderrBuff.String(), nil
 }
 
+type APICommandExecute struct {
+	Command                string
+	Env                    map[string]string
+	ProjectDir             string
+	WorkDir                string
+	TempDir                string
+	Capture                bool
+	Ports                  []int
+	UserProvidedConstraint string
+	Stdin                  io.Reader
+}
+
 // RunAPICommand gets called from actions or the api to execute commands
-func RunAPICommand(command string, env map[string]string, projectDir string, workDir string, capture bool, ports []int, userProvidedConstraint string) (stdout string, stderr string, candidate *config.BinaryExecutionCandidate, err error) {
+func RunAPICommand(cmd APICommandExecute) (stdout string, stderr string, executionCandidate *config.BinaryExecutionCandidate, err error) {
 	var stdoutWriter io.Writer
 	var stderrWriter io.Writer
 	var stdoutBuffer bytes.Buffer
 	var stderrBuffer bytes.Buffer
-	if capture {
+	if cmd.Capture {
 		stdoutWriter = protectoutput.NewProtectedWriter(nil, &stdoutBuffer)
 		stderrWriter = protectoutput.NewProtectedWriter(nil, &stderrBuffer)
 	} else {
@@ -94,7 +109,7 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 	}
 
 	// identify command
-	args := strings.SplitN(command, " ", 2)
+	args := strings.SplitN(cmd.Command, " ", 2)
 	binary := args[0]
 
 	// find version constraint from config
@@ -104,8 +119,8 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 		cmdConstraint = value
 	}
 	// user provided constraint
-	if len(userProvidedConstraint) > 0 {
-		cmdConstraint = userProvidedConstraint
+	if len(cmd.UserProvidedConstraint) > 0 {
+		cmdConstraint = cmd.UserProvidedConstraint
 	}
 
 	// find execution options
@@ -119,24 +134,41 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 		// overwrite binary for alias use-case
 		args[0] = candidate.Binary
 
-		containerExec := containerruntime.Container{}
-		containerExec.SetImage(candidate.Image)
-		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: cihelper.ToUnixPath(projectDir)})
-		containerExec.SetWorkingDirectory(cihelper.ToUnixPath(workDir))
-		containerExec.SetCommand(cihelper.ToUnixPathArgs(strings.Join(args, " ")))
+		containerExec := containerruntime.Container{
+			Image:            candidate.Image,
+			WorkingDirectory: cihelper.ToUnixPath(cmd.WorkDir),
+			Entrypoint:       candidate.Entrypoint,
+			Command:          cihelper.ToUnixPathArgs(strings.Join(args, " ")),
+			User:             util.GetContainerUser(),
+		}
 
-		// entrypoint
-		if candidate.Entrypoint != nil {
-			containerExec.SetEntrypoint(*candidate.Entrypoint)
+		// mount project dir
+		containerExec.AddVolume(containerruntime.ContainerMount{
+			MountType: "directory",
+			Source:    cmd.ProjectDir,
+			Target:    cihelper.ToUnixPath(cmd.ProjectDir),
+		})
+
+		// mount temp dir
+		if cmd.TempDir != "" {
+			containerExec.AddVolume(containerruntime.ContainerMount{
+				MountType: "directory",
+				Source:    cmd.TempDir,
+				Target:    cidconst.TempPathInContainer,
+			})
+		}
+
+		// interactive?
+		if cmd.Stdin != nil {
+			containerExec.Interactive = true
+			containerExec.TTY = true
 		}
 
 		// security
 		if candidate.Security.Privileged {
-			containerExec.SetPrivileged(true)
+			containerExec.Privileged = true
 		}
-		for _, capability := range candidate.Security.Capabilities {
-			containerExec.AddCapability(capability)
-		}
+		containerExec.Capabilities = append(containerExec.Capabilities, candidate.Security.Capabilities...)
 
 		// mounts
 		for _, mount := range candidate.Mounts {
@@ -144,24 +176,26 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 		}
 
 		// add env + sort by key
-		sortedEnvKeys := lo.Keys(env)
+		sortedEnvKeys := lo.Keys(cmd.Env)
 		sort.Strings(sortedEnvKeys)
 		for _, key := range sortedEnvKeys {
-			containerExec.AddEnvironmentVariable(key, env[key])
+			containerExec.AddEnvironmentVariable(key, cmd.Env[key])
 		}
 
 		// cache
 		for _, c := range candidate.ImageCache {
-			containerExec.AddVolume(containerruntime.ContainerMount{MountType: "volume", Source: "cid-cache-" + c.ID, Target: c.ContainerPath})
+			dir := filepath.Join(util.GetUserConfigDirectory(), "cid-cache-"+c.ID)
+			_ = os.MkdirAll(dir, 0775)
+			containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: dir, Target: c.ContainerPath})
 		}
 
 		// ports
-		for _, port := range ports {
+		for _, port := range cmd.Ports {
 			if network.IsFreePort(port) {
-				containerExec.AddContainerPort(containerruntime.ContainerPort{Source: port, Target: port})
+				containerExec.ContainerPorts = append(containerExec.ContainerPorts, containerruntime.ContainerPort{Source: port, Target: port})
 			} else {
 				freePort, _ := network.GetFreePort()
-				containerExec.AddContainerPort(containerruntime.ContainerPort{Source: freePort, Target: port})
+				containerExec.ContainerPorts = append(containerExec.ContainerPorts, containerruntime.ContainerPort{Source: freePort, Target: port})
 			}
 		}
 
@@ -179,7 +213,7 @@ func RunAPICommand(command string, env map[string]string, projectDir string, wor
 		log.Debug().Msg("running command via api: " + containerCmd)
 
 		containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
-		err := RunSystemCommand(containerCmdArgs[0], containerCmdArgs[1], env, "", stdoutWriter, stderrWriter)
+		err := RunSystemCommand(containerCmdArgs[0], containerCmdArgs[1], cmd.Env, "", cmd.Stdin, stdoutWriter, stderrWriter)
 		if err != nil {
 			return "", "", &candidate, errors.New("command failed: " + err.Error())
 		}
@@ -216,10 +250,8 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 	candidate := candidates[0]
 	switch candidate.Type {
 	case config.ExecutionExec:
-		return RunSystemCommand(candidate.File, cmdPayload, env, workDir, stdout, stderr)
+		return RunSystemCommand(candidate.File, cmdPayload, env, workDir, nil, stdout, stderr)
 	case config.ExecutionContainer:
-		containerExec := containerruntime.Container{}
-
 		if projectDir == "" {
 			projectDir = vcsrepository.FindRepositoryDirectory(workDir)
 		}
@@ -227,22 +259,21 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 		// overwrite binary for alias use-case
 		cmdArgs[0] = candidate.Binary
 
-		containerExec.SetImage(candidate.Image)
-		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: cihelper.ToUnixPath(projectDir)})
-		containerExec.SetWorkingDirectory(cihelper.ToUnixPath(workDir))
-		containerExec.SetCommand(cihelper.ToUnixPathArgs(strings.Join(cmdArgs, " ")))
-
-		// entrypoint
-		if candidate.Entrypoint != nil {
-			containerExec.SetEntrypoint(*candidate.Entrypoint)
+		containerExec := containerruntime.Container{
+			Image:            candidate.Image,
+			WorkingDirectory: cihelper.ToUnixPath(workDir),
+			Entrypoint:       candidate.Entrypoint,
+			Command:          cihelper.ToUnixPathArgs(strings.Join(cmdArgs, " ")),
+			User:             util.GetContainerUser(),
 		}
+		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: cihelper.ToUnixPath(projectDir)})
 
 		// security
 		if candidate.Security.Privileged {
-			containerExec.SetPrivileged(true)
+			containerExec.Privileged = true
 		}
 		for _, capability := range candidate.Security.Capabilities {
-			containerExec.AddCapability(capability)
+			containerExec.Capabilities = append(containerExec.Capabilities, capability)
 		}
 
 		// mounts
@@ -269,7 +300,7 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 
 		log.Debug().Msg("container-exec: " + containerCmd)
 		containerCmdArgs := strings.SplitN(containerCmd, " ", 2)
-		return RunSystemCommand(containerCmdArgs[0], containerCmdArgs[1], env, workDir, stdout, stderr)
+		return RunSystemCommand(containerCmdArgs[0], containerCmdArgs[1], env, workDir, nil, stdout, stderr)
 	default:
 		log.Fatal().Interface("type", candidate.Type).Msg("execution type is not supported!")
 	}
@@ -278,7 +309,7 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 }
 
 // RunSystemCommand runs a command and forwards all output to current console session
-func RunSystemCommand(file string, args string, env map[string]string, workDir string, stdout io.Writer, stderr io.Writer) error {
+func RunSystemCommand(file string, args string, env map[string]string, workDir string, stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 	log.Trace().Str("file", file).Str("args", args).Str("workdir", workDir).Msg("command exec")
 
 	// Run Command
@@ -299,7 +330,7 @@ func RunSystemCommand(file string, args string, env map[string]string, workDir s
 	}
 	cmd.Env = cihelper.ConvertEnvMapToStringSlice(commandEnv)
 	cmd.Dir = workDir
-	cmd.Stdin = os.Stdin
+	cmd.Stdin = stdin
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
 	err := cmd.Run()

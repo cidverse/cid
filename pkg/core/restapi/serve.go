@@ -2,6 +2,7 @@ package restapi
 
 import (
 	"net"
+	"os"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -67,11 +68,20 @@ func SecureWithAPIKey(e *echo.Echo, secret string) {
 }
 
 func ListenOnSocket(e *echo.Echo, file string) {
+	// unix socket listener
 	l, err := net.Listen("unix", file)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to listen on unix socket")
 	}
 	e.Listener = l
+
+	// socket permissions
+	err = os.Chmod(file, 0660)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to set socket permissions")
+	}
+
+	// start server
 	startErr := e.Start("")
 	if startErr != nil {
 		// graceful exit

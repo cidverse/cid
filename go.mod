@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.7.1
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/cidverse/cidverseutils v0.0.0-20230506223042-28865938a3a5
+	github.com/cidverse/cidverseutils v0.0.0-20230520132146-ba6b8806e1fc
 	github.com/cidverse/normalizeci v1.1.1-0.20230518180652-855bbba6f724
 	github.com/cidverse/repoanalyzer v0.0.0-20230506222947-3d733f1cdd8a
 	github.com/go-resty/resty/v2 v2.7.0
@@ -34,7 +34,7 @@ require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20230426101702-58e86b294756 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20230518184743-7afd39499903 // indirect
 	github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230512164433-5d1fd1a340c9 // indirect
@@ -78,7 +78,7 @@ require (
 	github.com/xanzy/go-gitlab v0.83.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
-	golang.org/x/exp v0.0.0-20230515195305-f3d0a9c9a5cc // indirect
+	golang.org/x/exp v0.0.0-20230519143937-03e91628a987 // indirect
 	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/oauth2 v0.8.0 // indirect
