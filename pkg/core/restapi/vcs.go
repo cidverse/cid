@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/cidverse/normalizeci/pkg/vcsrepository"
-	"github.com/cidverse/normalizeci/pkg/vcsrepository/vcsapi"
+	"github.com/cidverse/go-vcs"
+	"github.com/cidverse/go-vcs/vcsapi"
 	"github.com/hashicorp/go-version"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
@@ -46,7 +46,7 @@ func (hc *APIConfig) vcsCommits(c echo.Context) error {
 		}
 	}
 
-	client, clientErr := vcsrepository.GetVCSClient(hc.ProjectDir)
+	client, clientErr := vcs.GetVCSClient(hc.ProjectDir)
 	if clientErr != nil {
 		return c.JSON(http.StatusInternalServerError, apiError{
 			Status:  500,
@@ -68,7 +68,7 @@ func (hc *APIConfig) vcsCommitByHash(c echo.Context) error {
 	vcsCommitHash := c.Param("hash")
 	includeChanges := c.QueryParam("changes")
 
-	client, clientErr := vcsrepository.GetVCSClient(hc.ProjectDir)
+	client, clientErr := vcs.GetVCSClient(hc.ProjectDir)
 	if clientErr != nil {
 		return c.JSON(http.StatusInternalServerError, apiError{
 			Status:  500,
@@ -91,7 +91,7 @@ func (hc *APIConfig) vcsCommitByHash(c echo.Context) error {
 
 // vcsTags returns all tags
 func (hc *APIConfig) vcsTags(c echo.Context) error {
-	client, clientErr := vcsrepository.GetVCSClient(hc.ProjectDir)
+	client, clientErr := vcs.GetVCSClient(hc.ProjectDir)
 	if clientErr != nil {
 		return c.JSON(http.StatusInternalServerError, apiError{
 			Status:  500,
@@ -115,7 +115,7 @@ func (a ByVersion) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (hc *APIConfig) vcsReleases(c echo.Context) error {
 	releaseType := c.QueryParam("type")
 
-	client, clientErr := vcsrepository.GetVCSClient(hc.ProjectDir)
+	client, clientErr := vcs.GetVCSClient(hc.ProjectDir)
 	if clientErr != nil {
 		return c.JSON(http.StatusInternalServerError, apiError{
 			Status:  500,

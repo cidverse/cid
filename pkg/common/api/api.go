@@ -26,7 +26,10 @@ func FindProjectDir() string {
 
 // GetCIDEnvironment returns the normalized ci variables
 func GetCIDEnvironment(configEnv map[string]string, projectDirectory string) map[string]string {
-	normalized := normalizer.Normalize()
+	normalized, err := normalizer.Normalize()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to prepare ci environment variables")
+	}
 	env := envstruct.StructToEnvMap(normalized)
 	for key := range env {
 		if !strings.HasPrefix(key, "NCI") {

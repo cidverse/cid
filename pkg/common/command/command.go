@@ -3,6 +3,7 @@ package command
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -15,13 +16,13 @@ import (
 	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/cidverse/cidverseutils/pkg/network"
+	"github.com/cidverse/go-vcs/vcsutil"
 	"github.com/samber/lo"
 
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
-	"github.com/cidverse/normalizeci/pkg/vcsrepository"
 	"github.com/rs/zerolog/log"
 )
 
@@ -253,7 +254,11 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 		return RunSystemCommand(candidate.File, cmdPayload, env, workDir, nil, stdout, stderr)
 	case config.ExecutionContainer:
 		if projectDir == "" {
-			projectDir = vcsrepository.FindRepositoryDirectory(workDir)
+			p, err := vcsutil.FindProjectDirectory(workDir)
+			if err != nil {
+				return fmt.Errorf("failed to find project directory: %s", err.Error())
+			}
+			projectDir = p
 		}
 
 		// overwrite binary for alias use-case

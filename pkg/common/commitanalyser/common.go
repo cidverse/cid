@@ -4,7 +4,7 @@ import (
 	"regexp"
 
 	"github.com/cidverse/cidverseutils/pkg/version"
-	"github.com/cidverse/normalizeci/pkg/vcsrepository/vcsapi"
+	"github.com/cidverse/go-vcs/vcsapi"
 
 	"github.com/oriser/regroup"
 	"github.com/rs/zerolog/log"

@@ -5,9 +5,10 @@ go 1.20
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.7.1
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/cidverse/cidverseutils v0.0.0-20230523213644-75f1ca60e520
-	github.com/cidverse/normalizeci v1.1.1-0.20230518180652-855bbba6f724
-	github.com/cidverse/repoanalyzer v0.0.0-20230520183347-41eb72278eff
+	github.com/cidverse/cidverseutils v0.0.0-20230530185328-43ac5bcdda7d
+	github.com/cidverse/go-vcs v0.0.0-20230530192143-6e74dd46f9f8
+	github.com/cidverse/normalizeci v1.1.1-0.20230530192746-e9dae8e3241d
+	github.com/cidverse/repoanalyzer v0.0.0-20230530191039-89017676d334
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/cel-go v0.15.3
 	github.com/google/uuid v1.3.0
@@ -18,23 +19,23 @@ require (
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/mattn/go-colorable v0.1.13
 	github.com/opencontainers/image-spec v1.1.0-rc3
-	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
+	github.com/oriser/regroup v0.0.0-20230527212431-1b00c9bdbc5b
 	github.com/rs/zerolog v1.29.1
 	github.com/samber/lo v1.38.1
 	github.com/sethvargo/go-password v0.2.0
 	github.com/spf13/cobra v1.7.0
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	github.com/thoas/go-funk v0.9.3
-	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
+	google.golang.org/genproto/googleapis/api v0.0.0-20230530153820-e85fd2cbaebc
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.2.0
 )
 
 require (
-	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/BurntSushi/toml v1.3.0 // indirect
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20230518184743-7afd39499903 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20230528122434-6f98819771a1 // indirect
 	github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230512164433-5d1fd1a340c9 // indirect
@@ -57,7 +58,7 @@ require (
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.2 // indirect
-	github.com/imdario/mergo v0.3.15 // indirect
+	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
@@ -75,6 +76,7 @@ require (
 	github.com/skeema/knownhosts v1.1.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xanzy/go-gitlab v0.83.0 // indirect
@@ -90,6 +92,7 @@ require (
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.9.1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

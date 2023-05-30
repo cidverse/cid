@@ -3,7 +3,7 @@ package commitanalyser
 import (
 	"testing"
 
-	"github.com/cidverse/normalizeci/pkg/vcsrepository/vcsapi"
+	"github.com/cidverse/go-vcs/vcsapi"
 	"github.com/stretchr/testify/assert"
 )
 
