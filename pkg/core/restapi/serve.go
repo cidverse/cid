@@ -36,6 +36,7 @@ func Setup(handlers APIConfig) *echo.Echo {
 	e.GET("/vcs/commit/:hash", handlers.vcsCommitByHash)
 	e.GET("/vcs/tag", handlers.vcsTags)
 	e.GET("/vcs/release", handlers.vcsReleases)
+	e.GET("/vcs/diff", handlers.vcsDiff)
 
 	// artifacts
 	e.GET("/artifact", handlers.artifactList)

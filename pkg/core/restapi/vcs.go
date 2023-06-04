@@ -9,10 +9,9 @@ import (
 	"github.com/cidverse/go-vcs/vcsapi"
 	"github.com/hashicorp/go-version"
 	"github.com/labstack/echo/v4"
-	"github.com/rs/zerolog/log"
 )
 
-// projectInformation returns all available information about the current project
+// vcsCommits returns a list of commits between two refs
 func (hc *APIConfig) vcsCommits(c echo.Context) error {
 	fromRef, err := vcsapi.NewVCSRefFromString(c.QueryParam("from"))
 	if err != nil {
@@ -27,7 +26,7 @@ func (hc *APIConfig) vcsCommits(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, apiError{
 			Status:  400,
-			Title:   "parameter has a invalid value: from",
+			Title:   "parameter has a invalid value: to",
 			Details: err.Error(),
 		})
 	}
@@ -46,18 +45,22 @@ func (hc *APIConfig) vcsCommits(c echo.Context) error {
 		}
 	}
 
-	client, clientErr := vcs.GetVCSClient(hc.ProjectDir)
-	if clientErr != nil {
+	client, err := vcs.GetVCSClient(hc.ProjectDir)
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, apiError{
 			Status:  500,
 			Title:   "failed to open vcs repository",
-			Details: clientErr.Error(),
+			Details: err.Error(),
 		})
 	}
 
-	commits, commitsErr := client.FindCommitsBetween(fromRef, toRef, includeChanges == "true", limit)
-	if commitsErr != nil {
-		log.Err(commitsErr).Msg("failed to query commits")
+	commits, err := client.FindCommitsBetween(fromRef, toRef, includeChanges == "true", limit)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, apiError{
+			Status:  500,
+			Title:   "failed to query commits",
+			Details: err.Error(),
+		})
 	}
 
 	return c.JSON(http.StatusOK, commits)
@@ -160,4 +163,45 @@ func (hc *APIConfig) vcsReleases(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, releases)
+}
+
+// vcsDiff returns the diff between two refs
+func (hc *APIConfig) vcsDiff(c echo.Context) error {
+	fromRef, err := vcsapi.NewVCSRefFromString(c.QueryParam("from"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, apiError{
+			Status:  400,
+			Title:   "parameter has a invalid value: from",
+			Details: err.Error(),
+		})
+	}
+
+	toRef, err := vcsapi.NewVCSRefFromString(c.QueryParam("to"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, apiError{
+			Status:  400,
+			Title:   "parameter has a invalid value: from",
+			Details: err.Error(),
+		})
+	}
+
+	client, err := vcs.GetVCSClient(hc.ProjectDir)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, apiError{
+			Status:  500,
+			Title:   "failed to open vcs repository",
+			Details: err.Error(),
+		})
+	}
+
+	diff, err := client.Diff(fromRef, toRef)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, apiError{
+			Status:  500,
+			Title:   "failed to generate diff",
+			Details: err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, diff)
 }

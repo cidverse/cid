@@ -6,7 +6,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.7.1
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20230530185328-43ac5bcdda7d
-	github.com/cidverse/go-vcs v0.0.0-20230530192143-6e74dd46f9f8
+	github.com/cidverse/go-vcs v0.0.0-20230604170057-954a65cd03b4
 	github.com/cidverse/normalizeci v1.1.1-0.20230530192746-e9dae8e3241d
 	github.com/cidverse/repoanalyzer v0.0.0-20230530191039-89017676d334
 	github.com/go-resty/resty/v2 v2.7.0
@@ -48,7 +48,7 @@ require (
 	github.com/go-git/go-git/v5 v5.7.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.14.0 // indirect
+	github.com/go-playground/validator/v10 v10.14.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -71,7 +71,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.6.0 // indirect
-	github.com/sergi/go-diff v1.3.1 // indirect
+	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/shibumi/go-pathspec v1.3.0 // indirect
 	github.com/skeema/knownhosts v1.1.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
@@ -79,7 +79,7 @@ require (
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/xanzy/go-gitlab v0.83.0 // indirect
+	github.com/xanzy/go-gitlab v0.84.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
@@ -90,10 +90,16 @@ require (
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	golang.org/x/tools v0.9.1 // indirect
+	golang.org/x/tools v0.9.3 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+)
+
+exclude (
+	github.com/sergi/go-diff v1.2.0
+	github.com/sergi/go-diff v1.3.0
+	github.com/sergi/go-diff v1.3.1
 )
