@@ -16,7 +16,7 @@ require (
 	github.com/in-toto/in-toto-golang v0.9.0
 	github.com/jarcoal/httpmock v1.3.0
 	github.com/jinzhu/configor v1.2.1
-	github.com/labstack/echo/v4 v4.11.0
+	github.com/labstack/echo/v4 v4.11.1
 	github.com/mattn/go-colorable v0.1.13
 	github.com/opencontainers/image-spec v1.1.0-rc4
 	github.com/oriser/regroup v0.0.0-20230527212431-1b00c9bdbc5b
