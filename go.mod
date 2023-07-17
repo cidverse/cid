@@ -3,7 +3,7 @@ module github.com/cidverse/cid
 go 1.20
 
 require (
-	github.com/ProtonMail/gopenpgp/v2 v2.7.1
+	github.com/ProtonMail/gopenpgp/v2 v2.7.2
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20230530185328-43ac5bcdda7d
 	github.com/cidverse/go-vcs v0.0.0-20230604170057-954a65cd03b4
@@ -35,7 +35,7 @@ require (
 	github.com/BurntSushi/toml v1.3.0 // indirect
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20230528122434-6f98819771a1 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20230717121422-5aa5874ade95 // indirect
 	github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230512164433-5d1fd1a340c9 // indirect
