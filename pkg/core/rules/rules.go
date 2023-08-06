@@ -18,19 +18,17 @@ const ModuleFiles = "MODULE_FILES"
 
 // AnyRuleMatches will return true if at least one rule matches, if no rules are provided this always returns true
 func AnyRuleMatches(rules []catalog.WorkflowRule, evalContext map[string]interface{}) bool {
-	result := 0
-
 	if len(rules) == 0 {
 		return true
 	}
 
 	for _, rule := range rules {
 		if EvaluateRule(rule, evalContext) {
-			result++
+			return true
 		}
 	}
 
-	return result > 0
+	return false
 }
 
 // EvaluateRulesAsText will check all rules and returns the count of matching rules in the following format: 2/5

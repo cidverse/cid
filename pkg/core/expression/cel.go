@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
+	"github.com/google/cel-go/common/overloads"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/thoas/go-funk"
@@ -14,36 +15,10 @@ import (
 )
 
 var (
-	stringListType = reflect.TypeOf([]string{})
-)
-
-// EvalBooleanExpression evaluates a boolean expression using CEL (e.g. "1 == 1") and returns the result
-func EvalBooleanExpression(expression string, context map[string]interface{}) (bool, error) {
-	if expression == "" {
-		return false, nil
-	}
-
-	// init cel go environment
-	var exprDecl []*exprpb.Decl
-	for key, value := range context {
-		switch value.(type) {
-		case int:
-			exprDecl = append(exprDecl, decls.NewVar(key, decls.Int))
-		case string:
-			exprDecl = append(exprDecl, decls.NewVar(key, decls.String))
-		case []string:
-			exprDecl = append(exprDecl, decls.NewVar(key, decls.NewListType(decls.String)))
-		case map[string]string:
-			exprDecl = append(exprDecl, decls.NewVar(key, decls.NewMapType(decls.String, decls.String)))
-		default:
-			return false, fmt.Errorf("unsupported evalContext value type: %s", reflect.TypeOf(value))
-		}
-	}
-
-	celConfig, celConfigErr := cel.NewEnv(
-		cel.Declarations(exprDecl...),
-		cel.Function("contains",
-			cel.Overload("contains_string",
+	stringListType      = reflect.TypeOf([]string{})
+	additionalFunctions = []cel.EnvOption{
+		cel.Function(overloads.Contains,
+			cel.Overload("stringslice_contains_string",
 				[]*cel.Type{cel.ListType(cel.StringType), cel.StringType},
 				cel.BoolType,
 				cel.BinaryBinding(func(lhs, rhs ref.Val) ref.Val {
@@ -97,9 +72,38 @@ func EvalBooleanExpression(expression string, context map[string]interface{}) (b
 				}),
 			),
 		),
-	)
-	if celConfigErr != nil {
-		return false, fmt.Errorf("failed to initialize CEL environment: %w", celConfigErr)
+	}
+)
+
+// EvalBooleanExpression evaluates a boolean expression using CEL (e.g. "1 == 1") and returns the result
+func EvalBooleanExpression(expression string, context map[string]interface{}) (bool, error) {
+	// empty expression always evaluates to false
+	if expression == "" {
+		return false, nil
+	}
+
+	// init cel go environment
+	var exprDecl []*exprpb.Decl
+	for key, value := range context {
+		switch v := value.(type) {
+		case int:
+			exprDecl = append(exprDecl, decls.NewVar(key, decls.Int))
+		case string:
+			exprDecl = append(exprDecl, decls.NewVar(key, decls.String))
+		case []string:
+			exprDecl = append(exprDecl, decls.NewVar(key, decls.NewListType(decls.String)))
+		case map[string]string:
+			exprDecl = append(exprDecl, decls.NewVar(key, decls.NewMapType(decls.String, decls.String)))
+		default:
+			return false, fmt.Errorf("unsupported context value type: %T", v)
+		}
+	}
+
+	// generate cel evaluation environment
+	options := append([]cel.EnvOption{cel.Declarations(exprDecl...)}, additionalFunctions...)
+	celConfig, err := cel.NewEnv(options...)
+	if err != nil {
+		return false, fmt.Errorf("failed to create cel environment: %w", err)
 	}
 
 	// prepare program for evaluation
@@ -107,21 +111,21 @@ func EvalBooleanExpression(expression string, context map[string]interface{}) (b
 	if issues != nil && issues.Err() != nil {
 		return false, fmt.Errorf("failed to compile expression: %w", issues.Err())
 	}
-	prg, prgErr := celConfig.Program(ast)
-	if prgErr != nil {
-		return false, fmt.Errorf("failed to construct program: %w", prgErr)
+	prg, err := celConfig.Program(ast)
+	if err != nil {
+		return false, fmt.Errorf("failed to construct program: %w", err)
 	}
 
 	// evaluate
-	execOut, _, execErr := prg.Eval(context)
-	if execErr != nil {
-		return false, fmt.Errorf("failed to evaluate expression. expr: %s, error: %w", expression, execErr)
+	execOut, _, err := prg.Eval(context)
+	if err != nil {
+		return false, fmt.Errorf("failed to evaluate expression. expr: %s, error: %w", expression, err)
 	}
 
 	// check result
 	if execOut.Type() != types.BoolType {
-		return false, fmt.Errorf("expr does not return a boolean")
+		return false, fmt.Errorf("expression did not evaluate to boolean. expr: %s, type: %s", expression, execOut.Type())
 	}
 
-	return fmt.Sprintf("%+v", execOut) == "true", nil
+	return execOut.Value() == true, nil
 }
