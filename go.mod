@@ -10,7 +10,7 @@ require (
 	github.com/cidverse/normalizeci v1.1.1-0.20230530192746-e9dae8e3241d
 	github.com/cidverse/repoanalyzer v0.0.0-20230530191039-89017676d334
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/google/cel-go v0.17.6
+	github.com/google/cel-go v0.18.0
 	github.com/google/uuid v1.3.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/in-toto/in-toto-golang v0.9.0
@@ -26,7 +26,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 	github.com/thoas/go-funk v0.9.3
-	google.golang.org/genproto/googleapis/api v0.0.0-20230530153820-e85fd2cbaebc
+	google.golang.org/genproto/googleapis/api v0.0.0-20230803162519-f966b187b2e5
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.3.0
 )
@@ -92,8 +92,8 @@ require (
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.9.3 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
-	google.golang.org/protobuf v1.30.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230803162519-f966b187b2e5 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
