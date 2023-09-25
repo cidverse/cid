@@ -10,7 +10,7 @@ require (
 	github.com/cidverse/normalizeci v1.1.1-0.20230530192746-e9dae8e3241d
 	github.com/cidverse/repoanalyzer v0.0.0-20230827195525-14335808e737
 	github.com/go-resty/resty/v2 v2.8.0
-	github.com/google/cel-go v0.18.0
+	github.com/google/cel-go v0.18.1
 	github.com/google/uuid v1.3.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/in-toto/in-toto-golang v0.9.0
