@@ -23,7 +23,7 @@ require (
 	github.com/rs/zerolog v1.31.0
 	github.com/samber/lo v1.38.1
 	github.com/sethvargo/go-password v0.2.0
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	github.com/thoas/go-funk v0.9.3
 	google.golang.org/genproto/googleapis/api v0.0.0-20230913181813-007df8e322eb
