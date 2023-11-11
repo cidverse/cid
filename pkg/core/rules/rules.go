@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
-	"github.com/cidverse/cid/pkg/core/expression"
+	"github.com/cidverse/go-rules/pkg/expr"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 )
@@ -92,7 +92,7 @@ func GetModuleRuleContext(env map[string]string, module *analyzerapi.ProjectModu
 }
 
 func evalRuleCEL(rule catalog.WorkflowRule, context map[string]interface{}) bool {
-	match, err := expression.EvalBooleanExpression(rule.Expression, context)
+	match, err := expr.EvalBooleanExpression(rule.Expression, context)
 	if err != nil {
 		return false
 	}

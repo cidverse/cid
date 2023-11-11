@@ -12,13 +12,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cidverse/cid/pkg/core/expression"
 	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/pkg/archive/tar"
 	"github.com/cidverse/cidverseutils/pkg/archive/zip"
 	"github.com/cidverse/cidverseutils/pkg/encoding"
+	"github.com/cidverse/go-rules/pkg/expr"
 	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
@@ -28,13 +28,13 @@ import (
 // artifactList lists all generated reports
 func (hc *APIConfig) artifactList(c echo.Context) error {
 	// parameters
-	expr := util.GetStringOrDefault(c.QueryParam("query"), "true")
-	log.Debug().Str("query", expr).Msg("[API] artifact list query")
+	expression := util.GetStringOrDefault(c.QueryParam("query"), "true")
+	log.Debug().Str("query", expression).Msg("[API] artifact list query")
 
 	// filter artifacts
 	var result = make([]state.ActionArtifact, 0)
 	for _, artifact := range hc.State.Artifacts {
-		add, err := expression.EvalBooleanExpression(expr, map[string]interface{}{
+		add, err := expr.EvalBooleanExpression(expression, map[string]interface{}{
 			"id":             artifact.ArtifactID,
 			"module":         artifact.Module,
 			"artifact_type":  artifact.Type,
@@ -43,7 +43,7 @@ func (hc *APIConfig) artifactList(c echo.Context) error {
 			"format_version": artifact.FormatVersion,
 		})
 		if err != nil {
-			return fmt.Errorf("failed to evaluate query [%s]: %w", expr, err)
+			return fmt.Errorf("failed to evaluate query [%s]: %w", expression, err)
 		}
 
 		if add {
