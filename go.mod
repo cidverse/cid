@@ -11,7 +11,7 @@ require (
 	github.com/cidverse/normalizeci v1.1.1-0.20230530192746-e9dae8e3241d
 	github.com/cidverse/repoanalyzer v0.0.0-20231104204533-bd6b3a6c9725
 	github.com/go-resty/resty/v2 v2.10.0
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.5.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/in-toto/in-toto-golang v0.9.0
 	github.com/jarcoal/httpmock v1.3.1
@@ -97,7 +97,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231106174013-bbf56f31fb17 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
 exclude (
