@@ -18,7 +18,7 @@ require (
 	github.com/jinzhu/configor v1.2.2
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/mattn/go-colorable v0.1.13
-	github.com/opencontainers/image-spec v1.1.0-rc5
+	github.com/opencontainers/image-spec v1.1.0-rc6
 	github.com/oriser/regroup v0.0.0-20230527212431-1b00c9bdbc5b
 	github.com/rs/zerolog v1.31.0
 	github.com/samber/lo v1.39.0
