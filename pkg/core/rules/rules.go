@@ -94,6 +94,7 @@ func GetModuleRuleContext(env map[string]string, module *analyzerapi.ProjectModu
 func evalRuleCEL(rule catalog.WorkflowRule, context map[string]interface{}) bool {
 	match, err := expr.EvalBooleanExpression(rule.Expression, context)
 	if err != nil {
+		log.Debug().Err(err).Str("expression", rule.Expression).Msg("failed to evaluate workflow rule expression")
 		return false
 	}
 
