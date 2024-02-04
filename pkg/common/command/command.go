@@ -12,7 +12,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/cidverse/cid/pkg/core/cidconst"
+	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/cidverse/cidverseutils/pkg/network"
@@ -155,7 +155,7 @@ func RunAPICommand(cmd APICommandExecute) (stdout string, stderr string, executi
 			containerExec.AddVolume(containerruntime.ContainerMount{
 				MountType: "directory",
 				Source:    cmd.TempDir,
-				Target:    cidconst.TempPathInContainer,
+				Target:    constants.TempPathInContainer,
 			})
 		}
 

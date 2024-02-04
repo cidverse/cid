@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cidverse/cid/pkg/core/cidconst"
+	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/cidverse/cidverseutils/pkg/filesystem"
@@ -85,7 +85,7 @@ func GetCABundleFromHost(target string) {
 
 	var found []string
 	var bundledCerts []byte
-	for _, bundle := range cidconst.CaBundles {
+	for _, bundle := range constants.CaBundles {
 		for _, path := range bundle {
 			if _, err := os.Stat(path); err == nil {
 				found = append(found, path)

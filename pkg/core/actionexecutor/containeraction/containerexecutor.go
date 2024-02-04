@@ -15,8 +15,8 @@ import (
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
-	"github.com/cidverse/cid/pkg/core/cidconst"
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/core/util"
@@ -129,7 +129,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	containerExec.AddVolume(containerruntime.ContainerMount{
 		MountType: "directory",
 		Source:    tempDir,
-		Target:    cidconst.TempPathInContainer,
+		Target:    constants.TempPathInContainer,
 	})
 
 	if runtime.GOOS == "windows" {
@@ -141,9 +141,9 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		containerExec.AddVolume(containerruntime.ContainerMount{
 			MountType: "directory",
 			Source:    socketFile,
-			Target:    cidconst.SocketPathInContainer,
+			Target:    constants.SocketPathInContainer,
 		})
-		containerExec.AddEnvironmentVariable("CID_API_SOCKET", cidconst.SocketPathInContainer)
+		containerExec.AddEnvironmentVariable("CID_API_SOCKET", constants.SocketPathInContainer)
 	}
 	containerExec.AddEnvironmentVariable("CID_API_SECRET", secret)
 
