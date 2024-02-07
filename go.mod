@@ -3,7 +3,7 @@ module github.com/cidverse/cid
 go 1.21
 
 require (
-	github.com/ProtonMail/gopenpgp/v2 v2.7.4
+	github.com/ProtonMail/gopenpgp/v2 v2.7.5
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils v0.0.0-20231103225801-e7f71d0c6aba
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
