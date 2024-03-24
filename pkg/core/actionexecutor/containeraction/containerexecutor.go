@@ -10,7 +10,6 @@ import (
 	"regexp"
 	"runtime"
 	"strconv"
-	"strings"
 	"time"
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
@@ -23,7 +22,6 @@ import (
 	"github.com/cidverse/cidverseutils/pkg/cihelper"
 	"github.com/cidverse/cidverseutils/pkg/containerruntime"
 	"github.com/cidverse/cidverseutils/pkg/network"
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 )
@@ -62,8 +60,15 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		actionConfig = string(actionConfigJSON)
 	}
 
+	// temp dir override
+	osTempDir := os.TempDir()
+	if os.Getenv("CID_TEMP_DIR") != "" {
+		osTempDir = os.Getenv("CID_TEMP_DIR")
+		log.Debug().Str("dir", osTempDir).Msg("overriding temp dir")
+	}
+
 	// create temp dir
-	tempDir, err := os.MkdirTemp("", "cid-job-")
+	tempDir, err := os.MkdirTemp(osTempDir, "cid-job-")
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error creating temporary directory")
 	}
@@ -74,7 +79,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	}()
 
 	// create socket file
-	socketFile := path.Join(tempDir, strings.ReplaceAll(uuid.New().String(), "-", "")+".socket")
+	socketFile := path.Join(tempDir, util.RandomUUIDWithoutDashes()+".socket")
 
 	// listen
 	apiEngine := restapi.Setup(restapi.APIConfig{
