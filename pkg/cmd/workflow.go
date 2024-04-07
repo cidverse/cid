@@ -89,8 +89,7 @@ var workflowRunCmd = &cobra.Command{
 		}
 
 		if wf == nil {
-			log.Error().Str("workflow", args[0]).Msg("workflow does not exist")
-			return
+			log.Fatal().Str("workflow", args[0]).Msg("workflow does not exist")
 		}
 
 		// entrypoint
