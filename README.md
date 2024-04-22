@@ -2,6 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/cidverse/cid.svg)](https://pkg.go.dev/github.com/cidverse/cid)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cidverse/cid)](https://goreportcard.com/report/github.com/cidverse/cid)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/cidverse/cid/badge)](https://securityscorecards.dev/viewer/?uri=github.com/cidverse/cid)
 
 Run your continuous integration and deployment workflows in a platform-agnostic way!
 
