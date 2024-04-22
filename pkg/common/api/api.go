@@ -7,7 +7,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/secret"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/cidverse/normalizeci/pkg/envstruct"
 	"github.com/cidverse/normalizeci/pkg/normalizer"
 	"github.com/cidverse/normalizeci/pkg/normalizer/api"

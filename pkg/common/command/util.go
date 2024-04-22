@@ -9,8 +9,8 @@ import (
 
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/util"
-	"github.com/cidverse/cidverseutils/pkg/containerruntime"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/cidverseutils/containerruntime"
+	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/rs/zerolog/log"
 )
 

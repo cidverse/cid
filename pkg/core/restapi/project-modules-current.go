@@ -3,7 +3,7 @@ package restapi
 import (
 	"net/http"
 
-	"github.com/cidverse/cidverseutils/pkg/cihelper"
+	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/labstack/echo/v4"
 )
@@ -19,20 +19,20 @@ func (hc *APIConfig) moduleCurrent(c echo.Context) error {
 	}
 
 	var module = hc.CurrentModule
-	module.RootDirectory = cihelper.ToUnixPath(module.RootDirectory)
-	module.Directory = cihelper.ToUnixPath(module.Directory)
+	module.RootDirectory = ci.ToUnixPath(module.RootDirectory)
+	module.Directory = ci.ToUnixPath(module.Directory)
 
 	var discovery []analyzerapi.ProjectModuleDiscovery
 	for _, d := range module.Discovery {
 		if d.File != "" {
-			discovery = append(discovery, analyzerapi.ProjectModuleDiscovery{File: cihelper.ToUnixPath(d.File)})
+			discovery = append(discovery, analyzerapi.ProjectModuleDiscovery{File: ci.ToUnixPath(d.File)})
 		}
 	}
 	module.Discovery = discovery
 
 	var files = make([]string, len(module.Files))
 	for _, file := range module.Files {
-		files = append(files, cihelper.ToUnixPath(file))
+		files = append(files, ci.ToUnixPath(file))
 	}
 	module.Files = files
 

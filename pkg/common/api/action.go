@@ -8,11 +8,11 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/cidverse/normalizeci/pkg/normalizer/api"
 	"github.com/samber/lo"
 
 	"github.com/cidverse/cid/pkg/core/config"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
@@ -115,7 +115,7 @@ func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, e
 			Cache:    "",
 		},
 		ProjectDir:      projectDir,
-		WorkDir:         filesystem.GetWorkingDirectory(),
+		WorkDir:         filesystem.WorkingDirOrPanic(),
 		Config:          "",
 		Args:            nil,
 		Env:             finalEnv,

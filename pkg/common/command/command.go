@@ -14,15 +14,15 @@ import (
 
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/util"
-	"github.com/cidverse/cidverseutils/pkg/containerruntime"
-	"github.com/cidverse/cidverseutils/pkg/network"
+	"github.com/cidverse/cidverseutils/ci"
+	"github.com/cidverse/cidverseutils/containerruntime"
+	"github.com/cidverse/cidverseutils/filesystem"
+	"github.com/cidverse/cidverseutils/network"
 	"github.com/cidverse/go-vcs/vcsutil"
 	"github.com/samber/lo"
 
 	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/config"
-	"github.com/cidverse/cidverseutils/pkg/cihelper"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 )
 
@@ -137,9 +137,9 @@ func RunAPICommand(cmd APICommandExecute) (stdout string, stderr string, executi
 
 		containerExec := containerruntime.Container{
 			Image:            candidate.Image,
-			WorkingDirectory: cihelper.ToUnixPath(cmd.WorkDir),
+			WorkingDirectory: ci.ToUnixPath(cmd.WorkDir),
 			Entrypoint:       candidate.Entrypoint,
-			Command:          cihelper.ToUnixPathArgs(strings.Join(args, " ")),
+			Command:          ci.ToUnixPathArgs(strings.Join(args, " ")),
 			User:             util.GetContainerUser(),
 		}
 
@@ -147,7 +147,7 @@ func RunAPICommand(cmd APICommandExecute) (stdout string, stderr string, executi
 		containerExec.AddVolume(containerruntime.ContainerMount{
 			MountType: "directory",
 			Source:    cmd.ProjectDir,
-			Target:    cihelper.ToUnixPath(cmd.ProjectDir),
+			Target:    ci.ToUnixPath(cmd.ProjectDir),
 		})
 
 		// mount temp dir
@@ -195,7 +195,7 @@ func RunAPICommand(cmd APICommandExecute) (stdout string, stderr string, executi
 			if network.IsFreePort(port) {
 				containerExec.ContainerPorts = append(containerExec.ContainerPorts, containerruntime.ContainerPort{Source: port, Target: port})
 			} else {
-				freePort, _ := network.GetFreePort()
+				freePort, _ := network.FreePort()
 				containerExec.ContainerPorts = append(containerExec.ContainerPorts, containerruntime.ContainerPort{Source: freePort, Target: port})
 			}
 		}
@@ -266,12 +266,12 @@ func runCommand(command string, env map[string]string, projectDir string, workDi
 
 		containerExec := containerruntime.Container{
 			Image:            candidate.Image,
-			WorkingDirectory: cihelper.ToUnixPath(workDir),
+			WorkingDirectory: ci.ToUnixPath(workDir),
 			Entrypoint:       candidate.Entrypoint,
-			Command:          cihelper.ToUnixPathArgs(strings.Join(cmdArgs, " ")),
+			Command:          ci.ToUnixPathArgs(strings.Join(cmdArgs, " ")),
 			User:             util.GetContainerUser(),
 		}
-		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: cihelper.ToUnixPath(projectDir)})
+		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: projectDir, Target: ci.ToUnixPath(projectDir)})
 
 		// security
 		if candidate.Security.Privileged {
@@ -333,7 +333,7 @@ func RunSystemCommand(file string, args string, env map[string]string, workDir s
 	for k, v := range env {
 		commandEnv[k] = v
 	}
-	cmd.Env = cihelper.ConvertEnvMapToStringSlice(commandEnv)
+	cmd.Env = ci.EnvMapToStringSlice(commandEnv)
 	cmd.Dir = workDir
 	cmd.Stdin = stdin
 	cmd.Stdout = stdout

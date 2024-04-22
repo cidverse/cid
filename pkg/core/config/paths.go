@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/cidverseutils/filesystem"
 )
 
 // PathConfig contains the path configuration for build/tmp directories
@@ -18,7 +18,7 @@ type PathConfig struct {
 func (c PathConfig) ArtifactModule(dir ...string) string {
 	path := filepath.Join(c.Artifact, filepath.Join(dir...))
 
-	filesystem.CreateDirectory(path)
+	_ = os.MkdirAll(path, os.ModePerm)
 	return path
 }
 
@@ -26,7 +26,7 @@ func (c PathConfig) ArtifactModule(dir ...string) string {
 func (c PathConfig) TempModule(name string) string {
 	dir := filepath.Join(c.Temp, name)
 
-	filesystem.CreateDirectory(dir)
+	_ = os.MkdirAll(dir, os.ModePerm)
 	_ = os.Chmod(dir, 777)
 	return dir
 }
@@ -41,7 +41,7 @@ func (c PathConfig) NamedCache(name string) string {
 	}
 
 	if !filesystem.DirectoryExists(dir) {
-		filesystem.CreateDirectory(dir)
+		_ = os.MkdirAll(dir, os.ModePerm)
 	}
 	return dir
 }
@@ -56,7 +56,7 @@ func (c PathConfig) ModuleCache(module string) string {
 	}
 
 	if !filesystem.DirectoryExists(dir) {
-		filesystem.CreateDirectory(dir)
+		_ = os.MkdirAll(dir, os.ModePerm)
 	}
 	return dir
 }

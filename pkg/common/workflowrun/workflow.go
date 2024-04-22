@@ -3,6 +3,7 @@ package workflowrun
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -10,12 +11,12 @@ import (
 	"github.com/cidverse/cid/pkg/core/actionexecutor"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/cidverse/repoanalyzer"
 
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/rules"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
 	"github.com/rs/zerolog/log"
 	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v3"
@@ -120,7 +121,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 	if catalogAction == nil {
 		log.Fatal().Str("action_id", action.ID).Msg("workflow configuration error, referencing actions that do not exist")
 	}
-	modules := repoanalyzer.AnalyzeProject(projectDir, filesystem.GetWorkingDirectory())
+	modules := repoanalyzer.AnalyzeProject(projectDir, filesystem.WorkingDirOrPanic())
 	ctx := api.GetActionContext(modules, projectDir, env, &catalogAction.Access)
 
 	// serialize action config for pass-thru
@@ -194,8 +195,8 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		log.Trace().Str("action", action.ID).Str("type", string(catalogAction.Type)).Str("config", string(actConfig)).Msg("action configuration")
 
 		// paths
-		filesystem.CreateDirectory(ctx.Paths.Temp)
-		filesystem.CreateDirectory(ctx.Paths.Artifact)
+		_ = os.MkdirAll(ctx.Paths.Temp, os.ModePerm)
+		_ = os.MkdirAll(ctx.Paths.Artifact, os.ModePerm)
 
 		// execute
 		actionExecutor := actionexecutor.FindExecutorByType(string(catalogAction.Type))

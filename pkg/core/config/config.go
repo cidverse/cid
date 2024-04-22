@@ -4,7 +4,7 @@ import (
 	"embed"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/jinzhu/configor"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"

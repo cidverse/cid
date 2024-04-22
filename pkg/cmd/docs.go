@@ -7,7 +7,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/docs"
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )

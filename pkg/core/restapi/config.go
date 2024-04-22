@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/cidverse/cid/pkg/constants"
-	"github.com/cidverse/cidverseutils/pkg/cihelper"
+	"github.com/cidverse/cidverseutils/ci"
 	"github.com/labstack/echo/v4"
 )
 
@@ -29,8 +29,8 @@ func (hc *APIConfig) configCurrent(c echo.Context) error {
 		"host_user_name": currentUser.Username,
 		"host_group_id":  currentUser.Gid,
 		// paths
-		"project_dir":  cihelper.ToUnixPath(hc.ProjectDir),
-		"artifact_dir": cihelper.ToUnixPath(filepath.Join(hc.ProjectDir, ".dist")),
+		"project_dir":  ci.ToUnixPath(hc.ProjectDir),
+		"artifact_dir": ci.ToUnixPath(filepath.Join(hc.ProjectDir, ".dist")),
 		"temp_dir":     constants.TempPathInContainer,
 		// dynamic config
 		"config": hc.ActionConfig,

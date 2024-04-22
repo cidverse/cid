@@ -19,9 +19,9 @@ import (
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/core/util"
-	"github.com/cidverse/cidverseutils/pkg/cihelper"
-	"github.com/cidverse/cidverseutils/pkg/containerruntime"
-	"github.com/cidverse/cidverseutils/pkg/network"
+	"github.com/cidverse/cidverseutils/ci"
+	"github.com/cidverse/cidverseutils/containerruntime"
+	"github.com/cidverse/cidverseutils/network"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 )
@@ -42,7 +42,7 @@ func (e Executor) GetType() string {
 
 func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, action *catalog.WorkflowAction) error {
 	// api (port or socket)
-	freePort, err := network.GetFreePort()
+	freePort, err := network.FreePort()
 	if err != nil {
 		log.Fatal().Err(err).Msg("no free ports available")
 	}
@@ -118,7 +118,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	// configure container
 	containerExec := containerruntime.Container{
 		Image:            catalogAction.Container.Image,
-		WorkingDirectory: cihelper.ToUnixPath(ctx.ProjectDir),
+		WorkingDirectory: ci.ToUnixPath(ctx.ProjectDir),
 		Command:          insertCommandVariables(catalogAction.Container.Command, *catalogAction),
 		User:             util.GetContainerUser(),
 	}
@@ -127,7 +127,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	containerExec.AddVolume(containerruntime.ContainerMount{
 		MountType: "directory",
 		Source:    ctx.ProjectDir,
-		Target:    cihelper.ToUnixPath(ctx.ProjectDir),
+		Target:    ci.ToUnixPath(ctx.ProjectDir),
 	})
 
 	// mount temp dir

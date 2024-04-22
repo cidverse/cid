@@ -15,9 +15,8 @@ import (
 	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/core/util"
-	"github.com/cidverse/cidverseutils/pkg/archive/tar"
-	"github.com/cidverse/cidverseutils/pkg/archive/zip"
-	"github.com/cidverse/cidverseutils/pkg/encoding"
+	"github.com/cidverse/cidverseutils/compress"
+	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/go-rules/pkg/expr"
 	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1"
 	"github.com/labstack/echo/v4"
@@ -139,7 +138,7 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 	}
 
 	// sha256 hash
-	fileHash, err := encoding.SHA256Hash(&hashReader)
+	fileHash, err := hash.SHA256Hash(&hashReader)
 	if err != nil {
 		return "", err
 	}
@@ -164,12 +163,12 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 
 		log.Debug().Str("target_dir", extractTargetDir).Str("format", format).Msg("extracting artifact archive")
 		if format == "tar" {
-			err := tar.Extract(targetFile, extractTargetDir)
+			err := compress.TARExtract(targetFile, extractTargetDir)
 			if err != nil {
 				return "", err
 			}
 		} else if format == "zip" {
-			err := zip.Extract(targetFile, extractTargetDir)
+			err := compress.ZIPExtract(targetFile, extractTargetDir)
 			if err != nil {
 				return "", err
 			}

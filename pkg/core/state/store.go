@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	"github.com/cidverse/cidverseutils/pkg/filesystem"
+	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/rs/zerolog/log"
 )
 

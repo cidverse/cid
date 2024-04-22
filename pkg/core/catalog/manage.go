@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cidverse/cid/pkg/core/util"
-	"github.com/cidverse/cidverseutils/pkg/encoding"
+	"github.com/cidverse/cidverseutils/hash"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
@@ -136,7 +136,7 @@ func UpdateCatalog(name string, source *Source) {
 	}
 
 	// sha256 hash
-	fileHash, hashErr := encoding.SHA256Hash(bytes.NewReader(resp.Body()))
+	fileHash, hashErr := hash.SHA256Hash(bytes.NewReader(resp.Body()))
 	if hashErr != nil {
 		log.Fatal().Err(hashErr).Str("uri", source.URI).Msg("failed to calculate catalog hash")
 	}

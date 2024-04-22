@@ -3,7 +3,7 @@ package commitanalyser
 import (
 	"regexp"
 
-	"github.com/cidverse/cidverseutils/pkg/version"
+	"github.com/cidverse/cidverseutils/version"
 	"github.com/cidverse/go-vcs/vcsapi"
 
 	"github.com/oriser/regroup"
