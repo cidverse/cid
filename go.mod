@@ -7,17 +7,17 @@ toolchain go1.22.2
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.7.5
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/cidverse/cidverseutils/ci v0.0.0-20240422222733-849aa689d44c
-	github.com/cidverse/cidverseutils/compress v0.0.0-20240422221402-488260328200
-	github.com/cidverse/cidverseutils/containerruntime v0.0.0-20240422222733-849aa689d44c
-	github.com/cidverse/cidverseutils/filesystem v0.0.0-20240422222733-849aa689d44c
-	github.com/cidverse/cidverseutils/hash v0.0.0-20240421215032-ae9bd53b804a
-	github.com/cidverse/cidverseutils/network v0.0.0-20240422222733-849aa689d44c
-	github.com/cidverse/cidverseutils/version v0.0.0-20240422222733-849aa689d44c
+	github.com/cidverse/cidverseutils/ci v0.0.0-20240426222640-9d7a9ba21c1b
+	github.com/cidverse/cidverseutils/compress v0.0.0-20240426222640-9d7a9ba21c1b
+	github.com/cidverse/cidverseutils/containerruntime v0.0.0-20240426222640-9d7a9ba21c1b
+	github.com/cidverse/cidverseutils/filesystem v0.0.0-20240426222640-9d7a9ba21c1b
+	github.com/cidverse/cidverseutils/hash v0.0.0-20240426222640-9d7a9ba21c1b
+	github.com/cidverse/cidverseutils/network v0.0.0-20240426222640-9d7a9ba21c1b
+	github.com/cidverse/cidverseutils/version v0.0.0-20240426222640-9d7a9ba21c1b
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
 	github.com/cidverse/go-vcs v0.0.0-20240402102656-5c7ce4c133c6
 	github.com/cidverse/normalizeci v1.1.1-0.20240323134319-1eade1c37ec8
-	github.com/cidverse/repoanalyzer v0.0.0-20240421224756-d04af36a7d1e
+	github.com/cidverse/repoanalyzer v0.0.0-20240426222801-413ce793be73
 	github.com/go-resty/resty/v2 v2.12.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-version v1.6.0
@@ -47,8 +47,8 @@ require (
 	github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
 	github.com/charlievieth/fastwalk v1.0.3 // indirect
-	github.com/cidverse/cidverseutils/exec v0.0.0-20240422222733-849aa689d44c // indirect
-	github.com/cloudflare/circl v1.3.7 // indirect
+	github.com/cidverse/cidverseutils/exec v0.0.0-20240426222640-9d7a9ba21c1b // indirect
+	github.com/cloudflare/circl v1.3.8 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
@@ -58,7 +58,7 @@ require (
 	github.com/go-git/go-git/v5 v5.12.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.19.0 // indirect
+	github.com/go-playground/validator/v10 v10.20.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/cel-go v0.20.1 // indirect
@@ -100,9 +100,9 @@ require (
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240415180920-8c6c420018be // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240429193739-8cf5692501f6 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240429193739-8cf5692501f6 // indirect
+	google.golang.org/protobuf v1.34.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
 
