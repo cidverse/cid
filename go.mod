@@ -13,7 +13,7 @@ require (
 	github.com/cidverse/cidverseutils/filesystem v0.0.0-20240426222640-9d7a9ba21c1b
 	github.com/cidverse/cidverseutils/hash v0.0.0-20240426222640-9d7a9ba21c1b
 	github.com/cidverse/cidverseutils/network v0.0.0-20240426222640-9d7a9ba21c1b
-	github.com/cidverse/cidverseutils/version v0.0.0-20240426222640-9d7a9ba21c1b
+	github.com/cidverse/cidverseutils/version v0.0.0-20240501195623-588d642a5813
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
 	github.com/cidverse/go-vcs v0.0.0-20240402102656-5c7ce4c133c6
 	github.com/cidverse/normalizeci v1.1.1-0.20240323134319-1eade1c37ec8
