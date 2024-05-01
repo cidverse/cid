@@ -11,7 +11,7 @@ require (
 	github.com/cidverse/cidverseutils/compress v0.0.0-20240426222640-9d7a9ba21c1b
 	github.com/cidverse/cidverseutils/containerruntime v0.0.0-20240426222640-9d7a9ba21c1b
 	github.com/cidverse/cidverseutils/filesystem v0.0.0-20240426222640-9d7a9ba21c1b
-	github.com/cidverse/cidverseutils/hash v0.0.0-20240426222640-9d7a9ba21c1b
+	github.com/cidverse/cidverseutils/hash v0.0.0-20240501195623-588d642a5813
 	github.com/cidverse/cidverseutils/network v0.0.0-20240426222640-9d7a9ba21c1b
 	github.com/cidverse/cidverseutils/version v0.0.0-20240426222640-9d7a9ba21c1b
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
