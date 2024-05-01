@@ -26,8 +26,8 @@ github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgIS
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
 github.com/charlievieth/fastwalk v1.0.3 h1:eNWFaNPe5srPqQ5yyDbhAf11paeZaHWcihRhpuYFfSg=
 github.com/charlievieth/fastwalk v1.0.3/go.mod h1:JSfglY/gmL/rqsUS1NCsJTocB5n6sSl9ApAqif4CUbs=
-github.com/cidverse/cidverseutils/ci v0.0.0-20240426222640-9d7a9ba21c1b h1:u2KvMbxPFkTFLV5np1YhuzPF4Y8CMyyVKlpchulJ/bo=
-github.com/cidverse/cidverseutils/ci v0.0.0-20240426222640-9d7a9ba21c1b/go.mod h1:uOMGB2Kh/0HA936tlnzgBvrxv4hmXYeSbJxP383nHKU=
+github.com/cidverse/cidverseutils/ci v0.0.0-20240501195623-588d642a5813 h1:qcvZGs2HJb+4RTH9oPEeawqpYGXP0Q4W7MUkpG8PRQs=
+github.com/cidverse/cidverseutils/ci v0.0.0-20240501195623-588d642a5813/go.mod h1:uOMGB2Kh/0HA936tlnzgBvrxv4hmXYeSbJxP383nHKU=
 github.com/cidverse/cidverseutils/compress v0.0.0-20240426222640-9d7a9ba21c1b h1:hKxxufGkPSjgUGrlZIFCRs3fEO/UtsZnodZp6kaKBnU=
 github.com/cidverse/cidverseutils/compress v0.0.0-20240426222640-9d7a9ba21c1b/go.mod h1:Xga0FDD+hHizd9zH99+DrbqXTAsblYQVEolYiOCN/Ug=
 github.com/cidverse/cidverseutils/containerruntime v0.0.0-20240426222640-9d7a9ba21c1b h1:3MiPQ+FbhdH5j3BKMaOYhvvqGbdYAqukLgDC9lAYTuA=
