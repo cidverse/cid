@@ -38,8 +38,8 @@ github.com/cidverse/cidverseutils/filesystem v0.0.0-20240426222640-9d7a9ba21c1b 
 github.com/cidverse/cidverseutils/filesystem v0.0.0-20240426222640-9d7a9ba21c1b/go.mod h1:rw4oLD+q/7HCMkQUooxVz4He06ORyoAn2cXLFqpBinQ=
 github.com/cidverse/cidverseutils/hash v0.0.0-20240426222640-9d7a9ba21c1b h1:d0UwPwESvz6UP4VaqDYjmiMD9j9VVSH4EvFXfNX0Smc=
 github.com/cidverse/cidverseutils/hash v0.0.0-20240426222640-9d7a9ba21c1b/go.mod h1:MiRf2odL+20YA8iFNU14BT3o5d/1IOku+yjMYCxzXxo=
-github.com/cidverse/cidverseutils/network v0.0.0-20240426222640-9d7a9ba21c1b h1:ZfXFm9ZnmAjPOqLAIirTfeVL6xESkMqcca/zMblEdUE=
-github.com/cidverse/cidverseutils/network v0.0.0-20240426222640-9d7a9ba21c1b/go.mod h1:LYPCE5T+fLI5LdZXwFWkVWnxheR1ppPpmxKtXKBqKsw=
+github.com/cidverse/cidverseutils/network v0.0.0-20240501195623-588d642a5813 h1:7LjD5WKwgh/WifTMJb+iDpnCsPX75yEqBRwg8dG7jO4=
+github.com/cidverse/cidverseutils/network v0.0.0-20240501195623-588d642a5813/go.mod h1:LYPCE5T+fLI5LdZXwFWkVWnxheR1ppPpmxKtXKBqKsw=
 github.com/cidverse/cidverseutils/version v0.0.0-20240426222640-9d7a9ba21c1b h1:y38tH3ibB5SB++cFupamKiVMg0ydQWu2bFjZHEgRegM=
 github.com/cidverse/cidverseutils/version v0.0.0-20240426222640-9d7a9ba21c1b/go.mod h1:PbRN1pUYDBOT5uZXmOlQBCIoNJm6ubHJsg6Thgaq0TU=
 github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc h1:eVuHW4U9BoiqjIwWPATHRm6oiphVlm3Jn7QgHGgeVq8=
