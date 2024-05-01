@@ -9,7 +9,7 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils/ci v0.0.0-20240426222640-9d7a9ba21c1b
 	github.com/cidverse/cidverseutils/compress v0.0.0-20240426222640-9d7a9ba21c1b
-	github.com/cidverse/cidverseutils/containerruntime v0.0.0-20240426222640-9d7a9ba21c1b
+	github.com/cidverse/cidverseutils/containerruntime v0.0.0-20240501195623-588d642a5813
 	github.com/cidverse/cidverseutils/filesystem v0.0.0-20240426222640-9d7a9ba21c1b
 	github.com/cidverse/cidverseutils/hash v0.0.0-20240426222640-9d7a9ba21c1b
 	github.com/cidverse/cidverseutils/network v0.0.0-20240426222640-9d7a9ba21c1b
