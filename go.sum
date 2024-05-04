@@ -48,8 +48,8 @@ github.com/cidverse/go-vcs v0.0.0-20240402102656-5c7ce4c133c6 h1:MFnUQVoQj3etU3D
 github.com/cidverse/go-vcs v0.0.0-20240402102656-5c7ce4c133c6/go.mod h1:QDjMQz4P6BH7AsBNRuLfgtSFUwmLRFozbe8h92tRhao=
 github.com/cidverse/normalizeci v1.1.1-0.20240323134319-1eade1c37ec8 h1:h+0gC0H7zYh+h1S3ypgzfIt00kZL00wMoaKZDdUCIC4=
 github.com/cidverse/normalizeci v1.1.1-0.20240323134319-1eade1c37ec8/go.mod h1:o4GdPz6442jndTz8RZE8NS3KCexyzkrj5O6aB0t+8iw=
-github.com/cidverse/repoanalyzer v0.0.0-20240426222801-413ce793be73 h1:mM7tRwCTmgm5hS0P2yf8jfYCeIogWXYgD0/04nR7dH4=
-github.com/cidverse/repoanalyzer v0.0.0-20240426222801-413ce793be73/go.mod h1:vviTqMlsM9k6BHwdCEn2Qu1Okn724YRYp7ywcKvs0OA=
+github.com/cidverse/repoanalyzer v0.0.0-20240503224543-e134ee835d84 h1:Z4fE/X96Ab2RxzF07ftjfkNEXt6UvOuS/n6otOKnoeM=
+github.com/cidverse/repoanalyzer v0.0.0-20240503224543-e134ee835d84/go.mod h1:MicG/WwqQSGobEn622oIMwCi5ymqsj64PIKWPklJtWc=
 github.com/cloudflare/circl v1.3.3/go.mod h1:5XYMA4rFBvNIrhs50XuiBJ15vF2pZn4nnUKZrLbUZFA=
 github.com/cloudflare/circl v1.3.8 h1:j+V8jJt09PoeMFIu2uh5JUyEaIHTXVOHslFoLNAKqwI=
 github.com/cloudflare/circl v1.3.8/go.mod h1:PDRU+oXvdD7KCtgKxW95M5Z8BpSCJXQORiZFnBQS5QU=
@@ -157,8 +157,8 @@ github.com/opencontainers/image-spec v1.1.0 h1:8SG7/vwALn54lVB/0yZ/MMwhFrPYtpEHQ
 github.com/opencontainers/image-spec v1.1.0/go.mod h1:W4s4sFTMaBeK1BQLXbG4AdM2szdn85PY75RI83NrTrM=
 github.com/oriser/regroup v0.0.0-20230527212431-1b00c9bdbc5b h1:9L56kn3D7E9jd2R9U9p7tfzaBaLTVPt4HgnrP+g2VGk=
 github.com/oriser/regroup v0.0.0-20230527212431-1b00c9bdbc5b/go.mod h1:6eb1+OYHjOvThrtgEVue70NTfmzkalZgohRtndAUUbI=
-github.com/pelletier/go-toml/v2 v2.2.1 h1:9TA9+T8+8CUCO2+WYnDLCgrYi9+omqKXyjDtosvtEhg=
-github.com/pelletier/go-toml/v2 v2.2.1/go.mod h1:1t835xjRzz80PqgE6HHgN2JOsmgYu/h4qDAS4n929Rs=
+github.com/pelletier/go-toml/v2 v2.2.2 h1:aYUidT7k73Pcl9nb2gScu7NSrKCSHIDE89b3+6Wq+LM=
+github.com/pelletier/go-toml/v2 v2.2.2/go.mod h1:1t835xjRzz80PqgE6HHgN2JOsmgYu/h4qDAS4n929Rs=
 github.com/pjbgf/sha1cd v0.3.0 h1:4D5XXmUUBUl/xQ6IjCkEAbqXskkq/4O7LmGn0AqMDs4=
 github.com/pjbgf/sha1cd v0.3.0/go.mod h1:nZ1rrWOcGJ5uZgEEVL1VUM9iRQiZvWdbZjkKyFzPPsI=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
