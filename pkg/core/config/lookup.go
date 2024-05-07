@@ -20,6 +20,7 @@ type ExecutionType string
 const (
 	ExecutionExec      ExecutionType = "exec"
 	ExecutionContainer ExecutionType = "container"
+	ExecutionNixShell  ExecutionType = "nix-shell"
 )
 
 type PreferVersion string
