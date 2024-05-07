@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/util"
@@ -18,10 +19,10 @@ import (
 	"github.com/cidverse/cidverseutils/containerruntime"
 	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/cidverse/cidverseutils/network"
+	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/go-vcs/vcsutil"
 	"github.com/samber/lo"
 
-	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/rs/zerolog/log"
 )
@@ -59,7 +60,7 @@ func GetCommandVersion(binary string) (string, error) {
 
 // RunCommand runs a required command and forwards all output to console, but will panic/exit if the command fails
 func RunCommand(command string, env map[string]string, workDir string) {
-	err := runCommand(command, env, "", workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
+	err := runCommand(command, env, "", workDir, redact.NewProtectedWriter(os.Stdout, nil, &sync.Mutex{}, nil), redact.NewProtectedWriter(os.Stderr, nil, &sync.Mutex{}, nil))
 	if err != nil {
 		log.Fatal().Err(err).Str("command", command).Msg("failed to execute command")
 	}
@@ -67,7 +68,7 @@ func RunCommand(command string, env map[string]string, workDir string) {
 
 // RunOptionalCommand runs a command and forwards all output to console
 func RunOptionalCommand(command string, env map[string]string, workDir string) error {
-	return runCommand(command, env, "", workDir, protectoutput.NewProtectedWriter(os.Stdout, nil), protectoutput.NewProtectedWriter(os.Stderr, nil))
+	return runCommand(command, env, "", workDir, redact.NewProtectedWriter(os.Stdout, nil, &sync.Mutex{}, nil), redact.NewProtectedWriter(os.Stderr, nil, &sync.Mutex{}, nil))
 }
 
 // RunCommandAndGetOutput runs a command and returns the full response / command output
@@ -102,11 +103,11 @@ func RunAPICommand(cmd APICommandExecute) (stdout string, stderr string, executi
 	var stdoutBuffer bytes.Buffer
 	var stderrBuffer bytes.Buffer
 	if cmd.Capture {
-		stdoutWriter = protectoutput.NewProtectedWriter(nil, &stdoutBuffer)
-		stderrWriter = protectoutput.NewProtectedWriter(nil, &stderrBuffer)
+		stdoutWriter = redact.NewProtectedWriter(nil, &stdoutBuffer, &sync.Mutex{}, nil)
+		stderrWriter = redact.NewProtectedWriter(nil, &stderrBuffer, &sync.Mutex{}, nil)
 	} else {
-		stdoutWriter = protectoutput.NewProtectedWriter(os.Stdout, nil)
-		stderrWriter = protectoutput.NewProtectedWriter(os.Stderr, nil)
+		stdoutWriter = redact.NewProtectedWriter(os.Stdout, nil, &sync.Mutex{}, nil)
+		stderrWriter = redact.NewProtectedWriter(os.Stderr, nil, &sync.Mutex{}, nil)
 	}
 
 	// identify command

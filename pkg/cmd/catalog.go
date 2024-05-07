@@ -3,10 +3,11 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"sync"
 	"text/tabwriter"
 
-	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -47,7 +48,7 @@ var catalogListCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		registries := catalog.LoadSources()
 		// print list
-		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
+		w := tabwriter.NewWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), 1, 1, 1, ' ', 0)
 		_, _ = fmt.Fprintln(w, "NAME\tURI\tAdded\tUpdated\tWorkflows\tActions\tImages\tHash")
 		for key, source := range registries {
 			data := catalog.LoadCatalogs(map[string]*catalog.Source{key: source})

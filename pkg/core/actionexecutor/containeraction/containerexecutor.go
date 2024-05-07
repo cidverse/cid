@@ -21,7 +21,9 @@ import (
 	"github.com/cidverse/cid/pkg/core/util"
 	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/cidverseutils/containerruntime"
+	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/cidverseutils/network"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 )
@@ -79,7 +81,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	}()
 
 	// create socket file
-	socketFile := path.Join(tempDir, util.RandomUUIDWithoutDashes()+".socket")
+	socketFile := path.Join(tempDir, hash.UUIDNoDash(uuid.New().String())+".socket")
 
 	// listen
 	apiEngine := restapi.Setup(restapi.APIConfig{

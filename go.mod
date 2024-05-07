@@ -8,15 +8,16 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.7.5
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils/ci v0.0.0-20240501195623-588d642a5813
-	github.com/cidverse/cidverseutils/compress v0.0.0-20240501195623-588d642a5813
+	github.com/cidverse/cidverseutils/compress v0.0.0-20240507202753-435d763dc50c
 	github.com/cidverse/cidverseutils/containerruntime v0.0.0-20240501195623-588d642a5813
-	github.com/cidverse/cidverseutils/filesystem v0.0.0-20240501195623-588d642a5813
-	github.com/cidverse/cidverseutils/hash v0.0.0-20240501195623-588d642a5813
+	github.com/cidverse/cidverseutils/filesystem v0.0.0-20240507203508-adb806ff2095
+	github.com/cidverse/cidverseutils/hash v0.0.0-20240507202753-435d763dc50c
 	github.com/cidverse/cidverseutils/network v0.0.0-20240501195623-588d642a5813
+	github.com/cidverse/cidverseutils/redact v0.0.0-20240507202753-435d763dc50c
 	github.com/cidverse/cidverseutils/version v0.0.0-20240501195623-588d642a5813
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
 	github.com/cidverse/go-vcs v0.0.0-20240402102656-5c7ce4c133c6
-	github.com/cidverse/normalizeci v1.1.1-0.20240323134319-1eade1c37ec8
+	github.com/cidverse/normalizeci v1.1.1-0.20240507162324-423657017129
 	github.com/cidverse/repoanalyzer v0.1.0
 	github.com/go-resty/resty/v2 v2.12.0
 	github.com/google/uuid v1.6.0
@@ -47,7 +48,7 @@ require (
 	github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
 	github.com/charlievieth/fastwalk v1.0.3 // indirect
-	github.com/cidverse/cidverseutils/exec v0.0.0-20240501195623-588d642a5813 // indirect
+	github.com/cidverse/cidverseutils/exec v0.0.0-20240507202753-435d763dc50c // indirect
 	github.com/cloudflare/circl v1.3.8 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -62,7 +63,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/cel-go v0.20.1 // indirect
-	github.com/google/go-github/v60 v60.0.0 // indirect
+	github.com/google/go-github/v61 v61.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gosimple/slug v1.14.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect

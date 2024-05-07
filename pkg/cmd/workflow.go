@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"sync"
 	"text/tabwriter"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/provenance"
+	"github.com/cidverse/cidverseutils/redact"
 
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/common/workflowrun"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/rs/zerolog/log"
@@ -48,7 +49,7 @@ var workflowListCmd = &cobra.Command{
 		env := api.GetCIDEnvironment(cfg.Env, projectDir)
 
 		// print list
-		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
+		w := tabwriter.NewWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), 1, 1, 1, ' ', 0)
 		_, _ = fmt.Fprintln(w, "WORKFLOW\tVERSION\tRULES\tSTAGES\tACTIONS")
 		for _, workflow := range cfg.Registry.Workflows {
 			_, _ = fmt.Fprintln(w, workflow.Name+"\t"+workflow.Version+"\t"+

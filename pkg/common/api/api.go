@@ -4,10 +4,10 @@ import (
 	"encoding/base64"
 	"strings"
 
-	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/secret"
 	"github.com/cidverse/cidverseutils/filesystem"
+	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/normalizeci/pkg/envstruct"
 	"github.com/cidverse/normalizeci/pkg/normalizer"
 	"github.com/cidverse/normalizeci/pkg/normalizer/api"
@@ -91,10 +91,10 @@ func AutoProtectValues(key string, original string, decoded string) {
 	upperKey := strings.ToUpper(key)
 	if strings.Contains(upperKey, "KEY") || strings.Contains(upperKey, "USER") || strings.Contains(upperKey, "PASS") || strings.Contains(upperKey, "PRIVATE") || strings.Contains(upperKey, "TOKEN") || strings.Contains(upperKey, "SECRET") || strings.Contains(upperKey, "AUTH") {
 		if original != "" {
-			protectoutput.ProtectPhrase(original)
+			redact.ProtectPhrase(original)
 		}
 		if decoded != "" {
-			protectoutput.ProtectPhrase(decoded)
+			redact.ProtectPhrase(decoded)
 		}
 	}
 }

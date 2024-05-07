@@ -3,8 +3,9 @@ package cmd
 import (
 	"os"
 	"strings"
+	"sync"
 
-	"github.com/cidverse/cid/pkg/common/protectoutput"
+	"github.com/cidverse/cidverseutils/redact"
 	"github.com/mattn/go-colorable"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -40,12 +41,12 @@ var rootCmd = &cobra.Command{
 		}
 		var logContext zerolog.Context
 		if cfg.LogFormat == "plain" {
-			logContext = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: protectoutput.NewProtectedWriter(nil, os.Stderr), NoColor: true}).With().Timestamp()
+			logContext = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: redact.NewProtectedWriter(nil, os.Stderr, &sync.Mutex{}, nil), NoColor: true}).With().Timestamp()
 		} else if cfg.LogFormat == "color" {
 			colorableOutput := colorable.NewColorableStdout()
-			logContext = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: protectoutput.NewProtectedWriter(nil, colorableOutput), NoColor: false}).With().Timestamp()
+			logContext = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: redact.NewProtectedWriter(nil, colorableOutput, &sync.Mutex{}, nil), NoColor: false}).With().Timestamp()
 		} else if cfg.LogFormat == "json" {
-			logContext = zerolog.New(os.Stderr).Output(protectoutput.NewProtectedWriter(nil, os.Stderr)).With().Timestamp()
+			logContext = zerolog.New(os.Stderr).Output(redact.NewProtectedWriter(nil, os.Stderr, &sync.Mutex{}, nil)).With().Timestamp()
 		}
 		if cfg.LogCaller {
 			logContext = logContext.Caller()

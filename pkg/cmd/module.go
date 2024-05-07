@@ -3,10 +3,11 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"sync"
 	"text/tabwriter"
 
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/common/protectoutput"
+	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/repoanalyzer"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
@@ -42,7 +43,7 @@ var moduleListCmd = &cobra.Command{
 		modules := repoanalyzer.AnalyzeProject(projectDir, projectDir)
 
 		// print list
-		w := tabwriter.NewWriter(protectoutput.NewProtectedWriter(nil, os.Stdout), 1, 1, 1, ' ', 0)
+		w := tabwriter.NewWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), 1, 1, 1, ' ', 0)
 		_, _ = fmt.Fprintln(w, "NAME\tBUILD-SYSTEM\tBUILD-SYNTAX\tSUBMODULES")
 		for _, module := range modules {
 			_, _ = fmt.Fprintln(w, module.Name+"\t"+string(module.BuildSystem)+"\t"+string(module.BuildSystemSyntax)+"\t0")

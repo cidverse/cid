@@ -7,7 +7,7 @@ import (
 	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
-	"github.com/cidverse/cid/pkg/common/protectoutput"
+	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/repoanalyzer"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
@@ -100,6 +100,6 @@ var infoCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed to serialize yaml response")
 		}
-		fmt.Print(protectoutput.RedactProtectedPhrases(string(responseText)))
+		fmt.Print(redact.Redact(string(responseText)))
 	},
 }

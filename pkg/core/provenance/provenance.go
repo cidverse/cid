@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cidverse/cid/pkg/common/protectoutput"
 	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/normalizeci/pkg/envstruct"
 	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
 	intoto "github.com/in-toto/in-toto-golang/in_toto"
@@ -64,7 +64,7 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 		"RUNNER": fmt.Sprintf("%s:%s", nci.Worker.Type, nci.Worker.OS),
 	}
 	for k, v := range env {
-		systemParameters[protectoutput.RedactProtectedPhrases(k)] = protectoutput.RedactProtectedPhrases(v)
+		systemParameters[redact.Redact(k)] = redact.Redact(v)
 	}
 	prov.BuildDefinition = v1.ProvenanceBuildDefinition{
 		BuildType: fmt.Sprintf("https://github.com/cidverse/cid@%s", "0.0.0"),
