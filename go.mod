@@ -17,7 +17,7 @@ require (
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
 	github.com/cidverse/go-vcs v0.0.0-20240402102656-5c7ce4c133c6
 	github.com/cidverse/normalizeci v1.1.1-0.20240323134319-1eade1c37ec8
-	github.com/cidverse/repoanalyzer v0.0.0-20240503224543-e134ee835d84
+	github.com/cidverse/repoanalyzer v0.1.0
 	github.com/go-resty/resty/v2 v2.12.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-version v1.6.0
@@ -92,7 +92,7 @@ require (
 	github.com/xanzy/go-gitlab v0.103.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.22.0 // indirect
-	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
+	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/oauth2 v0.19.0 // indirect
