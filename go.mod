@@ -107,8 +107,4 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
 
-exclude (
-	github.com/sergi/go-diff v1.2.0
-	github.com/sergi/go-diff v1.3.0
-	github.com/sergi/go-diff v1.3.1
-)
+exclude github.com/sergi/go-diff v1.3.1
