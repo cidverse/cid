@@ -40,8 +40,8 @@ github.com/cidverse/cidverseutils/hash v0.1.0 h1:bWZoBCuZDy4HsBLQD4Os5XjpHwqP64G
 github.com/cidverse/cidverseutils/hash v0.1.0/go.mod h1:MiRf2odL+20YA8iFNU14BT3o5d/1IOku+yjMYCxzXxo=
 github.com/cidverse/cidverseutils/network v0.1.0 h1:8AL6asRt7V1VOe/4hvrZ0UBxtIE6aGIJxm5MZJuO0GY=
 github.com/cidverse/cidverseutils/network v0.1.0/go.mod h1:LYPCE5T+fLI5LdZXwFWkVWnxheR1ppPpmxKtXKBqKsw=
-github.com/cidverse/cidverseutils/redact v0.0.0-20240507202753-435d763dc50c h1:HYbiTOUvTVoMrzFqIjvGGP8V/Tfc0pFMlyq6iEh2Rnw=
-github.com/cidverse/cidverseutils/redact v0.0.0-20240507202753-435d763dc50c/go.mod h1:3DuGAE15Pjh5tLSKzXwcGPCBzgTgHLMVG6WltHP+mwI=
+github.com/cidverse/cidverseutils/redact v0.1.0 h1:+6AshqcT9iZiTxB/zgxsn27BkLdUxyjnjf+x5INhWOQ=
+github.com/cidverse/cidverseutils/redact v0.1.0/go.mod h1:vmnvyZGgLGgrx0H0uzrm99qPtQWOziYlJ9Qmx0txHBo=
 github.com/cidverse/cidverseutils/version v0.1.0 h1:+t9AaSW+++38SnlzF4x12E7oAdvXFw6HY7ujwBN7HCA=
 github.com/cidverse/cidverseutils/version v0.1.0/go.mod h1:PbRN1pUYDBOT5uZXmOlQBCIoNJm6ubHJsg6Thgaq0TU=
 github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc h1:eVuHW4U9BoiqjIwWPATHRm6oiphVlm3Jn7QgHGgeVq8=
