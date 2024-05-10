@@ -12,7 +12,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/filesystem"
-	"github.com/cidverse/repoanalyzer"
+	"github.com/cidverse/repoanalyzer/analyzer"
 
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/config"
@@ -121,7 +121,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 	if catalogAction == nil {
 		log.Fatal().Str("action_id", action.ID).Msg("workflow configuration error, referencing actions that do not exist")
 	}
-	modules := repoanalyzer.AnalyzeProject(projectDir, filesystem.WorkingDirOrPanic())
+	modules := analyzer.ScanDirectory(filesystem.WorkingDirOrPanic())
 	ctx := api.GetActionContext(modules, projectDir, env, &catalogAction.Access)
 
 	// serialize action config for pass-thru

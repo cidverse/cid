@@ -8,7 +8,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cidverseutils/redact"
-	"github.com/cidverse/repoanalyzer"
+	"github.com/cidverse/repoanalyzer/analyzer"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -51,7 +51,7 @@ var infoCmd = &cobra.Command{
 		}
 
 		// detect project modules
-		for _, module := range repoanalyzer.AnalyzeProject(projectDir, projectDir) {
+		for _, module := range analyzer.ScanDirectory(projectDir) {
 			if funk.Contains(excludes, "dep") {
 				module.Dependencies = nil
 			}

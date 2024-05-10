@@ -7,7 +7,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
-	"github.com/cidverse/repoanalyzer"
+	"github.com/cidverse/repoanalyzer/analyzer"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -44,7 +44,7 @@ cid api --type http --listen localhost:7400`,
 		log.Debug().Str("command", "api").Str("type", apiType).Str("listen", listen).Str("socket", socketFile).Str("dir", projectDir).Msg("running command")
 
 		// scan for modules
-		modules := repoanalyzer.AnalyzeProject(projectDir, projectDir)
+		modules := analyzer.ScanDirectory(projectDir)
 		var currentModule *analyzerapi.ProjectModule = nil
 		if currentModuleID >= 0 && currentModuleID < len(modules) {
 			currentModule = modules[currentModuleID]
