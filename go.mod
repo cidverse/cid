@@ -19,7 +19,7 @@ require (
 	github.com/cidverse/go-vcs v0.0.0-20240402102656-5c7ce4c133c6
 	github.com/cidverse/normalizeci v1.1.1-0.20240507162324-423657017129
 	github.com/cidverse/repoanalyzer v0.1.1-0.20240510193438-abb053de8c14
-	github.com/go-resty/resty/v2 v2.13.0
+	github.com/go-resty/resty/v2 v2.13.1
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/in-toto/in-toto-golang v0.9.0
