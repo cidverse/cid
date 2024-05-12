@@ -1,8 +1,6 @@
 module github.com/cidverse/cid
 
-go 1.22
-
-toolchain go1.22.2
+go 1.21
 
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.7.5
@@ -31,10 +29,8 @@ require (
 	github.com/oriser/regroup v0.0.0-20230527212431-1b00c9bdbc5b
 	github.com/rs/zerolog v1.32.0
 	github.com/samber/lo v1.39.0
-	github.com/sethvargo/go-password v0.3.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
-	github.com/thoas/go-funk v0.9.3
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.5.0
 )

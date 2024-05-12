@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"slices"
 	"strings"
 	"sync"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/thoas/go-funk"
 )
 
 var (
@@ -35,7 +35,7 @@ var rootCmd = &cobra.Command{
 	Long:  `cid is a cli to run pipeline actions locally and as part of your ci/cd process`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// log format
-		if !funk.ContainsString(validLogFormats, cfg.LogFormat) {
+		if !slices.Contains(validLogFormats, cfg.LogFormat) {
 			log.Error().Str("current", cfg.LogFormat).Strs("valid", validLogFormats).Msg("invalid log format specified")
 			os.Exit(1)
 		}
@@ -57,7 +57,7 @@ var rootCmd = &cobra.Command{
 		zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
 		// log level
-		if !funk.ContainsString(validLogLevels, cfg.LogLevel) {
+		if !slices.Contains(validLogLevels, cfg.LogLevel) {
 			log.Error().Str("current", cfg.LogLevel).Strs("valid", validLogLevels).Msg("invalid log level specified")
 			os.Exit(1)
 		}

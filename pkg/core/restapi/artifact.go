@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -21,7 +22,6 @@ import (
 	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
-	"github.com/thoas/go-funk"
 )
 
 // artifactList lists all generated reports
@@ -81,7 +81,7 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 	}
 
 	// generate build provenance?
-	if funk.Contains(provenance.FileTypes, fileType) {
+	if slices.Contains(provenance.FileTypes, fileType) {
 		log.Info().Str("artifact", file.Filename).Str("type", fileType).Msg("generating provenance for artifact")
 		prov := provenance.GenerateInTotoPredicate(file.Filename, fileHash, hc.Env, hc.State)
 

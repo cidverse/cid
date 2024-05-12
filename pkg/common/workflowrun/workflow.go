@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -18,7 +19,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/rs/zerolog/log"
-	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v3"
 )
 
@@ -84,7 +84,7 @@ func RunWorkflow(cfg *config.CIDConfig, wf *catalog.Workflow, env map[string]str
 
 	if rules.AnyRuleMatches(wf.Rules, ruleContext) {
 		for i := range wf.Stages {
-			if len(stagesFilter) == 0 || funk.Contains(stagesFilter, wf.Stages[i].Name) {
+			if len(stagesFilter) == 0 || slices.Contains(stagesFilter, wf.Stages[i].Name) {
 				RunWorkflowStage(cfg, &wf.Stages[i], env, projectDir, modulesFilter)
 			} else {
 				log.Debug().Str("workflow", wf.Name).Str("stage", wf.Stages[i].Name).Strs("filter", stagesFilter).Msg("stage has been skipped")
@@ -149,7 +149,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 			ctx.CurrentModule = &moduleRef
 
 			// check module filter
-			if len(modulesFilter) > 0 && !funk.Contains(modulesFilter, moduleRef.Name) {
+			if len(modulesFilter) > 0 && !slices.Contains(modulesFilter, moduleRef.Name) {
 				log.Trace().Str("action", action.ID).Str("module", moduleRef.Slug).Strs("filter", modulesFilter).Msg("action skipped by module filter")
 				continue
 			}

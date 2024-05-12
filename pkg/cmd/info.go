@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/cidverse/cid/pkg/app"
@@ -12,7 +13,6 @@ import (
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v3"
 )
 
@@ -52,10 +52,10 @@ var infoCmd = &cobra.Command{
 
 		// detect project modules
 		for _, module := range analyzer.ScanDirectory(projectDir) {
-			if funk.Contains(excludes, "dep") {
+			if slices.Contains(excludes, "dep") {
 				module.Dependencies = nil
 			}
-			if funk.Contains(excludes, "files") {
+			if slices.Contains(excludes, "files") {
 				module.Files = nil
 				module.FilesByExtension = nil
 			}
@@ -87,7 +87,7 @@ var infoCmd = &cobra.Command{
 			api.AutoProtectValues(key, value, value)
 			response.Environment[key] = value
 		}
-		if funk.Contains(excludes, "hostenv") {
+		if slices.Contains(excludes, "hostenv") {
 			for key := range env {
 				if !strings.HasPrefix(key, "NCI") {
 					delete(response.Environment, key)

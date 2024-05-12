@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"sort"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
@@ -12,7 +13,6 @@ import (
 	"github.com/cidverse/cidverseutils/version"
 	"github.com/cidverse/normalizeci/pkg/normalizer/api"
 	"github.com/rs/zerolog/log"
-	"github.com/thoas/go-funk"
 )
 
 type ExecutionType string
@@ -64,7 +64,7 @@ func (c *CIDConfig) FindExecutionCandidates(binary string, constraint string, pr
 	// container
 	for _, entry := range c.Registry.ContainerImages {
 		for _, provided := range entry.Provides {
-			if binary == provided.Binary || funk.Contains(provided.Alias, binary) {
+			if binary == provided.Binary || slices.Contains(provided.Alias, binary) {
 				log.Trace().Str("version", provided.Version).Str("constraint", constraint).Str("binary", binary).Str("image", entry.Image).Msg("checking version constraint")
 				if version.FulfillsConstraint(provided.Version, constraint) {
 					options = append(options, BinaryExecutionCandidate{
@@ -86,7 +86,7 @@ func (c *CIDConfig) FindExecutionCandidates(binary string, constraint string, pr
 	// exec
 	env := api.GetMachineEnvironment()
 	for _, entry := range c.LocalTools {
-		if funk.Contains(entry.Binary, binary) {
+		if slices.Contains(entry.Binary, binary) {
 			for _, lookup := range entry.Lookup {
 				// special case - PATH
 				if lookup.Key == "PATH" {
@@ -169,7 +169,7 @@ func (c *CIDConfig) FindImageOfBinary(binary string, constraint string) *catalog
 	// lookup
 	for _, entry := range c.Registry.ContainerImages {
 		for _, provided := range entry.Provides {
-			if binary == provided.Binary || funk.Contains(provided.Alias, binary) {
+			if binary == provided.Binary || slices.Contains(provided.Alias, binary) {
 				log.Trace().Str("version", provided.Version).Str("constraint", constraint).Str("binary", binary).Str("image", entry.Image).Msg("checking version constraint")
 				if version.FulfillsConstraint(provided.Version, constraint) {
 					return &entry
@@ -186,7 +186,7 @@ func (c *CIDConfig) FindPathOfBinary(binary string, constraint string) *ToolLoca
 	// lookup
 	env := api.GetMachineEnvironment()
 	for _, entry := range c.LocalTools {
-		if funk.Contains(entry.Binary, binary) {
+		if slices.Contains(entry.Binary, binary) {
 			for _, lookup := range entry.Lookup {
 				// special case - PATH
 				if lookup.Key == "PATH" {

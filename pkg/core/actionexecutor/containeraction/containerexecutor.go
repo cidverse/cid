@@ -51,7 +51,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	apiPort := strconv.Itoa(freePort)
 
 	// properties
-	secret := generateSecret()
+	secret := generateSecret(32)
 	buildID := generateSnowflakeId()
 	jobID := generateSnowflakeId()
 
