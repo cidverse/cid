@@ -27,7 +27,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/oriser/regroup v0.0.0-20230527212431-1b00c9bdbc5b
-	github.com/rs/zerolog v1.32.0
+	github.com/rs/zerolog v1.33.0
 	github.com/samber/lo v1.39.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
