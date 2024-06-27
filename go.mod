@@ -28,7 +28,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/oriser/regroup v0.0.0-20230527212431-1b00c9bdbc5b
 	github.com/rs/zerolog v1.33.0
-	github.com/samber/lo v1.39.0
+	github.com/samber/lo v1.41.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 	gopkg.in/yaml.v3 v3.0.1
