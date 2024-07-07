@@ -13,8 +13,9 @@ require (
 	github.com/cidverse/cidverseutils/network v0.1.0
 	github.com/cidverse/cidverseutils/redact v0.1.0
 	github.com/cidverse/cidverseutils/version v0.1.0
+	github.com/cidverse/cidverseutils/zerologconfig v0.1.0
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
-	github.com/cidverse/go-vcs v0.0.0-20240612200029-e7190a2a2bb6
+	github.com/cidverse/go-vcs v0.0.0-20240628195958-27702663f242
 	github.com/cidverse/normalizeci v1.1.1-0.20240507162324-423657017129
 	github.com/cidverse/repoanalyzer v0.1.1-0.20240510193438-abb053de8c14
 	github.com/go-resty/resty/v2 v2.13.1
@@ -24,7 +25,6 @@ require (
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/jinzhu/configor v1.2.2
 	github.com/labstack/echo/v4 v4.12.0
-	github.com/mattn/go-colorable v0.1.13
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/oriser/regroup v0.0.0-20230527212431-1b00c9bdbc5b
 	github.com/rs/zerolog v1.33.0
@@ -70,6 +70,7 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
@@ -86,7 +87,7 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/xanzy/go-gitlab v0.105.0 // indirect
+	github.com/xanzy/go-gitlab v0.106.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.24.0 // indirect
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
@@ -97,8 +98,8 @@ require (
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240617180043-68d350f18fd4 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240617180043-68d350f18fd4 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240624140628-dc46fd24d27d // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240624140628-dc46fd24d27d // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
