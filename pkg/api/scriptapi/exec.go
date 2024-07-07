@@ -1,4 +1,4 @@
-package cmd
+package scriptapi
 
 import (
 	"fmt"
@@ -14,22 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func stageRootCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "stage",
-		Aliases: []string{"s"},
-		Run: func(cmd *cobra.Command, args []string) {
-			_ = cmd.Help()
-			os.Exit(0)
-		},
-	}
-
-	cmd.AddCommand(stageListCmd())
-
-	return cmd
-}
-
-func stageListCmd() *cobra.Command {
+func execCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"ls"},

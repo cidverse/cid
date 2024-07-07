@@ -23,7 +23,8 @@ func init() {
 
 // CLI Main Entrypoint
 func main() {
-	cmdErr := cmd.Execute()
+	rootCommand := cmd.RootCmd()
+	cmdErr := rootCommand.Execute()
 	if cmdErr != nil {
 		log.Fatal().Err(cmdErr).Msg("cli error")
 	}

@@ -13,41 +13,46 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	rootCmd.AddCommand(moduleRootCmd)
-	moduleRootCmd.AddCommand(moduleListCmd)
+func moduleRootCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "module",
+		Aliases: []string{"m"},
+		Short:   ``,
+		Long:    ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			_ = cmd.Help()
+			os.Exit(0)
+		},
+	}
+
+	cmd.AddCommand(moduleListCmd())
+
+	return cmd
 }
 
-var moduleRootCmd = &cobra.Command{
-	Use:     "module",
-	Aliases: []string{"m"},
-	Short:   ``,
-	Long:    ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		_ = cmd.Help()
-		os.Exit(0)
-	},
-}
+func moduleListCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "lists all project modules",
+		Run: func(cmd *cobra.Command, args []string) {
+			zerolog.SetGlobalLevel(zerolog.WarnLevel)
 
-var moduleListCmd = &cobra.Command{
-	Use:     "list",
-	Aliases: []string{"ls"},
-	Short:   "lists all project modules",
-	Run: func(cmd *cobra.Command, args []string) {
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+			// find project directory and load config
+			projectDir := api.FindProjectDir()
 
-		// find project directory and load config
-		projectDir := api.FindProjectDir()
+			// analyze
+			modules := analyzer.ScanDirectory(projectDir)
 
-		// analyze
-		modules := analyzer.ScanDirectory(projectDir)
+			// print list
+			w := tabwriter.NewWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), 1, 1, 1, ' ', 0)
+			_, _ = fmt.Fprintln(w, "NAME\tBUILD-SYSTEM\tBUILD-SYNTAX\tSUBMODULES")
+			for _, module := range modules {
+				_, _ = fmt.Fprintln(w, module.Name+"\t"+string(module.BuildSystem)+"\t"+string(module.BuildSystemSyntax)+"\t0")
+			}
+			_ = w.Flush()
+		},
+	}
 
-		// print list
-		w := tabwriter.NewWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), 1, 1, 1, ' ', 0)
-		_, _ = fmt.Fprintln(w, "NAME\tBUILD-SYSTEM\tBUILD-SYNTAX\tSUBMODULES")
-		for _, module := range modules {
-			_, _ = fmt.Fprintln(w, module.Name+"\t"+string(module.BuildSystem)+"\t"+string(module.BuildSystemSyntax)+"\t0")
-		}
-		_ = w.Flush()
-	},
+	return cmd
 }
