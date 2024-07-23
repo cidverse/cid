@@ -4,7 +4,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cidverse/cid/pkg/api/scriptapi"
 	"github.com/cidverse/cidverseutils/zerologconfig"
 	"github.com/spf13/cobra"
 )
@@ -41,9 +40,6 @@ func RootCmd() *cobra.Command {
 	cmd.AddCommand(actionRootCmd())
 	cmd.AddCommand(xCmd())
 	cmd.AddCommand(apiCmd())
-
-	// api
-	cmd.AddCommand(scriptapi.RootCmd())
 
 	// version
 	cmd.AddCommand(versionCmd())
