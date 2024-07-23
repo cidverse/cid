@@ -1,65 +1,67 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
-  title: CID Workflow and Action API
+  title: CID
+  description: API for Actions and Workflows
   license:
     name: MIT
+    url: https://github.com/cidverse/cid/blob/main/LICENSE
+  contact:
+    name: Philipp Heuer
+    email: git@philippheuer.me
+    url: https://github.com/cidverse/cid
   version: 1.0.0
+
 servers:
   - url: http://localhost:8080
+  - url: unix://tmp/my-socket.socket
+
 tags:
+  - name: observability
+    description: Observability, Monitoring and Logging
   - name: info
     description: Information
-  - name: vcs
-    description: VCS Operations
-  - name: file
-    description: File Operations
   - name: artifact
     description: Artifact Operations
   - name: command
     description: Command Operations
+  - name: file
+    description: File Operations
+  - name: vcs
+    description: VCS Operations
+
 paths:
   # info api
-  /health:
+  /v1/health:
     get:
       tags:
-        - info
-      summary: simple healthcheck
-      operationId: health
+        - observability
+      summary: healthcheck
+      description: a very simple healthcheck
+      operationId: getHealthV1
       responses:
-        200:
+        "200":
           description: healthcheck result
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Healthcheck'
-  /log:
+                $ref: '#/components/schemas/HealthStatus'
+              example:
+                status: "up"
+  /v1/log:
     post:
       tags:
-        - info
+        - observability
       summary: logs a message
-      operationId: log
+      operationId: logMessageV1
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LogMessageRequest'
+              $ref: '#/components/schemas/LogMessagePayload'
       responses:
         201:
           description: Null response
           content: {}
-  /project:
-    get:
-      tags:
-        - info
-      summary: query information about the current project
-      operationId: projectInformation
-      responses:
-        200:
-          description: project information
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProjectInformation'
   /config/current:
     get:
       tags:
@@ -119,7 +121,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
   # vcs api
-  /vcs/commit:
+  /v1/vcs/commit:
     get:
       tags:
         - vcs
@@ -127,7 +129,7 @@ paths:
       operationId: vcsCommits
       parameters:
         - name: changes
-          in: path
+          in: query
           description: include changes in response
           required: false
           schema:
@@ -139,21 +141,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VCSCommitList'
-  /vcs/commit/{hash}:
+  /v1/vcs/commit/{id}:
     get:
       tags:
         - vcs
       summary: vcs commits
       operationId: vcsCommits
       parameters:
-        - name: hash
+        - name: id
           in: path
-          description: commit hash
+          description: commit id / hash
           required: true
           schema:
             type: string
         - name: changes
-          in: path
+          in: query
           description: include changes in response
           required: false
           schema:
@@ -215,6 +217,8 @@ paths:
             type: array
             items:
               type: string
+              nullable: false
+
       responses:
         200:
           description: file list
@@ -261,9 +265,10 @@ paths:
             type: string
       requestBody:
         content:
-          text/plain:
+          application/octet-stream:
             schema:
               type: string
+              format: binary
       responses:
         201:
           description: Null response
@@ -275,6 +280,13 @@ paths:
         - artifact
       summary: List Artifacts
       operationId: artifactList
+      parameters:
+        - name: query
+          in: query
+          description: Search Query
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: file list
@@ -348,7 +360,7 @@ paths:
             type: string
       responses:
         200:
-          description: file list
+          description: file content
           content:
             application/octet-stream:
               schema:
@@ -387,7 +399,7 @@ components:
         detail:
           type: string
           example: error details
-    Healthcheck:
+    HealthStatus:
       required:
         - status
       type: object
@@ -395,7 +407,7 @@ components:
         status:
           type: string
           example: up
-    LogMessageRequest:
+    LogMessagePayload:
       required:
         - level
         - message
@@ -403,7 +415,14 @@ components:
       properties:
         level:
           type: string
-          example: debug
+          description: log level
+          enum:
+            - trace
+            - debug
+            - info
+            - warning
+            - error
+          example: info
         message:
           type: string
           example: hello world
@@ -411,7 +430,7 @@ components:
           type: object
           description: dynamic key value properties / log context
           additionalProperties:
-            $ref: '#/components/schemas/AnyValue'
+            type: object
     ActionConfig:
       type: object
       properties:
@@ -456,7 +475,7 @@ components:
           type: object
           description: dynamic configuration options for the action
           additionalProperties:
-            $ref: '#/components/schemas/AnyValue'
+            type: object
     ProjectEnv:
       type: object
       additionalProperties:
@@ -531,6 +550,45 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ProjectModule'
+    ArtifactList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Artifact'
+    Artifact:
+        type: object
+        properties:
+          build_id:
+            type: string
+            description: build id
+            example: 1234
+          job_id:
+            type: string
+            description: job id
+            example: 1234
+          id:
+            type: string
+            description: artifact id
+            example: 1234
+          module:
+            type: string
+            description: module slug
+            example: root
+          type:
+            type: string
+            description: artifact type
+            example: binary
+          name:
+            type: string
+            description: artifact name
+            example: report.sarif
+          format:
+            type: string
+            description: artifact format
+            example: sarif
+          format_version:
+            type: string
+            description: artifact format version
+            example: 2.1.0
     # vcs
     VCSCommitList:
       type: array
@@ -562,11 +620,13 @@ components:
         tags:
           $ref: '#/components/schemas/VCSTagList'
         authored_at:
-          type: date
+          type: string
+          format: date-time
           description: authored at
           example: "2022-11-21T23:55:08+01:00"
         committed_at:
-          type: date
+          type: string
+          format: date-time
           description: committed at
           example: "2022-11-21T23:55:08+01:00"
     VCSAuthor:
@@ -686,12 +746,14 @@ components:
           type: array
           description: expose container ports
           items:
-            type: number
+            type: integer
+            format: int32
     ExecuteCommandResult:
       type: object
       properties:
         code:
-          type: number
+          type: integer
+          format: int32
           description: command exit code
           example: 1
         command:
@@ -706,6 +768,7 @@ components:
           type: string
           description: error message
           example: exit status 1
+          nullable: true
         stdout:
           type: string
           description: standard output (if capture-output was request, empty otherwise)
@@ -714,5 +777,3 @@ components:
           type: string
           description: error output (if capture-output was request, empty otherwise)
           example: ""
-    AnyValue:
-      description: 'Can be anything: string, number, array, object, etc., including `null`'

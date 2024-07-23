@@ -9,7 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Setup(handlers APIConfig) *echo.Echo {
+func Setup(handlers *APIConfig) *echo.Echo {
 	// config
 	e := echo.New()
 	e.HideBanner = true
@@ -19,24 +19,37 @@ func Setup(handlers APIConfig) *echo.Echo {
 	e.Use(middleware.Recover())
 	// e.Use(middleware.Logger())
 
-	// generic routes
-	e.GET("/health", handlers.healthCheck)
-	e.POST("/log", handlers.logMessage)
-
-	// config
-	e.GET("/config/current", handlers.configCurrent)
-
-	// project routes
-	e.GET("/env", handlers.projectEnv)
-	e.GET("/module", handlers.moduleList)
-	e.GET("/module/current", handlers.moduleCurrent)
+	// observability
+	e.GET("/health", handlers.healthCheck) // deprecated
+	e.GET("/v1/health", handlers.healthCheck)
+	e.POST("/log", handlers.logMessage) // deprecated
+	e.POST("/v1/log", handlers.logMessage)
 
 	// vcs
-	e.GET("/vcs/commit", handlers.vcsCommits)
-	e.GET("/vcs/commit/:hash", handlers.vcsCommitByHash)
-	e.GET("/vcs/tag", handlers.vcsTags)
-	e.GET("/vcs/release", handlers.vcsReleases)
-	e.GET("/vcs/diff", handlers.vcsDiff)
+	e.GET("/vcs/commit", handlers.vcsCommits)            // deprecated
+	e.GET("/vcs/commit/:hash", handlers.vcsCommitByHash) // deprecated
+	e.GET("/vcs/tag", handlers.vcsTags)                  // deprecated
+	e.GET("/vcs/release", handlers.vcsReleases)          // deprecated
+	e.GET("/vcs/diff", handlers.vcsDiff)                 // deprecated
+	e.GET("/v1/vcs/commit", handlers.vcsCommits)
+	e.GET("/v1/vcs/commit/:hash", handlers.vcsCommitByHash)
+	e.GET("/v1/vcs/tag", handlers.vcsTags)
+	e.GET("/v1/vcs/release", handlers.vcsReleases)
+	e.GET("/v1/vcs/diff", handlers.vcsDiff)
+
+	// deprecated job endpoints
+	e.GET("/config/current", handlers.configCurrent) // deprecated
+	e.GET("/env", handlers.projectEnv)               // deprecated
+	e.GET("/module/current", handlers.moduleCurrent) // deprecated
+
+	// current job
+	e.GET("/v1/job/config", handlers.configCurrent)
+	e.GET("/v1/job/env", handlers.projectEnv)
+	e.GET("/v1/job/module", handlers.moduleCurrent)
+
+	// repoanalyzer
+	e.GET("/module", handlers.moduleList) // deprecated
+	e.GET("/v1/repoanalyzer/module", handlers.moduleList)
 
 	// artifacts
 	e.GET("/artifact", handlers.artifactList)
@@ -49,11 +62,13 @@ func Setup(handlers APIConfig) *echo.Echo {
 	e.GET("/file/write", handlers.fileWrite)
 
 	// command routes
-	e.POST("/command", handlers.commandExecute)
+	e.POST("/command", handlers.commandExecute) // deprecated
+	e.POST("/v1/command/execute", handlers.commandExecute)
 	// TODO: (advanced) exec command as async task (+ get command status / log output / send stdin input)
 
 	// provenance
-	e.GET("/provenance", handlers.provenance)
+	e.GET("/provenance", handlers.provenance) // deprecated
+	e.GET("/v1/provenance", handlers.provenance)
 
 	return e
 }

@@ -84,7 +84,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	socketFile := path.Join(tempDir, hash.UUIDNoDash(uuid.New().String())+".socket")
 
 	// listen
-	apiEngine := restapi.Setup(restapi.APIConfig{
+	apiEngine := restapi.Setup(&restapi.APIConfig{
 		BuildID:       buildID,
 		JobID:         jobID,
 		ProjectDir:    ctx.ProjectDir,

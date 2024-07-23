@@ -27,13 +27,20 @@ cid api --type http --listen localhost:7400`,
 			secret, _ := cmd.Flags().GetString("secret")
 			currentModuleID, _ := cmd.Flags().GetInt("current-module")
 
-			// find project directory and load config
+			// find project dir
 			projectDir := api.FindProjectDir()
-			cfg := app.Load(projectDir)
-			env := api.GetCIDEnvironment(cfg.Env, projectDir)
 
 			// log
 			log.Debug().Str("command", "api").Str("type", apiType).Str("listen", listen).Str("socket", socketFile).Str("dir", projectDir).Msg("running command")
+			if apiType == "socket" {
+				log.Info().Str("path", socketFile).Msg("serving api via socket")
+			} else {
+				log.Info().Str("addr", listen).Msg("serving api via http")
+			}
+
+			// load config
+			cfg := app.Load(projectDir)
+			env := api.GetCIDEnvironment(cfg.Env, projectDir)
 
 			// scan for modules
 			modules := analyzer.ScanDirectory(projectDir)
@@ -47,7 +54,7 @@ cid api --type http --listen localhost:7400`,
 			localState := state.GetStateFromFile(stateFile)
 
 			// start api
-			apiEngine := restapi.Setup(restapi.APIConfig{
+			apiEngine := restapi.Setup(&restapi.APIConfig{
 				BuildID:       "0",
 				JobID:         "0",
 				ProjectDir:    projectDir,
