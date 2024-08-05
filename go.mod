@@ -18,7 +18,7 @@ require (
 	github.com/cidverse/go-vcs v0.0.0-20240628195958-27702663f242
 	github.com/cidverse/normalizeci v1.1.1-0.20240716145002-cfaf14fb65c4
 	github.com/cidverse/repoanalyzer v0.1.1-0.20240704190901-1e2e27d72222
-	github.com/go-resty/resty/v2 v2.13.1
+	github.com/go-resty/resty/v2 v2.14.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-version v1.7.0
 	github.com/in-toto/in-toto-golang v0.9.0
@@ -97,7 +97,7 @@ require (
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
-	golang.org/x/time v0.5.0 // indirect
+	golang.org/x/time v0.6.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240723171418-e6d459c13d2a // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240723171418-e6d459c13d2a // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
