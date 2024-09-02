@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 
@@ -12,8 +13,10 @@ import (
 
 const ModuleName = "MODULE_NAME"
 const ModuleSlug = "MODULE_SLUG"
+const ModuleType = "MODULE_TYPE"
 const ModuleBuildSystem = "MODULE_BUILD_SYSTEM"
 const ModuleBuildSystemSyntax = "MODULE_BUILD_SYSTEM_SYNTAX"
+const ModuleSpecificationType = "MODULE_SPECIFICATION_TYPE"
 const ModuleFiles = "MODULE_FILES"
 
 // AnyRuleMatches will return true if at least one rule matches, if no rules are provided this always returns true
@@ -74,13 +77,43 @@ func GetRuleContext(env map[string]string) map[string]interface{} {
 	}
 }
 
+func GetProjectRuleContext(env map[string]string, modules []*analyzerapi.ProjectModule) map[string]interface{} {
+	rc := GetRuleContext(env)
+
+	// module information
+	var buildSystems []string
+	var specificationTypes []string
+	var languages []string
+	for _, module := range modules {
+		if string(module.BuildSystem) != "" && !slices.Contains(buildSystems, string(module.BuildSystem)) {
+			buildSystems = append(buildSystems, string(module.BuildSystem))
+		}
+		if string(module.SpecificationType) != "" && !slices.Contains(specificationTypes, string(module.SpecificationType)) {
+			specificationTypes = append(specificationTypes, string(module.SpecificationType))
+		}
+
+		for _, lang := range module.Language {
+			if !slices.Contains(languages, lang) {
+				languages = append(languages, lang)
+			}
+		}
+	}
+	rc["PROJECT_BUILD_SYSTEMS"] = buildSystems
+	rc["PROJECT_SPECIFICATION_TYPES"] = specificationTypes
+	rc["PROJECT_LANGUAGES"] = languages
+
+	return rc
+}
+
 func GetModuleRuleContext(env map[string]string, module *analyzerapi.ProjectModule) map[string]interface{} {
 	ctx := GetRuleContext(env)
 
 	ctx[ModuleName] = module.Name
 	ctx[ModuleSlug] = module.Slug
+	ctx[ModuleType] = string(module.Type)
 	ctx[ModuleBuildSystem] = string(module.BuildSystem)
 	ctx[ModuleBuildSystemSyntax] = string(module.BuildSystemSyntax)
+	ctx[ModuleSpecificationType] = string(module.SpecificationType)
 
 	var files []string
 	for _, file := range module.Files {

@@ -130,7 +130,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 
 	// project-scoped actions
 	if catalogAction.Scope == catalog.ActionScopeProject {
-		ruleContext := rules.GetRuleContext(ctx.Env)
+		ruleContext := rules.GetProjectRuleContext(ctx.Env, ctx.Modules)
 		ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
 		log.Debug().Str("Trace", action.ID).Bool("rules_match", ruleMatch).Msg("check action rules")
 		if ruleMatch {
