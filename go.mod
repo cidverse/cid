@@ -10,7 +10,7 @@ require (
 	github.com/cidverse/cidverseutils/ci v0.1.0
 	github.com/cidverse/cidverseutils/compress v0.1.0
 	github.com/cidverse/cidverseutils/containerruntime v0.1.0
-	github.com/cidverse/cidverseutils/filesystem v0.1.0
+	github.com/cidverse/cidverseutils/filesystem v0.1.1
 	github.com/cidverse/cidverseutils/hash v0.1.0
 	github.com/cidverse/cidverseutils/network v0.1.0
 	github.com/cidverse/cidverseutils/redact v0.1.0
