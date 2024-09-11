@@ -34,8 +34,8 @@ github.com/cidverse/cidverseutils/containerruntime v0.1.0 h1:Jqv7/ughImvDL/Q/pTe
 github.com/cidverse/cidverseutils/containerruntime v0.1.0/go.mod h1:dyoA0ZzJc8YeTbZDtDnEFBXOuRXpOrQd5/9Y3XnZ3fg=
 github.com/cidverse/cidverseutils/exec v0.1.0 h1:KbCnDISptCrFJFHDrA9efNM0GWNLVkon3yEzehisETY=
 github.com/cidverse/cidverseutils/exec v0.1.0/go.mod h1:pBST2lLq7AnIZ6xM0foiz1VSUamGswN1csT/2MJAHHI=
-github.com/cidverse/cidverseutils/filesystem v0.1.0 h1:0WF4gBtThvRMWUsoGtK1MT5O6yE5Ql6H2x6RkMLQoc8=
-github.com/cidverse/cidverseutils/filesystem v0.1.0/go.mod h1:rw4oLD+q/7HCMkQUooxVz4He06ORyoAn2cXLFqpBinQ=
+github.com/cidverse/cidverseutils/filesystem v0.1.1 h1:xKGk+QhoywNKUp0artHkRPPOl+C3aa6wujkHhjTB6sI=
+github.com/cidverse/cidverseutils/filesystem v0.1.1/go.mod h1:cpAd2RNrNiBRtDJS8S/VRiTD88kU9pxV1i5aA+AqUso=
 github.com/cidverse/cidverseutils/hash v0.1.0 h1:bWZoBCuZDy4HsBLQD4Os5XjpHwqP64GdG1IZytD/GeU=
 github.com/cidverse/cidverseutils/hash v0.1.0/go.mod h1:MiRf2odL+20YA8iFNU14BT3o5d/1IOku+yjMYCxzXxo=
 github.com/cidverse/cidverseutils/network v0.1.0 h1:8AL6asRt7V1VOe/4hvrZ0UBxtIE6aGIJxm5MZJuO0GY=
