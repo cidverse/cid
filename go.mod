@@ -8,7 +8,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v2 v2.7.5
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils/ci v0.1.0
-	github.com/cidverse/cidverseutils/compress v0.1.0
+	github.com/cidverse/cidverseutils/compress v0.1.1
 	github.com/cidverse/cidverseutils/containerruntime v0.1.0
 	github.com/cidverse/cidverseutils/filesystem v0.1.1
 	github.com/cidverse/cidverseutils/hash v0.1.0
