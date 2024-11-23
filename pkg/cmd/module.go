@@ -1,15 +1,15 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
+	"strconv"
 	"sync"
-	"text/tabwriter"
 
-	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/context"
+	"github.com/cidverse/cid/pkg/core/cmdoutput"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/repoanalyzer/analyzer"
-	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -36,23 +36,44 @@ func moduleListCmd() *cobra.Command {
 		Aliases: []string{"ls"},
 		Short:   "lists all project modules",
 		Run: func(cmd *cobra.Command, args []string) {
-			zerolog.SetGlobalLevel(zerolog.WarnLevel)
+			format, _ := cmd.Flags().GetString("format")
 
-			// find project directory and load config
-			projectDir := api.FindProjectDir()
+			// app context
+			cid, err := context.NewAppContext()
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to prepare app context")
+				os.Exit(1)
+			}
 
 			// analyze
-			modules := analyzer.ScanDirectory(projectDir)
+			modules := analyzer.ScanDirectory(cid.ProjectDir)
 
-			// print list
-			w := tabwriter.NewWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), 1, 1, 1, ' ', 0)
-			_, _ = fmt.Fprintln(w, "NAME\tBUILD-SYSTEM\tBUILD-SYNTAX\tSUBMODULES")
-			for _, module := range modules {
-				_, _ = fmt.Fprintln(w, module.Name+"\t"+string(module.BuildSystem)+"\t"+string(module.BuildSystemSyntax)+"\t0")
+			// data
+			data := cmdoutput.TabularData{
+				Headers: []string{"NAME", "TYPE", "BUILD-SYSTEM", "BUILD-SYNTAX", "SPEC-TYPE", "SUBMODULES"},
+				Rows:    [][]string{},
 			}
-			_ = w.Flush()
+			for _, module := range modules {
+				data.Rows = append(data.Rows, []string{
+					module.Name,
+					string(module.Type),
+					string(module.BuildSystem),
+					string(module.BuildSystemSyntax),
+					string(module.SpecificationType),
+					strconv.Itoa(len(module.Submodules)),
+				})
+			}
+
+			// print
+			writer := redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil)
+			err = cmdoutput.PrintData(writer, data, cmdoutput.Format(format))
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to print data")
+				os.Exit(1)
+			}
 		},
 	}
+	cmd.Flags().StringP("format", "f", "table", "output format (table, json, csv)")
 
 	return cmd
 }

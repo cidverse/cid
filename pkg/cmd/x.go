@@ -4,9 +4,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cidverse/cid/pkg/app"
-	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/context"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -22,24 +21,25 @@ func xCmd() *cobra.Command {
 			userEnv, _ := cmd.Flags().GetStringArray("env")
 			ports, _ := cmd.Flags().GetIntSlice("port")
 
-			// find project directory and load config
-			projectDir := api.FindProjectDir()
-			workDir, _ := os.Getwd()
-			cfg := app.Load(projectDir)
+			// app context
+			cid, err := context.NewAppContext()
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to prepare app context")
+				os.Exit(1)
+			}
 
 			// user-provided env
-			env := api.GetCIDEnvironment(cfg.Env, projectDir)
 			for _, e := range userEnv {
 				parts := strings.SplitN(e, "=", 2)
-				env[parts[0]] = parts[1]
+				cid.Env[parts[0]] = parts[1]
 			}
 
 			// execute command
-			_, _, _, err := command.RunAPICommand(command.APICommandExecute{
+			_, _, _, err = command.RunAPICommand(command.APICommandExecute{
 				Command:                strings.Join(args, " "),
-				Env:                    env,
-				ProjectDir:             projectDir,
-				WorkDir:                workDir,
+				Env:                    cid.Env,
+				ProjectDir:             cid.ProjectDir,
+				WorkDir:                cid.WorkDir,
 				TempDir:                "",
 				Capture:                false,
 				Ports:                  ports,
@@ -53,7 +53,7 @@ func xCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringP("constraint", "c", "", "version constraint")
-	cmd.Flags().StringArrayP("env", "e", []string{}, "append to command environment")
+	cmd.Flags().StringArrayP("env", "e", []string{}, "environment variables")
 	cmd.Flags().IntSliceP("port", "p", []int{}, "ports to expose")
 
 	return cmd

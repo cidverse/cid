@@ -1,5 +1,8 @@
 module github.com/cidverse/cid
 
+//go:platform linux/amd64
+//go:platform darwin/amd64
+
 go 1.22.0
 
 toolchain go1.23.3

@@ -1,10 +1,10 @@
 package cmd
 
 import (
+	"os"
 	"path/filepath"
 
-	"github.com/cidverse/cid/pkg/app"
-	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer/analyzer"
@@ -27,44 +27,44 @@ cid api --type http --listen localhost:7400`,
 			secret, _ := cmd.Flags().GetString("secret")
 			currentModuleID, _ := cmd.Flags().GetInt("current-module")
 
-			// find project dir
-			projectDir := api.FindProjectDir()
+			// app context
+			cid, err := context.NewAppContext()
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to prepare app context")
+				os.Exit(1)
+			}
 
 			// log
-			log.Debug().Str("command", "api").Str("type", apiType).Str("listen", listen).Str("socket", socketFile).Str("dir", projectDir).Msg("running command")
+			log.Debug().Str("command", "api").Str("type", apiType).Str("listen", listen).Str("socket", socketFile).Str("dir", cid.ProjectDir).Msg("running command")
 			if apiType == "socket" {
 				log.Info().Str("path", socketFile).Msg("serving api via socket")
 			} else {
 				log.Info().Str("addr", listen).Msg("serving api via http")
 			}
 
-			// load config
-			cfg := app.Load(projectDir)
-			env := api.GetCIDEnvironment(cfg.Env, projectDir)
-
 			// scan for modules
-			modules := analyzer.ScanDirectory(projectDir)
+			modules := analyzer.ScanDirectory(cid.ProjectDir)
 			var currentModule *analyzerapi.ProjectModule = nil
 			if currentModuleID >= 0 && currentModuleID < len(modules) {
 				currentModule = modules[currentModuleID]
 			}
 
 			// state
-			stateFile := filepath.Join(projectDir, ".dist", "state.json")
+			stateFile := filepath.Join(cid.ProjectDir, ".dist", "state.json")
 			localState := state.GetStateFromFile(stateFile)
 
 			// start api
 			apiEngine := restapi.Setup(&restapi.APIConfig{
 				BuildID:       "0",
 				JobID:         "0",
-				ProjectDir:    projectDir,
+				ProjectDir:    cid.ProjectDir,
 				Modules:       modules,
 				CurrentModule: currentModule,
-				Env:           env,
+				Env:           cid.Env,
 				ActionConfig:  ``,
 				State:         &localState,
-				TempDir:       filepath.Join(projectDir, ".tmp"),
-				ArtifactDir:   filepath.Join(projectDir, ".dist"),
+				TempDir:       filepath.Join(cid.ProjectDir, ".tmp"),
+				ArtifactDir:   filepath.Join(cid.ProjectDir, ".dist"),
 			})
 			if len(secret) > 0 {
 				restapi.SecureWithAPIKey(apiEngine, secret)

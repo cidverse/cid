@@ -32,13 +32,13 @@ func versionCmd() *cobra.Command {
 				versionPrefix = "v"
 			}
 
-			fmt.Fprintf(os.Stdout, "GitVersion:    %s\n", versionPrefix+Version)
-			fmt.Fprintf(os.Stdout, "GitCommit:     %s\n", CommitHash)
-			fmt.Fprintf(os.Stdout, "GitTreeState:  %s\n", RepositoryStatus)
-			fmt.Fprintf(os.Stdout, "BuildDate:     %s\n", BuildAt)
-			fmt.Fprintf(os.Stdout, "GoVersion:     %s\n", runtime.Version())
-			fmt.Fprintf(os.Stdout, "Compiler:      %s\n", runtime.Compiler)
-			fmt.Fprintf(os.Stdout, "Platform:      %s\n", runtime.GOOS+"/"+runtime.GOARCH)
+			_, _ = fmt.Fprintf(os.Stdout, "GitVersion:    %s\n", versionPrefix+Version)
+			_, _ = fmt.Fprintf(os.Stdout, "GitCommit:     %s\n", CommitHash)
+			_, _ = fmt.Fprintf(os.Stdout, "GitTreeState:  %s\n", RepositoryStatus)
+			_, _ = fmt.Fprintf(os.Stdout, "BuildDate:     %s\n", BuildAt)
+			_, _ = fmt.Fprintf(os.Stdout, "GoVersion:     %s\n", runtime.Version())
+			_, _ = fmt.Fprintf(os.Stdout, "Compiler:      %s\n", runtime.Compiler)
+			_, _ = fmt.Fprintf(os.Stdout, "Platform:      %s\n", runtime.GOOS+"/"+runtime.GOARCH)
 		},
 	}
 }

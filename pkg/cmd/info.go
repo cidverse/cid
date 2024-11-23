@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"slices"
 	"strings"
 
-	"github.com/cidverse/cid/pkg/app"
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/repoanalyzer/analyzer"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
@@ -34,10 +35,12 @@ func infoCmd() *cobra.Command {
 			excludes, _ := cmd.Flags().GetStringArray("exclude")
 			log.Debug().Str("command", "info").Strs("excludes", excludes).Msg("running command")
 
-			// find project directory and load config
-			projectDir := api.FindProjectDir()
-			cfg := app.Load(projectDir)
-			env := api.GetCIDEnvironment(cfg.Env, projectDir)
+			// app context
+			cid, err := context.NewAppContext()
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to prepare app context")
+				os.Exit(1)
+			}
 
 			// response
 			var response = InfoCommandResponse{
@@ -47,7 +50,7 @@ func infoCmd() *cobra.Command {
 			}
 
 			// detect project modules
-			for _, module := range analyzer.ScanDirectory(projectDir) {
+			for _, module := range analyzer.ScanDirectory(cid.ProjectDir) {
 				if slices.Contains(excludes, "dep") {
 					module.Dependencies = nil
 				}
@@ -60,7 +63,7 @@ func infoCmd() *cobra.Command {
 
 			// tool constraints
 			response.ToolConstraints = make(map[string]string)
-			for key, value := range cfg.Dependencies {
+			for key, value := range cid.Config.Dependencies {
 				response.ToolConstraints[key] = value
 			}
 
@@ -79,12 +82,12 @@ func infoCmd() *cobra.Command {
 
 			// environment
 			response.Environment = make(map[string]string)
-			for key, value := range env {
+			for key, value := range cid.Env {
 				api.AutoProtectValues(key, value, value)
 				response.Environment[key] = value
 			}
 			if slices.Contains(excludes, "hostenv") {
-				for key := range env {
+				for key := range cid.Env {
 					if !strings.HasPrefix(key, "NCI") {
 						delete(response.Environment, key)
 					}

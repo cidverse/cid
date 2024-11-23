@@ -1,16 +1,16 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"sync"
-	"text/tabwriter"
 
-	"github.com/cidverse/cid/pkg/app"
-	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/context"
+	"github.com/cidverse/cid/pkg/core/cmdoutput"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/cidverse/cidverseutils/redact"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -35,25 +35,47 @@ func stageListCmd() *cobra.Command {
 		Aliases: []string{"ls"},
 		Short:   "lists all stages",
 		Run: func(cmd *cobra.Command, args []string) {
-			// find project directory and load config
-			projectDir := api.FindProjectDir()
-			cfg := app.Load(projectDir)
-			env := api.GetCIDEnvironment(cfg.Env, projectDir)
+			format, _ := cmd.Flags().GetString("format")
+			workflows, _ := cmd.Flags().GetStringArray("workflow")
 
-			// print list
-			w := tabwriter.NewWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), 1, 1, 1, ' ', 0)
-			_, _ = fmt.Fprintln(w, "WORKFLOW\tSTAGE\tRULES\tACTIONS")
-			for _, wf := range cfg.Registry.Workflows {
+			// app context
+			cid, err := context.NewAppContext()
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to prepare app context")
+				os.Exit(1)
+			}
+
+			// data
+			data := cmdoutput.TabularData{
+				Headers: []string{"WORKFLOW", "STAGE", "RULES", "ACTIONS"},
+				Rows:    [][]string{},
+			}
+			for _, wf := range cid.Config.Registry.Workflows {
+				if len(workflows) > 0 && !slices.Contains(workflows, wf.Name) {
+					continue
+				}
+
 				for _, stage := range wf.Stages {
-					_, _ = fmt.Fprintln(w, wf.Name+"\t"+
-						stage.Name+"\t"+
-						rules.EvaluateRulesAsText(stage.Rules, rules.GetRuleContext(env))+"\t"+
-						strconv.Itoa(len(stage.Actions)))
+					data.Rows = append(data.Rows, []string{
+						wf.Name,
+						stage.Name,
+						rules.EvaluateRulesAsText(stage.Rules, rules.GetRuleContext(cid.Env)),
+						strconv.Itoa(len(stage.Actions)),
+					})
 				}
 			}
-			_ = w.Flush()
+
+			// print
+			writer := redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil)
+			err = cmdoutput.PrintData(writer, data, cmdoutput.Format(format))
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to print data")
+				os.Exit(1)
+			}
 		},
 	}
+	cmd.Flags().StringArrayP("workflow", "w", []string{}, "filter by workflow (default: all workflows)")
+	cmd.Flags().StringP("format", "f", "table", "output format (table, json, csv)")
 
 	return cmd
 }

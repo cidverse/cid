@@ -1,17 +1,15 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
-	"text/tabwriter"
 
-	"github.com/cidverse/cid/pkg/app"
-	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/workflowrun"
+	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/cmdoutput"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
@@ -42,30 +40,46 @@ func actionListCmd() *cobra.Command {
 		Aliases: []string{"ls"},
 		Short:   "lists all actions",
 		Run: func(cmd *cobra.Command, args []string) {
-			// find project directory and load config
-			projectDir := api.FindProjectDir()
-			cfg := app.Load(projectDir)
-			env := api.GetCIDEnvironment(cfg.Env, projectDir)
+			format, _ := cmd.Flags().GetString("format")
 
-			// print list
-			w := tabwriter.NewWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), 1, 1, 1, ' ', 0)
-			_, _ = fmt.Fprintln(w, "REPOSITORY\tACTION\tTYPE\tSCOPE\tRULES\tDESCRIPTION")
-			for _, action := range cfg.Registry.Actions {
+			// app context
+			cid, err := context.NewAppContext()
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to prepare app context")
+				os.Exit(1)
+			}
+
+			// data
+			data := cmdoutput.TabularData{
+				Headers: []string{"REPOSITORY", "ACTION", "TYPE", "SCOPE", "RULES", "DESCRIPTION"},
+				Rows:    [][]string{},
+			}
+			for _, action := range cid.Config.Registry.Actions {
 				ruleEvaluation := "?/" + strconv.Itoa(len(action.Rules))
 				if action.Scope == catalog.ActionScopeProject {
-					ruleEvaluation = rules.EvaluateRulesAsText(action.Rules, rules.GetRuleContext(env))
+					ruleEvaluation = rules.EvaluateRulesAsText(action.Rules, rules.GetRuleContext(cid.Env))
 				}
 
-				_, _ = fmt.Fprintln(w, action.Repository+"\t"+
-					action.Name+"\t"+
-					string(action.Type)+"\t"+
-					string(action.Scope)+"\t"+
-					ruleEvaluation+"\t"+
-					strings.Replace(action.Description, "\n", "", -1))
+				data.Rows = append(data.Rows, []string{
+					action.Repository,
+					action.Name,
+					string(action.Type),
+					string(action.Scope),
+					ruleEvaluation,
+					strings.Replace(action.Description, "\n", "", -1),
+				})
 			}
-			_ = w.Flush()
+
+			// print
+			writer := redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil)
+			err = cmdoutput.PrintData(writer, data, cmdoutput.Format(format))
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to print data")
+				os.Exit(1)
+			}
 		},
 	}
+	cmd.Flags().StringP("format", "f", "table", "output format (table, json, csv)")
 
 	return cmd
 }
@@ -78,16 +92,18 @@ func actionRunCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			modules, _ := cmd.Flags().GetStringArray("module")
 
-			// find project directory and load config
-			projectDir := api.FindProjectDir()
-			cfg := app.Load(projectDir)
-			env := api.GetCIDEnvironment(cfg.Env, projectDir)
+			// app context
+			cid, err := context.NewAppContext()
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to prepare app context")
+				os.Exit(1)
+			}
 
 			// actions
 			actionName := args[0]
 
 			// pass action
-			action := cfg.Registry.FindAction(actionName)
+			action := cid.Config.Registry.FindAction(actionName)
 			if action == nil {
 				log.Error().Str("action", actionName).Msg("action is not known")
 				os.Exit(1)
@@ -98,10 +114,9 @@ func actionRunCmd() *cobra.Command {
 				Config: nil,
 				Module: nil,
 			}
-			workflowrun.RunWorkflowAction(cfg, &act, env, projectDir, modules)
+			workflowrun.RunWorkflowAction(cid.Config, &act, cid.Env, cid.ProjectDir, modules)
 		},
 	}
-
 	cmd.Flags().StringArrayP("module", "m", []string{}, "limit execution to the specified module(s)")
 
 	return cmd

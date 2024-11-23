@@ -1,4 +1,4 @@
-package api
+package context
 
 import (
 	"encoding/base64"
@@ -6,18 +6,16 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/secret"
-	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/normalizeci/pkg/envstruct"
 	"github.com/cidverse/normalizeci/pkg/normalizer"
 	"github.com/cidverse/normalizeci/pkg/normalizer/api"
-	"github.com/rs/zerolog/log"
 )
 
 // GetCIDEnvironment returns the normalized ci variables
-func GetCIDEnvironment(configEnv map[string]string, projectDirectory string) map[string]string {
+func GetCIDEnvironment(configEnv map[string]string, projectDirectory string) (map[string]string, error) {
 	normalized, err := normalizer.Normalize()
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to prepare ci environment variables")
+		return nil, err
 	}
 	env := envstruct.StructToEnvMap(normalized)
 	for key := range env {
@@ -49,7 +47,7 @@ func GetCIDEnvironment(configEnv map[string]string, projectDirectory string) map
 		}
 	*/
 
-	return env
+	return env, nil
 }
 
 func DecodeEnvValue(value string) string {
@@ -74,16 +72,4 @@ func DecodeEnvValue(value string) string {
 	}
 
 	return value
-}
-
-func AutoProtectValues(key string, original string, decoded string) {
-	upperKey := strings.ToUpper(key)
-	if strings.Contains(upperKey, "KEY") || strings.Contains(upperKey, "USER") || strings.Contains(upperKey, "PASS") || strings.Contains(upperKey, "PRIVATE") || strings.Contains(upperKey, "TOKEN") || strings.Contains(upperKey, "SECRET") || strings.Contains(upperKey, "AUTH") {
-		if original != "" {
-			redact.ProtectPhrase(original)
-		}
-		if decoded != "" {
-			redact.ProtectPhrase(decoded)
-		}
-	}
 }

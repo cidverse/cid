@@ -5,14 +5,13 @@ import (
 	"os"
 	"strconv"
 	"sync"
-	"text/tabwriter"
 
+	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/cmdoutput"
 	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cidverseutils/redact"
 
-	"github.com/cidverse/cid/pkg/app"
-	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/workflowrun"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/rs/zerolog/log"
@@ -43,23 +42,40 @@ func workflowListCmd() *cobra.Command {
 		Aliases: []string{"ls"},
 		Short:   "lists all workflows",
 		Run: func(cmd *cobra.Command, args []string) {
-			// find project directory and load config
-			projectDir := api.FindProjectDir()
-			cfg := app.Load(projectDir)
-			env := api.GetCIDEnvironment(cfg.Env, projectDir)
+			format, _ := cmd.Flags().GetString("format")
 
-			// print list
-			w := tabwriter.NewWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), 1, 1, 1, ' ', 0)
-			_, _ = fmt.Fprintln(w, "WORKFLOW\tVERSION\tRULES\tSTAGES\tACTIONS")
-			for _, workflow := range cfg.Registry.Workflows {
-				_, _ = fmt.Fprintln(w, workflow.Name+"\t"+workflow.Version+"\t"+
-					rules.EvaluateRulesAsText(workflow.Rules, rules.GetRuleContext(env))+"\t"+
-					strconv.Itoa(len(workflow.Stages))+"\t"+
-					strconv.Itoa(workflow.ActionCount()))
+			// app context
+			cid, err := context.NewAppContext()
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to prepare app context")
+				os.Exit(1)
 			}
-			_ = w.Flush()
+
+			// data
+			data := cmdoutput.TabularData{
+				Headers: []string{"WORKFLOW", "VERSION", "RULES", "STAGES", "ACTIONS"},
+				Rows:    [][]string{},
+			}
+			for _, workflow := range cid.Config.Registry.Workflows {
+				data.Rows = append(data.Rows, []string{
+					workflow.Name,
+					workflow.Version,
+					rules.EvaluateRulesAsText(workflow.Rules, rules.GetRuleContext(cid.Env)),
+					strconv.Itoa(len(workflow.Stages)),
+					strconv.Itoa(workflow.ActionCount()),
+				})
+			}
+
+			// print
+			writer := redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil)
+			err = cmdoutput.PrintData(writer, data, cmdoutput.Format(format))
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to print data")
+				os.Exit(1)
+			}
 		},
 	}
+	cmd.Flags().StringP("format", "f", "table", "output format (table, json, csv)")
 
 	return cmd
 }
@@ -73,10 +89,12 @@ func workflowRunCmd() *cobra.Command {
 			modules, _ := cmd.Flags().GetStringArray("module")
 			stages, _ := cmd.Flags().GetStringArray("stage")
 
-			// find project directory and load config
-			projectDir := api.FindProjectDir()
-			cfg := app.Load(projectDir)
-			env := api.GetCIDEnvironment(cfg.Env, projectDir)
+			// app context
+			cid, err := context.NewAppContext()
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to prepare app context")
+				os.Exit(1)
+			}
 
 			if len(args) > 1 {
 				// error
@@ -87,10 +105,10 @@ func workflowRunCmd() *cobra.Command {
 			var wf *catalog.Workflow
 			if len(args) == 0 {
 				// evaluate rules to pick workflow
-				wf = workflowrun.FirstWorkflowMatchingRules(cfg.Registry.Workflows, env)
+				wf = workflowrun.FirstWorkflowMatchingRules(cid.Config.Registry.Workflows, cid.Env)
 			} else if len(args) == 1 {
 				// find workflow
-				wf = cfg.Registry.FindWorkflow(args[0])
+				wf = cid.Config.Registry.FindWorkflow(args[0])
 			}
 
 			if wf == nil {
@@ -98,12 +116,12 @@ func workflowRunCmd() *cobra.Command {
 			}
 
 			// entrypoint
-			provenance.WorkflowSource = fmt.Sprintf("%s@%s", cfg.CatalogSources[wf.Repository].URI, cfg.CatalogSources[wf.Repository].SHA256)
+			provenance.WorkflowSource = fmt.Sprintf("%s@%s", cid.Config.CatalogSources[wf.Repository].URI, cid.Config.CatalogSources[wf.Repository].SHA256)
 			provenance.Workflow = fmt.Sprintf("%s@%s", wf.Name, wf.Version)
 
 			// run
 			log.Info().Str("repository", wf.Repository).Str("name", wf.Name).Str("version", wf.Version).Msg("running workflow")
-			workflowrun.RunWorkflow(cfg, wf, env, projectDir, stages, modules)
+			workflowrun.RunWorkflow(cid.Config, wf, cid.Env, cid.ProjectDir, stages, modules)
 		},
 	}
 
