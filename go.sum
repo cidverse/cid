@@ -42,8 +42,8 @@ github.com/cidverse/cidverseutils/redact v0.1.0 h1:+6AshqcT9iZiTxB/zgxsn27BkLdUx
 github.com/cidverse/cidverseutils/redact v0.1.0/go.mod h1:vmnvyZGgLGgrx0H0uzrm99qPtQWOziYlJ9Qmx0txHBo=
 github.com/cidverse/cidverseutils/version v0.1.0 h1:+t9AaSW+++38SnlzF4x12E7oAdvXFw6HY7ujwBN7HCA=
 github.com/cidverse/cidverseutils/version v0.1.0/go.mod h1:PbRN1pUYDBOT5uZXmOlQBCIoNJm6ubHJsg6Thgaq0TU=
-github.com/cidverse/cidverseutils/zerologconfig v0.1.0 h1:iUJ9ANUCHH6IsM8MoeOv5Q8QvCd+iDl4X8QL/nfAdVw=
-github.com/cidverse/cidverseutils/zerologconfig v0.1.0/go.mod h1:X3mGXDU1BtdGk818+a0UL6vzhU9lLb8/oEslSnVQzuA=
+github.com/cidverse/cidverseutils/zerologconfig v0.1.1 h1:+DU7kB7rNqPLIYIZtPtvHkMWSu9cenXpxcZuqZ7SZtY=
+github.com/cidverse/cidverseutils/zerologconfig v0.1.1/go.mod h1:ax/tFT2mPv9hNkNkcSyilwuvwzxw6v93R0GxMKEKsZg=
 github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc h1:eVuHW4U9BoiqjIwWPATHRm6oiphVlm3Jn7QgHGgeVq8=
 github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc/go.mod h1:1E+4h0XkcYJVq3RHoYQradnCt7wk3JgnuRRnfeiwAzE=
 github.com/cidverse/go-vcs v0.0.0-20241123123700-fb65a5c04ebd h1:QwKLgely2pWfIsV57RFDRk74BoxXCahj49IrYEiYz6Q=

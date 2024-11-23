@@ -15,7 +15,7 @@ require (
 	github.com/cidverse/cidverseutils/network v0.1.0
 	github.com/cidverse/cidverseutils/redact v0.1.0
 	github.com/cidverse/cidverseutils/version v0.1.0
-	github.com/cidverse/cidverseutils/zerologconfig v0.1.0
+	github.com/cidverse/cidverseutils/zerologconfig v0.1.1
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
 	github.com/cidverse/go-vcs v0.0.0-20241123123700-fb65a5c04ebd
 	github.com/cidverse/normalizeci v1.1.1-0.20240908141115-5bdf33fc46f7
