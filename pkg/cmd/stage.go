@@ -48,7 +48,7 @@ func stageListCmd() *cobra.Command {
 			// data
 			data := cmdoutput.TabularData{
 				Headers: []string{"WORKFLOW", "STAGE", "RULES", "ACTIONS"},
-				Rows:    [][]string{},
+				Rows:    [][]interface{}{},
 			}
 			for _, wf := range cid.Config.Registry.Workflows {
 				if len(workflows) > 0 && !slices.Contains(workflows, wf.Name) {
@@ -56,7 +56,7 @@ func stageListCmd() *cobra.Command {
 				}
 
 				for _, stage := range wf.Stages {
-					data.Rows = append(data.Rows, []string{
+					data.Rows = append(data.Rows, []interface{}{
 						wf.Name,
 						stage.Name,
 						rules.EvaluateRulesAsText(stage.Rules, rules.GetRuleContext(cid.Env)),

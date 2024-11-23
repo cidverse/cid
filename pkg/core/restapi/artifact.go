@@ -15,7 +15,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/state"
-	"github.com/cidverse/cid/pkg/core/util"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/compress"
 	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/go-rules/pkg/expr"

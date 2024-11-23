@@ -18,7 +18,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
-	"github.com/cidverse/cid/pkg/core/util"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/cidverseutils/containerruntime"
 	"github.com/cidverse/cidverseutils/hash"
@@ -157,7 +157,12 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	// enterprise (proxy, ca-certs)
 	command.ApplyProxyConfiguration(&containerExec)
 	for _, cert := range catalogAction.Container.Certs {
-		command.ApplyCertMount(&containerExec, command.GetCertFileByType(cert.Type), cert.ContainerPath)
+		certPath, certErr := util.GetCertFileByType(cert.Type)
+		if certErr != nil {
+			return certErr
+		}
+
+		command.ApplyCertMount(&containerExec, certPath, cert.ContainerPath)
 	}
 
 	// catalogAction access

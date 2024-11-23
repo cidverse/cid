@@ -1,12 +1,11 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"sync"
-	"text/tabwriter"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/cmdoutput"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -44,22 +43,47 @@ func catalogAddCmd() *cobra.Command {
 }
 
 func catalogListCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "list",
 		Aliases: []string{},
 		Short:   "list registries",
 		Run: func(cmd *cobra.Command, args []string) {
+			format, _ := cmd.Flags().GetString("format")
+
+			// app context
 			registries := catalog.LoadSources()
-			// print list
-			w := tabwriter.NewWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), 1, 1, 1, ' ', 0)
-			_, _ = fmt.Fprintln(w, "NAME\tURI\tAdded\tUpdated\tWorkflows\tActions\tImages\tHash")
-			for key, source := range registries {
-				data := catalog.LoadCatalogs(map[string]*catalog.Source{key: source})
-				_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%d\t%d\t%s\n", key, source.URI, source.AddedAt, source.UpdatedAt, len(data.Workflows), len(data.Actions), len(data.ContainerImages), source.SHA256[:7])
+
+			// data
+			data := cmdoutput.TabularData{
+				Headers: []string{"NAME", "URI", "ADDED", "UPDATED", "WORKFLOWS", "ACTIONS", "IMAGES", "HASH"},
+				Rows:    [][]interface{}{},
 			}
-			_ = w.Flush()
+			for key, source := range registries {
+				catalogData := catalog.LoadCatalogs(map[string]*catalog.Source{key: source})
+				data.Rows = append(data.Rows, []interface{}{
+					key,
+					source.URI,
+					source.AddedAt,
+					source.UpdatedAt,
+					len(catalogData.Workflows),
+					len(catalogData.Actions),
+					len(catalogData.ContainerImages),
+					source.SHA256[:7],
+				})
+			}
+
+			// print
+			writer := redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil)
+			err := cmdoutput.PrintData(writer, data, cmdoutput.Format(format))
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to print data")
+				os.Exit(1)
+			}
 		},
 	}
+	cmd.Flags().StringP("format", "f", "table", "output format (table, json, csv)")
+
+	return cmd
 }
 
 func catalogRemoveCmd() *cobra.Command {

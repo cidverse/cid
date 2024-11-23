@@ -9,7 +9,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/core/state"
-	"github.com/cidverse/cid/pkg/core/util"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 )

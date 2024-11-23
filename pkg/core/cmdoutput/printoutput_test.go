@@ -12,7 +12,7 @@ import (
 func TestPrintData_TableFormat(t *testing.T) {
 	data := TabularData{
 		Headers: []string{"REPOSITORY", "ACTION"},
-		Rows: [][]string{
+		Rows: [][]interface{}{
 			{"repo1", "action1"},
 			{"repo2", "action2"},
 		},
@@ -32,7 +32,7 @@ repo2      action2
 func TestPrintData_JSONFormat(t *testing.T) {
 	data := TabularData{
 		Headers: []string{"REPOSITORY", "ACTION"},
-		Rows: [][]string{
+		Rows: [][]interface{}{
 			{"repo1", "action1"},
 			{"repo2", "action2"},
 		},
@@ -59,7 +59,7 @@ func TestPrintData_JSONFormat(t *testing.T) {
 func TestPrintData_CSVFormat(t *testing.T) {
 	data := TabularData{
 		Headers: []string{"REPOSITORY", "ACTION"},
-		Rows: [][]string{
+		Rows: [][]interface{}{
 			{"repo1", "action1"},
 			{"repo2", "action2"},
 		},
@@ -79,7 +79,7 @@ repo2,action2
 func TestPrintData_UnsupportedFormat(t *testing.T) {
 	data := TabularData{
 		Headers: []string{"REPOSITORY", "ACTION"},
-		Rows: [][]string{
+		Rows: [][]interface{}{
 			{"repo1", "action1"},
 		},
 	}

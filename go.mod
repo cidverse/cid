@@ -9,6 +9,7 @@ toolchain go1.23.3
 
 require (
 	github.com/ProtonMail/gopenpgp/v3 v3.0.0
+	github.com/adrg/xdg v0.5.3
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils/ci v0.1.0
 	github.com/cidverse/cidverseutils/compress v0.1.1
@@ -18,7 +19,7 @@ require (
 	github.com/cidverse/cidverseutils/network v0.1.0
 	github.com/cidverse/cidverseutils/redact v0.1.0
 	github.com/cidverse/cidverseutils/version v0.1.0
-	github.com/cidverse/cidverseutils/zerologconfig v0.1.0
+	github.com/cidverse/cidverseutils/zerologconfig v0.1.1
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
 	github.com/cidverse/go-vcs v0.0.0-20241123123700-fb65a5c04ebd
 	github.com/cidverse/normalizeci v1.1.1-0.20240908141115-5bdf33fc46f7

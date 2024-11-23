@@ -14,7 +14,7 @@ import (
 	"sync"
 
 	"github.com/cidverse/cid/pkg/constants"
-	"github.com/cidverse/cid/pkg/core/util"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/cidverseutils/containerruntime"
 	"github.com/cidverse/cidverseutils/filesystem"
@@ -186,7 +186,7 @@ func RunAPICommand(cmd APICommandExecute) (stdout string, stderr string, executi
 
 		// cache
 		for _, c := range candidate.ImageCache {
-			dir := filepath.Join(util.GetUserConfigDirectory(), "cid-cache-"+c.ID)
+			dir := filepath.Join(util.CIDStateDir(), "cache-"+c.ID)
 			_ = os.MkdirAll(dir, 0775)
 			containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: dir, Target: c.ContainerPath})
 		}
@@ -204,7 +204,11 @@ func RunAPICommand(cmd APICommandExecute) (stdout string, stderr string, executi
 		// enterprise (proxy, ca-certs)
 		ApplyProxyConfiguration(&containerExec)
 		for _, cert := range candidate.Certs {
-			ApplyCertMount(&containerExec, GetCertFileByType(cert.Type), cert.ContainerPath)
+			certPath, certErr := util.GetCertFileByType(cert.Type)
+			if certErr != nil {
+				return "", "", &candidate, errors.New("failed to get cert file: " + certErr.Error())
+			}
+			ApplyCertMount(&containerExec, certPath, cert.ContainerPath)
 		}
 
 		// generate and execute command

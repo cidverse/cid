@@ -51,10 +51,10 @@ func moduleListCmd() *cobra.Command {
 			// data
 			data := cmdoutput.TabularData{
 				Headers: []string{"NAME", "TYPE", "BUILD-SYSTEM", "BUILD-SYNTAX", "SPEC-TYPE", "SUBMODULES"},
-				Rows:    [][]string{},
+				Rows:    [][]interface{}{},
 			}
 			for _, module := range modules {
-				data.Rows = append(data.Rows, []string{
+				data.Rows = append(data.Rows, []interface{}{
 					module.Name,
 					string(module.Type),
 					string(module.BuildSystem),

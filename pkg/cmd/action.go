@@ -52,7 +52,7 @@ func actionListCmd() *cobra.Command {
 			// data
 			data := cmdoutput.TabularData{
 				Headers: []string{"REPOSITORY", "ACTION", "TYPE", "SCOPE", "RULES", "DESCRIPTION"},
-				Rows:    [][]string{},
+				Rows:    [][]interface{}{},
 			}
 			for _, action := range cid.Config.Registry.Actions {
 				ruleEvaluation := "?/" + strconv.Itoa(len(action.Rules))
@@ -60,7 +60,7 @@ func actionListCmd() *cobra.Command {
 					ruleEvaluation = rules.EvaluateRulesAsText(action.Rules, rules.GetRuleContext(cid.Env))
 				}
 
-				data.Rows = append(data.Rows, []string{
+				data.Rows = append(data.Rows, []interface{}{
 					action.Repository,
 					action.Name,
 					string(action.Type),

@@ -20,8 +20,8 @@ const (
 
 // TabularData represents the data to be printed in a structured format.
 type TabularData struct {
-	Headers []string   // Column headers
-	Rows    [][]string // Rows of data
+	Headers []string        // Column headers
+	Rows    [][]interface{} // Rows of data
 }
 
 var (
@@ -54,7 +54,8 @@ func printTable(w io.Writer, data TabularData) error {
 		return err
 	}
 	for _, row := range data.Rows {
-		_, err = fmt.Fprintln(tw, strings.Join(row, "\t"))
+		strRow := interfaceToStringRow(row)
+		_, err = fmt.Fprintln(tw, strings.Join(strRow, "\t"))
 		if err != nil {
 			return err
 		}
@@ -65,9 +66,9 @@ func printTable(w io.Writer, data TabularData) error {
 
 // printJSON renders the data in JSON format.
 func printJSON(w io.Writer, data TabularData) error {
-	output := make([]map[string]string, len(data.Rows))
+	output := make([]map[string]interface{}, len(data.Rows))
 	for i, row := range data.Rows {
-		rowMap := make(map[string]string)
+		rowMap := make(map[string]interface{})
 		for j, header := range data.Headers {
 			rowMap[header] = row[j]
 		}
@@ -86,10 +87,19 @@ func printCSV(w io.Writer, data TabularData) error {
 		return err
 	}
 	for _, row := range data.Rows {
-		_, err = fmt.Fprintln(w, strings.Join(row, ","))
+		strRow := interfaceToStringRow(row)
+		_, err = fmt.Fprintln(w, strings.Join(strRow, ","))
 		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func interfaceToStringRow(row []interface{}) []string {
+	strRow := make([]string, len(row))
+	for i, v := range row {
+		strRow[i] = fmt.Sprintf("%v", v)
+	}
+	return strRow
 }

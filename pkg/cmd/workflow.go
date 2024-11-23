@@ -54,10 +54,10 @@ func workflowListCmd() *cobra.Command {
 			// data
 			data := cmdoutput.TabularData{
 				Headers: []string{"WORKFLOW", "VERSION", "RULES", "STAGES", "ACTIONS"},
-				Rows:    [][]string{},
+				Rows:    [][]interface{}{},
 			}
 			for _, workflow := range cid.Config.Registry.Workflows {
-				data.Rows = append(data.Rows, []string{
+				data.Rows = append(data.Rows, []interface{}{
 					workflow.Name,
 					workflow.Version,
 					rules.EvaluateRulesAsText(workflow.Rules, rules.GetRuleContext(cid.Env)),
