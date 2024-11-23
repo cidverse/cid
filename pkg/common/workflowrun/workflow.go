@@ -174,7 +174,7 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		if ctx.CurrentModule != nil {
 			currentModule = ctx.CurrentModule.Slug
 		}
-		log.Info().Str("action", action.ID).Str("module", currentModule).Msg("action start")
+		log.Info().Str("action", action.ID).Str("module", currentModule).Str("module-dir", ctx.CurrentModule.Directory).Msg("action start")
 
 		// state: retrieve/init
 		localState := state.GetStateFromDirectory(ctx.Paths.Artifact)
