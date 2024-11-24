@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
-	"github.com/cidverse/cid/pkg/core/cmdoutput"
+	"github.com/cidverse/cidverseutils/core/clioutputwriter"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -54,7 +54,7 @@ func catalogListCmd() *cobra.Command {
 			registries := catalog.LoadSources()
 
 			// data
-			data := cmdoutput.TabularData{
+			data := clioutputwriter.TabularData{
 				Headers: []string{"NAME", "URI", "ADDED", "UPDATED", "WORKFLOWS", "ACTIONS", "IMAGES", "HASH"},
 				Rows:    [][]interface{}{},
 			}
@@ -74,7 +74,7 @@ func catalogListCmd() *cobra.Command {
 
 			// print
 			writer := redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil)
-			err := cmdoutput.PrintData(writer, data, cmdoutput.Format(format))
+			err := clioutputwriter.PrintData(writer, data, clioutputwriter.Format(format))
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to print data")
 				os.Exit(1)

@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/cidverse/cid/pkg/context"
-	"github.com/cidverse/cid/pkg/core/cmdoutput"
+	"github.com/cidverse/cidverseutils/core/clioutputwriter"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/repoanalyzer/analyzer"
 	"github.com/rs/zerolog/log"
@@ -49,7 +49,7 @@ func moduleListCmd() *cobra.Command {
 			modules := analyzer.ScanDirectory(cid.ProjectDir)
 
 			// data
-			data := cmdoutput.TabularData{
+			data := clioutputwriter.TabularData{
 				Headers: []string{"NAME", "TYPE", "BUILD-SYSTEM", "BUILD-SYNTAX", "SPEC-TYPE", "SUBMODULES"},
 				Rows:    [][]interface{}{},
 			}
@@ -66,7 +66,7 @@ func moduleListCmd() *cobra.Command {
 
 			// print
 			writer := redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil)
-			err = cmdoutput.PrintData(writer, data, cmdoutput.Format(format))
+			err = clioutputwriter.PrintData(writer, data, clioutputwriter.Format(format))
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to print data")
 				os.Exit(1)

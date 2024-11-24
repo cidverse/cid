@@ -8,8 +8,8 @@ import (
 
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cid/pkg/core/catalog"
-	"github.com/cidverse/cid/pkg/core/cmdoutput"
 	"github.com/cidverse/cid/pkg/core/provenance"
+	"github.com/cidverse/cidverseutils/core/clioutputwriter"
 	"github.com/cidverse/cidverseutils/redact"
 
 	"github.com/cidverse/cid/pkg/common/workflowrun"
@@ -52,7 +52,7 @@ func workflowListCmd() *cobra.Command {
 			}
 
 			// data
-			data := cmdoutput.TabularData{
+			data := clioutputwriter.TabularData{
 				Headers: []string{"WORKFLOW", "VERSION", "RULES", "STAGES", "ACTIONS"},
 				Rows:    [][]interface{}{},
 			}
@@ -68,7 +68,7 @@ func workflowListCmd() *cobra.Command {
 
 			// print
 			writer := redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil)
-			err = cmdoutput.PrintData(writer, data, cmdoutput.Format(format))
+			err = clioutputwriter.PrintData(writer, data, clioutputwriter.Format(format))
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to print data")
 				os.Exit(1)
