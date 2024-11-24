@@ -84,25 +84,25 @@ func RegisterBuiltinAction(action ActionStep) {
 
 // GetActionContext gets the action context, this operation is expensive and should only be called once per execution
 func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, env map[string]string, access *catalog.ActionAccess) ActionExecutionContext {
-	finalEnv := make(map[string]string)
-	fullEnv := lo.Assign(env, api.GetMachineEnvironment())
+	actionEnv := make(map[string]string)
 
 	// user
 	currentUser, _ := user.Current()
 
-	// evaluate access
+	// only pass allowed env variables
+	fullEnv := lo.Assign(env, api.GetMachineEnvironment())
 	for k, v := range fullEnv {
 		if strings.HasPrefix(k, "NCI_") {
-			finalEnv[k] = v
+			actionEnv[k] = v
 			continue
 		}
 
 		if access != nil && len(access.Env) > 0 {
 			for _, envAccess := range access.Env {
 				if envAccess.Pattern == true && regexp.MustCompile(envAccess.Value).MatchString(k) {
-					finalEnv[k] = v
+					actionEnv[k] = v
 				} else if envAccess.Value == k {
-					finalEnv[k] = v
+					actionEnv[k] = v
 				}
 			}
 		}
@@ -118,7 +118,7 @@ func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, e
 		WorkDir:         filesystem.WorkingDirOrPanic(),
 		Config:          "",
 		Args:            nil,
-		Env:             finalEnv,
+		Env:             actionEnv,
 		Parallelization: DefaultParallelization,
 		CurrentUser:     *currentUser,
 		Modules:         modules,

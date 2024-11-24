@@ -58,9 +58,8 @@ func IsActionExecutable(a *catalog.Action, env map[string]string) bool {
 // FirstWorkflowMatchingRules returns the first workflow that matches at least one rule
 func FirstWorkflowMatchingRules(workflows []catalog.Workflow, env map[string]string) *catalog.Workflow {
 	// select workflow
-	log.Info().Msg("evaluating all workflows")
 	for _, wf := range workflows {
-		log.Debug().Str("workflow", wf.Name).Msg("evaluating workflow rules")
+		log.Debug().Str("workflow", wf.Name).Int("rules", len(wf.Rules)).Msg("evaluating workflow rules")
 
 		if len(wf.Rules) > 0 {
 			for _, rule := range wf.Rules {
@@ -174,7 +173,7 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		if ctx.CurrentModule != nil {
 			currentModule = ctx.CurrentModule.Slug
 		}
-		log.Info().Str("action", action.ID).Str("module", currentModule).Str("module-dir", ctx.CurrentModule.Directory).Msg("action start")
+		log.Info().Str("action", action.ID).Str("module", currentModule).Msg("action start")
 
 		// state: retrieve/init
 		localState := state.GetStateFromDirectory(ctx.Paths.Artifact)

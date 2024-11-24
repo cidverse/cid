@@ -3,6 +3,7 @@ package containeraction
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"os"
 	"os/exec"
 	"path"
@@ -106,16 +107,16 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		}
 	}()
 
-	// shutdown listener (on function end)
+	// shutdown listener
 	defer func(apiEngine *echo.Echo, ctx context.Context) {
-		err := apiEngine.Shutdown(ctx)
+		err = apiEngine.Shutdown(ctx)
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed to shutdown rest api")
 		}
 	}(apiEngine, context.Background())
 
 	// wait a short moment for the unix socket to be created / the api endpoint to be ready
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond) // TODO: find a better way to wait for the api to be ready
 
 	// configure container
 	containerExec := containerruntime.Container{
@@ -184,12 +185,13 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	}
 	log.Debug().Str("action", catalogAction.Name).Msg("container command for action: " + containerCmd)
 	cmdErr := command.RunOptionalCommand(containerCmd, nil, "")
-	exitErr, isExitError := cmdErr.(*exec.ExitError)
-	if isExitError {
-		log.Error().Int("exit_code", exitErr.ExitCode()).Str("message", exitErr.Error()).Msg("command failed")
-		return cmdErr
-	} else if cmdErr != nil {
-		log.Error().Int("exit_code", 1).Str("message", exitErr.Error()).Msg("command failed")
+	if cmdErr != nil {
+		var exitErr *exec.ExitError
+		exitCode := 1
+		if errors.As(cmdErr, &exitErr) {
+			exitCode = exitErr.ExitCode()
+		}
+		log.Error().Int("exit_code", exitCode).Str("message", cmdErr.Error()).Msg("command failed")
 		return cmdErr
 	}
 

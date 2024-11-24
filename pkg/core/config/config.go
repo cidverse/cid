@@ -28,7 +28,8 @@ var Current = CIDConfig{}
 
 func LoadConfig(projectDirectory string) *CIDConfig {
 	cfg := CIDConfig{}
-	// internal config
+
+	// defaults
 	unmarshalNoError("files/cid-main.yaml", yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-main.yaml")), &cfg))
 	unmarshalNoError("files/cid-tools.yaml", yaml.Unmarshal([]byte(getEmbeddedConfig("files/cid-tools.yaml")), &cfg))
 
@@ -36,7 +37,8 @@ func LoadConfig(projectDirectory string) *CIDConfig {
 	catalogSources := catalog.LoadSources()
 	cfg.CatalogSources = catalogSources
 	data := catalog.LoadCatalogs(catalogSources)
-	log.Info().Int("images", len(data.ContainerImages)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Msg("loaded catalogs")
+	log.Debug().Int("catalogs", len(cfg.CatalogSources)).Int("images", len(data.ContainerImages)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Msg("loaded catalog from registries")
+
 	cfg.Registry.ContainerImages = append(cfg.Registry.ContainerImages, data.ContainerImages...)
 	cfg.Registry.Actions = append(cfg.Registry.Actions, data.Actions...)
 	cfg.Registry.Workflows = append(cfg.Registry.Workflows, data.Workflows...)

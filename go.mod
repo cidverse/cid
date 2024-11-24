@@ -23,7 +23,7 @@ require (
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
 	github.com/cidverse/go-vcs v0.0.0-20241123123700-fb65a5c04ebd
 	github.com/cidverse/normalizeci v1.1.1-0.20240908141115-5bdf33fc46f7
-	github.com/cidverse/repoanalyzer v0.1.1-0.20240908105803-398dee64015f
+	github.com/cidverse/repoanalyzer v0.1.1-0.20241123141326-6ec8c45aa8a1
 	github.com/go-resty/resty/v2 v2.16.2
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-version v1.7.0

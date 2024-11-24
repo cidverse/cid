@@ -11,13 +11,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const ModuleName = "MODULE_NAME"
-const ModuleSlug = "MODULE_SLUG"
-const ModuleType = "MODULE_TYPE"
-const ModuleBuildSystem = "MODULE_BUILD_SYSTEM"
-const ModuleBuildSystemSyntax = "MODULE_BUILD_SYSTEM_SYNTAX"
-const ModuleSpecificationType = "MODULE_SPECIFICATION_TYPE"
-const ModuleFiles = "MODULE_FILES"
+const (
+	ModuleName              = "MODULE_NAME"
+	ModuleSlug              = "MODULE_SLUG"
+	ModuleType              = "MODULE_TYPE"
+	ModuleBuildSystem       = "MODULE_BUILD_SYSTEM"
+	ModuleBuildSystemSyntax = "MODULE_BUILD_SYSTEM_SYNTAX"
+	ModuleSpecificationType = "MODULE_SPECIFICATION_TYPE"
+	ModuleFiles             = "MODULE_FILES"
+)
 
 // AnyRuleMatches will return true if at least one rule matches, if no rules are provided this always returns true
 func AnyRuleMatches(rules []catalog.WorkflowRule, evalContext map[string]interface{}) bool {

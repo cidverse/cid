@@ -52,8 +52,8 @@ github.com/cidverse/go-vcs v0.0.0-20241123123700-fb65a5c04ebd h1:QwKLgely2pWfIsV
 github.com/cidverse/go-vcs v0.0.0-20241123123700-fb65a5c04ebd/go.mod h1:TizJRTDYBAugrGTqJ+ui8g8XOghxuJpKW3Y5/JXZkq8=
 github.com/cidverse/normalizeci v1.1.1-0.20240908141115-5bdf33fc46f7 h1:R4MHxm375DRDfdPxSCq9MS5PaKONj/fOqQiu+k6s9QQ=
 github.com/cidverse/normalizeci v1.1.1-0.20240908141115-5bdf33fc46f7/go.mod h1:p8GjbBHa9vQ9JF0I14b33JNcbrRhLOtzLbZMmuDEVAw=
-github.com/cidverse/repoanalyzer v0.1.1-0.20240908105803-398dee64015f h1:1KoORYMFAC0/lkmCvhbwLU0csfSfCu+zgpJl1n5lUKY=
-github.com/cidverse/repoanalyzer v0.1.1-0.20240908105803-398dee64015f/go.mod h1:7UudNgfkiXc+lXV7xhyUAd2hsmG4DrFyX/31hnWRpaE=
+github.com/cidverse/repoanalyzer v0.1.1-0.20241123141326-6ec8c45aa8a1 h1:2KS5Z+NYxGCNc97wTuhp0hj+P5SAxxQMJ7EiKfqzjmM=
+github.com/cidverse/repoanalyzer v0.1.1-0.20241123141326-6ec8c45aa8a1/go.mod h1:aENXKFNhY9iYvVkjT+Y9qIKjLsgJeZ5P+30MEUMTBlA=
 github.com/cloudflare/circl v1.5.0 h1:hxIWksrX6XN5a1L2TI/h53AGPhNHoUBo+TD1ms9+pys=
 github.com/cloudflare/circl v1.5.0/go.mod h1:uddAzsPgqdMAYatqJ0lsjX1oECcQLIlRpzZh3pJrofs=
 github.com/codahale/rfc6979 v0.0.0-20141003034818-6a90f24967eb h1:EDmT6Q9Zs+SbUoc7Ik9EfrFqcylYqgPZ9ANSbTAntnE=
