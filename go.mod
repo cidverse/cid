@@ -8,7 +8,7 @@ go 1.22.0
 toolchain go1.23.3
 
 require (
-	github.com/ProtonMail/gopenpgp/v3 v3.0.0
+	github.com/ProtonMail/gopenpgp/v3 v3.1.0
 	github.com/adrg/xdg v0.5.3
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils/ci v0.1.0
