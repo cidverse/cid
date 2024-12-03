@@ -5,7 +5,7 @@ module github.com/cidverse/cid
 
 go 1.22.0
 
-toolchain go1.23.3
+toolchain go1.23.4
 
 require (
 	github.com/ProtonMail/gopenpgp/v3 v3.1.0
