@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"sync"
@@ -73,7 +74,7 @@ func moduleListCmd() *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().StringP("format", "f", "table", "output format (table, json, csv)")
+	cmd.Flags().StringP("format", "f", string(clioutputwriter.DefaultOutputFormat()), fmt.Sprintf("output format %s", clioutputwriter.SupportedOutputFormats()))
 
 	return cmd
 }

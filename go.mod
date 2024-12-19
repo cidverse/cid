@@ -14,7 +14,7 @@ require (
 	github.com/cidverse/cidverseutils/ci v0.1.0
 	github.com/cidverse/cidverseutils/compress v0.1.1
 	github.com/cidverse/cidverseutils/containerruntime v0.1.0
-	github.com/cidverse/cidverseutils/core v0.0.0-20241124224616-d11c8afe3a26
+	github.com/cidverse/cidverseutils/core v0.0.0-20241217232401-ec977fb5b6d7
 	github.com/cidverse/cidverseutils/filesystem v0.1.1
 	github.com/cidverse/cidverseutils/hash v0.1.0
 	github.com/cidverse/cidverseutils/network v0.1.0
@@ -31,7 +31,7 @@ require (
 	github.com/in-toto/in-toto-golang v0.9.0
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/jinzhu/configor v1.2.2
-	github.com/labstack/echo/v4 v4.13.2
+	github.com/labstack/echo/v4 v4.13.3
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/oriser/regroup v0.0.0-20240925165441-f6bb0e08289e
 	github.com/rs/zerolog v1.33.0
@@ -53,7 +53,7 @@ require (
 	github.com/charlievieth/fastwalk v1.0.9 // indirect
 	github.com/cidverse/cidverseutils/exec v0.1.0 // indirect
 	github.com/cloudflare/circl v1.5.0 // indirect
-	github.com/cyphar/filepath-securejoin v0.3.5 // indirect
+	github.com/cyphar/filepath-securejoin v0.3.6 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.7 // indirect
@@ -84,7 +84,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 // indirect
-	github.com/secure-systems-lab/go-securesystemslib v0.8.0 // indirect
+	github.com/secure-systems-lab/go-securesystemslib v0.9.0 // indirect
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/shibumi/go-pathspec v1.3.0 // indirect
 	github.com/skeema/knownhosts v1.3.0 // indirect
@@ -96,17 +96,17 @@ require (
 	github.com/xanzy/go-gitlab v0.115.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/exp v0.0.0-20241210194714-1829a127f884 // indirect
+	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/mod v0.22.0 // indirect
-	golang.org/x/net v0.32.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20241209162323-e6fa225c2576 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576 // indirect
-	google.golang.org/protobuf v1.35.2 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20241216192217-9240e9c98484 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241216192217-9240e9c98484 // indirect
+	google.golang.org/protobuf v1.36.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
 

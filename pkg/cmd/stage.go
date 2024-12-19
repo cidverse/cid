@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"slices"
 	"strconv"
@@ -75,7 +76,7 @@ func stageListCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringArrayP("workflow", "w", []string{}, "filter by workflow (default: all workflows)")
-	cmd.Flags().StringP("format", "f", "table", "output format (table, json, csv)")
+	cmd.Flags().StringP("format", "f", string(clioutputwriter.DefaultOutputFormat()), fmt.Sprintf("output format %s", clioutputwriter.SupportedOutputFormats()))
 
 	return cmd
 }
