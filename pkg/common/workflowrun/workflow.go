@@ -119,6 +119,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 	catalogAction := cfg.Registry.FindAction(action.ID)
 	if catalogAction == nil {
 		log.Fatal().Str("action_id", action.ID).Msg("workflow configuration error, referencing actions that do not exist")
+		os.Exit(1)
 	}
 	modules := analyzer.ScanDirectory(filesystem.WorkingDirOrPanic())
 	ctx := api.GetActionContext(modules, projectDir, env, &catalogAction.Access)

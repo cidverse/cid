@@ -14,7 +14,7 @@ import (
 	"time"
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/common/candidate"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/restapi"
@@ -22,6 +22,7 @@ import (
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/cidverseutils/containerruntime"
+	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/cidverseutils/network"
 	"github.com/google/uuid"
@@ -137,7 +138,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	containerExec.AddVolume(containerruntime.ContainerMount{
 		MountType: "directory",
 		Source:    tempDir,
-		Target:    constants.TempPathInContainer,
+		Target:    tempDir,
 	})
 
 	if runtime.GOOS == "windows" {
@@ -156,14 +157,29 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	containerExec.AddEnvironmentVariable("CID_API_SECRET", secret)
 
 	// enterprise (proxy, ca-certs)
-	command.ApplyProxyConfiguration(&containerExec)
+	containerExec.AutoProxyConfiguration()
 	for _, cert := range catalogAction.Container.Certs {
 		certPath, certErr := util.GetCertFileByType(cert.Type)
 		if certErr != nil {
 			return certErr
 		}
 
-		command.ApplyCertMount(&containerExec, certPath, cert.ContainerPath)
+		// copy files into a custom directory if CID_CERT_MOUNT_DIR is set, workaround for some dind setups
+		customCertDir := os.Getenv("CID_CERT_MOUNT_DIR")
+		if customCertDir != "" {
+			_ = os.MkdirAll(customCertDir, os.ModePerm)
+			certDestinationFile := filepath.Join(customCertDir, filepath.Base(certPath))
+			_ = filesystem.CopyFile(certPath, certDestinationFile)
+
+			certPath = certDestinationFile
+		}
+
+		containerExec.AddVolume(containerruntime.ContainerMount{
+			MountType: "directory",
+			Source:    certPath,
+			Target:    cert.ContainerPath,
+			Mode:      containerruntime.ReadMode,
+		})
 	}
 
 	// catalogAction access
@@ -184,7 +200,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		return containerCmdErr
 	}
 	log.Debug().Str("action", catalogAction.Name).Msg("container command for action: " + containerCmd)
-	cmdErr := command.RunOptionalCommand(containerCmd, nil, "")
+	cmdErr := candidate.RunOptionalCommand(containerCmd, nil, "")
 	if cmdErr != nil {
 		var exitErr *exec.ExitError
 		exitCode := 1

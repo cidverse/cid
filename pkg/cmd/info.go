@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/repoanalyzer/analyzer"
@@ -72,12 +71,15 @@ func infoCmd() *cobra.Command {
 			// -> find all used tools
 			// -> determinate versions
 			for key := range response.Tools {
-				commandVer, commandVerErr := command.GetCommandVersion(key)
-				if commandVerErr != nil {
-					log.Warn().Str("executable", key).Msg("failed to determinate version of tool!")
-				} else {
-					response.Tools[key] = commandVer
-				}
+				/*
+					commandVer, commandVerErr := command.GetCommandVersion(key)
+					if commandVerErr != nil {
+						log.Warn().Str("executable", key).Msg("failed to determinate version of tool!")
+					} else {
+						response.Tools[key] = commandVer
+					}
+				*/
+				response.Tools[key] = "0.0.0"
 			}
 
 			// environment

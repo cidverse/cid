@@ -38,6 +38,7 @@ func RootCmd() *cobra.Command {
 	cmd.AddCommand(catalogRootCmd())
 	cmd.AddCommand(stageRootCmd())
 	cmd.AddCommand(actionRootCmd())
+	cmd.AddCommand(executeRootCmd())
 	cmd.AddCommand(xCmd())
 	cmd.AddCommand(apiCmd())
 

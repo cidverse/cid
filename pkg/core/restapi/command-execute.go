@@ -1,13 +1,14 @@
 package restapi
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/labstack/echo/v4"
@@ -48,31 +49,42 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 		}
 	}
 
+	// get candidates
+	candidates, err := command.CandidatesFromConfig(config.Current)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to discover candidates")
+	}
+
 	// execute
 	exitCode := 0
 	var errorMessage = ""
-	stdout, stderr, candidate, cmdErr := command.RunAPICommand(command.APICommandExecute{
+	stdout, stderr, candidate, cmdErr := command.Execute(command.Opts{
+		Candidates:             candidates,
 		Command:                replaceCommandPlaceholders(req.Command, hc.Env),
 		Env:                    commandEnv,
 		ProjectDir:             hc.ProjectDir,
 		WorkDir:                execDir,
 		TempDir:                hc.TempDir,
-		Capture:                req.CaptureOutput,
+		CaptureOutput:          req.CaptureOutput,
 		Ports:                  req.Ports,
 		UserProvidedConstraint: req.Constraint,
+		Constraints:            config.Current.Dependencies,
 		Stdin:                  nil,
 	})
-	exitErr, isExitError := cmdErr.(*exec.ExitError)
-	hc.State.AuditLog = append(hc.State.AuditLog, state.AuditEvents{
-		Timestamp: time.Now().UTC(),
-		Type:      "command",
-		Payload: map[string]string{
-			"binary":  candidate.Binary,
-			"version": candidate.Version,
-			"uri":     fmt.Sprintf("oci://%s", candidate.Image),
-			"command": replaceCommandPlaceholders(req.Command, hc.Env),
-		},
-	})
+	var exitErr *exec.ExitError
+	isExitError := errors.As(cmdErr, &exitErr)
+	if candidate != nil {
+		hc.State.AuditLog = append(hc.State.AuditLog, state.AuditEvents{
+			Timestamp: time.Now().UTC(),
+			Type:      "command",
+			Payload: map[string]string{
+				"binary":  candidate.GetName(),
+				"version": candidate.GetVersion(),
+				"uri":     candidate.GetUri(),
+				"command": replaceCommandPlaceholders(req.Command, hc.Env),
+			},
+		})
+	}
 
 	if isExitError {
 		exitCode = exitErr.ExitCode()

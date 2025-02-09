@@ -6,6 +6,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/context"
+	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -34,16 +35,24 @@ func xCmd() *cobra.Command {
 				cid.Env[parts[0]] = parts[1]
 			}
 
+			// get candidates
+			candidates, err := command.CandidatesFromConfig(*cid.Config)
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to discover candidates")
+			}
+
 			// execute command
-			_, _, _, err = command.RunAPICommand(command.APICommandExecute{
+			_, _, _, err = command.Execute(command.Opts{
+				Candidates:             candidates,
 				Command:                strings.Join(args, " "),
 				Env:                    cid.Env,
 				ProjectDir:             cid.ProjectDir,
 				WorkDir:                cid.WorkDir,
 				TempDir:                "",
-				Capture:                false,
+				CaptureOutput:          false,
 				Ports:                  ports,
 				UserProvidedConstraint: constraint,
+				Constraints:            config.Current.Dependencies,
 				Stdin:                  os.Stdin,
 			})
 			if err != nil {
