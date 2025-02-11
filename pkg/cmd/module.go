@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/cidverse/cid/pkg/context"
@@ -51,16 +52,25 @@ func moduleListCmd() *cobra.Command {
 
 			// data
 			data := clioutputwriter.TabularData{
-				Headers: []string{"NAME", "TYPE", "BUILD-SYSTEM", "BUILD-SYNTAX", "SPEC-TYPE", "SUBMODULES"},
+				Headers: []string{"NAME", "SLUG", "TYPE", "DISCOVERY", "BUILD-SYSTEM", "BUILD-SYNTAX", "SPEC-TYPE", "CONFIG-TYPE", "DEPLOYMENT-TYPE", "SUBMODULES"},
 				Rows:    [][]interface{}{},
 			}
 			for _, module := range modules {
+				discovery := ""
+				if len(module.Discovery) > 0 {
+					discovery = strings.TrimPrefix(module.Discovery[0].File, cid.ProjectDir)
+					discovery = strings.TrimLeft(discovery, "/")
+				}
 				data.Rows = append(data.Rows, []interface{}{
 					module.Name,
+					module.Slug,
 					string(module.Type),
+					discovery,
 					string(module.BuildSystem),
 					string(module.BuildSystemSyntax),
 					string(module.SpecificationType),
+					string(module.ConfigType),
+					string(module.DeploymentType),
 					strconv.Itoa(len(module.Submodules)),
 				})
 			}

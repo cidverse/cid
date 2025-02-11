@@ -1,4 +1,4 @@
-package candidate
+package executable
 
 import (
 	"bytes"
@@ -18,8 +18,8 @@ import (
 // ExecCandidate is used for the execution using locally installed binaries
 type ExecCandidate struct {
 	BaseCandidate
-	AbsolutePath string
-	Env          map[string]string
+	AbsolutePath string            `json:"absolute-path,omitempty"`
+	Env          map[string]string `json:"env,omitempty"`
 }
 
 func (c ExecCandidate) Run(opts RunParameters) (string, string, error) {

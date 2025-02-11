@@ -11,10 +11,12 @@ import (
 	"regexp"
 	"runtime"
 	"strconv"
+	"sync"
 	"time"
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/common/candidate"
+	"github.com/cidverse/cid/pkg/common/executable"
+	"github.com/cidverse/cid/pkg/common/shellcommand"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/restapi"
@@ -25,6 +27,7 @@ import (
 	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/cidverseutils/network"
+	"github.com/cidverse/cidverseutils/redact"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
@@ -85,19 +88,27 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	// create socket file
 	socketFile := path.Join(tempDir, hash.UUIDNoDash(uuid.New().String())+".socket")
 
+	// executables
+	executableCandidates, err := executable.LoadExecutables()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to load candidates from cache")
+		os.Exit(1)
+	}
+
 	// listen
 	apiEngine := restapi.Setup(&restapi.APIConfig{
-		BuildID:       buildID,
-		JobID:         jobID,
-		ProjectDir:    ctx.ProjectDir,
-		Modules:       ctx.Modules,
-		CurrentModule: ctx.CurrentModule,
-		CurrentAction: catalogAction,
-		Env:           ctx.Env,
-		ActionConfig:  actionConfig,
-		State:         localState,
-		TempDir:       tempDir,
-		ArtifactDir:   filepath.Join(ctx.ProjectDir, ".dist"),
+		BuildID:              buildID,
+		JobID:                jobID,
+		ProjectDir:           ctx.ProjectDir,
+		Modules:              ctx.Modules,
+		CurrentModule:        ctx.CurrentModule,
+		CurrentAction:        catalogAction,
+		Env:                  ctx.Env,
+		ActionConfig:         actionConfig,
+		State:                localState,
+		TempDir:              tempDir,
+		ArtifactDir:          filepath.Join(ctx.ProjectDir, ".dist"),
+		ExecutableCandidates: executableCandidates,
 	})
 	restapi.SecureWithAPIKey(apiEngine, secret)
 	go func() {
@@ -195,20 +206,25 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		}
 	}
 
-	containerCmd, containerCmdErr := containerExec.GetRunCommand(containerExec.DetectRuntime())
-	if containerCmdErr != nil {
-		return containerCmdErr
+	containerCmd, err := containerExec.GetRunCommand(containerExec.DetectRuntime())
+	if err != nil {
+		return err
 	}
-	log.Debug().Str("action", catalogAction.Name).Msg("container command for action: " + containerCmd)
-	cmdErr := candidate.RunOptionalCommand(containerCmd, nil, "")
-	if cmdErr != nil {
+
+	cmd, err := shellcommand.PrepareCommand(containerCmd, runtime.GOOS, "", true, nil, "", nil, redact.NewProtectedWriter(os.Stdout, nil, &sync.Mutex{}, nil), redact.NewProtectedWriter(os.Stderr, nil, &sync.Mutex{}, nil))
+	if err != nil {
+		return err
+	}
+
+	err = cmd.Run()
+	if err != nil {
 		var exitErr *exec.ExitError
 		exitCode := 1
-		if errors.As(cmdErr, &exitErr) {
+		if errors.As(err, &exitErr) {
 			exitCode = exitErr.ExitCode()
 		}
-		log.Error().Int("exit_code", exitCode).Str("message", cmdErr.Error()).Msg("command failed")
-		return cmdErr
+		log.Error().Int("exit_code", exitCode).Str("message", err.Error()).Msg("command failed")
+		return err
 	}
 
 	return nil

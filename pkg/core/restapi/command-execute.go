@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cidverse/cid/pkg/common/candidate"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/util"
@@ -61,7 +61,7 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 	var errorMessage = ""
 	stdout, stderr, selectedCandidate, cmdErr := command.Execute(command.Opts{
 		Candidates:             candidates,
-		CandidateTypes:         candidate.ToCandidateTypes(config.Current.CommandExecutionTypes),
+		CandidateTypes:         executable.ToCandidateTypes(config.Current.CommandExecutionTypes),
 		Command:                replaceCommandPlaceholders(req.Command, hc.Env),
 		Env:                    commandEnv,
 		ProjectDir:             hc.ProjectDir,

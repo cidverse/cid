@@ -1,4 +1,4 @@
-package candidate
+package executable
 
 const AnyVersionConstraint = ">= 0.0.0"
 

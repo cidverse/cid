@@ -1,4 +1,4 @@
-package candidate
+package executable
 
 import (
 	"bytes"
@@ -18,10 +18,10 @@ import (
 // NixStoreCandidate is used for the execution using binaries in the nix store
 type NixStoreCandidate struct {
 	BaseCandidate
-	AbsolutePath   string            `yaml:"absolute-path,omitempty"`
-	Package        string            `yaml:"package,omitempty"`
-	PackageVersion string            `yaml:"package-version,omitempty"`
-	Env            map[string]string `yaml:"env,omitempty"`
+	AbsolutePath   string            `json:"absolute-path,omitempty"`
+	Package        string            `json:"package,omitempty"`
+	PackageVersion string            `json:"package-version,omitempty"`
+	Env            map[string]string `json:"env,omitempty"`
 }
 
 func (c NixStoreCandidate) GetUri() string {

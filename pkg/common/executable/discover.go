@@ -1,7 +1,11 @@
-package candidate
+package executable
 
-func DiscoverCandidates() ([]Candidate, error) {
+func DiscoverExecutables() ([]Candidate, error) {
 	var result []Candidate
+
+	// nix candidates
+	nixCandidates := DiscoverNixStoreCandidates(nil)
+	result = append(result, nixCandidates...)
 
 	// exec candidates
 	execCandidates := DiscoverPathCandidates(nil)
@@ -10,10 +14,6 @@ func DiscoverCandidates() ([]Candidate, error) {
 	// container candidates
 	containerCandidates := DiscoverContainerCandidates(nil)
 	result = append(result, containerCandidates...)
-
-	// nix candidates
-	nixCandidates := DiscoverNixStoreCandidates(nil)
-	result = append(result, nixCandidates...)
 
 	return result, nil
 }

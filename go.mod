@@ -5,7 +5,7 @@ module github.com/cidverse/cid
 
 go 1.22.0
 
-toolchain go1.23.6
+toolchain go1.24.0
 
 require (
 	github.com/ProtonMail/gopenpgp/v3 v3.1.2
@@ -22,9 +22,9 @@ require (
 	github.com/cidverse/cidverseutils/version v0.1.0
 	github.com/cidverse/cidverseutils/zerologconfig v0.1.1
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
-	github.com/cidverse/go-vcs v0.0.0-20250211002934-091a1ea9479f
-	github.com/cidverse/normalizeci v1.1.1-0.20250211003301-def64c93be26
-	github.com/cidverse/repoanalyzer v0.1.1-0.20241219212354-1a0dd2adb255
+	github.com/cidverse/go-vcs v0.0.0-20250211192106-10d556c90e3b
+	github.com/cidverse/normalizeci v1.1.1-0.20250211213138-cce3a5af5b69
+	github.com/cidverse/repoanalyzer v0.1.1-0.20250213233353-22031a02652f
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-version v1.7.0
@@ -43,7 +43,7 @@ require (
 )
 
 require (
-	cel.dev/expr v0.19.2 // indirect
+	cel.dev/expr v0.20.0 // indirect
 	dario.cat/mergo v1.0.1 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/Masterminds/semver/v3 v3.3.1 // indirect
@@ -105,8 +105,8 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/time v0.10.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250207221924-e9438ea467c6 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250207221924-e9438ea467c6 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250212204824-5a70512c5d8b // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250212204824-5a70512c5d8b // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )

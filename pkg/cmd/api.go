@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
@@ -53,18 +54,26 @@ cid api --type http --listen localhost:7400`,
 			stateFile := filepath.Join(cid.ProjectDir, ".dist", "state.json")
 			localState := state.GetStateFromFile(stateFile)
 
+			// executables
+			executableCandidates, err := executable.LoadExecutables()
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to load candidates from cache")
+				os.Exit(1)
+			}
+
 			// start api
 			apiEngine := restapi.Setup(&restapi.APIConfig{
-				BuildID:       "0",
-				JobID:         "0",
-				ProjectDir:    cid.ProjectDir,
-				Modules:       modules,
-				CurrentModule: currentModule,
-				Env:           cid.Env,
-				ActionConfig:  ``,
-				State:         &localState,
-				TempDir:       filepath.Join(cid.ProjectDir, ".tmp"),
-				ArtifactDir:   filepath.Join(cid.ProjectDir, ".dist"),
+				BuildID:              "0",
+				JobID:                "0",
+				ProjectDir:           cid.ProjectDir,
+				Modules:              modules,
+				CurrentModule:        currentModule,
+				Env:                  cid.Env,
+				ActionConfig:         ``,
+				State:                &localState,
+				TempDir:              filepath.Join(cid.ProjectDir, ".tmp"),
+				ArtifactDir:          filepath.Join(cid.ProjectDir, ".dist"),
+				ExecutableCandidates: executableCandidates,
 			})
 			if len(secret) > 0 {
 				restapi.SecureWithAPIKey(apiEngine, secret)

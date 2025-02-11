@@ -4,8 +4,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cidverse/cid/pkg/common/candidate"
 	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/rs/zerolog/log"
@@ -45,7 +45,7 @@ func xCmd() *cobra.Command {
 			// execute command
 			_, _, _, err = command.Execute(command.Opts{
 				Candidates:             candidates,
-				CandidateTypes:         candidate.ToCandidateTypes(cid.Config.CommandExecutionTypes),
+				CandidateTypes:         executable.ToCandidateTypes(cid.Config.CommandExecutionTypes),
 				Command:                strings.Join(args, " "),
 				Env:                    cid.Env,
 				ProjectDir:             cid.ProjectDir,

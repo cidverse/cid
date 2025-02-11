@@ -1,4 +1,4 @@
-package candidate
+package executable
 
 import (
 	"os"
@@ -119,6 +119,7 @@ var DefaultDiscoverPathOptions = DiscoverPathOptions{
 			Env: map[string]string{
 				"GOPATH":     "$HOME/go",
 				"GOMODCACHE": "$HOME/go/pkg/mod",
+				"GOCACHE":    "$HOME/.cache/go-build",
 			},
 		},
 	},
