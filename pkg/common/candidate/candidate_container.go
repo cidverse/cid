@@ -140,7 +140,7 @@ func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 		return "", "", containerCmdErr
 	}
 
-	cmd, err := shellcommand.PrepareCommand(containerCmd, runtime.GOOS, "bash", true, nil, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
+	cmd, err := shellcommand.PrepareCommand(containerCmd, runtime.GOOS, "bash", false, nil, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
 	if err != nil {
 		return "", "", err
 	}

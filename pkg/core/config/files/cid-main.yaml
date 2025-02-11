@@ -5,7 +5,7 @@
 command-execution-types:
   - exec
   - container
-  #- nix-store
+  - nix-store
 
 # paths
 paths:

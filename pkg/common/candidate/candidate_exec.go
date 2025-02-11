@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/cidverse/cid/pkg/common/shellcommand"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
 )
@@ -18,6 +19,7 @@ import (
 type ExecCandidate struct {
 	BaseCandidate
 	AbsolutePath string
+	Env          map[string]string
 }
 
 func (c ExecCandidate) Run(opts RunParameters) (string, string, error) {
@@ -35,8 +37,10 @@ func (c ExecCandidate) Run(opts RunParameters) (string, string, error) {
 		stderrWriter = redact.NewProtectedWriter(os.Stderr, nil, &sync.Mutex{}, nil)
 	}
 
+	env := util.MergeMaps(c.Env, opts.Env)
+	env = util.ResolveEnvMap(env)
 	cmdArgs := append([]string{c.AbsolutePath}, opts.Args...)
-	cmd, err := shellcommand.PrepareCommand(strings.Join(cmdArgs, " "), runtime.GOOS, "bash", true, opts.Env, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
+	cmd, err := shellcommand.PrepareCommand(strings.Join(cmdArgs, " "), runtime.GOOS, "bash", false, env, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
 	if err != nil {
 		return "", "", err
 	}

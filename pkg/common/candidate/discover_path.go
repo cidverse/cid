@@ -19,9 +19,9 @@ type PathDiscoveryRuleLookup struct {
 }
 
 type PathDiscoveryRule struct {
-	Binary         []string
-	Lookup         []PathDiscoveryRuleLookup
-	LookupSuffixes []string `yaml:"lookup-suffixes"`
+	Binary []string
+	Lookup []PathDiscoveryRuleLookup
+	Env    map[string]string
 }
 
 type DiscoverPathOptions struct {
@@ -116,6 +116,10 @@ var DefaultDiscoverPathOptions = DiscoverPathOptions{
 					VersionRegex:   `(?m)go(\d+\.\d+\.\d+)`,
 				},
 			},
+			Env: map[string]string{
+				"GOPATH":     "$HOME/go",
+				"GOMODCACHE": "$HOME/go/pkg/mod",
+			},
 		},
 	},
 	VersionLookupCommand: true,
@@ -136,7 +140,7 @@ func DiscoverPathCandidates(opts *DiscoverPathOptions) []Candidate {
 				for _, binary := range lr.Binary {
 					file, fileErr := exec.LookPath(binary)
 					if fileErr == nil {
-						if candidate := createExecCandidate(binary, file, lookup, opts.VersionLookupCommand); candidate != nil {
+						if candidate := createExecCandidate(binary, file, lr.Env, lookup, opts.VersionLookupCommand); candidate != nil {
 							result = append(result, *candidate)
 						}
 					}
@@ -152,7 +156,7 @@ func DiscoverPathCandidates(opts *DiscoverPathOptions) []Candidate {
 					for _, binary := range lr.Binary {
 						file := findExecutableInDirectory(filepath.Join(env[envKey], lookup.Directory), binary)
 
-						if candidate := createExecCandidate(binary, file, lookup, opts.VersionLookupCommand); candidate != nil {
+						if candidate := createExecCandidate(binary, file, lr.Env, lookup, opts.VersionLookupCommand); candidate != nil {
 							result = append(result, *candidate)
 						}
 					}
@@ -165,7 +169,7 @@ func DiscoverPathCandidates(opts *DiscoverPathOptions) []Candidate {
 }
 
 // Helper function to check if the binary exists and return a candidate
-func createExecCandidate(binary, executableFile string, lookup PathDiscoveryRuleLookup, versionLookupCommand bool) *ExecCandidate {
+func createExecCandidate(binary, executableFile string, env map[string]string, lookup PathDiscoveryRuleLookup, versionLookupCommand bool) *ExecCandidate {
 	// resolve symlink
 	info, err := os.Lstat(executableFile)
 	if err != nil {
@@ -197,5 +201,6 @@ func createExecCandidate(binary, executableFile string, lookup PathDiscoveryRule
 			Version: version,
 		},
 		AbsolutePath: executableFile,
+		Env:          env,
 	}
 }

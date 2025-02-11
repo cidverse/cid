@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/cidverse/cid/pkg/common/shellcommand"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
 )
@@ -17,9 +18,10 @@ import (
 // NixStoreCandidate is used for the execution using binaries in the nix store
 type NixStoreCandidate struct {
 	BaseCandidate
-	AbsolutePath   string `yaml:"absolute-path,omitempty"`
-	Package        string `yaml:"package,omitempty"`
-	PackageVersion string `yaml:"package-version,omitempty"`
+	AbsolutePath   string            `yaml:"absolute-path,omitempty"`
+	Package        string            `yaml:"package,omitempty"`
+	PackageVersion string            `yaml:"package-version,omitempty"`
+	Env            map[string]string `yaml:"env,omitempty"`
 }
 
 func (c NixStoreCandidate) GetUri() string {
@@ -41,8 +43,10 @@ func (c NixStoreCandidate) Run(opts RunParameters) (string, string, error) {
 		stderrWriter = redact.NewProtectedWriter(os.Stderr, nil, &sync.Mutex{}, nil)
 	}
 
+	env := util.MergeMaps(c.Env, opts.Env)
+	env = util.ResolveEnvMap(env)
 	cmdArgs := append([]string{c.AbsolutePath}, opts.Args...)
-	cmd, err := shellcommand.PrepareCommand(strings.Join(cmdArgs, " "), runtime.GOOS, "", true, opts.Env, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
+	cmd, err := shellcommand.PrepareCommand(strings.Join(cmdArgs, " "), runtime.GOOS, "", false, env, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
 	if err != nil {
 		return "", "", err
 	}
