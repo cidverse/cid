@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cidverse/cid/pkg/common/candidate"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/state"
@@ -58,8 +59,9 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 	// execute
 	exitCode := 0
 	var errorMessage = ""
-	stdout, stderr, candidate, cmdErr := command.Execute(command.Opts{
+	stdout, stderr, selectedCandidate, cmdErr := command.Execute(command.Opts{
 		Candidates:             candidates,
+		CandidateTypes:         candidate.ToCandidateTypes(config.Current.CommandExecutionTypes),
 		Command:                replaceCommandPlaceholders(req.Command, hc.Env),
 		Env:                    commandEnv,
 		ProjectDir:             hc.ProjectDir,
@@ -73,14 +75,14 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 	})
 	var exitErr *exec.ExitError
 	isExitError := errors.As(cmdErr, &exitErr)
-	if candidate != nil {
+	if selectedCandidate != nil {
 		hc.State.AuditLog = append(hc.State.AuditLog, state.AuditEvents{
 			Timestamp: time.Now().UTC(),
 			Type:      "command",
 			Payload: map[string]string{
-				"binary":  candidate.GetName(),
-				"version": candidate.GetVersion(),
-				"uri":     candidate.GetUri(),
+				"binary":  selectedCandidate.GetName(),
+				"version": selectedCandidate.GetVersion(),
+				"uri":     selectedCandidate.GetUri(),
 				"command": replaceCommandPlaceholders(req.Command, hc.Env),
 			},
 		})

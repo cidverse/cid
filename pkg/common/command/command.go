@@ -14,20 +14,6 @@ var (
 	ErrNoCommandProvided    = fmt.Errorf("command is a required field")
 )
 
-type Opts struct {
-	Candidates             []candidate.Candidate
-	Command                string
-	Env                    map[string]string
-	ProjectDir             string
-	WorkDir                string
-	TempDir                string
-	CaptureOutput          bool
-	Ports                  []int
-	UserProvidedConstraint string
-	Constraints            map[string]string
-	Stdin                  io.Reader
-}
-
 func CandidatesFromConfig(cfg config.CIDConfig) ([]candidate.Candidate, error) {
 	var result []candidate.Candidate
 
@@ -110,6 +96,21 @@ func CandidatesFromConfig(cfg config.CIDConfig) ([]candidate.Candidate, error) {
 	return result, nil
 }
 
+type Opts struct {
+	Candidates             []candidate.Candidate
+	CandidateTypes         []candidate.CandidateType
+	Command                string
+	Env                    map[string]string
+	ProjectDir             string
+	WorkDir                string
+	TempDir                string
+	CaptureOutput          bool
+	Ports                  []int
+	UserProvidedConstraint string
+	Constraints            map[string]string
+	Stdin                  io.Reader
+}
+
 // Execute gets called from actions or the api to execute commands
 func Execute(opts Opts) (stdout string, stderr string, cand candidate.Candidate, err error) {
 	// validate
@@ -140,6 +141,7 @@ func Execute(opts Opts) (stdout string, stderr string, cand candidate.Candidate,
 
 	// select candidate
 	c := candidate.SelectCandidate(opts.Candidates, candidate.CandidateFilter{
+		Types:             opts.CandidateTypes,
 		Executable:        cmdBinary,
 		VersionPreference: candidate.PreferHighest,
 		VersionConstraint: versionConstraint,

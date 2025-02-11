@@ -29,6 +29,8 @@ type PathDiscoveryRuleLookup struct {
 
 // CIDConfig is the full struct of the configuration file
 type CIDConfig struct {
+	CommandExecutionTypes []string `yaml:"command-execution-types,omitempty"`
+
 	Paths       PathConfig
 	Conventions ProjectConventions
 	Env         map[string]string

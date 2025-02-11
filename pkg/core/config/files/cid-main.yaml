@@ -2,6 +2,11 @@
 # Main Configuration / Global Defaults
 ###
 
+command-execution-types:
+  - exec
+  - container
+  #- nix-store
+
 # paths
 paths:
   artifact: dist

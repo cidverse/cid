@@ -63,6 +63,14 @@ func (c BaseCandidate) Run(opts RunParameters) (string, string, error) {
 	return "", "", nil
 }
 
+func ToCandidateTypes(types []string) []CandidateType {
+	var result []CandidateType
+	for _, t := range types {
+		result = append(result, CandidateType(t))
+	}
+	return result
+}
+
 type CandidateFilter struct {
 	Types             []CandidateType
 	Executable        string
