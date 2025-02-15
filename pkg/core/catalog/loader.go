@@ -36,13 +36,6 @@ func LoadFromDirectory(dir string) (*Config, error) {
 				}
 			}
 
-			// merge images
-			if len(fileData.ContainerImages) > 0 {
-				for _, image := range fileData.ContainerImages {
-					data.ContainerImages = append(data.ContainerImages, image)
-				}
-			}
-
 			// merge workflows
 			if len(fileData.Workflows) > 0 {
 				for _, workflow := range fileData.Workflows {

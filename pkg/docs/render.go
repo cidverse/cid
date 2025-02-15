@@ -28,13 +28,13 @@ func GenerateActionIndex(payload []catalog.Action) (string, error) {
 	// group actions by category
 	categories := make(map[string][]catalog.Action)
 	for _, action := range payload {
-		categories[action.Category] = append(categories[action.Category], action)
+		categories[action.Metadata.Category] = append(categories[action.Metadata.Category], action)
 	}
 
 	// sort the actions in each category by name
 	for _, actions := range categories {
 		sort.Slice(actions, func(i, j int) bool {
-			return actions[i].Name < actions[j].Name
+			return actions[i].Metadata.Name < actions[j].Metadata.Name
 		})
 	}
 
@@ -48,8 +48,8 @@ func GenerateActionIndex(payload []catalog.Action) (string, error) {
 }
 
 func GenerateAction(payload catalog.Action) (string, error) {
-	for i := range payload.Access.Env {
-		payload.Access.Env[i].Description = strings.Trim(payload.Access.Env[i].Description, "\n")
+	for i := range payload.Metadata.Access.Environment {
+		payload.Metadata.Access.Environment[i].Description = strings.Trim(payload.Metadata.Access.Environment[i].Description, "\n")
 	}
 
 	out, err := render(tplAction, payload)

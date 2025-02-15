@@ -194,12 +194,12 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	}
 
 	// catalogAction access
-	if len(catalogAction.Access.Env) > 0 {
+	if len(catalogAction.Metadata.Access.Environment) > 0 {
 		for k, v := range ctx.Env {
-			for _, access := range catalogAction.Access.Env {
-				if access.Pattern && regexp.MustCompile(access.Value).MatchString(k) {
+			for _, access := range catalogAction.Metadata.Access.Environment {
+				if access.Pattern && regexp.MustCompile(access.Name).MatchString(k) {
 					containerExec.AddEnvironmentVariable(k, v)
-				} else if access.Value == k {
+				} else if access.Name == k {
 					containerExec.AddEnvironmentVariable(k, v)
 				}
 			}

@@ -37,16 +37,16 @@ func docsCmd() *cobra.Command {
 			// docs: actions
 			var actions []catalog.Action
 			for _, action := range data.Actions {
-				if strings.HasSuffix(action.Name, "-start") {
+				if strings.HasSuffix(action.Metadata.Name, "-start") {
 					continue
 				}
 
 				out, err := docs.GenerateAction(action)
 				if err != nil {
-					log.Fatal().Err(err).Str("action", action.Name).Msg("failed to generate workflow documentation")
+					log.Fatal().Err(err).Str("action", action.Metadata.Name).Msg("failed to generate workflow documentation")
 				}
 
-				filesystem.SaveFileText(path.Join(outputDir, "actions", fmt.Sprintf("%s.md", action.Name)), out)
+				filesystem.SaveFileText(path.Join(outputDir, "actions", fmt.Sprintf("%s.md", action.Metadata.Name)), out)
 				actions = append(actions, action)
 			}
 

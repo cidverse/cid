@@ -46,9 +46,9 @@ func IsStageExecutable(s *catalog.WorkflowStage, env map[string]string) bool {
 
 // IsActionExecutable returns true if the action is executable (enabled + at least one rule matches)
 func IsActionExecutable(a *catalog.Action, env map[string]string) bool {
-	matchingRules := rules.EvaluateRules(a.Rules, rules.GetRuleContext(env))
+	matchingRules := rules.EvaluateRules(a.Metadata.Rules, rules.GetRuleContext(env))
 
-	if len(a.Rules) == 0 || matchingRules > 0 {
+	if len(a.Metadata.Rules) == 0 || matchingRules > 0 {
 		return true
 	}
 
@@ -122,16 +122,16 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 		os.Exit(1)
 	}
 	modules := analyzer.ScanDirectory(filesystem.WorkingDirOrPanic())
-	ctx := api.GetActionContext(modules, projectDir, env, &catalogAction.Access)
+	ctx := api.GetActionContext(modules, projectDir, env, &catalogAction.Metadata.Access)
 
 	// serialize action config for pass-thru
 	configAsJSON, _ := json.Marshal(&action.Config)
 	ctx.Config = string(configAsJSON)
 
 	// project-scoped actions
-	if catalogAction.Scope == catalog.ActionScopeProject {
+	if catalogAction.Metadata.Scope == catalog.ActionScopeProject {
 		ruleContext := rules.GetProjectRuleContext(ctx.Env, ctx.Modules)
-		ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
+		ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext)
 		log.Debug().Str("Trace", action.ID).Bool("rules_match", ruleMatch).Msg("check action rules")
 		if ruleMatch {
 			runWorkflowAction(catalogAction, action, &ctx)
@@ -139,7 +139,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 	}
 
 	// module-scoped actions
-	if catalogAction.Scope == catalog.ActionScopeModule {
+	if catalogAction.Metadata.Scope == catalog.ActionScopeModule {
 		// for each module
 		for _, m := range ctx.Modules {
 			moduleRef := *m
@@ -155,7 +155,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 			}
 
 			var ruleContext = rules.GetModuleRuleContext(ctx.Env, &moduleRef)
-			ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Rules...), ruleContext)
+			ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext)
 			log.Trace().Str("action", action.ID).Str("module", moduleRef.Name).Bool("rules_match", ruleMatch).Msg("check action rules")
 			if ruleMatch {
 				runWorkflowAction(catalogAction, action, &ctx)
@@ -185,7 +185,7 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 			Timestamp: time.Now(),
 			Type:      "action",
 			Payload: map[string]string{
-				"action": catalogAction.Repository + "/" + catalogAction.Name + "@" + catalogAction.Version,
+				"action": catalogAction.Repository + "/" + catalogAction.Metadata.Name + "@" + catalogAction.Version,
 				"uri":    fmt.Sprintf("oci://%s", catalogAction.Container.Image),
 			},
 		})

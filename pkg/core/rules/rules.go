@@ -85,6 +85,8 @@ func GetProjectRuleContext(env map[string]string, modules []*analyzerapi.Project
 	// module information
 	var buildSystems []string
 	var specificationTypes []string
+	var configTypes []string
+	var deploymentTypes []string
 	var languages []string
 	for _, module := range modules {
 		if string(module.BuildSystem) != "" && !slices.Contains(buildSystems, string(module.BuildSystem)) {
@@ -92,6 +94,12 @@ func GetProjectRuleContext(env map[string]string, modules []*analyzerapi.Project
 		}
 		if string(module.SpecificationType) != "" && !slices.Contains(specificationTypes, string(module.SpecificationType)) {
 			specificationTypes = append(specificationTypes, string(module.SpecificationType))
+		}
+		if string(module.ConfigType) != "" && !slices.Contains(configTypes, string(module.ConfigType)) {
+			configTypes = append(configTypes, string(module.ConfigType))
+		}
+		if string(module.DeploymentType) != "" && !slices.Contains(deploymentTypes, string(module.DeploymentType)) {
+			deploymentTypes = append(deploymentTypes, string(module.DeploymentType))
 		}
 
 		for _, lang := range module.Language {
@@ -102,6 +110,8 @@ func GetProjectRuleContext(env map[string]string, modules []*analyzerapi.Project
 	}
 	rc["PROJECT_BUILD_SYSTEMS"] = buildSystems
 	rc["PROJECT_SPECIFICATION_TYPES"] = specificationTypes
+	rc["PROJECT_CONFIG_TYPES"] = configTypes
+	rc["PROJECT_DEPLOYMENT_TYPES"] = deploymentTypes
 	rc["PROJECT_LANGUAGES"] = languages
 
 	return rc

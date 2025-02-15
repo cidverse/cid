@@ -97,11 +97,11 @@ func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, e
 			continue
 		}
 
-		if access != nil && len(access.Env) > 0 {
-			for _, envAccess := range access.Env {
-				if envAccess.Pattern == true && regexp.MustCompile(envAccess.Value).MatchString(k) {
+		if access != nil && len(access.Environment) > 0 {
+			for _, envAccess := range access.Environment {
+				if envAccess.Pattern == true && regexp.MustCompile(envAccess.Name).MatchString(k) {
 					actionEnv[k] = v
-				} else if envAccess.Value == k {
+				} else if envAccess.Name == k {
 					actionEnv[k] = v
 				}
 			}

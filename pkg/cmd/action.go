@@ -56,18 +56,18 @@ func actionListCmd() *cobra.Command {
 				Rows:    [][]interface{}{},
 			}
 			for _, action := range cid.Config.Registry.Actions {
-				ruleEvaluation := "?/" + strconv.Itoa(len(action.Rules))
-				if action.Scope == catalog.ActionScopeProject {
-					ruleEvaluation = rules.EvaluateRulesAsText(action.Rules, rules.GetRuleContext(cid.Env))
+				ruleEvaluation := "?/" + strconv.Itoa(len(action.Metadata.Rules))
+				if action.Metadata.Scope == catalog.ActionScopeProject {
+					ruleEvaluation = rules.EvaluateRulesAsText(action.Metadata.Rules, rules.GetRuleContext(cid.Env))
 				}
 
 				data.Rows = append(data.Rows, []interface{}{
 					action.Repository,
-					action.Name,
+					action.Metadata.Name,
 					string(action.Type),
-					string(action.Scope),
+					string(action.Metadata.Scope),
 					ruleEvaluation,
-					strings.Replace(action.Description, "\n", "", -1),
+					strings.Replace(action.Metadata.Description, "\n", "", -1),
 				})
 			}
 
@@ -110,7 +110,7 @@ func actionRunCmd() *cobra.Command {
 				os.Exit(1)
 			}
 			act := catalog.WorkflowAction{
-				ID:     action.Repository + "/" + action.Name,
+				ID:     action.Repository + "/" + action.Metadata.Name,
 				Rules:  []catalog.WorkflowRule{},
 				Config: nil,
 				Module: nil,

@@ -37,7 +37,7 @@ func catalogAddCmd() *cobra.Command {
 		Aliases: []string{},
 		Short:   "add registry",
 		Run: func(cmd *cobra.Command, args []string) {
-			catalog.AddCatalog(args[0], args[1])
+			catalog.AddCatalog(args[0], args[1], []string{})
 			log.Info().Str("name", args[0]).Str("url", args[1]).Msg("added registry")
 		},
 	}
@@ -56,7 +56,7 @@ func catalogListCmd() *cobra.Command {
 
 			// data
 			data := clioutputwriter.TabularData{
-				Headers: []string{"NAME", "URI", "ADDED", "UPDATED", "WORKFLOWS", "ACTIONS", "IMAGES", "HASH"},
+				Headers: []string{"NAME", "URI", "ADDED", "UPDATED", "WORKFLOWS", "ACTIONS", "HASH"},
 				Rows:    [][]interface{}{},
 			}
 			for key, source := range registries {
@@ -68,7 +68,6 @@ func catalogListCmd() *cobra.Command {
 					source.UpdatedAt,
 					len(catalogData.Workflows),
 					len(catalogData.Actions),
-					len(catalogData.ContainerImages),
 					source.SHA256[:7],
 				})
 			}

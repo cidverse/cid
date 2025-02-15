@@ -38,52 +38,5 @@ func CandidatesFromConfig(cfg config.CIDConfig) ([]executable.Candidate, error) 
 		VersionLookupCommand: false,
 	})...)
 
-	// append registry candidates - image registry
-	for _, entry := range cfg.Registry.ContainerImages {
-		for _, provided := range entry.Provides {
-			var containerCache []executable.ContainerCache
-			for _, cache := range entry.Cache {
-				containerCache = append(containerCache, executable.ContainerCache{
-					ID:            cache.ID,
-					ContainerPath: cache.ContainerPath,
-					MountType:     cache.MountType,
-				})
-			}
-
-			var containerMounts []executable.ContainerMount
-			for _, mount := range entry.Mounts {
-				containerMounts = append(containerMounts, executable.ContainerMount{
-					Src:  mount.Src,
-					Dest: mount.Dest,
-				})
-			}
-
-			var containerCerts []executable.ContainerCerts
-			for _, cert := range entry.Certs {
-				containerCerts = append(containerCerts, executable.ContainerCerts{
-					Type:          cert.Type,
-					ContainerPath: cert.ContainerPath,
-				})
-			}
-
-			result = append(result, executable.ContainerCandidate{
-				BaseCandidate: executable.BaseCandidate{
-					Name:    provided.Binary,
-					Version: provided.Version,
-					Type:    executable.ExecutionContainer,
-				},
-				Image:      entry.Image,
-				ImageCache: containerCache,
-				Mounts:     containerMounts,
-				Security: executable.ContainerSecurity{
-					Capabilities: entry.Security.Capabilities,
-					Privileged:   entry.Security.Privileged,
-				},
-				Entrypoint: entry.Entrypoint,
-				Certs:      containerCerts,
-			})
-		}
-	}
-
 	return result, nil
 }

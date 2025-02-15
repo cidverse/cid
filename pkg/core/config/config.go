@@ -37,9 +37,8 @@ func LoadConfig(projectDirectory string) *CIDConfig {
 	catalogSources := catalog.LoadSources()
 	cfg.CatalogSources = catalogSources
 	data := catalog.LoadCatalogs(catalogSources)
-	log.Debug().Int("catalogs", len(cfg.CatalogSources)).Int("images", len(data.ContainerImages)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Msg("loaded catalog from registries")
+	log.Debug().Int("catalogs", len(cfg.CatalogSources)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Msg("loaded catalog from registries")
 
-	cfg.Registry.ContainerImages = append(cfg.Registry.ContainerImages, data.ContainerImages...)
 	cfg.Registry.Actions = append(cfg.Registry.Actions, data.Actions...)
 	cfg.Registry.Workflows = append(cfg.Registry.Workflows, data.Workflows...)
 

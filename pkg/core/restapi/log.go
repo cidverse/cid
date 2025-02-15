@@ -47,7 +47,7 @@ func (hc *APIConfig) logMessage(c echo.Context) error {
 
 	msgPrefix := ""
 	if hc.CurrentAction != nil {
-		msgPrefix = fmt.Sprintf("[%s/%s] ", hc.CurrentAction.Repository, hc.CurrentAction.Name)
+		msgPrefix = fmt.Sprintf("[%s/%s] ", hc.CurrentAction.Repository, hc.CurrentAction.Metadata.Name)
 	}
 	ev.Msg(msgPrefix + req.Message)
 

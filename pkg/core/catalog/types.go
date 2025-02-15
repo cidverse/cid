@@ -14,9 +14,6 @@ type Config struct {
 	// Actions
 	Actions []Action `yaml:"actions,omitempty"`
 
-	// ContainerImages
-	ContainerImages []ContainerImage `yaml:"images,omitempty"`
-
 	// Workflows
 	Workflows []Workflow `yaml:"workflows,omitempty"`
 }
@@ -37,7 +34,7 @@ func (r *Config) FindAction(name string) *Action {
 	// exact match
 	for i := range r.Actions {
 		a := r.Actions[i]
-		if a.Repository+"/"+a.Name == name {
+		if a.Repository+"/"+a.Metadata.Name == name {
 			return &a
 		}
 	}

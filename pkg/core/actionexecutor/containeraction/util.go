@@ -11,7 +11,7 @@ import (
 
 func insertCommandVariables(input string, action catalog.Action) string {
 	input = strings.Replace(input, "{REPOSITORY}", action.Repository, -1)
-	input = strings.Replace(input, "{ACTION}", action.Name, -1)
+	input = strings.Replace(input, "{ACTION}", action.Metadata.Name, -1)
 	return input
 }
 
