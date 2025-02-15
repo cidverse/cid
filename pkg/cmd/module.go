@@ -52,7 +52,7 @@ func moduleListCmd() *cobra.Command {
 
 			// data
 			data := clioutputwriter.TabularData{
-				Headers: []string{"NAME", "SLUG", "TYPE", "DISCOVERY", "BUILD-SYSTEM", "BUILD-SYNTAX", "SPEC-TYPE", "CONFIG-TYPE", "DEPLOYMENT-TYPE", "SUBMODULES"},
+				Headers: []string{"NAME", "SLUG", "KIND", "TYPE", "BUILD-SYSTEM", "BUILD-SYNTAX", "DISCOVERY", "SUBMODULES"},
 				Rows:    [][]interface{}{},
 			}
 			for _, module := range modules {
@@ -61,16 +61,26 @@ func moduleListCmd() *cobra.Command {
 					discovery = strings.TrimPrefix(module.Discovery[0].File, cid.ProjectDir)
 					discovery = strings.TrimLeft(discovery, "/")
 				}
+
+				moduleType := ""
+				if module.SpecificationType != "" {
+					moduleType = string(module.SpecificationType)
+				} else if module.ConfigType != "" {
+					moduleType = string(module.ConfigType)
+				} else if module.DeploymentType != "" {
+					moduleType = string(module.DeploymentType)
+				} else {
+					moduleType = string(module.Type)
+				}
+
 				data.Rows = append(data.Rows, []interface{}{
 					module.Name,
 					module.Slug,
 					string(module.Type),
-					discovery,
+					moduleType,
 					string(module.BuildSystem),
 					string(module.BuildSystemSyntax),
-					string(module.SpecificationType),
-					string(module.ConfigType),
-					string(module.DeploymentType),
+					discovery,
 					strconv.Itoa(len(module.Submodules)),
 				})
 			}

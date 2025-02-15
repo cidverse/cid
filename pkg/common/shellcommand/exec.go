@@ -60,7 +60,7 @@ func SplitCommand(command string) ([]string, error) {
 }
 
 // PrepareCommand prepares a command to be executed
-func PrepareCommand(command string, platform string, shell string, fullEnv bool, env map[string]string, workDir string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (*exec.Cmd, error) {
+func PrepareCommand(command string, platform string, shell string, fullEnv bool, env map[string]string, workDir string, stdin io.Reader, stdoutWriter io.Writer, stderrWriter io.Writer) (*exec.Cmd, error) {
 	args, err := FormatPlatformCommand(command, platform, shell)
 	if err != nil {
 		return nil, err
@@ -68,8 +68,8 @@ func PrepareCommand(command string, platform string, shell string, fullEnv bool,
 	cmd := Command(args)
 	cmd.Dir = workDir
 	cmd.Stdin = stdin
-	cmd.Stdout = stdout
-	cmd.Stderr = stderr
+	cmd.Stdout = stdoutWriter
+	cmd.Stderr = stderrWriter
 	log.Trace().Str("command", command).Str("platform", platform).Str("shell", shell).Str("workdir", workDir).Strs("args", cmd.Args).Interface("env", env).Msg("preparing command")
 
 	var commandEnv = make(map[string]string)
