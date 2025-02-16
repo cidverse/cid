@@ -75,6 +75,12 @@ func DiscoverNixStoreCandidates(opts *DiscoverNixOptions) []Candidate {
 		opts = &DefaultDiscoverNixOptions
 	}
 
+	// check for nix-store command
+	if _, err := exec.LookPath("nix-store"); err != nil {
+		log.Debug().Msg("nix-store command not found, skipping nix store discovery")
+		return result
+	}
+
 	// discover using store paths
 	for _, dir := range nixCurrentSystemStorePaths() {
 		var hash, pkgName, pkgVersion string

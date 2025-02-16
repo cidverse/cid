@@ -98,7 +98,7 @@ func saveSources(data map[string]*Source) {
 
 	err = os.WriteFile(repositoryConfigFile, out, os.ModePerm)
 	if err != nil {
-		log.Fatal().Str("file", repositoryConfigFile).Msg("failed to update registries")
+		log.Fatal().Err(err).Str("file", repositoryConfigFile).Msg("failed to update registries")
 	}
 }
 
@@ -125,7 +125,6 @@ func UpdateAllCatalogs() {
 
 func UpdateCatalog(name string, source *Source) error {
 	dir := filepath.Join(util.CIDConfigDir(), "repo.d")
-	_ = os.MkdirAll(dir, os.ModePerm)
 	file := filepath.Join(dir, name+".json")
 
 	if strings.HasPrefix(source.URI, "oci://") {

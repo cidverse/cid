@@ -4,6 +4,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/zerologconfig"
 	"github.com/spf13/cobra"
 )
@@ -16,7 +17,11 @@ func RootCmd() *cobra.Command {
 		Short: `cid is a cli to run pipeline actions locally and as part of your ci/cd process`,
 		Long:  `cid is a cli to run pipeline actions locally and as part of your ci/cd process`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			// logger
 			zerologconfig.Configure(cfg)
+
+			// directories
+			util.DirectorySetup()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			_ = cmd.Help()
