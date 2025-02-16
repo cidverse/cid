@@ -5,18 +5,28 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/cidverse/cid/pkg/common/executable"
 	"gopkg.in/yaml.v3"
 )
 
 func LoadFromDirectory(dir string) (*Config, error) {
-	var data Config
+	data := Config{
+		Actions:   nil,
+		Workflows: nil,
+		ExecutableDiscovery: &ExecutableDiscovery{
+			ContainerDiscovery: executable.DiscoverContainerOptions{
+				Packages: nil,
+			},
+		},
+		Executables: nil,
+	}
 
 	// list all yaml files in directory
 	loadErr := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && strings.HasSuffix(info.Name(), ".yaml") && !strings.HasSuffix(info.Name(), "cid-index.yaml") {
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ".yaml") {
 			content, err := os.ReadFile(path)
 			if err != nil {
 				return err
@@ -42,6 +52,11 @@ func LoadFromDirectory(dir string) (*Config, error) {
 					data.Workflows = append(data.Workflows, workflow)
 				}
 			}
+
+			// merge executable discovery
+			if fileData.ExecutableDiscovery != nil && fileData.ExecutableDiscovery.ContainerDiscovery.Packages != nil {
+				data.ExecutableDiscovery.ContainerDiscovery.Packages = append(data.ExecutableDiscovery.ContainerDiscovery.Packages, fileData.ExecutableDiscovery.ContainerDiscovery.Packages...)
+			}
 		}
 		return nil
 	})
@@ -50,38 +65,4 @@ func LoadFromDirectory(dir string) (*Config, error) {
 	}
 
 	return &data, nil
-}
-
-func LoadFromFile(file string) (*Config, error) {
-	// load file
-	content, err := os.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-
-	// parse
-	var data Config
-	err = yaml.Unmarshal(content, &data)
-	if err != nil {
-		return nil, err
-	}
-
-	// test
-	return &data, nil
-}
-
-func SaveToFile(registry *Config, file string) error {
-	// marshal
-	data, err := yaml.Marshal(&registry)
-	if err != nil {
-		return err
-	}
-
-	// write to filesystem
-	err = os.WriteFile(file, data, os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

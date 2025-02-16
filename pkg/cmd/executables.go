@@ -5,7 +5,9 @@ import (
 	"os"
 	"sync"
 
+	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/common/executable"
+	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cidverseutils/core/clioutputwriter"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
@@ -76,8 +78,15 @@ func executablesListCmd() *cobra.Command {
 			format, _ := cmd.Flags().GetString("format")
 			columns, _ := cmd.Flags().GetStringSlice("columns")
 
+			// app context
+			cid, err := context.NewAppContext()
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to prepare app context")
+				os.Exit(1)
+			}
+
 			// executables
-			executableCandidates, err := executable.LoadExecutables()
+			executableCandidates, err := command.CandidatesFromConfig(*cid.Config)
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to load candidates from cache")
 				os.Exit(1)

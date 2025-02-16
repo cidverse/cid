@@ -10,33 +10,71 @@ import (
 	"github.com/cidverse/cid/pkg/util"
 )
 
-// TODO: freeze constraints only?
-
 type cacheData struct {
 	Timestamp  time.Time        `json:"timestamp"`  // Timestamp when the cache was created
-	Candidates []typedCandidate `json:"candidates"` // Candidates contains the candidate list
+	Candidates []TypedCandidate `json:"candidates"` // Candidates contains the candidate list
 }
 
-type typedCandidate struct {
+type TypedCandidate struct {
 	Type      string          `json:"type"`      // Type required for unmarshalling
 	Candidate json.RawMessage `json:"candidate"` // Candidate contains the actual candidate data
+}
+
+func ToTypedCandidate(candidate Candidate) (TypedCandidate, error) {
+	data, err := json.Marshal(candidate)
+	if err != nil {
+		return TypedCandidate{}, err
+	}
+
+	return TypedCandidate{
+		Type:      fmt.Sprintf("%T", candidate),
+		Candidate: data,
+	}, nil
+}
+
+func FromTypedCandidate(typed TypedCandidate) (Candidate, error) {
+	var candidate Candidate
+	switch typed.Type {
+	case "executable.ExecCandidate":
+		candidate = &ExecCandidate{}
+	case "*executable.ExecCandidate":
+		candidate = &ExecCandidate{}
+	case "executable.NixStoreCandidate":
+		candidate = &NixStoreCandidate{}
+	case "*executable.NixStoreCandidate":
+		candidate = &NixStoreCandidate{}
+	case "executable.NixShellCandidate":
+		candidate = &NixShellCandidate{}
+	case "*executable.NixShellCandidate":
+		candidate = &NixShellCandidate{}
+	case "executable.ContainerCandidate":
+		candidate = &ContainerCandidate{}
+	case "*executable.ContainerCandidate":
+		candidate = &ContainerCandidate{}
+	default:
+		return nil, fmt.Errorf("unknown executable type: %s", typed.Type)
+	}
+
+	if err := json.Unmarshal(typed.Candidate, candidate); err != nil {
+		return nil, err
+	}
+
+	return candidate, nil
 }
 
 var executablesLockFile = filepath.Join(util.CIDStateDir(), "executable-lock.json")
 
 // UpdateExecutableCache persists the candidates into a file
 func UpdateExecutableCache(candidates []Candidate) error {
-	var result []typedCandidate
+	var result []TypedCandidate
 
 	for _, c := range candidates {
-		data, err := json.Marshal(c)
+		data, err := ToTypedCandidate(c)
 		if err != nil {
 			return err
 		}
-		result = append(result, typedCandidate{
-			Type:      fmt.Sprintf("%T", c),
-			Candidate: data,
-		})
+
+		result = append(result, data)
 	}
 
 	data, err := json.Marshal(cacheData{
@@ -70,23 +108,11 @@ func LoadCachedExecutables() ([]Candidate, error) {
 
 		var candidates []Candidate
 		for _, c := range cached.Candidates {
-			var candidate Candidate
-			switch c.Type {
-			case "executable.ExecCandidate":
-				candidate = &ExecCandidate{}
-			case "executable.NixStoreCandidate":
-				candidate = &NixStoreCandidate{}
-			case "executable.NixShellCandidate":
-				candidate = &NixShellCandidate{}
-			case "executable.ContainerCandidate":
-				candidate = &ContainerCandidate{}
-			default:
-				return nil, fmt.Errorf("unknown executable type: %s", c.Type)
-			}
-
-			if err = json.Unmarshal(c.Candidate, candidate); err != nil {
+			candidate, err := FromTypedCandidate(c)
+			if err != nil {
 				return nil, err
 			}
+
 			candidates = append(candidates, candidate)
 		}
 

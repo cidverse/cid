@@ -37,10 +37,11 @@ func LoadConfig(projectDirectory string) *CIDConfig {
 	catalogSources := catalog.LoadSources()
 	cfg.CatalogSources = catalogSources
 	data := catalog.LoadCatalogs(catalogSources)
-	log.Debug().Int("catalogs", len(cfg.CatalogSources)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Msg("loaded catalog from registries")
+	log.Debug().Int("catalogs", len(cfg.CatalogSources)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Int("executables", len(data.Executables)).Msg("loaded catalog from registries")
 
 	cfg.Registry.Actions = append(cfg.Registry.Actions, data.Actions...)
 	cfg.Registry.Workflows = append(cfg.Registry.Workflows, data.Workflows...)
+	cfg.Registry.Executables = append(cfg.Registry.Executables, data.Executables...)
 
 	// load project config
 	if filesystem.FileExists(projectDirectory + "/cid.yml") {

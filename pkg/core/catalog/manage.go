@@ -85,6 +85,7 @@ func LoadCatalogs(sources map[string]*Source) Config {
 		// append
 		cfg.Actions = append(cfg.Actions, fileCfg.Actions...)
 		cfg.Workflows = append(cfg.Workflows, fileCfg.Workflows...)
+		cfg.Executables = append(cfg.Executables, fileCfg.Executables...)
 	}
 
 	return cfg
@@ -222,6 +223,13 @@ func updateCatalogFile(file string, source *Source) error {
 		if err != nil {
 			return fmt.Errorf("failed to parse yaml for %s: %w", source.URI, err)
 		}
+	} else if strings.HasSuffix(source.URI, ".json") {
+		err = json.Unmarshal(content, &config)
+		if err != nil {
+			return fmt.Errorf("failed to parse json for %s: %w", source.URI, err)
+		}
+	} else {
+		return fmt.Errorf("unsupported file format for %s", source.URI)
 	}
 
 	// filter
@@ -230,6 +238,9 @@ func updateCatalogFile(file string, source *Source) error {
 	}
 	if len(source.Filter) > 0 && !slices.Contains(source.Filter, "workflows") {
 		config.Workflows = nil
+	}
+	if len(source.Filter) > 0 && !slices.Contains(source.Filter, "executables") {
+		config.Executables = nil
 	}
 
 	// persist

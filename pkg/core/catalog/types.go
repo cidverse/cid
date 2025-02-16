@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/rs/zerolog/log"
 )
 
@@ -12,10 +13,20 @@ var workflowRegexp = regexp.MustCompile(`(?P<repo>\w+)/?(?P<workflow>\w+)@?(?P<v
 // Config is a registry configuration with placeholders
 type Config struct {
 	// Actions
-	Actions []Action `yaml:"actions,omitempty"`
+	Actions []Action `yaml:"actions,omitempty" json:"actions,omitempty"`
 
 	// Workflows
-	Workflows []Workflow `yaml:"workflows,omitempty"`
+	Workflows []Workflow `yaml:"workflows,omitempty" json:"workflows,omitempty"`
+
+	// ExecutableDiscovery
+	ExecutableDiscovery *ExecutableDiscovery `yaml:"executable-discovery,omitempty" json:"-"`
+
+	// Executables
+	Executables []executable.TypedCandidate `yaml:"executables,omitempty" json:"executables,omitempty"`
+}
+
+type ExecutableDiscovery struct {
+	ContainerDiscovery executable.DiscoverContainerOptions `yaml:"container,omitempty"`
 }
 
 // FindWorkflow finds a workflow by name

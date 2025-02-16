@@ -3,9 +3,11 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/core/clioutputwriter"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
@@ -56,7 +58,7 @@ func catalogListCmd() *cobra.Command {
 
 			// data
 			data := clioutputwriter.TabularData{
-				Headers: []string{"NAME", "URI", "ADDED", "UPDATED", "WORKFLOWS", "ACTIONS", "HASH"},
+				Headers: []string{"NAME", "URI", "FILTER", "ADDED", "UPDATED", "WORKFLOWS", "ACTIONS", "EXECUTABLES", "HASH"},
 				Rows:    [][]interface{}{},
 			}
 			for key, source := range registries {
@@ -64,10 +66,12 @@ func catalogListCmd() *cobra.Command {
 				data.Rows = append(data.Rows, []interface{}{
 					key,
 					source.URI,
+					strings.Join(source.Filter, ","),
 					source.AddedAt,
 					source.UpdatedAt,
 					len(catalogData.Workflows),
 					len(catalogData.Actions),
+					len(catalogData.Executables),
 					source.SHA256[:7],
 				})
 			}
@@ -137,7 +141,7 @@ func catalogProcessFileCmd() *cobra.Command {
 			fileRegistry = catalog.ProcessCatalog(fileRegistry)
 
 			// store output
-			err = catalog.SaveToFile(fileRegistry, dir+"/cid-index.yaml")
+			err = util.StructToJsonFile(fileRegistry, dir+"/cid-index.json")
 			if err != nil {
 				log.Fatal().Str("file", dir).Err(err).Msg("failed to save registry file")
 			}

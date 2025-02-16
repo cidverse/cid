@@ -38,5 +38,14 @@ func CandidatesFromConfig(cfg config.CIDConfig) ([]executable.Candidate, error) 
 		VersionLookupCommand: false,
 	})...)
 
+	// append registry candidates
+	for _, e := range cfg.Registry.Executables {
+		c, err := executable.FromTypedCandidate(e)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, c)
+	}
+
 	return result, nil
 }
