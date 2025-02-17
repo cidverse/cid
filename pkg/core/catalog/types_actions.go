@@ -28,6 +28,7 @@ const (
 type ActionAccess struct {
 	Environment []ActionAccessEnv        `json:"env,omitempty"`         // Environment variables that the action may access during execution
 	Executables []ActionAccessExecutable `json:"executables,omitempty"` // Executables that the action may invoke during execution
+	Network     []ActionAccessNetwork    `json:"network,omitempty"`     // Network access that the action may use during execution
 }
 
 type ActionAccessEnv struct {
@@ -40,6 +41,10 @@ type ActionAccessEnv struct {
 type ActionAccessExecutable struct {
 	Name       string `json:"name"`
 	Constraint string `json:"constraint,omitempty"`
+}
+
+type ActionAccessNetwork struct {
+	Host string `json:"host"`
 }
 
 type ActionType string
