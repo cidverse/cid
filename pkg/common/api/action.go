@@ -83,7 +83,7 @@ func RegisterBuiltinAction(action ActionStep) {
 }
 
 // GetActionContext gets the action context, this operation is expensive and should only be called once per execution
-func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, env map[string]string, access *catalog.ActionAccess) ActionExecutionContext {
+func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, env map[string]string, access catalog.ActionAccess) ActionExecutionContext {
 	actionEnv := make(map[string]string)
 
 	// user
@@ -97,7 +97,7 @@ func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, e
 			continue
 		}
 
-		if access != nil && len(access.Environment) > 0 {
+		if len(access.Environment) > 0 {
 			for _, envAccess := range access.Environment {
 				if envAccess.Pattern == true && regexp.MustCompile(envAccess.Name).MatchString(k) {
 					actionEnv[k] = v

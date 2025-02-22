@@ -17,7 +17,9 @@ const (
 	ModuleType              = "MODULE_TYPE"
 	ModuleBuildSystem       = "MODULE_BUILD_SYSTEM"
 	ModuleBuildSystemSyntax = "MODULE_BUILD_SYSTEM_SYNTAX"
+	ModuleConfigType        = "MODULE_CONFIG_TYPE"
 	ModuleSpecificationType = "MODULE_SPECIFICATION_TYPE"
+	ModuleDeploymentType    = "MODULE_DEPLOYMENT_TYPE"
 	ModuleFiles             = "MODULE_FILES"
 )
 
@@ -80,9 +82,6 @@ func GetRuleContext(env map[string]string) map[string]interface{} {
 }
 
 func GetProjectRuleContext(env map[string]string, modules []*analyzerapi.ProjectModule) map[string]interface{} {
-	rc := GetRuleContext(env)
-
-	// module information
 	var buildSystems []string
 	var specificationTypes []string
 	var configTypes []string
@@ -108,6 +107,8 @@ func GetProjectRuleContext(env map[string]string, modules []*analyzerapi.Project
 			}
 		}
 	}
+
+	rc := GetRuleContext(env)
 	rc["PROJECT_BUILD_SYSTEMS"] = buildSystems
 	rc["PROJECT_SPECIFICATION_TYPES"] = specificationTypes
 	rc["PROJECT_CONFIG_TYPES"] = configTypes
@@ -119,13 +120,14 @@ func GetProjectRuleContext(env map[string]string, modules []*analyzerapi.Project
 
 func GetModuleRuleContext(env map[string]string, module *analyzerapi.ProjectModule) map[string]interface{} {
 	ctx := GetRuleContext(env)
-
 	ctx[ModuleName] = module.Name
 	ctx[ModuleSlug] = module.Slug
 	ctx[ModuleType] = string(module.Type)
 	ctx[ModuleBuildSystem] = string(module.BuildSystem)
 	ctx[ModuleBuildSystemSyntax] = string(module.BuildSystemSyntax)
+	ctx[ModuleConfigType] = string(module.ConfigType)
 	ctx[ModuleSpecificationType] = string(module.SpecificationType)
+	ctx[ModuleDeploymentType] = string(module.DeploymentType)
 
 	var files []string
 	for _, file := range module.Files {

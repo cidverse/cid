@@ -122,7 +122,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 		os.Exit(1)
 	}
 	modules := analyzer.ScanDirectory(filesystem.WorkingDirOrPanic())
-	ctx := api.GetActionContext(modules, projectDir, env, &catalogAction.Metadata.Access)
+	ctx := api.GetActionContext(modules, projectDir, env, catalogAction.Metadata.Access)
 
 	// serialize action config for pass-thru
 	configAsJSON, _ := json.Marshal(&action.Config)
