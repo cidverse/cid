@@ -37,10 +37,14 @@ func (c ExecCandidate) Run(opts RunParameters) (string, string, error) {
 		stderrWriter = redact.NewProtectedWriter(os.Stderr, nil, &sync.Mutex{}, nil)
 	}
 
+	// replace executable with absolute path
+	if opts.Args[0] == opts.Executable {
+		opts.Args[0] = c.AbsolutePath
+	}
+
 	env := util.MergeMaps(c.Env, opts.Env)
 	env = util.ResolveEnvMap(env)
-	cmdArgs := append([]string{c.AbsolutePath}, opts.Args...)
-	cmd, err := shellcommand.PrepareCommand(strings.Join(cmdArgs, " "), runtime.GOOS, "bash", false, env, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
+	cmd, err := shellcommand.PrepareCommand(strings.Join(opts.Args, " "), runtime.GOOS, "bash", false, env, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
 	if err != nil {
 		return "", "", err
 	}

@@ -21,6 +21,7 @@ func xCmd() *cobra.Command {
 			// arguments
 			constraint, _ := cmd.Flags().GetString("constraint")
 			userEnv, _ := cmd.Flags().GetStringArray("env")
+			types, _ := cmd.Flags().GetStringArray("types")
 			ports, _ := cmd.Flags().GetIntSlice("port")
 
 			// app context
@@ -42,10 +43,15 @@ func xCmd() *cobra.Command {
 				log.Fatal().Err(err).Msg("failed to discover candidates")
 			}
 
+			// fallback to config types
+			if types == nil || len(types) == 0 {
+				types = cid.Config.CommandExecutionTypes
+			}
+
 			// execute command
 			_, _, _, err = command.Execute(command.Opts{
 				Candidates:             candidates,
-				CandidateTypes:         executable.ToCandidateTypes(cid.Config.CommandExecutionTypes),
+				CandidateTypes:         executable.ToCandidateTypes(types),
 				Command:                strings.Join(args, " "),
 				Env:                    cid.Env,
 				ProjectDir:             cid.ProjectDir,
@@ -65,6 +71,7 @@ func xCmd() *cobra.Command {
 
 	cmd.Flags().StringP("constraint", "c", "", "version constraint")
 	cmd.Flags().StringArrayP("env", "e", []string{}, "environment variables")
+	cmd.Flags().StringArray("types", []string{}, "executable types")
 	cmd.Flags().IntSliceP("port", "p", []int{}, "ports to expose")
 
 	return cmd

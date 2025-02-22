@@ -17,6 +17,7 @@ const (
 )
 
 type RunParameters struct {
+	Executable    string
 	Args          []string
 	Env           map[string]string
 	RootDir       string

@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/cidverse/normalizeci/pkg/normalizer/api"
 	"github.com/rs/zerolog/log"
@@ -84,6 +85,9 @@ var DefaultDiscoverPathOptions = DiscoverPathOptions{
 					VersionRegex:   `(?m)openjdk (\d+\.\d+\.\d+)`,
 				},
 			},
+			Env: map[string]string{
+				"JAVA_HOME": "{{EXECUTABLE_PKG_DIR}}",
+			},
 		},
 		{
 			Binary: []string{"go"},
@@ -134,14 +138,13 @@ func DiscoverPathCandidates(opts *DiscoverPathOptions) []Candidate {
 
 	env := api.GetMachineEnvironment()
 	for _, lr := range opts.LookupRules {
-
 		for _, lookup := range lr.Lookup {
 			// special case - PATH
 			if lookup.Key == "PATH" {
 				for _, binary := range lr.Binary {
 					file, fileErr := exec.LookPath(binary)
 					if fileErr == nil {
-						if candidate := createExecCandidate(binary, file, lr.Env, lookup, opts.VersionLookupCommand); candidate != nil {
+						if candidate := createExecCandidate(binary, filepath.Dir(file), file, lr.Env, lookup, opts.VersionLookupCommand); candidate != nil {
 							result = append(result, *candidate)
 						}
 					}
@@ -156,8 +159,12 @@ func DiscoverPathCandidates(opts *DiscoverPathOptions) []Candidate {
 				if env[envKey] != "" {
 					for _, binary := range lr.Binary {
 						file := findExecutableInDirectory(filepath.Join(env[envKey], lookup.Directory), binary)
+						if file == "" {
+							log.Debug().Str("binary", binary).Str("env", envKey).Str("dir", env[envKey]).Msg("binary not found in directory")
+							continue
+						}
 
-						if candidate := createExecCandidate(binary, file, lr.Env, lookup, opts.VersionLookupCommand); candidate != nil {
+						if candidate := createExecCandidate(binary, env[envKey], file, lr.Env, lookup, opts.VersionLookupCommand); candidate != nil {
 							result = append(result, *candidate)
 						}
 					}
@@ -170,7 +177,7 @@ func DiscoverPathCandidates(opts *DiscoverPathOptions) []Candidate {
 }
 
 // Helper function to check if the binary exists and return a candidate
-func createExecCandidate(binary, executableFile string, env map[string]string, lookup PathDiscoveryRuleLookup, versionLookupCommand bool) *ExecCandidate {
+func createExecCandidate(binary, dir, executableFile string, env map[string]string, lookup PathDiscoveryRuleLookup, versionLookupCommand bool) *ExecCandidate {
 	// resolve symlink
 	info, err := os.Lstat(executableFile)
 	if err != nil {
@@ -186,13 +193,20 @@ func createExecCandidate(binary, executableFile string, env map[string]string, l
 		executableFile = resolvedPath
 	}
 
+	// check if executable exists
 	if _, err = os.Stat(executableFile); os.IsNotExist(err) {
 		return nil
 	}
 
+	// version lookup
 	version := lookup.Version
 	if lookup.VersionCommand != "" && versionLookupCommand {
 		version, _ = getCommandVersion(executableFile, lookup.VersionCommand, lookup.VersionRegex)
+	}
+
+	// preprocess env
+	for k, v := range env {
+		env[k] = strings.ReplaceAll(v, "{{EXECUTABLE_PKG_DIR}}", dir) // placeholder to set e.g. JAVA_HOME to the store dir
 	}
 
 	return &ExecCandidate{

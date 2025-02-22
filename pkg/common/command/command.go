@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/common/executable"
+	"github.com/cidverse/go-ptr"
 )
 
 var (
@@ -41,10 +42,6 @@ func Execute(opts Opts) (stdout string, stderr string, cand executable.Candidate
 	// identify command
 	args := strings.SplitN(opts.Command, " ", 2)
 	cmdBinary := args[0]
-	var cmdArgs []string
-	if len(args) > 1 {
-		cmdArgs = strings.Split(args[1], " ")
-	}
 
 	// constraint from config
 	versionConstraint := executable.AnyVersionConstraint
@@ -66,11 +63,12 @@ func Execute(opts Opts) (stdout string, stderr string, cand executable.Candidate
 	if c == nil {
 		return "", "", nil, fmt.Errorf("no candidate found for %s fulfilling constraint %s", cmdBinary, versionConstraint)
 	}
-	cand = *c
+	cand = ptr.Value(c)
 
 	// run command
 	stdout, stderr, err = cand.Run(executable.RunParameters{
-		Args:          cmdArgs,
+		Executable:    cmdBinary,
+		Args:          args,
 		Env:           opts.Env,
 		RootDir:       opts.ProjectDir,
 		WorkDir:       opts.WorkDir,

@@ -27,6 +27,9 @@ var DefaultDiscoverNixOptions = DiscoverNixOptions{
 		{
 			Name:       "openjdk",
 			Expression: `([a-z0-9]{32})-(openjdk)-(\d+\.\d+\.\d+.+)`,
+			Env: map[string]string{
+				"JAVA_HOME": "{{EXECUTABLE_PKG_DIR}}/lib/openjdk",
+			},
 		},
 		{
 			Name:       "go",
@@ -99,6 +102,11 @@ func DiscoverNixStoreCandidates(opts *DiscoverNixOptions) []Candidate {
 		}
 
 		for _, executable := range findExecutablesInDirectory(dir + "/bin") {
+			// preprocess env
+			for k, v := range env {
+				env[k] = strings.ReplaceAll(v, "{{EXECUTABLE_PKG_DIR}}", dir) // placeholder to set e.g. JAVA_HOME to the store dir when running java
+			}
+
 			result = append(result, NixStoreCandidate{
 				BaseCandidate: BaseCandidate{
 					Name:    executable,
