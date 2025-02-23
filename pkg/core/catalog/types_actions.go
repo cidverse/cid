@@ -1,5 +1,9 @@
 package catalog
 
+import (
+	"strings"
+)
+
 type Action struct {
 	Repository string          `yaml:"repository,omitempty" json:"repository,omitempty"`
 	Type       ActionType      `required:"true" yaml:"type" json:"type"`
@@ -16,6 +20,8 @@ type ActionMetadata struct {
 	Links       map[string]string `json:"links,omitempty"`
 	Rules       []WorkflowRule    `json:"rules,omitempty"`  // Rules define conditions that must be met for the action to be executed
 	Access      ActionAccess      `json:"access,omitempty"` // Access defines resources that the action may access
+	Input       ActionInput       `json:"input,omitempty"`  // Input defines the inputs that the action may consume
+	Output      ActionOutput      `json:"output,omitempty"` // Output defines the outputs that the action may produce
 }
 
 type ActionScope string
@@ -45,6 +51,35 @@ type ActionAccessExecutable struct {
 
 type ActionAccessNetwork struct {
 	Host string `json:"host"`
+}
+
+type ActionInput struct {
+	Artifacts []ActionArtifactType `json:"artifacts,omitempty"`
+}
+
+type ActionOutput struct {
+	Artifacts []ActionArtifactType `json:"artifacts,omitempty"`
+}
+
+type ActionArtifactType struct {
+	Type          string `json:"type"`             // Type, e.g. "report", "binary"
+	Format        string `json:"format,omitempty"` // Format, e.g. "sarif"
+	FormatVersion string `json:"format_version,omitempty"`
+}
+
+func (a ActionArtifactType) Key() string {
+	var parts []string
+	if a.Type != "" {
+		parts = append(parts, a.Type)
+	}
+	if a.Format != "" {
+		parts = append(parts, a.Format)
+	}
+	if a.FormatVersion != "" {
+		parts = append(parts, a.FormatVersion)
+	}
+
+	return strings.Join(parts, ":")
 }
 
 type ActionType string

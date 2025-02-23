@@ -20,6 +20,7 @@ type WorkflowAction struct {
 	Rules  []WorkflowRule             `yaml:"rules,omitempty"`
 	Config interface{}                `yaml:"config,omitempty"`
 	Module *analyzerapi.ProjectModule `yaml:"-"`
+	Stage  string                     `yaml:"-"`
 }
 
 type WorkflowStage struct {

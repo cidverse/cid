@@ -39,6 +39,7 @@ func RootCmd() *cobra.Command {
 	cmd.AddCommand(moduleRootCmd())
 
 	// execute
+	cmd.AddCommand(planRootCmd())
 	cmd.AddCommand(workflowRootCmd())
 	cmd.AddCommand(catalogRootCmd())
 	cmd.AddCommand(stageRootCmd())
