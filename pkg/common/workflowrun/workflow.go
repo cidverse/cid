@@ -201,7 +201,7 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		// execute
 		actionExecutor := actionexecutor.FindExecutorByType(string(catalogAction.Type))
 		if actionExecutor != nil {
-			err := actionExecutor.Execute(ctx, &localState, catalogAction, action)
+			err := actionExecutor.Execute(ctx, &localState, catalogAction)
 			if err != nil {
 				log.Fatal().Err(err).Str("action", action.ID).Msg("action error")
 				return

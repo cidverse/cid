@@ -12,7 +12,9 @@ var (
 )
 
 type Plan struct {
-	Steps []Step `json:"steps"`
+	Name   string   `json:"name"`
+	Stages []string `json:"stages"`
+	Steps  []Step   `json:"steps"`
 }
 
 type Stage struct {
@@ -30,6 +32,7 @@ type Step struct {
 	Module   string              `json:"module,omitempty"`
 	RunAfter []string            `json:"run-after,omitempty"`
 	Order    int                 `json:"order"`
+	Config   interface{}         `json:"config,omitempty"`
 }
 
 type Action struct {

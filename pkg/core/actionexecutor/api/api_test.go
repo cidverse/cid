@@ -23,7 +23,7 @@ func (e mockExecutor) GetType() string {
 	return "mock"
 }
 
-func (e mockExecutor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, action *catalog.WorkflowAction) error {
+func (e mockExecutor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action) error {
 	return nil
 }
 
@@ -32,5 +32,5 @@ func TestActionExecutor(t *testing.T) {
 	assert.Equal(t, "MockExecutor", executor.GetName())
 	assert.Equal(t, "1.0", executor.GetVersion())
 	assert.Equal(t, "mock", executor.GetType())
-	assert.Nil(t, executor.Execute(nil, nil, nil, nil))
+	assert.Nil(t, executor.Execute(nil, nil, nil))
 }

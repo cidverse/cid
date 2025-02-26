@@ -2,6 +2,7 @@ package plangenerate
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 
 	"github.com/cidverse/cid/pkg/common/api"
@@ -44,8 +45,18 @@ func GeneratePlan(modules []*analyzerapi.ProjectModule, registry catalog.Config,
 		return Plan{}, err
 	}
 
+	// collect stages
+	var stages []string
+	for _, step := range steps {
+		if !slices.Contains(stages, step.Stage) {
+			stages = append(stages, step.Stage)
+		}
+	}
+
 	return Plan{
-		Steps: steps,
+		Name:   workflow.Name,
+		Stages: stages,
+		Steps:  steps,
 	}, nil
 }
 
@@ -89,6 +100,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 					Action:   fmt.Sprintf("%s/%s", catalogAction.Repository, catalogAction.Metadata.Name),
 					RunAfter: dependencies,
 					Order:    1,
+					Config:   action.Config,
 				})
 			}
 		} else if catalogAction.Metadata.Scope == catalog.ActionScopeModule {
@@ -106,6 +118,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 						Action:   fmt.Sprintf("%s/%s", catalogAction.Repository, catalogAction.Metadata.Name),
 						RunAfter: dependencies,
 						Order:    1,
+						Config:   action.Config,
 					})
 				}
 			}

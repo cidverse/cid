@@ -20,6 +20,6 @@ func (e Executor) GetType() string {
 	return string(catalog.ActionTypeContainer)
 }
 
-func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, action *catalog.WorkflowAction) error {
+func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action) error {
 	return nil
 }

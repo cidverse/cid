@@ -18,5 +18,5 @@ type ActionExecutor interface {
 	GetType() string
 
 	// Execute will run the action
-	Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, action *catalog.WorkflowAction) error
+	Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action) error
 }

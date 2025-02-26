@@ -47,7 +47,7 @@ func (e Executor) GetType() string {
 	return string(catalog.ActionTypeContainer)
 }
 
-func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, action *catalog.WorkflowAction) error {
+func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action) error {
 	// api (port or socket)
 	freePort, err := network.FreePort()
 	if err != nil {
@@ -59,13 +59,6 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	secret := generateSecret(32)
 	buildID := generateSnowflakeId()
 	jobID := generateSnowflakeId()
-
-	// pass config
-	var actionConfig string
-	if len(ctx.Config) > 0 {
-		actionConfigJSON, _ := json.Marshal(action.Config)
-		actionConfig = string(actionConfigJSON)
-	}
 
 	// temp dir override
 	osTempDir := os.TempDir()
@@ -95,6 +88,12 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		os.Exit(1)
 	}
 
+	// actionConfig
+	actionConfig, err := json.Marshal(ctx.Config)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to marshal action config")
+	}
+
 	// listen
 	apiEngine := restapi.Setup(&restapi.APIConfig{
 		BuildID:              buildID,
@@ -104,7 +103,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		CurrentModule:        ctx.CurrentModule,
 		CurrentAction:        catalogAction,
 		Env:                  ctx.Env,
-		ActionConfig:         actionConfig,
+		ActionConfig:         string(actionConfig),
 		State:                localState,
 		TempDir:              tempDir,
 		ArtifactDir:          filepath.Join(ctx.ProjectDir, ".dist"),

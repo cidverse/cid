@@ -47,7 +47,7 @@ type ActionExecutionContext struct {
 	WorkDir string
 
 	// Config holds the json configuration passed to this action
-	Config string
+	Config interface{}
 
 	// Args holds the arguments passed to the action
 	Args []string
