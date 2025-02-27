@@ -8,7 +8,7 @@ go 1.23.0
 toolchain go1.24.0
 
 require (
-	github.com/ProtonMail/gopenpgp/v3 v3.1.2
+	github.com/ProtonMail/gopenpgp/v3 v3.1.3
 	github.com/adrg/xdg v0.5.3
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils/ci v0.1.0
@@ -48,7 +48,7 @@ require (
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
-	github.com/ProtonMail/go-crypto v1.1.5 // indirect
+	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/charlievieth/fastwalk v1.0.9 // indirect
 	github.com/cidverse/cidverseutils/exec v0.1.0 // indirect
