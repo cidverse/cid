@@ -8,13 +8,13 @@ go 1.23.0
 toolchain go1.24.0
 
 require (
-	github.com/ProtonMail/gopenpgp/v3 v3.1.2
+	github.com/ProtonMail/gopenpgp/v3 v3.1.3
 	github.com/adrg/xdg v0.5.3
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cidverseutils/ci v0.1.0
 	github.com/cidverse/cidverseutils/compress v0.1.1
 	github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4
-	github.com/cidverse/cidverseutils/core v0.0.0-20250210224234-b2040fc3a6b4
+	github.com/cidverse/cidverseutils/core v0.0.0-20250308170839-94a75eae5842
 	github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20241219211714-77ae5cef4073
 	github.com/cidverse/cidverseutils/hash v0.1.0
 	github.com/cidverse/cidverseutils/network v0.1.0
@@ -23,7 +23,7 @@ require (
 	github.com/cidverse/cidverseutils/zerologconfig v0.1.1
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
-	github.com/cidverse/go-vcs v0.0.0-20250217213613-f5cbb063737e
+	github.com/cidverse/go-vcs v0.0.0-20250227174958-f70c3e161d9e
 	github.com/cidverse/normalizeci v1.1.1-0.20250217214444-43e6ffc0a1c6
 	github.com/cidverse/repoanalyzer v0.1.1-0.20250222141132-e4adbf1da309
 	github.com/go-resty/resty/v2 v2.16.5
@@ -34,7 +34,7 @@ require (
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/jinzhu/configor v1.2.2
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/opencontainers/image-spec v1.1.0
+	github.com/opencontainers/image-spec v1.1.1
 	github.com/oriser/regroup v0.0.0-20240925165441-f6bb0e08289e
 	github.com/rs/zerolog v1.33.0
 	github.com/samber/lo v1.49.1
@@ -45,14 +45,14 @@ require (
 )
 
 require (
-	cel.dev/expr v0.21.2 // indirect
+	cel.dev/expr v0.22.0 // indirect
 	dario.cat/mergo v1.0.1 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
-	github.com/ProtonMail/go-crypto v1.1.5 // indirect
+	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
-	github.com/charlievieth/fastwalk v1.0.9 // indirect
+	github.com/charlievieth/fastwalk v1.0.10 // indirect
 	github.com/cidverse/cidverseutils/exec v0.1.0 // indirect
 	github.com/cloudflare/circl v1.6.0 // indirect
 	github.com/cyphar/filepath-securejoin v0.4.1 // indirect
@@ -61,12 +61,12 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.6.2 // indirect
-	github.com/go-git/go-git/v5 v5.13.2 // indirect
+	github.com/go-git/go-git/v5 v5.14.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.25.0 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
-	github.com/google/cel-go v0.23.2 // indirect
+	github.com/google/cel-go v0.24.1 // indirect
 	github.com/google/go-github/v69 v69.2.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gosimple/slug v1.15.0 // indirect
@@ -96,18 +96,18 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	gitlab.com/gitlab-org/api/client-go v0.123.0 // indirect
-	golang.org/x/crypto v0.34.0 // indirect
-	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa // indirect
-	golang.org/x/mod v0.23.0 // indirect
-	golang.org/x/net v0.35.0 // indirect
-	golang.org/x/oauth2 v0.26.0 // indirect
-	golang.org/x/sync v0.11.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
-	golang.org/x/time v0.10.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250219182151-9fdb1cabc7b2 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250219182151-9fdb1cabc7b2 // indirect
+	gitlab.com/gitlab-org/api/client-go v0.124.0 // indirect
+	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
+	golang.org/x/mod v0.24.0 // indirect
+	golang.org/x/net v0.37.0 // indirect
+	golang.org/x/oauth2 v0.28.0 // indirect
+	golang.org/x/sync v0.12.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/time v0.11.0 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
