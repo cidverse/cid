@@ -32,7 +32,7 @@ require (
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/jinzhu/configor v1.2.2
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/opencontainers/image-spec v1.1.0
+	github.com/opencontainers/image-spec v1.1.1
 	github.com/oriser/regroup v0.0.0-20240925165441-f6bb0e08289e
 	github.com/rs/zerolog v1.33.0
 	github.com/samber/lo v1.49.1
