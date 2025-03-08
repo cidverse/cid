@@ -130,8 +130,8 @@ var DefaultDiscoverPathOptions = DiscoverPathOptions{
 	VersionLookupCommand: true,
 }
 
-func DiscoverPathCandidates(opts *DiscoverPathOptions) []Candidate {
-	var result []Candidate
+func DiscoverPathCandidates(opts *DiscoverPathOptions) []Executable {
+	var result []Executable
 	if opts == nil {
 		opts = &DefaultDiscoverPathOptions
 	}

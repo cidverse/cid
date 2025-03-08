@@ -1,11 +1,13 @@
 package executable
 
-func DiscoverExecutables() ([]Candidate, error) {
-	var result []Candidate
+func DiscoverExecutables() ([]Executable, error) {
+	var result []Executable
 
 	// nix candidates
-	nixCandidates := DiscoverNixStoreCandidates(nil)
-	result = append(result, nixCandidates...)
+	nixStoreCandidates := DiscoverNixStoreExecutables(nil)
+	result = append(result, nixStoreCandidates...)
+	nixShellCandidates := DiscoverNixShellExecutables(nil)
+	result = append(result, nixShellCandidates...)
 
 	// exec candidates
 	execCandidates := DiscoverPathCandidates(nil)

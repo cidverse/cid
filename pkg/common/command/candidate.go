@@ -5,7 +5,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/config"
 )
 
-func CandidatesFromConfig(cfg config.CIDConfig) ([]executable.Candidate, error) {
+func CandidatesFromConfig(cfg config.CIDConfig) ([]executable.Executable, error) {
 	// load candidates
 	result, err := executable.LoadCachedExecutables()
 	if err != nil {

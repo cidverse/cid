@@ -5,25 +5,27 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strconv"
+	"slices"
 	"strings"
 
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/rs/zerolog/log"
 )
 
-type NixPackage struct {
-	Name       string
-	Expression string
-	Env        map[string]string
+type NixStorePackage struct {
+	Name             string
+	ProgramsProvided []string
+	Expression       string
+	Env              map[string]string
 }
 
-type DiscoverNixOptions struct {
-	Packages             []NixPackage
+type DiscoverNixStoreOptions struct {
+	Packages             []NixStorePackage
 	VersionLookupCommand bool
 }
 
-var DefaultDiscoverNixOptions = DiscoverNixOptions{
-	Packages: []NixPackage{
+var DefaultDiscoverNixOptions = DiscoverNixStoreOptions{
+	Packages: []NixStorePackage{
 		{
 			Name:       "openjdk",
 			Expression: `([a-z0-9]{32})-(openjdk)-(\d+\.\d+\.\d+.+)`,
@@ -57,23 +59,25 @@ var DefaultDiscoverNixOptions = DiscoverNixOptions{
 			Expression: `([a-z0-9]{32})-(kubectl)-(\d+\.\d+\.\d+)`,
 		},
 		{
-			Name:       "openshift",
-			Expression: `([a-z0-9]{32})-(openshift)-(\d+\.\d+\.\d+)`,
+			Name:             "openshift",
+			ProgramsProvided: []string{"oc"},
+			Expression:       `([a-z0-9]{32})-(openshift)-(\d+\.\d+\.\d+)`,
 		},
 		{
 			Name:       "ansible",
 			Expression: `([a-z0-9]{32})-(ansible)-(\d+\.\d+\.\d+)`,
 		},
 		{
-			Name:       "minio-client",
-			Expression: `([a-z0-9]{32})-(minio-client)-(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z)`,
+			Name:             "minio-client",
+			ProgramsProvided: []string{"mc"},
+			Expression:       `([a-z0-9]{32})-(minio-client)-(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z)`,
 		},
 	},
 	VersionLookupCommand: true,
 }
 
-func DiscoverNixStoreCandidates(opts *DiscoverNixOptions) []Candidate {
-	var result []Candidate
+func DiscoverNixStoreExecutables(opts *DiscoverNixStoreOptions) []Executable {
+	var result []Executable
 	if opts == nil {
 		opts = &DefaultDiscoverNixOptions
 	}
@@ -87,12 +91,14 @@ func DiscoverNixStoreCandidates(opts *DiscoverNixOptions) []Candidate {
 	// discover using store paths
 	for _, dir := range nixCurrentSystemStorePaths() {
 		var hash, pkgName, pkgVersion string
+		var programsProvided []string
 		var env map[string]string
 
 		for _, pkg := range opts.Packages {
 			if hash, pkgName, pkgVersion = nixPathToHashNameVersion(dir, pkg.Expression); hash != "" {
 				env = pkg.Env
-				pkgVersion = toSemanticVersion(pkgVersion)
+				programsProvided = pkg.ProgramsProvided
+				pkgVersion = util.ToSemanticVersion(pkgVersion)
 				break
 			}
 		}
@@ -102,6 +108,11 @@ func DiscoverNixStoreCandidates(opts *DiscoverNixOptions) []Candidate {
 		}
 
 		for _, executable := range findExecutablesInDirectory(dir + "/bin") {
+			// restrict to executables provided by the package if specified
+			if len(programsProvided) > 0 && !slices.Contains(programsProvided, executable) {
+				continue
+			}
+
 			// preprocess env
 			for k, v := range env {
 				env[k] = strings.ReplaceAll(v, "{{EXECUTABLE_PKG_DIR}}", dir) // placeholder to set e.g. JAVA_HOME to the store dir when running java
@@ -158,27 +169,4 @@ func nixPathToHashNameVersion(path string, expr string) (hash string, name strin
 	}
 
 	return "", "", ""
-}
-
-func toSemanticVersion(version string) string {
-	// timestamp-version: "2024-10-02T08-27-28Z" → "2024.10.2+082728"
-	timestampPattern := regexp.MustCompile(`^(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})Z$`)
-	if matches := timestampPattern.FindStringSubmatch(version); matches != nil {
-		year := matches[1]
-		month, _ := strconv.Atoi(matches[2])
-		day, _ := strconv.Atoi(matches[3])
-		hour := matches[4]
-		minute := matches[5]
-		second := matches[6]
-
-		return fmt.Sprintf("%s.%d.%d+%s%s%s", year, month, day, hour, minute, second)
-	}
-
-	// Versions with 4 numeric segments: "6.2.1.4610" → "6.2.1+4610"
-	fourSegmentPattern := regexp.MustCompile(`^(\d+)\.(\d+)\.(\d+)\.(\d+)$`)
-	if matches := fourSegmentPattern.FindStringSubmatch(version); matches != nil {
-		return fmt.Sprintf("%s.%s.%s+%s", matches[1], matches[2], matches[3], matches[4])
-	}
-
-	return version
 }

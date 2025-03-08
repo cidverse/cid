@@ -15,7 +15,7 @@ var (
 )
 
 type Opts struct {
-	Candidates             []executable.Candidate
+	Candidates             []executable.Executable
 	CandidateTypes         []executable.CandidateType
 	Command                string
 	Env                    map[string]string
@@ -30,7 +30,7 @@ type Opts struct {
 }
 
 // Execute gets called from actions or the api to execute commands
-func Execute(opts Opts) (stdout string, stderr string, cand executable.Candidate, err error) {
+func Execute(opts Opts) (stdout string, stderr string, cand executable.Executable, err error) {
 	// validate
 	if len(opts.Candidates) == 0 {
 		return "", "", cand, ErrNoCandidatesProvided

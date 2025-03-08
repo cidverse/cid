@@ -6,39 +6,54 @@ import (
 	"io"
 	"os"
 	"runtime"
-	"sync"
+	"strings"
 
 	"github.com/cidverse/cid/pkg/common/shellcommand"
-	"github.com/cidverse/cidverseutils/redact"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/rs/zerolog/log"
 )
 
 // NixShellCandidate is used for the execution using nix-shell
 type NixShellCandidate struct {
 	BaseCandidate
-	Package            string   `yaml:"package,omitempty"`
-	PackageVersion     string   `yaml:"package-version,omitempty"`
-	AdditionalPackages []string `yaml:"additional-packages,omitempty"`
-	Channel            string   `yaml:"channel,omitempty"`
-	//nix-shell with channel: nix-shell -I nixpkgs=channel:nixos-unstable -p hugo
+	Package            string            `yaml:"package,omitempty"`
+	PackageVersion     string            `yaml:"package-version,omitempty"`
+	AdditionalPackages []string          `yaml:"additional-packages,omitempty"`
+	Channel            string            `yaml:"channel,omitempty"`
+	Env                map[string]string `json:"env,omitempty"`
+}
+
+func (c NixShellCandidate) GetUri() string {
+	return fmt.Sprintf("nix-shell:/%s#%s@%s", c.Channel, c.Package, c.Version)
 }
 
 func (c NixShellCandidate) Run(opts RunParameters) (string, string, error) {
 	log.Debug().Msgf("Running NixShellCandidate %s %s with args %v", c.Package, c.PackageVersion, opts.Args)
 
-	var stdoutWriter io.Writer
-	var stderrWriter io.Writer
-	var stdoutBuffer bytes.Buffer
-	var stderrBuffer bytes.Buffer
+	var stdoutBuffer, stderrBuffer bytes.Buffer
+	var stdoutWriter, stderrWriter io.Writer
 	if opts.CaptureOutput {
-		stdoutWriter = redact.NewProtectedWriter(nil, &stdoutBuffer, &sync.Mutex{}, nil)
-		stderrWriter = redact.NewProtectedWriter(nil, &stderrBuffer, &sync.Mutex{}, nil)
+		stdoutWriter = &stdoutBuffer
+		stderrWriter = &stderrBuffer
 	} else {
-		stdoutWriter = redact.NewProtectedWriter(os.Stdout, nil, &sync.Mutex{}, nil)
-		stderrWriter = redact.NewProtectedWriter(os.Stderr, nil, &sync.Mutex{}, nil)
+		stdoutWriter = io.MultiWriter(os.Stdout, &stdoutBuffer)
+		stderrWriter = io.MultiWriter(os.Stderr, &stderrBuffer)
 	}
 
-	cmd, err := shellcommand.PrepareCommand("", runtime.GOOS, "bash", true, nil, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
+	var nixShellArgs = []string{"nix-shell"}
+	if c.Channel == "unstable" {
+		nixShellArgs = append(nixShellArgs, "-I", "nixpkgs=nixos-unstable")
+	}
+	nixShellArgs = append(nixShellArgs, "-p", c.Package)
+	if len(c.AdditionalPackages) > 0 {
+		nixShellArgs = append(nixShellArgs, "-p", strings.Join(c.AdditionalPackages, " "))
+	}
+	nixShellArgs = append(nixShellArgs, "--run", fmt.Sprintf("%q", strings.Join(opts.Args, " ")))
+
+	env := util.MergeMaps(c.Env, opts.Env)
+	env = util.ResolveEnvMap(env)
+	env["NIX_PATH"] = os.Getenv("NIX_PATH")
+	cmd, err := shellcommand.PrepareCommand(strings.Join(nixShellArgs, " "), runtime.GOOS, "", false, env, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
 	if err != nil {
 		return "", "", err
 	}

@@ -14,6 +14,7 @@ const (
 	ExecutionExec      CandidateType = "exec"
 	ExecutionContainer CandidateType = "container"
 	ExecutionNixStore  CandidateType = "nix-store"
+	ExecutionNixShell CandidateType = "nix-shell"
 )
 
 type RunParameters struct {
@@ -30,7 +31,7 @@ type RunParameters struct {
 	CaptureOutput bool
 }
 
-type Candidate interface {
+type Executable interface {
 	GetName() string
 	GetVersion() string
 	GetType() CandidateType
@@ -80,8 +81,8 @@ type CandidateFilter struct {
 }
 
 // SelectCandidate selects the first candidate that matches the given requirements
-func SelectCandidate(candidates []Candidate, options CandidateFilter) *Candidate {
-	var filteredCandidates []Candidate
+func SelectCandidate(candidates []Executable, options CandidateFilter) *Executable {
+	var filteredCandidates []Executable
 	for _, candidate := range candidates {
 		// type constraint
 		if len(options.Types) > 0 && !slices.Contains(options.Types, candidate.GetType()) {
@@ -102,7 +103,7 @@ func SelectCandidate(candidates []Candidate, options CandidateFilter) *Candidate
 	}
 
 	// filter by type
-	var orderedCandidates []Candidate
+	var orderedCandidates []Executable
 	if len(options.Types) == 0 {
 		orderedCandidates = filteredCandidates
 	} else {

@@ -19,7 +19,7 @@ type APIConfig struct {
 	State                *state.ActionStateContext
 	TempDir              string
 	ArtifactDir          string
-	ExecutableCandidates []executable.Candidate
+	ExecutableCandidates []executable.Executable
 }
 
 // apiError, see https://www.rfc-editor.org/rfc/rfc7807

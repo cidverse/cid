@@ -20,7 +20,7 @@ type TypedCandidate struct {
 	Candidate json.RawMessage `json:"candidate"` // Candidate contains the actual candidate data
 }
 
-func ToTypedCandidate(candidate Candidate) (TypedCandidate, error) {
+func ToTypedCandidate(candidate Executable) (TypedCandidate, error) {
 	data, err := json.Marshal(candidate)
 	if err != nil {
 		return TypedCandidate{}, err
@@ -32,8 +32,8 @@ func ToTypedCandidate(candidate Candidate) (TypedCandidate, error) {
 	}, nil
 }
 
-func FromTypedCandidate(typed TypedCandidate) (Candidate, error) {
-	var candidate Candidate
+func FromTypedCandidate(typed TypedCandidate) (Executable, error) {
+	var candidate Executable
 	switch typed.Type {
 	case "executable.ExecCandidate":
 		candidate = &ExecCandidate{}
@@ -65,7 +65,7 @@ func FromTypedCandidate(typed TypedCandidate) (Candidate, error) {
 var executablesLockFile = filepath.Join(util.CIDStateDir(), "executable-lock.json")
 
 // UpdateExecutableCache persists the candidates into a file
-func UpdateExecutableCache(candidates []Candidate) error {
+func UpdateExecutableCache(candidates []Executable) error {
 	var result []TypedCandidate
 
 	for _, c := range candidates {
@@ -94,7 +94,7 @@ func ResetExecutableCache() {
 }
 
 // LoadCachedExecutables loads the candidates from the cache
-func LoadCachedExecutables() ([]Candidate, error) {
+func LoadCachedExecutables() ([]Executable, error) {
 	if _, statErr := os.Stat(executablesLockFile); statErr == nil {
 		data, err := os.ReadFile(executablesLockFile)
 		if err != nil {
@@ -106,7 +106,7 @@ func LoadCachedExecutables() ([]Candidate, error) {
 			return nil, err
 		}
 
-		var candidates []Candidate
+		var candidates []Executable
 		for _, c := range cached.Candidates {
 			candidate, err := FromTypedCandidate(c)
 			if err != nil {
@@ -122,7 +122,7 @@ func LoadCachedExecutables() ([]Candidate, error) {
 	return nil, nil
 }
 
-func LoadExecutables() ([]Candidate, error) {
+func LoadExecutables() ([]Executable, error) {
 	executableCandidates, err := LoadCachedExecutables()
 	if err != nil {
 		return nil, err

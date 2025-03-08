@@ -7,7 +7,7 @@ import (
 )
 
 func TestSelectCandidateByTypeFilter(t *testing.T) {
-	candidate := SelectCandidate([]Candidate{
+	candidate := SelectCandidate([]Executable{
 		newCandidate("helm", ExecutionExec, "1.0.0"),
 		newCandidate("kubectl", ExecutionExec, "1.0.0"),
 		newCandidate("kubectl", ExecutionContainer, "1.0.0"),
@@ -23,7 +23,7 @@ func TestSelectCandidateByTypeFilter(t *testing.T) {
 }
 
 func TestSelectCandidateByVersionFilter(t *testing.T) {
-	candidate := SelectCandidate([]Candidate{
+	candidate := SelectCandidate([]Executable{
 		newCandidate("helm", ExecutionExec, "1.0.0"),
 		newCandidate("kubectl", ExecutionExec, "1.0.0"),
 		newCandidate("kubectl", ExecutionContainer, "2.0.0"),
@@ -38,7 +38,7 @@ func TestSelectCandidateByVersionFilter(t *testing.T) {
 	assert.Equal(t, ExecutionContainer, (*candidate).GetType())
 }
 
-func newCandidate(name string, candidateType CandidateType, version string) Candidate {
+func newCandidate(name string, candidateType CandidateType, version string) Executable {
 	return &BaseCandidate{
 		Name:    name,
 		Type:    candidateType,

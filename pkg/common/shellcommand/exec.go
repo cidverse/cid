@@ -80,6 +80,7 @@ func PrepareCommand(command string, platform string, shell string, fullEnv bool,
 		}
 	} else {
 		commandEnv["PATH"] = os.Getenv("PATH")
+		commandEnv["HOME"] = os.Getenv("HOME")
 	}
 	for k, v := range env {
 		commandEnv[k] = v

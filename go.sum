@@ -28,8 +28,8 @@ github.com/charlievieth/fastwalk v1.0.10 h1:0qUbvA2O+K+X+IrTfZTC0UH2DK5MOA+KjVfS
 github.com/charlievieth/fastwalk v1.0.10/go.mod h1:yGy1zbxog41ZVMcKA/i8ojXLFsuayX5VvwhQVoj9PBI=
 github.com/cidverse/cidverseutils/ci v0.1.0 h1:vLxi+T3Oj2uJzO8KWLLRUzgEfC8y2hoS14AE9pCr2ew=
 github.com/cidverse/cidverseutils/ci v0.1.0/go.mod h1:uOMGB2Kh/0HA936tlnzgBvrxv4hmXYeSbJxP383nHKU=
-github.com/cidverse/cidverseutils/compress v0.1.1 h1:VKmDRRGc5rQlzhnJy+ul1yS7OgqfRlVYcZVgidxyKYg=
-github.com/cidverse/cidverseutils/compress v0.1.1/go.mod h1:Xga0FDD+hHizd9zH99+DrbqXTAsblYQVEolYiOCN/Ug=
+github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842 h1:G7E9P9kcLs/bMGf8BMtOXc+QbRM8w2/3/5D8HkWmJtQ=
+github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842/go.mod h1:Xga0FDD+hHizd9zH99+DrbqXTAsblYQVEolYiOCN/Ug=
 github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4 h1:kmqVOqeuz1Bis0v4nb9o28fZIv/dQuyKBlBXEz1pSc0=
 github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4/go.mod h1:uS1HruKWaR4YluZgGgvEPWwfHutw0KsuBTyehewcdbo=
 github.com/cidverse/cidverseutils/core v0.0.0-20250308170839-94a75eae5842 h1:2byZwqkhwaZjkwC9VdyWUo0FrMXEAYBiGU//kYZO9h8=

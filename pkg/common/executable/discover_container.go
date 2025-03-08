@@ -21,8 +21,8 @@ var DefaultDiscoverContainerOptions = DiscoverContainerOptions{
 	Packages: []ContainerPackage{},
 }
 
-func DiscoverContainerCandidates(opts *DiscoverContainerOptions) []Candidate {
-	var result []Candidate
+func DiscoverContainerCandidates(opts *DiscoverContainerOptions) []Executable {
+	var result []Executable
 	if opts == nil {
 		opts = &DefaultDiscoverContainerOptions
 	}
