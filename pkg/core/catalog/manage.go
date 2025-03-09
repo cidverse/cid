@@ -172,6 +172,7 @@ func updateCatalogOCI(file string, source *Source) error {
 	for _, am := range actionMetadata {
 		data.Actions = append(data.Actions, Action{
 			Repository: source.URI,
+			URI:        fmt.Sprintf("%s://%s+%s", ActionTypeContainer, ociImage, am.Name),
 			Type:       ActionTypeContainer,
 			Container: ContainerAction{
 				Image:   ociImage,

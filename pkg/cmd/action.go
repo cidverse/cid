@@ -52,7 +52,7 @@ func actionListCmd() *cobra.Command {
 
 			// data
 			data := clioutputwriter.TabularData{
-				Headers: []string{"REPOSITORY", "ACTION", "TYPE", "SCOPE", "RULES", "DESCRIPTION"},
+				Headers: []string{"URI", "ACTION", "TYPE", "SCOPE", "RULES", "DESCRIPTION"},
 				Rows:    [][]interface{}{},
 			}
 			for _, action := range cid.Config.Registry.Actions {
@@ -62,7 +62,7 @@ func actionListCmd() *cobra.Command {
 				}
 
 				data.Rows = append(data.Rows, []interface{}{
-					action.Repository,
+					action.URI,
 					action.Metadata.Name,
 					string(action.Type),
 					string(action.Metadata.Scope),

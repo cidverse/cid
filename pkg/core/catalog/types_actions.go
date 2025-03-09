@@ -6,6 +6,7 @@ import (
 
 type Action struct {
 	Repository string          `yaml:"repository,omitempty" json:"repository,omitempty"`
+	URI        string          `yaml:"uri" json:"uri"` // URI is a unique absolute identifier for the action
 	Type       ActionType      `required:"true" yaml:"type" json:"type"`
 	Container  ContainerAction `yaml:"container,omitempty" json:"container,omitempty"` // Container contains the configuration for containerized actions
 	Version    string          `yaml:"version,omitempty" json:"version,omitempty"`

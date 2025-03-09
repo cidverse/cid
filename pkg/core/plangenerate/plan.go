@@ -69,7 +69,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 		catalogAction := ptr.Value(context.Registry.FindAction(action.ID))
 		for _, artifact := range catalogAction.Metadata.Output.Artifacts {
 			if catalogAction.Metadata.Scope == catalog.ActionScopeProject {
-				artifactProducers[artifact.Key()] = append(artifactProducers[artifact.Key()], action.ID)
+				artifactProducers[artifact.Key()] = append(artifactProducers[artifact.Key()], catalogAction.URI) // TODO: action.ID
 			}
 		}
 	}
@@ -81,14 +81,14 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 
 		var dependencies []string
 
-		// Check required artifacts and add dependencies
+		// check required artifacts and add dependencies
 		for _, artifact := range catalogAction.Metadata.Input.Artifacts {
 			if producers, exists := artifactProducers[artifact.Key()]; exists {
 				dependencies = append(dependencies, producers...)
 			}
 		}
 
-		// Create steps without stage grouping, but store the stage name
+		// create steps without stage grouping, but store the stage name
 		if catalogAction.Metadata.Scope == catalog.ActionScopeProject {
 			ruleContext := rules.GetProjectRuleContext(ctx.Env, ctx.Modules)
 			if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext) {
@@ -97,7 +97,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 					Name:     catalogAction.Metadata.Name,
 					Stage:    action.Stage,
 					Scope:    catalogAction.Metadata.Scope,
-					Action:   fmt.Sprintf("%s/%s", catalogAction.Repository, catalogAction.Metadata.Name),
+					Action:   catalogAction.URI,
 					RunAfter: dependencies,
 					Order:    1,
 					Config:   action.Config,
@@ -115,7 +115,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 						Stage:    action.Stage,
 						Scope:    catalogAction.Metadata.Scope,
 						Module:   moduleRef.ID,
-						Action:   fmt.Sprintf("%s/%s", catalogAction.Repository, catalogAction.Metadata.Name),
+						Action:   catalogAction.URI,
 						RunAfter: dependencies,
 						Order:    1,
 						Config:   action.Config,
