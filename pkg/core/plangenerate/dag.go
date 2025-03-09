@@ -13,18 +13,20 @@ func SortSteps(steps []Step) ([]Step, error) {
 
 	// add vertices
 	for _, step := range steps {
-		err := d.AddVertexByID(step.ID, step.Action)
+		err := d.AddVertexByID(step.ID, step.Name)
 		if err != nil {
 			return nil, err
 		}
 
+		log.Trace().Str("step", step.Name).Str("id", step.ID).Msg("adding step to dag")
 		stepMap[step.ID] = step
-		vertexIds[step.Action] = step.ID
+		vertexIds[step.Name] = step.ID
 	}
 
 	// add edges
 	for _, step := range steps {
 		for _, dep := range step.RunAfter {
+			log.Trace().Str("from", vertexIds[dep]).Str("from_name", dep).Str("to", step.ID).Str("to_name", step.Name).Msg("adding dep for step")
 			if err := d.AddEdge(vertexIds[dep], step.ID); err != nil {
 				return nil, err
 			}

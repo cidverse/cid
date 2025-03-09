@@ -3,6 +3,7 @@ package plangenerate
 import (
 	"errors"
 
+	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
@@ -12,9 +13,10 @@ var (
 )
 
 type Plan struct {
-	Name   string   `json:"name"`
-	Stages []string `json:"stages"`
-	Steps  []Step   `json:"steps"`
+	Name              string                  `json:"name"`
+	Stages            []string                `json:"stages"`
+	Steps             []Step                  `json:"steps"`
+	PinnedExecutables []executable.Executable `json:"pinned-executables,omitempty"`
 }
 
 type Stage struct {
@@ -24,20 +26,20 @@ type Stage struct {
 }
 
 type Step struct {
-	ID       string              `json:"id"`
-	Name     string              `json:"name"`
-	Stage    string              `json:"stage"`
-	Scope    catalog.ActionScope `json:"scope"`
-	Action   string              `json:"action"`
-	Module   string              `json:"module,omitempty"`
-	RunAfter []string            `json:"run-after,omitempty"`
-	Order    int                 `json:"order"`
-	Config   interface{}         `json:"config,omitempty"`
+	ID                    string              `json:"id"`
+	Name                  string              `json:"name"`
+	Stage                 string              `json:"stage"`
+	Scope                 catalog.ActionScope `json:"scope"`
+	Action                string              `json:"action"`
+	Module                string              `json:"module,omitempty"`
+	RunAfter              []string            `json:"run-after,omitempty"`
+	ExecutableConstraints map[string]string   `json:"executable-constraints,omitempty"`
+	Order                 int                 `json:"order"` // Topological order
+	Config                interface{}         `json:"config,omitempty"`
 }
 
-type Action struct {
-	Name      string            `json:"name"`
-	Arguments map[string]string `json:"arguments"`
+type StepMetadata struct {
+	VersionConstraint string `json:"version-constraint"`
 }
 
 type PlanContext struct {

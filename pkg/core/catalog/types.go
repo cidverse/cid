@@ -45,7 +45,10 @@ func (r *Config) FindAction(name string) *Action {
 	// exact match
 	for i := range r.Actions {
 		a := r.Actions[i]
-		if a.Repository+"/"+a.Metadata.Name == name {
+
+		if a.URI == name {
+			return &a
+		} else if a.Repository+"/"+a.Metadata.Name == name {
 			return &a
 		}
 	}

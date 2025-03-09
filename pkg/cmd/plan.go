@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
 
+	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cid/pkg/core/planexecute"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
@@ -37,6 +39,8 @@ func planGenerateCmd() *cobra.Command {
 		Aliases: []string{"gen"},
 		Short:   "",
 		Run: func(cmd *cobra.Command, args []string) {
+			pin, _ := cmd.Flags().GetBool("pin")
+
 			// app context
 			cid, err := context.NewAppContext()
 			if err != nil {
@@ -47,18 +51,30 @@ func planGenerateCmd() *cobra.Command {
 			// analyze
 			modules := analyzer.ScanDirectory(cid.ProjectDir)
 
+			// get candidates
+			candidates, err := command.CandidatesFromConfig(*cid.Config)
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to discover candidates")
+			}
+
 			// data
-			plan, err := plangenerate.GeneratePlan(modules, cid.Config.Registry, cid.ProjectDir, cid.Env)
+			plan, err := plangenerate.GeneratePlan(modules, cid.Config.Registry, cid.ProjectDir, cid.Env, candidates, pin)
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to generate action plan")
 				os.Exit(1)
 			}
 
 			// output
-			out, _ := json.MarshalIndent(plan, "", "  ")
-			fmt.Println(string(out))
+			buffer := &bytes.Buffer{}
+			encoder := json.NewEncoder(buffer)
+			encoder.SetIndent("", "  ")
+			encoder.SetEscapeHTML(false)
+			_ = encoder.Encode(plan)
+			fmt.Println(buffer.String())
 		},
 	}
+
+	cmd.Flags().Bool("pin", false, "pin all versions when generating the plan")
 
 	return cmd
 }
@@ -79,8 +95,14 @@ func planExecuteCmd() *cobra.Command {
 			// analyze
 			modules := analyzer.ScanDirectory(cid.ProjectDir)
 
+			// get candidates
+			candidates, err := command.CandidatesFromConfig(*cid.Config)
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to discover candidates")
+			}
+
 			// plan
-			plan, err := plangenerate.GeneratePlan(modules, cid.Config.Registry, cid.ProjectDir, cid.Env)
+			plan, err := plangenerate.GeneratePlan(modules, cid.Config.Registry, cid.ProjectDir, cid.Env, candidates, false)
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to generate action plan")
 				os.Exit(1)
