@@ -10,7 +10,6 @@ import (
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cidverseutils/core/clioutputwriter"
 	"github.com/cidverse/cidverseutils/redact"
-	"github.com/cidverse/repoanalyzer/analyzer"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -47,15 +46,12 @@ func moduleListCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			// analyze
-			modules := analyzer.ScanDirectory(cid.ProjectDir)
-
 			// data
 			data := clioutputwriter.TabularData{
 				Headers: []string{"NAME", "SLUG", "KIND", "TYPE", "BUILD-SYSTEM", "BUILD-SYNTAX", "DISCOVERY", "SUBMODULES"},
 				Rows:    [][]interface{}{},
 			}
-			for _, module := range modules {
+			for _, module := range cid.Modules {
 				discovery := ""
 				if len(module.Discovery) > 0 {
 					discovery = strings.TrimPrefix(module.Discovery[0].File, cid.ProjectDir)

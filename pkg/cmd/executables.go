@@ -5,7 +5,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cidverseutils/core/clioutputwriter"
@@ -85,19 +84,12 @@ func executablesListCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			// executables
-			executableCandidates, err := command.CandidatesFromConfig(*cid.Config)
-			if err != nil {
-				log.Fatal().Err(err).Msg("failed to load candidates from cache")
-				os.Exit(1)
-			}
-
 			// data
 			data := clioutputwriter.TabularData{
 				Headers: []string{"NAME", "TYPE", "VERSION", "URI"},
 				Rows:    [][]interface{}{},
 			}
-			for _, c := range executableCandidates {
+			for _, c := range cid.Executables {
 				data.Rows = append(data.Rows, []interface{}{
 					c.GetName(),
 					string(c.GetType()),

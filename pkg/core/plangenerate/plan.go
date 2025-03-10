@@ -72,7 +72,8 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 		catalogAction := ptr.Value(context.Registry.FindAction(action.ID))
 		ctx := api.GetActionContext(context.Modules, context.ProjectDir, context.Environment, catalogAction.Metadata.Access)
 
-		executableConstraints := make(map[string]string)
+		// pin executable constraints
+		var executableConstraints []catalog.ActionAccessExecutable
 		for _, ex := range catalogAction.Metadata.Access.Executables {
 			versionConstraint := ex.Constraint
 			if versionConstraint == "" {
@@ -92,7 +93,10 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 				}
 			}
 
-			executableConstraints[ex.Name] = versionConstraint
+			executableConstraints = append(executableConstraints, catalog.ActionAccessExecutable{
+				Name:       ex.Name,
+				Constraint: versionConstraint,
+			})
 		}
 
 		// create steps without stage grouping, but store the stage name
@@ -100,15 +104,19 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 			ruleContext := rules.GetProjectRuleContext(ctx.Env, ctx.Modules)
 			if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext) {
 				steps = append(steps, Step{
-					ID:                    strconv.Itoa(len(steps)),
-					Name:                  catalogAction.Metadata.Name,
-					Stage:                 action.Stage,
-					Scope:                 catalogAction.Metadata.Scope,
-					Action:                catalogAction.URI,
-					RunAfter:              []string{},
-					ExecutableConstraints: executableConstraints,
-					Order:                 1,
-					Config:                action.Config,
+					ID:       strconv.Itoa(len(steps)),
+					Name:     catalogAction.Metadata.Name,
+					Stage:    action.Stage,
+					Scope:    catalogAction.Metadata.Scope,
+					Action:   catalogAction.URI,
+					RunAfter: []string{},
+					Access: catalog.ActionAccess{
+						Environment: catalogAction.Metadata.Access.Environment,
+						Executables: executableConstraints,
+						Network:     catalogAction.Metadata.Access.Network,
+					},
+					Order:  1,
+					Config: action.Config,
 				})
 			}
 		} else if catalogAction.Metadata.Scope == catalog.ActionScopeModule {
@@ -118,16 +126,20 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 				ruleContext := rules.GetModuleRuleContext(ctx.Env, &moduleRef)
 				if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext) {
 					steps = append(steps, Step{
-						ID:                    strconv.Itoa(len(steps)),
-						Name:                  fmt.Sprintf("%s - %s", catalogAction.Metadata.Name, moduleRef.Name),
-						Stage:                 action.Stage,
-						Scope:                 catalogAction.Metadata.Scope,
-						Module:                moduleRef.ID,
-						Action:                catalogAction.URI,
-						RunAfter:              []string{},
-						ExecutableConstraints: executableConstraints,
-						Order:                 1,
-						Config:                action.Config,
+						ID:       strconv.Itoa(len(steps)),
+						Name:     fmt.Sprintf("%s - %s", catalogAction.Metadata.Name, moduleRef.Name),
+						Stage:    action.Stage,
+						Scope:    catalogAction.Metadata.Scope,
+						Module:   moduleRef.ID,
+						Action:   catalogAction.URI,
+						RunAfter: []string{},
+						Access: catalog.ActionAccess{
+							Environment: catalogAction.Metadata.Access.Environment,
+							Executables: executableConstraints,
+							Network:     catalogAction.Metadata.Access.Network,
+						},
+						Order:  1,
+						Config: action.Config,
 					})
 				}
 			}

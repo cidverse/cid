@@ -19,6 +19,7 @@ const (
 	ModuleBuildSystemSyntax = "MODULE_BUILD_SYSTEM_SYNTAX"
 	ModuleConfigType        = "MODULE_CONFIG_TYPE"
 	ModuleSpecificationType = "MODULE_SPECIFICATION_TYPE"
+	ModuleDeploymentSpec    = "MODULE_DEPLOYMENT_SPEC"
 	ModuleDeploymentType    = "MODULE_DEPLOYMENT_TYPE"
 	ModuleFiles             = "MODULE_FILES"
 )
@@ -127,7 +128,8 @@ func GetModuleRuleContext(env map[string]string, module *analyzerapi.ProjectModu
 	ctx[ModuleBuildSystemSyntax] = string(module.BuildSystemSyntax)
 	ctx[ModuleConfigType] = string(module.ConfigType)
 	ctx[ModuleSpecificationType] = string(module.SpecificationType)
-	ctx[ModuleDeploymentType] = string(module.DeploymentType)
+	ctx[ModuleDeploymentSpec] = string(module.DeploymentSpec)
+	ctx[ModuleDeploymentType] = module.DeploymentType
 
 	var files []string
 	for _, file := range module.Files {

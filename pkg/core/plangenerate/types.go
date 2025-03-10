@@ -26,20 +26,20 @@ type Stage struct {
 }
 
 type Step struct {
-	ID                    string              `json:"id"`
-	Name                  string              `json:"name"`
-	Stage                 string              `json:"stage"`
-	Scope                 catalog.ActionScope `json:"scope"`
-	Action                string              `json:"action"`
-	Module                string              `json:"module,omitempty"`
-	RunAfter              []string            `json:"run-after,omitempty"`
-	ExecutableConstraints map[string]string   `json:"executable-constraints,omitempty"`
-	Order                 int                 `json:"order"` // Topological order
-	Config                interface{}         `json:"config,omitempty"`
+	ID       string               `json:"id"`
+	Name     string               `json:"name"`
+	Stage    string               `json:"stage"`
+	Scope    catalog.ActionScope  `json:"scope"`
+	Action   string               `json:"action"`
+	Module   string               `json:"module,omitempty"`
+	RunAfter []string             `json:"run-after,omitempty"`
+	Access   catalog.ActionAccess `json:"access,omitempty"`
+	Order    int                  `json:"order"` // Topological order
+	Config   interface{}          `json:"config,omitempty"`
 }
 
 type StepMetadata struct {
-	VersionConstraint string `json:"version-constraint"`
+	ExecutableConstraints map[string]string `json:"executable-constraints,omitempty"`
 }
 
 type PlanContext struct {

@@ -7,22 +7,21 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/common/command"
+	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cidverseutils/filesystem"
+	"github.com/cidverse/repoanalyzer/analyzer"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
 type CIDContext struct {
-	// ProjectDir is the root directory of the project
-	ProjectDir string
-
-	// WorkDir is the current working directory, must be a subdirectory of ProjectDir or ProjectDir itself
-	WorkDir string
-
-	// Config is the CID configuration for the project
-	Config *config.CIDConfig
-
-	// Env holds the resolved environment variables for the project
-	Env map[string]string
+	ProjectDir  string                       // ProjectDir is the root directory of the project
+	WorkDir     string                       // WorkDir is the current working directory, must be a subdirectory of ProjectDir or ProjectDir itself
+	Config      *config.CIDConfig            // Config is the CID configuration for the project
+	Env         map[string]string            // Env holds the resolved environment variables for the project
+	Modules     []*analyzerapi.ProjectModule // Modules is a list of all discovered modules in the project
+	Executables []executable.Executable      // Executables is a list of all executable candidates usable for command execution
 }
 
 var (
@@ -48,10 +47,21 @@ func NewAppContext() (*CIDContext, error) {
 		return nil, ErrWorkDirNotInProjectDir
 	}
 
+	// modules
+	modules := analyzer.ScanDirectory(projectDir)
+
+	// get candidates
+	executables, err := command.CandidatesFromConfig(*cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	return &CIDContext{
-		ProjectDir: projectDir,
-		WorkDir:    workDir,
-		Config:     cfg,
-		Env:        env,
+		ProjectDir:  projectDir,
+		WorkDir:     workDir,
+		Config:      cfg,
+		Env:         env,
+		Modules:     modules,
+		Executables: executables,
 	}, nil
 }

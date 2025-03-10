@@ -6,11 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cid/pkg/core/planexecute"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
-	"github.com/cidverse/repoanalyzer/analyzer"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -48,17 +46,8 @@ func planGenerateCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			// analyze
-			modules := analyzer.ScanDirectory(cid.ProjectDir)
-
-			// get candidates
-			candidates, err := command.CandidatesFromConfig(*cid.Config)
-			if err != nil {
-				log.Fatal().Err(err).Msg("failed to discover candidates")
-			}
-
 			// data
-			plan, err := plangenerate.GeneratePlan(modules, cid.Config.Registry, cid.ProjectDir, cid.Env, candidates, pin)
+			plan, err := plangenerate.GeneratePlan(cid.Modules, cid.Config.Registry, cid.ProjectDir, cid.Env, cid.Executables, pin)
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to generate action plan")
 				os.Exit(1)
@@ -92,17 +81,10 @@ func planExecuteCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			// analyze
-			modules := analyzer.ScanDirectory(cid.ProjectDir)
-
-			// get candidates
-			candidates, err := command.CandidatesFromConfig(*cid.Config)
-			if err != nil {
-				log.Fatal().Err(err).Msg("failed to discover candidates")
-			}
+			// TODO: generate plan or take from input file
 
 			// plan
-			plan, err := plangenerate.GeneratePlan(modules, cid.Config.Registry, cid.ProjectDir, cid.Env, candidates, false)
+			plan, err := plangenerate.GeneratePlan(cid.Modules, cid.Config.Registry, cid.ProjectDir, cid.Env, cid.Executables, false)
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to generate action plan")
 				os.Exit(1)
@@ -111,7 +93,7 @@ func planExecuteCmd() *cobra.Command {
 			// run plan
 			planexecute.RunPlan(plan, planexecute.ExecuteContext{
 				Cfg:           cid.Config,
-				Modules:       modules,
+				Modules:       cid.Modules,
 				Env:           cid.Env,
 				ProjectDir:    cid.ProjectDir,
 				StagesFilter:  []string{},
