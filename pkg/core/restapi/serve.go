@@ -46,6 +46,7 @@ func Setup(handlers *APIConfig) *echo.Echo {
 	e.GET("/v1/job/config", handlers.configCurrent)
 	e.GET("/v1/job/env", handlers.projectEnv)
 	e.GET("/v1/job/module", handlers.moduleCurrent)
+	e.GET("/v1/job/deployment", handlers.deployment)
 
 	// repoanalyzer
 	e.GET("/module", handlers.moduleList) // deprecated

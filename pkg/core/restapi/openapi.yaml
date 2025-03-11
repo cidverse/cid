@@ -1,13 +1,14 @@
 openapi: 3.0.3
 info:
   title: CID
-  description: API for Actions and Workflows
+  description: |-
+    API for Actions and Workflows
   license:
     name: MIT
     url: https://github.com/cidverse/cid/blob/main/LICENSE
   contact:
     name: Philipp Heuer
-    email: git@philippheuer.me
+    email: git@philippheuer.de
     url: https://github.com/cidverse/cid
   version: 1.0.0
 
@@ -25,9 +26,14 @@ tags:
   - name: command
     description: Command Operations
   - name: file
-    description: File Operations
+    description: |-
+        File Operations, e.g. reading, writing or listing files
   - name: vcs
-    description: VCS Operations
+    description: |-
+        Version Control System Operations, e.g. querying commits, tags, releases or diffs
+  - name: job
+    description: |-
+        Various Job related operations, e.g. querying the current module, environment or config
 
 paths:
   # info api
@@ -37,7 +43,7 @@ paths:
         - observability
       summary: healthcheck
       description: a very simple healthcheck
-      operationId: getHealthV1
+      operationId: healthV1
       responses:
         "200":
           description: healthcheck result
@@ -62,10 +68,11 @@ paths:
         201:
           description: Null response
           content: {}
-  /config/current:
+  # current job
+  /v1/job/config:
     get:
       tags:
-        - info
+        - job
       summary: query the config for the currently running action
       operationId: configCurrent
       responses:
@@ -75,10 +82,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ActionConfig'
-  /env:
+  /v1/job/env:
     get:
       tags:
-        - info
+        - job
       summary: query the environment (NCI variables and variables have been granted explicit access to)
       operationId: projectEnv
       responses:
@@ -88,25 +95,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectEnv'
-  /module:
+  /v1/job/module:
     get:
       tags:
-        - info
-      summary: query modules
-      operationId: modules
-      responses:
-        200:
-          description: project modules
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProjectModuleList'
-  /module/current:
-    get:
-      tags:
-        - info
+        - job
       summary: query current module (only available for module scoped actions)
-      operationId: currentModule
+      operationId: jobModuleV1
       responses:
         200:
           description: current module
@@ -120,13 +114,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /v1/job/deployment:
+    get:
+      tags:
+        - job
+      summary: if the current job is a deployment, query the deployment details
+      operationId: jobDeploymentV1
+      responses:
+        200:
+          description: deployment details for the current module
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDeployment'
+        400:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  # repoanalyzer
+  /v1/repoanalyzer/module:
+    get:
+      tags:
+        - info
+      summary: query modules
+      operationId: moduleListV1
+      responses:
+        200:
+          description: project modules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectModuleList'
   # vcs api
   /v1/vcs/commit:
     get:
       tags:
         - vcs
       summary: vcs commits
-      operationId: vcsCommits
+      operationId: vcsCommitsV1
       parameters:
         - name: changes
           in: query
@@ -146,7 +173,7 @@ paths:
       tags:
         - vcs
       summary: vcs commits
-      operationId: vcsCommits
+      operationId: vcsCommitsV1
       parameters:
         - name: id
           in: path
@@ -167,12 +194,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VCSCommit'
-  /vcs/tag:
+  /v1/vcs/tag:
     get:
       tags:
         - vcs
       summary: vcs tags
-      operationId: getTags
+      operationId: vcsTagsV1
       responses:
         200:
           description: query tags
@@ -180,12 +207,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VCSTagList'
-  /vcs/release:
+  /v1/vcs/release:
     get:
       tags:
         - vcs
       summary: vcs releases
-      operationId: getReleases
+      operationId: vcsReleasesV1
       responses:
         200:
           description: query releases
@@ -193,6 +220,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VCSReleaseList'
+  /v1/vcs/diff:
+    get:
+      tags:
+        - vcs
+      summary: vcs diff between two references
+      operationId: vcsDiffV1
+      parameters:
+        - name: from
+          in: query
+          description: from reference
+          required: true
+          schema:
+            type: string
+        - name: to
+          in: query
+          description: to reference
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: query releases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VCSDiff'
   # file api
   /files/list:
     get:
@@ -367,12 +420,12 @@ paths:
                 type: string
                 format: binary
   # command api
-  /command:
+  /v1/command/execute:
     post:
       tags:
         - command
       summary: Executes a command
-      operationId: executeCommand
+      operationId: executeCommandV1
       requestBody:
         content:
           application/json:
@@ -400,6 +453,7 @@ components:
           type: string
           example: error details
     HealthStatus:
+      title: HealthStatus
       required:
         - status
       type: object
@@ -517,26 +571,46 @@ components:
           type: string
           description: module name
           example: my-project
+        type:
+          type: string
+          description: type of the module
+          example: deployment
         build_system:
           type: string
-          description: module name
+          description: the build system used in this project
           example: container
         build_system_syntax:
           type: string
-          description: module name
+          description: variant of the build system used
           example: containerfile
+        specification_type:
+          type: string
+          description: specification type
+          example: openapi
+        config_type:
+          type: string
+          description: type of configuration that was found, e.g. renovate, gitlab-ci, github-actions, ...
+          example: renovate
+        deployment_spec:
+          type: string
+          description: type of spec describing the deployment, e.g. dotenv, ...
+          example: dotenv
+        deployment_type:
+          type: string
+          description: type of deployment, e.g. ansible, helm, kustomize, ...
+          example: helm
         language:
           type: object
           additionalProperties:
             type: string
-          description: module name
+          description: languages used in the project
         dependencies:
           type: array
           items:
             $ref: '#/components/schemas/ProjectDependency'
-          description: module name
+          description: dependencies of the current module
         submodules:
-          description: submodules
+          description: holds reference to all submodules, e.g. in gradle multi-module projects
           type: array
           items:
             $ref: '#/components/schemas/ProjectModule'
@@ -672,6 +746,45 @@ components:
           example: 1.0.0
         ref:
           $ref: '#/components/schemas/VCSTag'
+    VCSDiff:
+      type: object
+      properties:
+        file_from:
+          $ref: '#/components/schemas/CommitFile'
+        file_to:
+          $ref: '#/components/schemas/CommitFile'
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/VCSDiffLine'
+          description: "List of changes between the files"
+      required:
+        - file_from
+        - file_to
+    VCSDiffLine:
+      type: object
+      properties:
+        operation:
+          type: integer
+          description: "Operation type representing the change (e.g., addition, deletion, modification)"
+        content:
+          type: string
+          description: "The content of the changed line"
+      required:
+        - operation
+        - content
+    CommitFile:
+      type: object
+      properties:
+        path:
+          type: string
+          description: "Path to the file in the repository"
+        sha:
+          type: string
+          description: "SHA hash of the file"
+      required:
+        - path
+        - sha
     # files
     File:
       required:
@@ -777,3 +890,23 @@ components:
           type: string
           description: error output (if capture-output was request, empty otherwise)
           example: ""
+    ProjectDeployment:
+      type: object
+      properties:
+        deployment-type:
+          type: string
+          description: type of deployment, e.g. ansible, helm, kustomize, ...
+          example: helm
+        deployment-spec:
+          type: string
+          description: type of spec describing the deployment, e.g. dotenv, ...
+          example: dotenv
+        deployment-file:
+          type: string
+          description: path to the deployment spec file
+          example: /projects/my-project/.env-dev
+        properties:
+            type: object
+            description: a key value map of additional properties
+            additionalProperties:
+                type: string

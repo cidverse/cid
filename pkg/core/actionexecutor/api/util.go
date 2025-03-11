@@ -1,4 +1,4 @@
-package containeraction
+package api
 
 import (
 	"crypto/rand"
@@ -9,7 +9,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/catalog"
 )
 
-func insertCommandVariables(input string, action catalog.Action) string {
+func InsertCommandVariables(input string, action catalog.Action) string {
 	input = strings.Replace(input, "{REPOSITORY}", action.Repository, -1)
 	input = strings.Replace(input, "{ACTION}", action.Metadata.Name, -1)
 	return input
@@ -17,7 +17,7 @@ func insertCommandVariables(input string, action catalog.Action) string {
 
 var allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~#^*()_+-=|[]<>,./"
 
-func generateSecret(passwordLength int) string {
+func GenerateSecret(passwordLength int) string {
 	password := make([]byte, passwordLength)
 	allowedCharCount := big.NewInt(int64(len(allowedChars)))
 
@@ -32,7 +32,7 @@ func generateSecret(passwordLength int) string {
 	return string(password)
 }
 
-func generateSnowflakeId() string {
+func GenerateSnowflakeId() string {
 	snowflake.Epoch = 1672527600000
 	node, _ := snowflake.NewNode(1)
 	id := node.Generate()

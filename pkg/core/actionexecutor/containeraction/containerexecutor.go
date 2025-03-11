@@ -18,6 +18,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/common/shellcommand"
 	"github.com/cidverse/cid/pkg/constants"
+	"github.com/cidverse/cid/pkg/core/actionexecutor/api"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
@@ -56,9 +57,9 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	apiPort := strconv.Itoa(freePort)
 
 	// properties
-	secret := generateSecret(32)
-	buildID := generateSnowflakeId()
-	jobID := generateSnowflakeId()
+	secret := api.GenerateSecret(32)
+	buildID := api.GenerateSnowflakeId()
+	jobID := api.GenerateSnowflakeId()
 
 	// temp dir override
 	osTempDir := os.TempDir()
@@ -133,7 +134,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	containerExec := containerruntime.Container{
 		Image:            catalogAction.Container.Image,
 		WorkingDirectory: ci.ToUnixPath(ctx.ProjectDir),
-		Command:          insertCommandVariables(catalogAction.Container.Command, *catalogAction),
+		Command:          api.InsertCommandVariables(catalogAction.Container.Command, *catalogAction),
 		User:             util.GetContainerUser(),
 	}
 
