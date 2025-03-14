@@ -128,7 +128,8 @@ func RunAction(actionContext api.ActionExecutionContext, catalogAction *catalog.
 	if actionExecutor != nil {
 		err := actionExecutor.Execute(&actionContext, &localState, catalogAction)
 		if err != nil {
-			log.Fatal().Err(err).Str("action", step.Name).Msg("action error")
+			// TODO: handle error
+			log.Fatal().Err(err).Str("action", step.Name).Str("duration", time.Since(start).String()).Str("module", currentModule).Msg("action error")
 			return
 		}
 	} else {

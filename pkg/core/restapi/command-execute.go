@@ -41,7 +41,7 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 
 	// command env
 	var commandEnv = make(map[string]string)
-	for k, v := range hc.Env {
+	for k, v := range hc.ActionEnv {
 		commandEnv[k] = v
 	}
 	if req.Env != nil {
@@ -83,7 +83,7 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 				"binary":  selectedCandidate.GetName(),
 				"version": selectedCandidate.GetVersion(),
 				"uri":     selectedCandidate.GetUri(),
-				"command": replaceCommandPlaceholders(req.Command, hc.Env),
+				"command": replaceCommandPlaceholders(req.Command, hc.ActionEnv),
 			},
 		})
 	}

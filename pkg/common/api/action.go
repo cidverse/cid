@@ -37,35 +37,17 @@ type ActionStep interface {
 
 // ActionExecutionContext holds runtime information for the actions
 type ActionExecutionContext struct {
-	// Paths holds the path configuration
-	Paths config.PathConfig
-
-	// ProjectDir holds the project directory
-	ProjectDir string
-
-	// WorkDir holds the current working directory
-	WorkDir string
-
-	// Config holds the json configuration passed to this action
-	Config interface{}
-
-	// Args holds the arguments passed to the action
-	Args []string
-
-	// Env contains the environment that is visible to the action
-	Env map[string]string
-
-	// Parallelization defines how many tasks can be run in parallel inside an action
-	Parallelization int
-
-	// CurrentUser holds information about the user running this process
-	CurrentUser user.User
-
-	// Modules contains the project modules
-	Modules []*analyzerapi.ProjectModule
-
-	// CurrentModule contains the module that is currently being build
-	CurrentModule *analyzerapi.ProjectModule
+	Paths           config.PathConfig            // Paths holds the path configuration
+	ProjectDir      string                       // ProjectDir holds the project directory
+	WorkDir         string                       // WorkDir holds the current working directory
+	Config          interface{}                  // Config holds the json configuration passed to this action
+	Args            []string                     // Args holds the arguments passed to the action
+	Env             map[string]string            // Env contains the full environment
+	ActionEnv       map[string]string            // ActionEnv contains the environment that is visible to the action
+	Parallelization int                          // Parallelization defines how many tasks can be run in parallel inside an action
+	CurrentUser     user.User                    // CurrentUser holds information about the user running this process
+	Modules         []*analyzerapi.ProjectModule // Modules contains the project modules
+	CurrentModule   *analyzerapi.ProjectModule   // CurrentModule contains the module that is currently being build
 }
 
 // CoverageReport contains a generic coverage report
@@ -118,7 +100,8 @@ func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, e
 		WorkDir:         filesystem.WorkingDirOrPanic(),
 		Config:          "",
 		Args:            nil,
-		Env:             actionEnv,
+		Env:             fullEnv,
+		ActionEnv:       actionEnv,
 		Parallelization: DefaultParallelization,
 		CurrentUser:     *currentUser,
 		Modules:         modules,

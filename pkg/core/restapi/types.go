@@ -15,6 +15,7 @@ type APIConfig struct {
 	CurrentModule        *analyzerapi.ProjectModule
 	CurrentAction        *catalog.Action
 	Env                  map[string]string
+	ActionEnv            map[string]string
 	ActionConfig         string
 	State                *state.ActionStateContext
 	TempDir              string

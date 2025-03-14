@@ -1,9 +1,10 @@
 package deployment
 
 import (
-	"bufio"
 	"os"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 // ParseDotEnvFile reads a .env file from the file system and returns key-value pairs.
@@ -13,41 +14,20 @@ func ParseDotEnvFile(filePath string) (map[string]string, error) {
 		return nil, err
 	}
 
-	return ParseDotEnvContent(string(content)), nil
+	env, err := ParseDotEnvContent(string(content))
+	if err != nil {
+		return nil, err
+	}
+
+	return env, nil
 }
 
 // ParseDotEnvContent parses .env content from a string and returns key-value pairs.
-func ParseDotEnvContent(content string) map[string]string {
-	envMap := make(map[string]string)
-	scanner := bufio.NewScanner(strings.NewReader(content))
-
-	for scanner.Scan() {
-		parseDotEnvLine(scanner.Text(), envMap)
+func ParseDotEnvContent(content string) (map[string]string, error) {
+	envMap, err := godotenv.Parse(strings.NewReader(content))
+	if err != nil {
+		return nil, err
 	}
 
-	return envMap
-}
-
-func parseDotEnvLine(line string, envMap map[string]string) {
-	line = strings.TrimSpace(line)
-
-	// ignore empty lines and comments
-	if line == "" || strings.HasPrefix(line, "#") {
-		return
-	}
-
-	// parse key-value pairs, ignore malformed lines
-	parts := strings.SplitN(line, "=", 2)
-	if len(parts) != 2 {
-		return
-	}
-	key := strings.TrimSpace(parts[0])
-	value := strings.TrimSpace(parts[1])
-
-	// escape sequences
-	if (strings.HasPrefix(value, `"`) && strings.HasSuffix(value, `"`)) || (strings.HasPrefix(value, `'`) && strings.HasSuffix(value, `'`)) {
-		value = value[1 : len(value)-1]
-	}
-
-	envMap[key] = value
+	return envMap, nil
 }

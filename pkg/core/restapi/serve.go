@@ -20,36 +20,25 @@ func Setup(handlers *APIConfig) *echo.Echo {
 	// e.Use(middleware.Logger())
 
 	// observability
-	e.GET("/health", handlers.healthCheck) // deprecated
 	e.GET("/v1/health", handlers.healthCheck)
-	e.POST("/log", handlers.logMessage) // deprecated
 	e.POST("/v1/log", handlers.logMessage)
 
 	// vcs
-	e.GET("/vcs/commit", handlers.vcsCommits)            // deprecated
-	e.GET("/vcs/commit/:hash", handlers.vcsCommitByHash) // deprecated
-	e.GET("/vcs/tag", handlers.vcsTags)                  // deprecated
-	e.GET("/vcs/release", handlers.vcsReleases)          // deprecated
-	e.GET("/vcs/diff", handlers.vcsDiff)                 // deprecated
 	e.GET("/v1/vcs/commit", handlers.vcsCommits)
 	e.GET("/v1/vcs/commit/:hash", handlers.vcsCommitByHash)
 	e.GET("/v1/vcs/tag", handlers.vcsTags)
 	e.GET("/v1/vcs/release", handlers.vcsReleases)
 	e.GET("/v1/vcs/diff", handlers.vcsDiff)
 
-	// deprecated job endpoints
-	e.GET("/config/current", handlers.configCurrent) // deprecated
-	e.GET("/env", handlers.projectEnv)               // deprecated
-	e.GET("/module/current", handlers.moduleCurrent) // deprecated
-
 	// current job
-	e.GET("/v1/job/config", handlers.configCurrent)
-	e.GET("/v1/job/env", handlers.projectEnv)
+	e.GET("/v1/job/module-action-data", handlers.jobModuleDataV1)
+	e.GET("/v1/job/project-action-data", handlers.jobProjectDataV1)
+	e.GET("/v1/job/config", handlers.jobConfigV1)
+	e.GET("/v1/job/env", handlers.jobEnvV1)
 	e.GET("/v1/job/module", handlers.moduleCurrent)
-	e.GET("/v1/job/deployment", handlers.deployment)
+	e.GET("/v1/job/deployment", handlers.jobDeploymentV1)
 
 	// repoanalyzer
-	e.GET("/module", handlers.moduleList) // deprecated
 	e.GET("/v1/repoanalyzer/module", handlers.moduleList)
 
 	// artifacts
@@ -63,12 +52,10 @@ func Setup(handlers *APIConfig) *echo.Echo {
 	e.GET("/file/write", handlers.fileWrite)
 
 	// command routes
-	e.POST("/command", handlers.commandExecute) // deprecated
 	e.POST("/v1/command/execute", handlers.commandExecute)
 	// TODO: (advanced) exec command as async task (+ get command status / log output / send stdin input)
 
 	// provenance
-	e.GET("/provenance", handlers.provenance) // deprecated
 	e.GET("/v1/provenance", handlers.provenance)
 
 	return e

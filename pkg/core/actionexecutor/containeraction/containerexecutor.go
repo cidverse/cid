@@ -104,6 +104,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		CurrentModule:        ctx.CurrentModule,
 		CurrentAction:        catalogAction,
 		Env:                  ctx.Env,
+		ActionEnv:            ctx.ActionEnv,
 		ActionConfig:         string(actionConfig),
 		State:                localState,
 		TempDir:              tempDir,

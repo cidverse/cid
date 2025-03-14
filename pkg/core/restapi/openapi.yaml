@@ -69,6 +69,32 @@ paths:
           description: Null response
           content: {}
   # current job
+  /v1/job/module-action-data:
+    get:
+      tags:
+        - job
+      summary: query all info related to the currently running action
+      operationId: moduleActionDataV1
+      responses:
+        200:
+          description: config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModuleActionData'
+  /v1/job/project-action-data:
+    get:
+      tags:
+        - job
+      summary: query all info related to the currently running action
+      operationId: projectActionDataV1
+      responses:
+        200:
+          description: config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectActionData'
   /v1/job/config:
     get:
       tags:
@@ -485,6 +511,32 @@ components:
           description: dynamic key value properties / log context
           additionalProperties:
             type: object
+    ModuleActionData:
+      type: object
+      properties:
+        project-dir:
+          type: string
+          description: project root directory
+          example: /projects/my-project
+        config:
+          $ref: '#/components/schemas/ActionConfig'
+        env:
+          $ref: '#/components/schemas/ProjectEnv'
+        module:
+          $ref: '#/components/schemas/ProjectModule'
+        deployment:
+          $ref: '#/components/schemas/ProjectDeployment'
+    ProjectActionData:
+      type: object
+      properties:
+        project-dir:
+          type: string
+          description: project root directory
+          example: /projects/my-project
+        config:
+          $ref: '#/components/schemas/ActionConfig'
+        env:
+          $ref: '#/components/schemas/ProjectEnv'
     ActionConfig:
       type: object
       properties:
@@ -892,6 +944,7 @@ components:
           example: ""
     ProjectDeployment:
       type: object
+      nullable: true
       properties:
         deployment-type:
           type: string
