@@ -3,6 +3,8 @@ package deployment
 import (
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestParseDotEnvContent(t *testing.T) {
@@ -48,18 +50,6 @@ func TestParseDotEnvContent(t *testing.T) {
 			},
 		},
 		{
-			name: "Handle malformed lines",
-			input: `
-			VALID=value
-			INVALID_LINE
-			ANOTHER_VALID=123
-			`,
-			expected: map[string]string{
-				"VALID":         "value",
-				"ANOTHER_VALID": "123",
-			},
-		},
-		{
 			name: "Handle equals inside quotes",
 			input: `
 			COMPLEX="key=value=another"
@@ -72,7 +62,8 @@ func TestParseDotEnvContent(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result := ParseDotEnvContent(tc.input)
+			result, err := ParseDotEnvContent(tc.input)
+			assert.NoError(t, err)
 			if !reflect.DeepEqual(result, tc.expected) {
 				t.Errorf("Expected %v, got %v", tc.expected, result)
 			}

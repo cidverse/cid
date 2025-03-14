@@ -43,10 +43,12 @@ func Setup(handlers *APIConfig) *echo.Echo {
 	e.GET("/module/current", handlers.moduleCurrent) // deprecated
 
 	// current job
-	e.GET("/v1/job/config", handlers.configCurrent)
-	e.GET("/v1/job/env", handlers.projectEnv)
+	e.GET("/v1/job/module-action-data", handlers.jobModuleDataV1)
+	e.GET("/v1/job/project-action-data", handlers.jobProjectDataV1)
+	e.GET("/v1/job/config", handlers.jobConfigV1)
+	e.GET("/v1/job/env", handlers.jobEnvV1)
 	e.GET("/v1/job/module", handlers.moduleCurrent)
-	e.GET("/v1/job/deployment", handlers.deployment)
+	e.GET("/v1/job/deployment", handlers.jobDeploymentV1)
 
 	// repoanalyzer
 	e.GET("/module", handlers.moduleList) // deprecated
