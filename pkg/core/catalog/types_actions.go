@@ -14,15 +14,16 @@ type Action struct {
 }
 
 type ActionMetadata struct {
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	Category    string            `json:"category"`
-	Scope       ActionScope       `json:"scope"`
-	Links       map[string]string `json:"links,omitempty"`
-	Rules       []WorkflowRule    `json:"rules,omitempty"`  // Rules define conditions that must be met for the action to be executed
-	Access      ActionAccess      `json:"access,omitempty"` // Access defines resources that the action may access
-	Input       ActionInput       `json:"input,omitempty"`  // Input defines the inputs that the action may consume
-	Output      ActionOutput      `json:"output,omitempty"` // Output defines the outputs that the action may produce
+	Name          string            `json:"name"`
+	Description   string            `json:"description"`
+	Documentation string            `json:"documentation,omitempty"`
+	Category      string            `json:"category"`
+	Scope         ActionScope       `json:"scope"`
+	Links         map[string]string `json:"links,omitempty"`
+	Rules         []WorkflowRule    `json:"rules,omitempty"`  // Rules define conditions that must be met for the action to be executed
+	Access        ActionAccess      `json:"access,omitempty"` // Access defines resources that the action may access
+	Input         ActionInput       `json:"input,omitempty"`  // Input defines the inputs that the action may consume
+	Output        ActionOutput      `json:"output,omitempty"` // Output defines the outputs that the action may produce
 }
 
 type ActionScope string

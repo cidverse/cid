@@ -1,5 +1,9 @@
 package executable
 
+import (
+	"fmt"
+)
+
 const AnyVersionConstraint = ">= 0.0.0"
 
 type PreferVersion string
@@ -28,3 +32,8 @@ type ContainerCerts struct {
 	Type          string `yaml:"type"`
 	ContainerPath string `yaml:"dir"`
 }
+
+var (
+	ErrCheckingForExecutable = fmt.Errorf("error checking for executable")
+	ErrExecutableNotFound    = fmt.Errorf("executable not found")
+)

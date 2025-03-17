@@ -2,6 +2,7 @@ package executable
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -45,6 +46,12 @@ func (c NixStoreCandidate) Run(opts RunParameters) (string, string, error) {
 
 	// replace executable with absolute path
 	if opts.Args[0] == opts.Executable {
+		if _, err := os.Stat(c.AbsolutePath); err != nil {
+			if os.IsNotExist(err) {
+				return "", "", errors.Join(ErrCheckingForExecutable, fmt.Errorf("path: %q", c.AbsolutePath))
+			}
+			return "", "", errors.Join(ErrExecutableNotFound, fmt.Errorf("path: %q", c.AbsolutePath))
+		}
 		opts.Args[0] = c.AbsolutePath
 	}
 

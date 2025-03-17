@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -19,7 +21,6 @@ import (
 	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
-	"github.com/samber/lo"
 )
 
 // ContainerCandidate is used for the execution using container images
@@ -53,12 +54,11 @@ func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 	}
 
 	// overwrite binary for alias use-case
-	commandArgs := append([]string{c.GetName()}, opts.Args...)
 	containerExec := containerruntime.Container{
 		Image:            c.Image,
 		WorkingDirectory: ci.ToUnixPath(opts.WorkDir),
 		Entrypoint:       c.Entrypoint,
-		Command:          ci.ToUnixPathArgs(strings.Join(commandArgs, " ")),
+		Command:          ci.ToUnixPathArgs(strings.Join(opts.Args, " ")),
 		User:             util.GetContainerUser(),
 	}
 
@@ -84,7 +84,7 @@ func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 	}
 
 	// add env + sort by key
-	sortedEnvKeys := lo.Keys(opts.Env)
+	sortedEnvKeys := slices.Collect(maps.Keys(opts.Env))
 	sort.Strings(sortedEnvKeys)
 	for _, key := range sortedEnvKeys {
 		containerExec.AddEnvironmentVariable(key, opts.Env[key])
@@ -140,7 +140,7 @@ func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 		return "", "", containerCmdErr
 	}
 
-	cmd, err := shellcommand.PrepareCommand(containerCmd, runtime.GOOS, "bash", false, nil, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
+	cmd, err := shellcommand.PrepareCommand(containerCmd, runtime.GOOS, "", false, nil, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
 	if err != nil {
 		return "", "", err
 	}
