@@ -40,7 +40,12 @@ func NewAppContext() (*CIDContext, error) {
 		return nil, errors.Join(ErrWorkDirNotFound, err)
 	}
 	cfg := config.LoadConfig(projectDir)
-	env := api.GetCIDEnvironment(cfg.Env, projectDir)
+
+	// env
+	env, err := api.GetCIDEnvironment(cfg.Env, projectDir)
+	if err != nil {
+		return nil, errors.Join(fmt.Errorf("failed to prepare cid environment"), err)
+	}
 
 	// validate
 	if !strings.HasPrefix(workDir, projectDir) {

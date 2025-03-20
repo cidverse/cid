@@ -651,6 +651,10 @@ components:
           type: string
           description: type of deployment, e.g. ansible, helm, kustomize, ...
           example: helm
+        deployment_environment:
+          type: string
+          description: deployment environment, e.g. dev, prod, ...
+          example: dev
         language:
           type: object
           additionalProperties:

@@ -10,7 +10,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/filesystem"
-	"github.com/cidverse/normalizeci/pkg/normalizer/api"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
@@ -70,9 +69,6 @@ func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, e
 	currentUser, _ := user.Current()
 
 	// only pass allowed env variables
-	for k, v := range api.GetMachineEnvironment() {
-		env[k] = v
-	}
 	for k, v := range env {
 		if strings.HasPrefix(k, "NCI_") {
 			actionEnv[k] = v

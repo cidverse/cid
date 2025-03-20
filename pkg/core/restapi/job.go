@@ -6,7 +6,6 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/cidverse/cid/pkg/core/deployment"
 	"github.com/cidverse/cid/pkg/util"
@@ -148,18 +147,23 @@ func (hc *APIConfig) jobDeploymentV1(c echo.Context) error {
 }
 
 func JobDeploymentV1(module *analyzerapi.ProjectModule, actionEnv map[string]string, env map[string]string) (DeploymentResponse, error) {
+	decoderConfig := deployment.DecodeSecretsConfig{
+		PGPPrivateKey:         env["CID_SECRET_PGP_PRIVATE_KEY"],
+		PGPPrivateKeyPassword: env["CID_SECRET_PGP_PRIVATE_KEY_PASSWORD"],
+	}
+
 	if module.DeploymentSpec == analyzerapi.DeploymentSpecDotEnv && len(module.Discovery) > 0 {
-		envFile := module.Discovery[0].File
+		deploymentFile := module.Discovery[0].File
 		response := DeploymentResponse{
 			DeploymentSpec:        string(module.DeploymentSpec),
 			DeploymentType:        module.DeploymentType,
-			DeploymentEnvironment: strings.TrimPrefix(filepath.Base(envFile), ".env-"),
-			DeploymentFile:        envFile,
+			DeploymentEnvironment: module.DeploymentEnvironment,
+			DeploymentFile:        deploymentFile,
 			Properties:            make(map[string]string),
 		}
 
 		// read common and module specific env files
-		envFiles := []string{path.Join(module.Directory, ".env-common"), envFile}
+		envFiles := []string{path.Join(module.Directory, ".env-common"), deploymentFile}
 		for _, f := range envFiles {
 			if _, err := os.Stat(f); os.IsNotExist(err) {
 				continue
@@ -179,10 +183,25 @@ func JobDeploymentV1(module *analyzerapi.ProjectModule, actionEnv map[string]str
 
 		// decode secrets
 		var err error
-		response.Properties, err = deployment.DecodeSecrets(response.Properties, deployment.DecodeSecretsConfig{
-			PGPPrivateKey:         env["CID_SECRET_PGP_PRIVATE_KEY"],
-			PGPPrivateKeyPassword: env["CID_SECRET_PGP_PRIVATE_KEY_PASSWORD"],
-		})
+		response.Properties, err = deployment.DecodeSecrets(response.Properties, decoderConfig)
+		if err != nil {
+			return DeploymentResponse{}, err
+		}
+
+		return response, nil
+	} else if module.DeploymentSpec == analyzerapi.DeploymentSpecHelmfile && len(module.Discovery) > 0 {
+		deploymentFile := module.Discovery[0].File
+		response := DeploymentResponse{
+			DeploymentSpec:        string(module.DeploymentSpec),
+			DeploymentType:        module.DeploymentType,
+			DeploymentEnvironment: module.DeploymentEnvironment,
+			DeploymentFile:        deploymentFile,
+			Properties:            make(map[string]string),
+		}
+
+		// decode secrets
+		var err error
+		response.Properties, err = deployment.DecodeSecrets(response.Properties, decoderConfig)
 		if err != nil {
 			return DeploymentResponse{}, err
 		}
