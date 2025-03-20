@@ -54,10 +54,10 @@ github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc h1:eVuHW4U9Boiqj
 github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc/go.mod h1:1E+4h0XkcYJVq3RHoYQradnCt7wk3JgnuRRnfeiwAzE=
 github.com/cidverse/go-vcs v0.0.0-20250227174958-f70c3e161d9e h1:Lf7Zfj1PZBtc0xRu3W2LJJqG5t12P5OopKW2JPXSIM0=
 github.com/cidverse/go-vcs v0.0.0-20250227174958-f70c3e161d9e/go.mod h1:lvQ6FBaZypoSSxoQKxb7Z3kAqEAfLEzkkBzNCmF5dCg=
-github.com/cidverse/normalizeci v1.1.1-0.20250217214444-43e6ffc0a1c6 h1:91FPk5jjM553ZQkq+8GOm37P9MxJMJCdHhQics85wvM=
-github.com/cidverse/normalizeci v1.1.1-0.20250217214444-43e6ffc0a1c6/go.mod h1:rDeic5SmR8IoxVH1nWiGK9b63+1W4LROxEmdiZ2iM3w=
-github.com/cidverse/repoanalyzer v0.1.1-0.20250319235639-7b172096a620 h1:ZENNCV+2gx8yPkYQ9mbhtqSD3DT0YUurTVUwhQo4rsw=
-github.com/cidverse/repoanalyzer v0.1.1-0.20250319235639-7b172096a620/go.mod h1:U0nZmbPgonbyT1e+r141tkpCDMrGP4g9gmJG/lNUxK0=
+github.com/cidverse/normalizeci v1.1.1-0.20250321221103-1b3821c468d9 h1:toP66dMrodvlg0BAlydpP/Fl46As7JDJK0ds1/NJTrI=
+github.com/cidverse/normalizeci v1.1.1-0.20250321221103-1b3821c468d9/go.mod h1:VuHO8Et4aCZYMo11cKZ35gAgO77I+Nz4tpfM1KmMGT4=
+github.com/cidverse/repoanalyzer v0.1.1-0.20250320224038-fc4c20e388a4 h1:v3zCPGYgqFy9c6X4N40Jzj3Q4jO9PT7ear+et4qpTpw=
+github.com/cidverse/repoanalyzer v0.1.1-0.20250320224038-fc4c20e388a4/go.mod h1:U0nZmbPgonbyT1e+r141tkpCDMrGP4g9gmJG/lNUxK0=
 github.com/cloudflare/circl v1.6.0 h1:cr5JKic4HI+LkINy2lg3W2jF8sHCVTBncJr5gIIq7qk=
 github.com/cloudflare/circl v1.6.0/go.mod h1:uddAzsPgqdMAYatqJ0lsjX1oECcQLIlRpzZh3pJrofs=
 github.com/codahale/rfc6979 v0.0.0-20141003034818-6a90f24967eb h1:EDmT6Q9Zs+SbUoc7Ik9EfrFqcylYqgPZ9ANSbTAntnE=
@@ -107,8 +107,8 @@ github.com/google/cel-go v0.24.1/go.mod h1:Hdf9TqOaTNSFQA1ybQaRqATVoK7m/zcf7IMhG
 github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
-github.com/google/go-github/v69 v69.2.0 h1:wR+Wi/fN2zdUx9YxSmYE0ktiX9IAR/BeePzeaUUbEHE=
-github.com/google/go-github/v69 v69.2.0/go.mod h1:xne4jymxLR6Uj9b7J7PyTpkMYstEMMwGZa0Aehh1azM=
+github.com/google/go-github/v70 v70.0.0 h1:/tqCp5KPrcvqCc7vIvYyFYTiCGrYvaWoYMGHSQbo55o=
+github.com/google/go-github/v70 v70.0.0/go.mod h1:xBUZgo8MI3lUL/hwxl3hlceJW1U8MVnXP3zUyI+rhQY=
 github.com/google/go-querystring v1.1.0 h1:AnCroh3fv4ZBgVIf1Iwtovgjaw/GiKJo8M8yD/fhyJ8=
 github.com/google/go-querystring v1.1.0/go.mod h1:Kcdr2DB4koayq7X8pmAG4sNG59So17icRSOU623lUBU=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
