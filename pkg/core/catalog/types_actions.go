@@ -44,6 +44,7 @@ type ActionAccessEnv struct {
 	Description string `json:"description"`
 	Pattern     bool   `json:"pattern,omitempty"`
 	Required    bool   `json:"required,omitempty"`
+	Secret      bool   `json:"secret,omitempty"` // Secret indicates that the environment variable holds a secret and should be redacted
 }
 
 type ActionAccessExecutable struct {
