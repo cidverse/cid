@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path"
@@ -71,9 +72,10 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	// create temp dir
 	tempDir, err := os.MkdirTemp(osTempDir, "cid-job-")
 	if err != nil {
-		log.Fatal().Err(err).Msg("Error creating temporary directory")
+		return fmt.Errorf("failed to create temporary directory: %w", err)
 	}
 	log.Debug().Str("dir", tempDir).Msg("using temp dir")
+	_ = os.Chmod(tempDir, 0774)
 	defer func() {
 		log.Debug().Str("dir", tempDir).Msg("cleaning up temp dir")
 		_ = os.RemoveAll(tempDir)

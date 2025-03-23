@@ -32,8 +32,8 @@ github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842 
 github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842/go.mod h1:Xga0FDD+hHizd9zH99+DrbqXTAsblYQVEolYiOCN/Ug=
 github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4 h1:kmqVOqeuz1Bis0v4nb9o28fZIv/dQuyKBlBXEz1pSc0=
 github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4/go.mod h1:uS1HruKWaR4YluZgGgvEPWwfHutw0KsuBTyehewcdbo=
-github.com/cidverse/cidverseutils/core v0.0.0-20250318215805-037061ab84fc h1:qPvtbxrCTlD8vUOqoKQZGoiURU0Eut+IXiPuXMtDg8s=
-github.com/cidverse/cidverseutils/core v0.0.0-20250318215805-037061ab84fc/go.mod h1:ce0txxfVVA+69HYQGpedk2W2TwRdsoLT5NFfZU8uuoI=
+github.com/cidverse/cidverseutils/core v0.0.0-20250322081847-d069b75b9dd4 h1:VfZk7U0PnkTrtq6uW1r5pH2uGq/XiWfidk+v/QKI5rU=
+github.com/cidverse/cidverseutils/core v0.0.0-20250322081847-d069b75b9dd4/go.mod h1:ce0txxfVVA+69HYQGpedk2W2TwRdsoLT5NFfZU8uuoI=
 github.com/cidverse/cidverseutils/exec v0.1.0 h1:KbCnDISptCrFJFHDrA9efNM0GWNLVkon3yEzehisETY=
 github.com/cidverse/cidverseutils/exec v0.1.0/go.mod h1:pBST2lLq7AnIZ6xM0foiz1VSUamGswN1csT/2MJAHHI=
 github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20241219211714-77ae5cef4073 h1:Cu62vJAf2N2SWgYKiIntX5hXaDf+8H/A4GO1BuF+7OM=
@@ -52,8 +52,8 @@ github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf h1:/DLETx+e0J8mWZy
 github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf/go.mod h1:nvQPqid2KB17xXiiFp/Fhd+dO5lusCSuBQtOXfsd+mk=
 github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc h1:eVuHW4U9BoiqjIwWPATHRm6oiphVlm3Jn7QgHGgeVq8=
 github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc/go.mod h1:1E+4h0XkcYJVq3RHoYQradnCt7wk3JgnuRRnfeiwAzE=
-github.com/cidverse/go-vcs v0.0.0-20250227174958-f70c3e161d9e h1:Lf7Zfj1PZBtc0xRu3W2LJJqG5t12P5OopKW2JPXSIM0=
-github.com/cidverse/go-vcs v0.0.0-20250227174958-f70c3e161d9e/go.mod h1:lvQ6FBaZypoSSxoQKxb7Z3kAqEAfLEzkkBzNCmF5dCg=
+github.com/cidverse/go-vcs v0.0.0-20250322081629-e413fe0cd7a4 h1:PehhoUIVjeTMI6fQFSbTt8YqdJ3uhC1gAiBQR2Vt0HA=
+github.com/cidverse/go-vcs v0.0.0-20250322081629-e413fe0cd7a4/go.mod h1:Gokt4QEURwB6169UMzmGKqXRFCng7OiO84CdUrLynqU=
 github.com/cidverse/normalizeci v1.1.1-0.20250321221103-1b3821c468d9 h1:toP66dMrodvlg0BAlydpP/Fl46As7JDJK0ds1/NJTrI=
 github.com/cidverse/normalizeci v1.1.1-0.20250321221103-1b3821c468d9/go.mod h1:VuHO8Et4aCZYMo11cKZ35gAgO77I+Nz4tpfM1KmMGT4=
 github.com/cidverse/repoanalyzer v0.1.1-0.20250320224038-fc4c20e388a4 h1:v3zCPGYgqFy9c6X4N40Jzj3Q4jO9PT7ear+et4qpTpw=

@@ -898,6 +898,10 @@ components:
           description: command
           required: true
           example: npm install
+        constraint:
+            type: string
+            description: semver version constraint for the executable
+            example: ">= 1.0.0, < 2.0.0"
         capture_output:
           type: boolean
           description: capture and return the output (stdout and stderr will be passed thru if not set)
