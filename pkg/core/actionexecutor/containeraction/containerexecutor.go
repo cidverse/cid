@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path"
@@ -16,11 +17,12 @@ import (
 	"time"
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
-	"github.com/cidverse/cid/pkg/common/executable"
+	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/common/shellcommand"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/actionexecutor/api"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/util"
@@ -57,11 +59,6 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	}
 	apiPort := strconv.Itoa(freePort)
 
-	// properties
-	secret := api.GenerateSecret(32)
-	buildID := api.GenerateSnowflakeId()
-	jobID := api.GenerateSnowflakeId()
-
 	// temp dir override
 	osTempDir := os.TempDir()
 	if os.Getenv("CID_TEMP_DIR") != "" {
@@ -69,13 +66,27 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		log.Debug().Str("dir", osTempDir).Msg("overriding temp dir")
 	}
 
-	// create temp dir
+	// properties
+	secret := api.GenerateSecret(32)
+	buildID := api.GenerateSnowflakeId()
+	jobID := api.GenerateSnowflakeId()
+	artifactDir := filepath.Join(ctx.ProjectDir, ".dist")
 	tempDir, err := os.MkdirTemp(osTempDir, "cid-job-")
 	if err != nil {
 		return fmt.Errorf("failed to create temporary directory: %w", err)
 	}
-	log.Debug().Str("dir", tempDir).Msg("using temp dir")
-	_ = os.Chmod(tempDir, 0774)
+
+	// create dirs
+	log.Debug().Str("temp-dir", tempDir).Str("artifact-dir", artifactDir).Msg("creating action directories")
+	err = os.MkdirAll(artifactDir, 0770)
+	if err != nil {
+		return fmt.Errorf("failed to create artifact directory: %w", err)
+	}
+	err = os.MkdirAll(tempDir, 0770)
+	if err != nil {
+		return fmt.Errorf("failed to create artifact directory: %w", err)
+	}
+	_ = os.Chmod(tempDir, 0770) // MkdirTemp creates the dir chmod 0700, which is not accessible for other users in the group
 	defer func() {
 		log.Debug().Str("dir", tempDir).Msg("cleaning up temp dir")
 		_ = os.RemoveAll(tempDir)
@@ -85,10 +96,9 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	socketFile := path.Join(tempDir, hash.UUIDNoDash(uuid.New().String())+".socket")
 
 	// executables
-	executableCandidates, err := executable.LoadExecutables()
+	executableCandidates, err := command.CandidatesFromConfig(config.Current)
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to load candidates from cache")
-		os.Exit(1)
+		log.Fatal().Err(err).Msg("failed to discover candidates")
 	}
 
 	// actionConfig
@@ -110,7 +120,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		ActionConfig:         string(actionConfig),
 		State:                localState,
 		TempDir:              tempDir,
-		ArtifactDir:          filepath.Join(ctx.ProjectDir, ".dist"),
+		ArtifactDir:          artifactDir,
 		ExecutableCandidates: executableCandidates,
 	})
 	restapi.SecureWithAPIKey(apiEngine, secret)
@@ -221,12 +231,14 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 
 	err = cmd.Run()
 	if err != nil {
-		var exitErr *exec.ExitError
 		exitCode := 1
+
+		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {
 			exitCode = exitErr.ExitCode()
 		}
-		log.Error().Int("exit_code", exitCode).Str("message", err.Error()).Msg("command failed")
+
+		slog.With("err", err).With("exit_code", exitCode).Error("command failed")
 		return err
 	}
 

@@ -3,6 +3,7 @@ package workflowrun
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"slices"
@@ -111,7 +112,8 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		if actionExecutor != nil {
 			err := actionExecutor.Execute(ctx, &localState, catalogAction)
 			if err != nil {
-				log.Fatal().Err(err).Str("action", action.ID).Msg("action error")
+				slog.With("err", err).With("action", action.ID).Error("action execution failed")
+				os.Exit(1)
 				return
 			}
 		} else {

@@ -75,6 +75,7 @@ func planExecuteCmd() *cobra.Command {
 		Short:   "",
 		Run: func(cmd *cobra.Command, args []string) {
 			stages, _ := cmd.Flags().GetStringArray("stage")
+			steps, _ := cmd.Flags().GetStringArray("step")
 
 			// app context
 			cid, err := context.NewAppContext()
@@ -100,11 +101,13 @@ func planExecuteCmd() *cobra.Command {
 				ProjectDir:    cid.ProjectDir,
 				StagesFilter:  stages,
 				ModulesFilter: []string{},
+				StepFilter:    steps,
 			})
 		},
 	}
 
 	cmd.Flags().StringArrayP("stage", "s", []string{}, "limit execution to the specified stage(s)")
+	cmd.Flags().StringArray("step", []string{}, "limit execution to the specified step(s)")
 
 	return cmd
 }

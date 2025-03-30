@@ -77,7 +77,7 @@ func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 	// mounts
 	containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: opts.RootDir, Target: ci.ToUnixPath(opts.RootDir)})
 	if opts.TempDir != "" {
-		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: opts.TempDir, Target: opts.TempDir})
+		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: opts.TempDir, Target: ci.ToUnixPath(opts.TempDir)})
 	}
 	for _, mount := range c.Mounts {
 		containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: mount.Src, Target: mount.Dest})

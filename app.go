@@ -2,11 +2,12 @@ package main
 
 import (
 	"github.com/cidverse/cid/pkg/cmd"
+	"github.com/cidverse/cid/pkg/constants"
 	"github.com/rs/zerolog/log"
 )
 
 var (
-	version = "dev"
+	version = "0.5.0"
 	commit  = "none"
 	date    = "unknown"
 	status  = "clean"
@@ -15,10 +16,10 @@ var (
 // Init Hook
 func init() {
 	// Set Version Information
-	cmd.Version = version
-	cmd.CommitHash = commit
-	cmd.BuildAt = date
-	cmd.RepositoryStatus = status
+	constants.Version = version
+	constants.CommitHash = commit
+	constants.BuildAt = date
+	constants.RepositoryStatus = status
 }
 
 // CLI Main Entrypoint

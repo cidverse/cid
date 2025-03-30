@@ -50,17 +50,11 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 		}
 	}
 
-	// get candidates
-	candidates, err := command.CandidatesFromConfig(config.Current)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to discover candidates")
-	}
-
 	// execute
 	exitCode := 0
 	var errorMessage = ""
 	stdout, stderr, selectedCandidate, cmdErr := command.Execute(command.Opts{
-		Candidates:             candidates,
+		Candidates:             hc.ExecutableCandidates,
 		CandidateTypes:         executable.ToCandidateTypes(config.Current.CommandExecutionTypes),
 		Command:                replaceCommandPlaceholders(req.Command, hc.Env),
 		Env:                    commandEnv,

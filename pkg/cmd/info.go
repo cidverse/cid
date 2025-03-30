@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/repoanalyzer/analyzer"
@@ -43,9 +44,9 @@ func infoCmd() *cobra.Command {
 
 			// response
 			var response = InfoCommandResponse{
-				Version:           Version,
-				VersionCommitHash: CommitHash,
-				VersionBuildAt:    BuildAt,
+				Version:           constants.Version,
+				VersionCommitHash: constants.CommitHash,
+				VersionBuildAt:    constants.BuildAt,
 			}
 
 			// detect project modules

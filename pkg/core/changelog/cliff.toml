@@ -1,0 +1,17 @@
+[git]
+# parse the commits based on https://www.conventionalcommits.org
+conventional_commits = true
+
+# filter out the commits that are not conventional
+filter_unconventional = false
+
+commit_parsers = [
+  { message = "^feat", group = "feat" },
+  { message = "^fix", group = "fix" },
+  { message = "^doc", group = "docs" },
+  { message = "^perf", group = "perf" },
+  { message = "^refactor", group = "refactor" },
+  { message = "^test", group = "test" },
+  { message = "^chore", group = "chore" },
+  { message = "^ci", group = "ci" },
+]

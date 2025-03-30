@@ -3,6 +3,7 @@ package context
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -30,26 +31,14 @@ var (
 	ErrWorkDirNotInProjectDir = fmt.Errorf("workDir must be the projectDir or a subdirectory of projectDir")
 )
 
-func NewAppContext() (*CIDContext, error) {
-	projectDir, err := filesystem.GetProjectDirectory()
-	if err != nil {
-		return nil, errors.Join(ErrProjectDirNotFound, err)
-	}
-	workDir, err := os.Getwd()
-	if err != nil {
-		return nil, errors.Join(ErrWorkDirNotFound, err)
-	}
+func NewAppContextFromDir(projectDir string, workDir string) (*CIDContext, error) {
+	slog.With("dir", projectDir).Debug("initializing cid context")
 	cfg := config.LoadConfig(projectDir)
 
 	// env
 	env, err := api.GetCIDEnvironment(cfg.Env, projectDir)
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("failed to prepare cid environment"), err)
-	}
-
-	// validate
-	if !strings.HasPrefix(workDir, projectDir) {
-		return nil, ErrWorkDirNotInProjectDir
 	}
 
 	// modules
@@ -69,4 +58,23 @@ func NewAppContext() (*CIDContext, error) {
 		Modules:     modules,
 		Executables: executables,
 	}, nil
+}
+
+func NewAppContext() (*CIDContext, error) {
+	projectDir, err := filesystem.GetProjectDirectory()
+	if err != nil {
+		return nil, errors.Join(ErrProjectDirNotFound, err)
+	}
+
+	workDir, err := os.Getwd()
+	if err != nil {
+		return nil, errors.Join(ErrWorkDirNotFound, err)
+	}
+
+	// validate
+	if !strings.HasPrefix(workDir, projectDir) {
+		return nil, ErrWorkDirNotInProjectDir
+	}
+
+	return NewAppContextFromDir(projectDir, workDir)
 }

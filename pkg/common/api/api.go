@@ -67,7 +67,7 @@ var systemEnvVariables = []string{
 // GetCIDEnvironment returns the normalized ci variables
 func GetCIDEnvironment(configEnv map[string]string, projectDirectory string) (map[string]string, error) {
 	// TODO: allow overriding of NCI_ variables?
-	normalized, err := normalizer.Normalize()
+	normalized, err := normalizer.NormalizeEnv(normalizer.Options{ProjectDir: projectDirectory, Env: api.GetMachineEnvironment()})
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to prepare ci environment variables")
 	}

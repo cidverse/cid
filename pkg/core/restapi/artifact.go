@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"path"
@@ -65,7 +66,6 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	log.Debug().Str("module", moduleSlug).Str("type", fileType).Str("format", format).Str("format_version", formatVersion).Str("extract_file", extractFile).Msg("[API] artifact upload")
 
 	// reader
 	src, err := file.Open()
@@ -144,6 +144,7 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 	}
 
 	// store into state
+	slog.With("module", moduleSlug).With("type", fileType).With("format", format).With("format_version", formatVersion).With("file", targetFile).With("hash", fileHash).Info("[API] action output artifact stored")
 	hc.State.Artifacts[fmt.Sprintf("%s|%s|%s", moduleSlug, fileType, name)] = state.ActionArtifact{
 		BuildID:       hc.BuildID,
 		JobID:         hc.JobID,
@@ -163,12 +164,12 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 
 		log.Debug().Str("target_dir", extractTargetDir).Str("format", format).Msg("extracting artifact archive")
 		if format == "tar" {
-			err := compress.TARExtract(targetFile, extractTargetDir)
+			err = compress.TARExtract(targetFile, extractTargetDir)
 			if err != nil {
 				return "", err
 			}
 		} else if format == "zip" {
-			err := compress.ZIPExtract(targetFile, extractTargetDir)
+			err = compress.ZIPExtract(targetFile, extractTargetDir)
 			if err != nil {
 				return "", err
 			}

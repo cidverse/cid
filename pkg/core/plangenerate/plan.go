@@ -11,6 +11,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/cidverse/go-ptr"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
+	"github.com/gosimple/slug"
 )
 
 func GeneratePlan(modules []*analyzerapi.ProjectModule, registry catalog.Config, projectDir string, env map[string]string, executables []executable.Executable, pinVersions bool) (Plan, error) {
@@ -58,9 +59,10 @@ func GeneratePlan(modules []*analyzerapi.ProjectModule, registry catalog.Config,
 	}
 
 	return Plan{
-		Name:   workflow.Name,
-		Stages: stages,
-		Steps:  steps,
+		Name:        workflow.Name,
+		Stages:      stages,
+		Steps:       steps,
+		Environment: "",
 	}, nil
 }
 
@@ -106,6 +108,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 				steps = append(steps, Step{
 					ID:       strconv.Itoa(len(steps)),
 					Name:     catalogAction.Metadata.Name,
+					Slug:     slug.Make(catalogAction.Metadata.Name),
 					Stage:    action.Stage,
 					Scope:    catalogAction.Metadata.Scope,
 					Action:   catalogAction.URI,
@@ -115,8 +118,10 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 						Executables: executableConstraints,
 						Network:     catalogAction.Metadata.Access.Network,
 					},
-					Order:  1,
-					Config: action.Config,
+					Inputs:  catalogAction.Metadata.Input,
+					Outputs: catalogAction.Metadata.Output,
+					Order:   1,
+					Config:  action.Config,
 				})
 			}
 		} else if catalogAction.Metadata.Scope == catalog.ActionScopeModule {
@@ -128,6 +133,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 					steps = append(steps, Step{
 						ID:       strconv.Itoa(len(steps)),
 						Name:     fmt.Sprintf("%s - %s", catalogAction.Metadata.Name, moduleRef.Name),
+						Slug:     slug.Make(fmt.Sprintf("%s - %s", catalogAction.Metadata.Name, moduleRef.Name)),
 						Stage:    action.Stage,
 						Scope:    catalogAction.Metadata.Scope,
 						Module:   moduleRef.ID,
@@ -138,8 +144,10 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 							Executables: executableConstraints,
 							Network:     catalogAction.Metadata.Access.Network,
 						},
-						Order:  1,
-						Config: action.Config,
+						Inputs:  catalogAction.Metadata.Input,
+						Outputs: catalogAction.Metadata.Output,
+						Order:   1,
+						Config:  action.Config,
 					})
 				}
 			}
@@ -158,12 +166,12 @@ func assignStepDependencies(steps []Step, context PlanContext) []Step {
 		catalogAction := ptr.Value(context.Registry.FindAction(step.Action))
 
 		// track action instances by ID
-		actionInstances[step.Action] = append(actionInstances[step.Action], step.Name)
+		actionInstances[step.Action] = append(actionInstances[step.Action], step.Slug)
 
 		// track which actions produce which artifacts
 		for _, artifact := range catalogAction.Metadata.Output.Artifacts {
 			if catalogAction.Metadata.Scope == catalog.ActionScopeProject {
-				artifactProducers[artifact.Key()] = append(artifactProducers[artifact.Key()], step.Name)
+				artifactProducers[artifact.Key()] = append(artifactProducers[artifact.Key()], step.Slug)
 			}
 		}
 	}

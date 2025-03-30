@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"log/slog"
 	"os"
 	"strings"
 
@@ -38,7 +39,7 @@ func xCmd() *cobra.Command {
 			}
 
 			// get candidates
-			candidates, err := command.CandidatesFromConfig(*cid.Config)
+			executableCandidates, err := command.CandidatesFromConfig(*cid.Config)
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to discover candidates")
 			}
@@ -50,7 +51,7 @@ func xCmd() *cobra.Command {
 
 			// execute command
 			_, _, _, err = command.Execute(command.Opts{
-				Candidates:             candidates,
+				Candidates:             executableCandidates,
 				CandidateTypes:         executable.ToCandidateTypes(types),
 				Command:                strings.Join(args, " "),
 				Env:                    cid.Env,
@@ -64,7 +65,8 @@ func xCmd() *cobra.Command {
 				Stdin:                  os.Stdin,
 			})
 			if err != nil {
-				log.Fatal().Err(err).Msg("command failed")
+				slog.With("err", err).Error("command failed")
+				os.Exit(1)
 			}
 		},
 	}

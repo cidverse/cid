@@ -16,6 +16,7 @@ type Plan struct {
 	Name              string                  `json:"name"`
 	Stages            []string                `json:"stages"`
 	Steps             []Step                  `json:"steps"`
+	Environment       string                  `json:"environment,omitempty"` // Environment name, only set for deployments
 	PinnedExecutables []executable.Executable `json:"pinned-executables,omitempty"`
 }
 
@@ -28,12 +29,15 @@ type Stage struct {
 type Step struct {
 	ID       string               `json:"id"`
 	Name     string               `json:"name"`
+	Slug     string               `json:"slug"`
 	Stage    string               `json:"stage"`
 	Scope    catalog.ActionScope  `json:"scope"`
 	Action   string               `json:"action"`
 	Module   string               `json:"module,omitempty"`
 	RunAfter []string             `json:"run-after,omitempty"`
 	Access   catalog.ActionAccess `json:"access,omitempty"`
+	Inputs   catalog.ActionInput  `json:"inputs,omitempty"`
+	Outputs  catalog.ActionOutput `json:"outputs,omitempty"`
 	Order    int                  `json:"order"` // Topological order
 	Config   interface{}          `json:"config,omitempty"`
 }

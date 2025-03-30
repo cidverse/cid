@@ -26,17 +26,30 @@ type ExecuteContext struct {
 	ProjectDir    string
 	StagesFilter  []string
 	ModulesFilter []string
+	StepFilter    []string
 }
 
 func RunPlan(plan plangenerate.Plan, planContext ExecuteContext) {
 	log.Debug().Str("plan", plan.Name).Strs("stages", plan.Stages).Msg("workflow start")
 	start := time.Now()
 
-	for _, stageName := range plan.Stages {
-		if len(planContext.StagesFilter) == 0 || slices.Contains(planContext.StagesFilter, stageName) {
-			RunPlanStage(plan, planContext, stageName)
-		} else {
-			log.Debug().Str("workflow", plan.Name).Str("stage", stageName).Strs("filter", planContext.StagesFilter).Msg("stage has been skipped")
+	if planContext.StepFilter != nil && len(planContext.StepFilter) > 0 {
+		// run steps directly, match via id or slug
+		for _, step := range plan.Steps {
+			if !slices.Contains(planContext.StepFilter, step.ID) && !slices.Contains(planContext.StepFilter, step.Slug) {
+				continue
+			}
+
+			RunPlanStep(plan, planContext, step)
+		}
+	} else {
+		// run stages
+		for _, stageName := range plan.Stages {
+			if len(planContext.StagesFilter) == 0 || slices.Contains(planContext.StagesFilter, stageName) {
+				RunPlanStage(plan, planContext, stageName)
+			} else {
+				log.Debug().Str("workflow", plan.Name).Str("stage", stageName).Strs("filter", planContext.StagesFilter).Msg("stage has been skipped")
+			}
 		}
 	}
 

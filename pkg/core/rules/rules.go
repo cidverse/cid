@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"log/slog"
 	"slices"
 	"strconv"
 	"strings"
@@ -61,13 +62,13 @@ func EvaluateRules(rules []catalog.WorkflowRule, evalContext map[string]interfac
 
 // EvaluateRule will evaluate a WorkflowRule and return the result
 func EvaluateRule(rule catalog.WorkflowRule, evalContext map[string]interface{}) bool {
-	log.Debug().Str("type", string(rule.Type)).Str("expression", rule.Expression).Msg("evaluating rule")
+	slog.With("type", string(rule.Type), "expression", rule.Expression).Debug("evaluating rule")
 
 	if rule.Type == "" || rule.Type == catalog.WorkflowExpressionCEL {
 		return evalRuleCEL(rule, evalContext)
 	}
 
-	log.Error().Str("type", string(rule.Type)).Msg("expression type is not supported!")
+	slog.With("type", string(rule.Type)).Error("expression type is not supported!")
 	return false
 }
 

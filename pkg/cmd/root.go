@@ -4,6 +4,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cidverse/cid/pkg/app/appcmd"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/zerologconfig"
 	"github.com/spf13/cobra"
@@ -46,6 +47,11 @@ func RootCmd() *cobra.Command {
 	cmd.AddCommand(executablesRootCmd())
 	cmd.AddCommand(xCmd())
 	cmd.AddCommand(apiCmd())
+
+	// vcs app
+	cmd.AddGroup(&cobra.Group{ID: "vcsapp", Title: "VCS App"})
+	cmd.AddCommand(appcmd.ListCmd())
+	cmd.AddCommand(appcmd.RunCmd())
 
 	// version
 	cmd.AddCommand(versionCmd())
