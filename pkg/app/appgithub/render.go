@@ -30,16 +30,23 @@ type WorkflowTemplateData struct {
 }
 
 // renderWorkflow renders the workflow template and returns the rendered template and the hash
-func renderWorkflow(cidContext *context.CIDContext, taskContext taskcommon.TaskContext, conf appconfig.Config, wfName string, wfConfig appconfig.WorkflowConfig, templateFile string, outputFile string) (string, error) {
+func renderWorkflow(cidContext *context.CIDContext, taskContext taskcommon.TaskContext, conf appconfig.Config, wfName string, wfConfig appconfig.WorkflowConfig, environments map[string]appcommon.VCSEnvironment, templateFile string, outputFile string) (string, error) {
 	wfConfig = appconfig.PreProcessWorkflowConfig(wfConfig, taskContext.Repository)
 
 	// generate plan
-	plan, err := plangenerate.GeneratePlan(cidContext.Modules, cidContext.Config.Registry, taskContext.Directory, cidContext.Env, cidContext.Executables, false)
+	plan, err := plangenerate.GeneratePlan(plangenerate.GeneratePlanRequest{
+		Modules:         cidContext.Modules,
+		Registry:        cidContext.Config.Registry,
+		ProjectDir:      taskContext.Directory,
+		Env:             cidContext.Env,
+		Executables:     cidContext.Executables,
+		Environments:    environments,
+		PinVersions:     false,
+		WorkflowVariant: wfConfig.Type, // workflow variant, e.g. "nightly", "release", "pull-request"
+	})
 	if err != nil {
 		return "", err
 	}
-
-	// TODO: provide custom info such as nightly, release, ...
 
 	// pre-process access section for workflow rendering
 	for i := range plan.Steps {

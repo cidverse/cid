@@ -139,6 +139,7 @@ func UpdateCatalog(name string, source *Source) error {
 func updateCatalogOCI(file string, source *Source) error {
 	// get metadata from oci image
 	ociImage := strings.TrimPrefix(source.URI, "oci://")
+	ociImageTag := strings.Split(ociImage, ":") // TODO: create util function
 
 	// configure container
 	containerExec := containerruntime.Container{
@@ -179,16 +180,17 @@ func updateCatalogOCI(file string, source *Source) error {
 				Command: "central run " + am.Name,
 				Certs:   nil,
 			},
-			Version:  ociImage,
+			Version:  ociImageTag[1],
 			Metadata: am,
 		})
 	}
-	output, err := json.Marshal(data)
+	output, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal catalog data for %s: %w", source.URI, err)
 	}
 
 	// persist
+	_ = os.Remove(file)
 	err = os.WriteFile(file, output, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to write catalog file for %s: %w", source.URI, err)

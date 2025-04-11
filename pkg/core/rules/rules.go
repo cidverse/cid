@@ -9,7 +9,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/go-rules/pkg/expr"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -24,6 +23,19 @@ const (
 	ModuleDeploymentType    = "MODULE_DEPLOYMENT_TYPE"
 	ModuleFiles             = "MODULE_FILES"
 )
+
+var ReservedVariables = []string{
+	ModuleName,
+	ModuleSlug,
+	ModuleType,
+	ModuleBuildSystem,
+	ModuleBuildSystemSyntax,
+	ModuleConfigType,
+	ModuleSpecificationType,
+	ModuleDeploymentSpec,
+	ModuleDeploymentType,
+	ModuleFiles,
+}
 
 // AnyRuleMatches will return true if at least one rule matches, if no rules are provided this always returns true
 func AnyRuleMatches(rules []catalog.WorkflowRule, evalContext map[string]interface{}) bool {
@@ -144,7 +156,7 @@ func GetModuleRuleContext(env map[string]string, module *analyzerapi.ProjectModu
 func evalRuleCEL(rule catalog.WorkflowRule, context map[string]interface{}) bool {
 	match, err := expr.EvalBooleanExpression(rule.Expression, context)
 	if err != nil {
-		log.Debug().Err(err).Str("expression", rule.Expression).Msg("failed to evaluate workflow rule expression")
+		slog.With("err", err).With("expression", rule.Expression).Debug("failed to evaluate workflow rule expression")
 		return false
 	}
 

@@ -113,7 +113,10 @@ func catalogUpdateCmd() *cobra.Command {
 			if len(args) > 0 {
 				name := args[0]
 				log.Info().Str("name", name).Msg("updating registry")
-				catalog.UpdateCatalog(name, registries[name])
+				err := catalog.UpdateCatalog(name, registries[name])
+				if err != nil {
+					log.Error().Err(err).Str("name", name).Msg("failed to update registry")
+				}
 			} else {
 				log.Info().Int("count", len(registries)).Msg("updating all registries")
 				catalog.UpdateAllCatalogs()

@@ -24,6 +24,7 @@ type WorkflowConfig struct {
 	TriggerPushBranches []string `json:"trigger_push_branches"`
 	TriggerPushTags     []string `json:"trigger_push_tags"`
 	TriggerPullRequest  bool     `json:"trigger_pull_request"`
+	EnvironmentPattern  string   `json:"environment_pattern"` // EnvironmentPattern can be a regex or glob pattern to match which environments should be deployed from this workflow
 }
 
 func PreProcessWorkflowConfig(wfConfig WorkflowConfig, repo api.Repository) WorkflowConfig {

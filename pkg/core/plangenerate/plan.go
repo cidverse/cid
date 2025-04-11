@@ -3,43 +3,61 @@ package plangenerate
 import (
 	"fmt"
 	"slices"
-	"strconv"
 
-	"github.com/cidverse/cid/pkg/common/api"
+	"github.com/cidverse/cid/pkg/app/appcommon"
+	actionApi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/rules"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/go-ptr"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
-	"github.com/gosimple/slug"
+	"github.com/rs/zerolog/log"
 )
 
-func GeneratePlan(modules []*analyzerapi.ProjectModule, registry catalog.Config, projectDir string, env map[string]string, executables []executable.Executable, pinVersions bool) (Plan, error) {
+type GeneratePlanRequest struct {
+	Modules         []*analyzerapi.ProjectModule        `json:"modules"`
+	Registry        catalog.Config                      `json:"registry"`
+	ProjectDir      string                              `json:"project_dir"`
+	Env             map[string]string                   `json:"env"`
+	Executables     []executable.Executable             `json:"executables"`
+	PinVersions     bool                                `json:"pin_versions"`
+	Environments    map[string]appcommon.VCSEnvironment `json:"environments"`
+	WorkflowVariant string                              `json:"workflow_variant"`
+}
+
+func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
 	planContext := PlanContext{
-		ProjectDir:  projectDir,
-		Environment: env,
-		Registry:    registry,
-		Modules:     modules,
+		ProjectDir:      request.ProjectDir,
+		Registry:        request.Registry,
+		Environment:     request.Env,
+		Stages:          []string{"build", "test", "lint", "scan", "package", "publish", "deploy"},
+		VCSEnvironments: request.Environments,
+		Modules:         request.Modules,
 	}
-	ruleContext := rules.GetRuleContext(env)
+	ruleContext := rules.GetRuleContext(request.Env)
+	ruleContext["VARIANT"] = request.WorkflowVariant
 
 	// select workflow
 	workflow, err := selectWorkflow(planContext, ruleContext)
 	if err != nil {
 		return Plan{}, err
 	}
+	log.Debug().Str("workflow-name", workflow.Name).Msg("selected workflow")
 
 	// collect all actions
 	actions, err := getWorkflowActions(workflow)
 	if err != nil {
 		return Plan{}, err
 	}
+	log.Debug().Int("actions", len(actions)).Msg("workflow actions loaded")
 
 	// generate plan
-	steps, err := generateFlatExecutionPlan(planContext, actions, executables, pinVersions)
+	steps, err := generateFlatExecutionPlan(planContext, actions, request.Executables, request.PinVersions)
 	if err != nil {
 		return Plan{}, err
 	}
+	log.Debug().Int("steps", len(steps)).Msg("workflow steps generated")
 
 	// determine dependencies
 	steps = assignStepDependencies(steps, planContext)
@@ -59,10 +77,9 @@ func GeneratePlan(modules []*analyzerapi.ProjectModule, registry catalog.Config,
 	}
 
 	return Plan{
-		Name:        workflow.Name,
-		Stages:      stages,
-		Steps:       steps,
-		Environment: "",
+		Name:   workflow.Name,
+		Stages: stages,
+		Steps:  steps,
 	}, nil
 }
 
@@ -71,8 +88,12 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 
 	// create steps for each action, respecting dependencies
 	for _, action := range actions {
-		catalogAction := ptr.Value(context.Registry.FindAction(action.ID))
-		ctx := api.GetActionContext(context.Modules, context.ProjectDir, context.Environment, catalogAction.Metadata.Access)
+		catalogActionPtr := context.Registry.FindAction(action.ID)
+		if catalogActionPtr == nil {
+			return nil, fmt.Errorf("action [%s] not found in registry", action.ID)
+		}
+		catalogAction := ptr.Value(catalogActionPtr)
+		ctx := actionApi.GetActionContext(context.Modules, context.ProjectDir, context.Environment, catalogAction.Metadata.Access)
 
 		// pin executable constraints
 		var executableConstraints []catalog.ActionAccessExecutable
@@ -104,53 +125,67 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 		// create steps without stage grouping, but store the stage name
 		if catalogAction.Metadata.Scope == catalog.ActionScopeProject {
 			ruleContext := rules.GetProjectRuleContext(ctx.Env, ctx.Modules)
+
+			// check if the action rules match, if not check again for each environment
 			if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext) {
-				steps = append(steps, Step{
-					ID:       strconv.Itoa(len(steps)),
-					Name:     catalogAction.Metadata.Name,
-					Slug:     slug.Make(catalogAction.Metadata.Name),
-					Stage:    action.Stage,
-					Scope:    catalogAction.Metadata.Scope,
-					Action:   catalogAction.URI,
-					RunAfter: []string{},
-					Access: catalog.ActionAccess{
-						Environment: catalogAction.Metadata.Access.Environment,
-						Executables: executableConstraints,
-						Network:     catalogAction.Metadata.Access.Network,
-					},
-					Inputs:  catalogAction.Metadata.Input,
-					Outputs: catalogAction.Metadata.Output,
-					Order:   1,
-					Config:  action.Config,
-				})
+				steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, "", "", executableConstraints))
+			} else {
+				for _, env := range context.VCSEnvironments {
+					vcsEnv := util.CloneMap(ctx.Env)
+					for _, e := range env.Vars {
+						if isReservedVariable(e.Name) {
+							continue
+						}
+
+						if e.IsSecret {
+							vcsEnv[e.Name] = "***"
+						} else {
+							vcsEnv[e.Name] = e.Value
+						}
+					}
+
+					envRuleContext := rules.GetProjectRuleContext(vcsEnv, ctx.Modules)
+					if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), envRuleContext) {
+						steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, "", env.Env.Name, executableConstraints))
+					} else {
+						log.Debug().Str("action", action.ID).Str("environment", env.Env.Name).Msg("action skipped by environment filter")
+					}
+				}
 			}
 		} else if catalogAction.Metadata.Scope == catalog.ActionScopeModule {
 			for _, m := range ctx.Modules {
 				moduleRef := ptr.Value(m)
-
 				ruleContext := rules.GetModuleRuleContext(ctx.Env, &moduleRef)
+
+				// check if the action rules match, if not check again for each environment
 				if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext) {
-					steps = append(steps, Step{
-						ID:       strconv.Itoa(len(steps)),
-						Name:     fmt.Sprintf("%s - %s", catalogAction.Metadata.Name, moduleRef.Name),
-						Slug:     slug.Make(fmt.Sprintf("%s - %s", catalogAction.Metadata.Name, moduleRef.Name)),
-						Stage:    action.Stage,
-						Scope:    catalogAction.Metadata.Scope,
-						Module:   moduleRef.ID,
-						Action:   catalogAction.URI,
-						RunAfter: []string{},
-						Access: catalog.ActionAccess{
-							Environment: catalogAction.Metadata.Access.Environment,
-							Executables: executableConstraints,
-							Network:     catalogAction.Metadata.Access.Network,
-						},
-						Inputs:  catalogAction.Metadata.Input,
-						Outputs: catalogAction.Metadata.Output,
-						Order:   1,
-						Config:  action.Config,
-					})
+					steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, moduleRef.ID, "", executableConstraints))
+				} else {
+					for _, env := range context.VCSEnvironments {
+						vcsEnv := util.CloneMap(ctx.Env)
+						for _, e := range env.Vars {
+							if isReservedVariable(e.Name) {
+								continue
+							}
+
+							if e.IsSecret {
+								vcsEnv[e.Name] = "***"
+							} else {
+								vcsEnv[e.Name] = e.Value
+							}
+						}
+
+						envRuleContext := rules.GetModuleRuleContext(vcsEnv, &moduleRef)
+						if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), envRuleContext) {
+							steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, "", env.Env.Name, executableConstraints))
+						} else {
+							log.Debug().Str("action", action.ID).Str("environment", env.Env.Name).Msg("action skipped by environment filter")
+						}
+					}
 				}
 			}
+		} else {
+			return nil, fmt.Errorf("unsupported action scope [%s]: %s", catalogAction.URI, catalogAction.Metadata.Scope)
 		}
 	}
 
@@ -160,20 +195,26 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 func assignStepDependencies(steps []Step, context PlanContext) []Step {
 	actionInstances := make(map[string][]string)   // Track instances of each action
 	artifactProducers := make(map[string][]string) // Track artifact producers
+	stepsByStage := make(map[string][]string)      // Track steps by stage
 
 	// track action instances and artifact producers
 	for _, step := range steps {
-		catalogAction := ptr.Value(context.Registry.FindAction(step.Action))
+		stepsByStage[step.Stage] = append(stepsByStage[step.Stage], step.Slug)
 
-		// track action instances by ID
+		catalogAction := ptr.Value(context.Registry.FindAction(step.Action))
 		actionInstances[step.Action] = append(actionInstances[step.Action], step.Slug)
 
-		// track which actions produce which artifacts
 		for _, artifact := range catalogAction.Metadata.Output.Artifacts {
 			if catalogAction.Metadata.Scope == catalog.ActionScopeProject {
 				artifactProducers[artifact.Key()] = append(artifactProducers[artifact.Key()], step.Slug)
 			}
 		}
+	}
+
+	// create a mapping of stage names to their indices
+	stageIndex := map[string]int{}
+	for i, stage := range context.Stages {
+		stageIndex[stage] = i
 	}
 
 	// assign dependencies
@@ -195,8 +236,27 @@ func assignStepDependencies(steps []Step, context PlanContext) []Step {
 			}
 		}
 
+		// Stage-based ordering (only for "late" stages)
+		if shouldEnforceStageOrdering(step.Stage) {
+			if currentStageIndex, exists := stageIndex[step.Stage]; exists {
+				for j := 0; j < currentStageIndex; j++ {
+					priorStage := context.Stages[j]
+					dependencies = append(dependencies, stepsByStage[priorStage]...)
+				}
+			}
+		}
+
 		steps[i].RunAfter = dependencies
 	}
 
 	return steps
+}
+
+func shouldEnforceStageOrdering(stage string) bool {
+	switch stage {
+	case "publish", "deploy":
+		return true
+	default:
+		return false
+	}
 }

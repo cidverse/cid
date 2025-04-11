@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/app/appgithub"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"github.com/cidverse/go-vcsapp/pkg/task/taskcommon"
 	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
+	"github.com/gosimple/slug"
 	"github.com/spf13/cobra"
 )
 
@@ -70,9 +72,13 @@ func processRepository(platform api.Platform, repo api.Repository, channel strin
 	// run platform-specific task
 	slog.With("namespace", repo.Namespace).With("repo", repo.Name).With("repo_channel", channel).With("platform", platform.Name()).Info("running workflow update task")
 	taskContext := taskcommon.TaskContext{
-		Directory:  tempDir,
+		Directory:  filepath.Join(tempDir, slug.Make(repo.Name)),
 		Platform:   platform,
 		Repository: repo,
+	}
+	err = os.MkdirAll(taskContext.Directory, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
 	}
 	if platform.Slug() == "github" {
 		err = appgithub.GitHubWorkflowTask(taskContext)

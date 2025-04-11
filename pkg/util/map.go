@@ -22,3 +22,16 @@ func ResolveEnvMap(env map[string]string) map[string]string {
 	}
 	return result
 }
+
+// CloneMap returns a shallow copy of a map[K]V.
+func CloneMap[K comparable, V any](src map[K]V) map[K]V {
+	if src == nil {
+		return nil
+	}
+
+	dst := make(map[K]V, len(src))
+	for k, v := range src {
+		dst[k] = v
+	}
+	return dst
+}

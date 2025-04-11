@@ -1,6 +1,9 @@
 package plangenerate
 
 import (
+	"slices"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/rules"
 )
@@ -29,4 +32,12 @@ func getWorkflowActions(workflow catalog.Workflow) ([]catalog.WorkflowAction, er
 	}
 
 	return actions, nil
+}
+
+func isReservedVariable(name string) bool {
+	if strings.HasPrefix(name, "NCI_") {
+		return true
+	}
+
+	return slices.Contains(rules.ReservedVariables, name)
 }

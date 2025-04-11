@@ -34,7 +34,7 @@ func planRootCmd() *cobra.Command {
 func planGenerateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "generate",
-		Aliases: []string{"gen"},
+		Aliases: []string{"g"},
 		Short:   "",
 		Run: func(cmd *cobra.Command, args []string) {
 			pin, _ := cmd.Flags().GetBool("pin")
@@ -47,7 +47,15 @@ func planGenerateCmd() *cobra.Command {
 			}
 
 			// data
-			plan, err := plangenerate.GeneratePlan(cid.Modules, cid.Config.Registry, cid.ProjectDir, cid.Env, cid.Executables, pin)
+			plan, err := plangenerate.GeneratePlan(plangenerate.GeneratePlanRequest{
+				Modules:         cid.Modules,
+				Registry:        cid.Config.Registry,
+				ProjectDir:      cid.ProjectDir,
+				Env:             cid.Env,
+				Executables:     cid.Executables,
+				PinVersions:     pin,
+				WorkflowVariant: "",
+			})
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to generate action plan")
 				os.Exit(1)
@@ -87,7 +95,15 @@ func planExecuteCmd() *cobra.Command {
 			// TODO: generate plan or take from input file
 
 			// plan
-			plan, err := plangenerate.GeneratePlan(cid.Modules, cid.Config.Registry, cid.ProjectDir, cid.Env, cid.Executables, false)
+			plan, err := plangenerate.GeneratePlan(plangenerate.GeneratePlanRequest{
+				Modules:         cid.Modules,
+				Registry:        cid.Config.Registry,
+				ProjectDir:      cid.ProjectDir,
+				Env:             cid.Env,
+				Executables:     cid.Executables,
+				PinVersions:     false,
+				WorkflowVariant: "",
+			})
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to generate action plan")
 				os.Exit(1)

@@ -99,9 +99,9 @@ jobs:
     permissions:
       id-token: write # provenance signing
     timeout-minutes: {{ $root.JobTimeout }}
-    {{- if $root.Plan.Environment }}
+    {{- if $step.Environment }}
     environment:
-      name: '{{ $root.Plan.Environment }}'
+      name: '{{ $step.Environment}}'
     {{- end }}
     steps:
       - name: Harden Runner

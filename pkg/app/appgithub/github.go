@@ -11,26 +11,12 @@ import (
 	"github.com/cidverse/cid/pkg/app/appmergerequest"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/context"
-	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/go-vcsapp/pkg/task/simpletask"
 	"github.com/cidverse/go-vcsapp/pkg/task/taskcommon"
 	"github.com/gosimple/slug"
 	"gopkg.in/yaml.v3"
 )
-
-var githubNetworkAllowList = []catalog.ActionAccessNetwork{
-	// GitHub Platform
-	{Host: "github.com:443"},
-	{Host: "api.github.com:443"},
-	{Host: "codeload.github.com:443"},
-	{Host: "uploads.github.com:443"},
-	{Host: "objects.githubusercontent.com:443"},
-	{Host: "raw.githubusercontent.com:443"},
-	// GitHub Container Registry
-	{Host: "ghcr.io:443"},
-	{Host: "pkg-containers.githubusercontent.com:443"},
-}
 
 func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 	helper := simpletask.New(taskContext)
@@ -64,6 +50,7 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 				TriggerManual:       true,
 				TriggerSchedule:     true,
 				TriggerScheduleCron: "@daily",
+				EnvironmentPattern:  "nightly-.*",
 			},
 		},
 	}
@@ -95,12 +82,37 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 		return err
 	}
 
+	// env
+	envs, err := taskContext.Platform.Environments(taskContext.Repository)
+	if err != nil {
+		return fmt.Errorf("failed to get environments: %w", err)
+	}
+
+	environments := make(map[string]appcommon.VCSEnvironment, len(envs))
+	for _, e := range envs {
+		// fetch environment variables
+		vars, err := taskContext.Platform.EnvironmentVariables(taskContext.Repository, e.Name)
+		if err != nil {
+			return fmt.Errorf("failed to get environment variables: %w", err)
+		}
+
+		environments[e.Name] = appcommon.VCSEnvironment{
+			Env:  e,
+			Vars: vars,
+		}
+	}
+
 	// workflows
 	if conf.Workflows != nil {
 		for wfKey, wfConfig := range conf.Workflows {
-			data, err := renderWorkflow(cid, taskContext, conf, wfKey, wfConfig, "wf-main.gohtml", filepath.Join(taskContext.Directory, fmt.Sprintf(".github/workflows/cid-%s.yml", slug.Make(wfKey))))
-			if err != nil {
-				return fmt.Errorf("failed to render workflow: %w", err)
+			filteredEnvs, wfErr := appcommon.FilterVCSEnvironments(environments, wfConfig.EnvironmentPattern)
+			if wfErr != nil {
+				return fmt.Errorf("failed to filter workflow environments [%s]: %w", wfKey, err)
+			}
+
+			data, wfErr := renderWorkflow(cid, taskContext, conf, wfKey, wfConfig, filteredEnvs, "wf-main.gohtml", filepath.Join(taskContext.Directory, fmt.Sprintf(".github/workflows/cid-%s.yml", slug.Make(wfKey))))
+			if wfErr != nil {
+				return fmt.Errorf("failed to render workflow [%s]: %w", wfKey, wfErr)
 			}
 			generatedContent += data
 		}
