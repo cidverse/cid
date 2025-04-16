@@ -1,9 +1,14 @@
 package appconfig
 
 import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
+	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 )
 
@@ -37,4 +42,47 @@ func PreProcessWorkflowConfig(wfConfig WorkflowConfig, repo api.Repository) Work
 	}
 
 	return wfConfig
+}
+
+type WorkflowDependency struct {
+	Id      string `json:"id"`
+	Type    string `json:"type"`
+	Hash    string `json:"hash"`
+	Version string `json:"version"`
+}
+
+// PersistPlan saves the workflow plan to a file in the specified project directory.
+func PersistPlan(plan plangenerate.Plan, file string) error {
+	err := os.MkdirAll(filepath.Dir(file), 0755)
+	if err != nil {
+		return fmt.Errorf("failed to create directory for workflow plan [%s]: %w", file, err)
+	}
+
+	planBytes, err := json.MarshalIndent(plan, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal workflow plan [%s]: %w", file, err)
+	}
+
+	err = os.WriteFile(file, planBytes, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write workflow plan [%s]: %w", file, err)
+	}
+
+	return nil
+}
+
+func LoadPlan(projectDirectory string, file string) (plangenerate.Plan, error) {
+	planFile := filepath.Join(projectDirectory, file)
+	planBytes, err := os.ReadFile(planFile)
+	if err != nil {
+		return plangenerate.Plan{}, fmt.Errorf("failed to read workflow plan [%s]: %w", file, err)
+	}
+
+	var plan plangenerate.Plan
+	err = json.Unmarshal(planBytes, &plan)
+	if err != nil {
+		return plangenerate.Plan{}, fmt.Errorf("failed to unmarshal workflow plan [%s]: %w", file, err)
+	}
+
+	return plan, nil
 }

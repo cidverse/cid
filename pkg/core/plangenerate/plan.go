@@ -177,7 +177,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 
 						envRuleContext := rules.GetModuleRuleContext(vcsEnv, &moduleRef)
 						if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), envRuleContext) {
-							steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, "", env.Env.Name, executableConstraints))
+							steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, moduleRef.ID, env.Env.Name, executableConstraints))
 						} else {
 							log.Debug().Str("action", action.ID).Str("environment", env.Env.Name).Msg("action skipped by environment filter")
 						}
@@ -221,11 +221,13 @@ func assignStepDependencies(steps []Step, context PlanContext) []Step {
 	for i, step := range steps {
 		catalogAction := ptr.Value(context.Registry.FindAction(step.Action))
 		var dependencies []string
+		var usesOutputOf []string
 
 		// add dependencies based on required artifacts
 		for _, artifact := range catalogAction.Metadata.Input.Artifacts {
 			if producers, exists := artifactProducers[artifact.Key()]; exists {
 				dependencies = append(dependencies, producers...)
+				usesOutputOf = append(usesOutputOf, producers...)
 			}
 		}
 
@@ -233,6 +235,7 @@ func assignStepDependencies(steps []Step, context PlanContext) []Step {
 		for _, requiredAction := range step.RunAfter {
 			if instances, exists := actionInstances[requiredAction]; exists {
 				dependencies = append(dependencies, instances...)
+				usesOutputOf = append(usesOutputOf, instances...)
 			}
 		}
 
@@ -247,6 +250,7 @@ func assignStepDependencies(steps []Step, context PlanContext) []Step {
 		}
 
 		steps[i].RunAfter = dependencies
+		steps[i].UsesOutputOf = usesOutputOf
 	}
 
 	return steps

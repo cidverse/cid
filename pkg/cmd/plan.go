@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cid/pkg/core/planexecute"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
@@ -84,6 +85,7 @@ func planExecuteCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			stages, _ := cmd.Flags().GetStringArray("stage")
 			steps, _ := cmd.Flags().GetStringArray("step")
+			planFile, _ := cmd.Flags().GetString("plan-file")
 
 			// app context
 			cid, err := context.NewAppContext()
@@ -93,20 +95,30 @@ func planExecuteCmd() *cobra.Command {
 			}
 
 			// TODO: generate plan or take from input file
-
-			// plan
-			plan, err := plangenerate.GeneratePlan(plangenerate.GeneratePlanRequest{
-				Modules:         cid.Modules,
-				Registry:        cid.Config.Registry,
-				ProjectDir:      cid.ProjectDir,
-				Env:             cid.Env,
-				Executables:     cid.Executables,
-				PinVersions:     false,
-				WorkflowVariant: "",
-			})
-			if err != nil {
-				log.Fatal().Err(err).Msg("failed to generate action plan")
-				os.Exit(1)
+			// read plan file
+			var plan plangenerate.Plan
+			if planFile != "" {
+				// read plan file
+				plan, err = appconfig.LoadPlan(cid.ProjectDir, planFile)
+				if err != nil {
+					log.Fatal().Err(err).Msg("failed to load plan file")
+					os.Exit(1)
+				}
+			} else {
+				// generate
+				plan, err = plangenerate.GeneratePlan(plangenerate.GeneratePlanRequest{
+					Modules:         cid.Modules,
+					Registry:        cid.Config.Registry,
+					ProjectDir:      cid.ProjectDir,
+					Env:             cid.Env,
+					Executables:     cid.Executables,
+					PinVersions:     false,
+					WorkflowVariant: "",
+				})
+				if err != nil {
+					log.Fatal().Err(err).Msg("failed to generate action plan")
+					os.Exit(1)
+				}
 			}
 
 			// run plan
@@ -124,6 +136,7 @@ func planExecuteCmd() *cobra.Command {
 
 	cmd.Flags().StringArrayP("stage", "s", []string{}, "limit execution to the specified stage(s)")
 	cmd.Flags().StringArray("step", []string{}, "limit execution to the specified step(s)")
+	cmd.Flags().String("plan-file", "", "plan file to execute")
 
 	return cmd
 }

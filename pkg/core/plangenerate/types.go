@@ -30,20 +30,21 @@ type Stage struct {
 }
 
 type Step struct {
-	ID          string               `json:"id"`
-	Name        string               `json:"name"`
-	Slug        string               `json:"slug"`
-	Stage       string               `json:"stage"`
-	Scope       catalog.ActionScope  `json:"scope"`
-	Action      string               `json:"action"`
-	Module      string               `json:"module,omitempty"`
-	RunAfter    []string             `json:"run-after,omitempty"`
-	Environment string               `json:"environment,omitempty"`
-	Access      catalog.ActionAccess `json:"access,omitempty"`
-	Inputs      catalog.ActionInput  `json:"inputs,omitempty"`
-	Outputs     catalog.ActionOutput `json:"outputs,omitempty"`
-	Order       int                  `json:"order"` // Topological order
-	Config      interface{}          `json:"config,omitempty"`
+	ID           string               `json:"id"`
+	Name         string               `json:"name"`
+	Slug         string               `json:"slug"`
+	Stage        string               `json:"stage"`
+	Scope        catalog.ActionScope  `json:"scope"`
+	Action       string               `json:"action"`
+	Module       string               `json:"module,omitempty"`
+	RunAfter     []string             `json:"run-after,omitempty"`      // List of steps that need to be completed before this step starts
+	UsesOutputOf []string             `json:"uses-output-of,omitempty"` // List of steps whose outputs need to be downloaded
+	Environment  string               `json:"environment,omitempty"`
+	Access       catalog.ActionAccess `json:"access,omitempty"`
+	Inputs       catalog.ActionInput  `json:"inputs,omitempty"`
+	Outputs      catalog.ActionOutput `json:"outputs,omitempty"`
+	Order        int                  `json:"order"` // Topological order
+	Config       interface{}          `json:"config,omitempty"`
 }
 
 func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id int, name string, moduleID string, environment string, executableConstraints []catalog.ActionAccessExecutable) Step {

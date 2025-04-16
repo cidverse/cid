@@ -35,15 +35,16 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 				TriggerPushBranches: []string{taskContext.Repository.DefaultBranch},
 			},
 			"Release": {
-				Type:            "release",
-				TriggerManual:   true,
-				TriggerPush:     true,
-				TriggerPushTags: []string{"v*.*.*"},
+				Type:               "release",
+				TriggerManual:      true,
+				TriggerPush:        true,
+				TriggerPushTags:    []string{"v*.*.*"},
+				EnvironmentPattern: "release-.*",
 			},
 			"Pull Request": {
 				Type:               "pull-request",
-				TriggerManual:      true,
 				TriggerPullRequest: true,
+				EnvironmentPattern: "pr-.*",
 			},
 			"Nightly": {
 				Type:                "nightly",
@@ -114,7 +115,13 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 			if wfErr != nil {
 				return fmt.Errorf("failed to render workflow [%s]: %w", wfKey, wfErr)
 			}
-			generatedContent += data
+
+			err = appconfig.PersistPlan(data.Plan, filepath.Join(taskContext.Directory, fmt.Sprintf(".github/cid/plans/%s.json", slug.Make(wfKey))))
+			if err != nil {
+				return fmt.Errorf("failed to persist workflow plan [%s]: %w", wfKey, err)
+			}
+
+			generatedContent += data.WorkflowContent
 		}
 	}
 
