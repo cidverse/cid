@@ -1,4 +1,4 @@
-package appgithub
+package appgitlab
 
 import (
 	"bytes"
@@ -15,15 +15,10 @@ import (
 	"github.com/cidverse/go-vcsapp/pkg/task/simpletask"
 	"github.com/cidverse/go-vcsapp/pkg/task/taskcommon"
 	"github.com/elliotchance/orderedmap/v3"
-	"github.com/gosimple/slug"
 	"gopkg.in/yaml.v3"
 )
 
-// GitHubWorkflowTask generates a project-specific GitHub workflow file and creates a pull request
-//
-// Links of interest:
-// https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md?plain=1
-func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
+func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 	helper := simpletask.New(taskContext)
 	var generatedContent string
 
@@ -110,28 +105,26 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 
 	// workflows
 	if conf.Workflows != nil {
+		var workflowTemplateData []appconfig.WorkflowData
+
 		for wfKey, wfConfig := range conf.Workflows.AllFromFront() {
 			filteredEnvs, wfErr := appcommon.FilterVCSEnvironments(environments, wfConfig.EnvironmentPattern)
 			if wfErr != nil {
 				return fmt.Errorf("failed to filter workflow environments [%s]: %w", wfKey, err)
 			}
 
-			workflowTemplateData, wfErr := appconfig.GenerateWorkflowData(cid, taskContext, conf, wfKey, wfConfig, filteredEnvs, githubWorkflowDependencies, githubNetworkAllowList)
+			wtd, wfErr := appconfig.GenerateWorkflowData(cid, taskContext, conf, wfKey, wfConfig, filteredEnvs, nil, gitlabNetworkAllowList)
 			if wfErr != nil {
 				return fmt.Errorf("failed to generate workflow template [%s]: %w", wfKey, wfErr)
 			}
 
-			data, wfErr := renderWorkflow(workflowTemplateData, "wf-main.gohtml", filepath.Join(taskContext.Directory, fmt.Sprintf(".github/workflows/cid-%s.yml", slug.Make(wfKey))))
-			if wfErr != nil {
-				return fmt.Errorf("failed to render workflow [%s]: %w", wfKey, wfErr)
-			}
+			workflowTemplateData = append(workflowTemplateData, wtd)
+		}
 
-			err = appconfig.PersistPlan(data.Plan, filepath.Join(taskContext.Directory, fmt.Sprintf(".github/cid/plans/%s.json", slug.Make(wfKey))))
-			if err != nil {
-				return fmt.Errorf("failed to persist workflow plan [%s]: %w", wfKey, err)
-			}
-
-			generatedContent += data.WorkflowContent
+		// render workflow
+		_, wfErr := renderWorkflow(workflowTemplateData, "wf-main.gohtml", filepath.Join(taskContext.Directory, ".gitlab-ci.yml"))
+		if wfErr != nil {
+			return fmt.Errorf("failed to render [gitlab-ci.yml]: %w", wfErr)
 		}
 	}
 

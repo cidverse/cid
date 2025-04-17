@@ -10,6 +10,7 @@ import (
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
+	"github.com/elliotchance/orderedmap/v3"
 )
 
 type Config struct {
@@ -17,7 +18,7 @@ type Config struct {
 	JobTimeout   int    `json:"job_timeout" env:"JOB_TIMEOUT" validate:"required"`     // Timeout for the job in minutes
 	EgressPolicy string `json:"egress_policy" env:"EGRESS_POLICY" validate:"required"` // Egress policy for network traffic (block, audit, ...)
 
-	Workflows map[string]WorkflowConfig `json:"workflows"`
+	Workflows *orderedmap.OrderedMap[string, WorkflowConfig] `json:"workflows"`
 }
 
 type WorkflowConfig struct {

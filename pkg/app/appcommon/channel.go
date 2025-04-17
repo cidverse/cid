@@ -7,15 +7,21 @@ import (
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 )
 
-var alphaNamespaces = []string{
+var githubAlphaNamespaces = []string{
 	"cidverse",
 	"philippheuer",
 }
 
+var gitlabAlphaNamespaces = []string{
+	"cidverse",
+	"cidverse-app",
+}
+
 // GetChannel returns the channel of a given repository
 func GetChannel(platform api.Platform, repo api.Repository) string {
-	// repo topics
-	if slices.Contains(alphaNamespaces, strings.ToLower(repo.Namespace)) && slices.Contains(repo.Topics, "cid-wf-alpha") {
+	if platform.Slug() == "github" && slices.Contains(githubAlphaNamespaces, strings.ToLower(repo.Namespace)) && slices.Contains(repo.Topics, "cid-wf-alpha") {
+		return "alpha"
+	} else if platform.Slug() == "gitlab" && slices.Contains(gitlabAlphaNamespaces, strings.ToLower(repo.Namespace)) && slices.Contains(repo.Topics, "cid-wf-alpha") {
 		return "alpha"
 	} else if slices.Contains(repo.Topics, "cid-wf-beta") {
 		return "beta"

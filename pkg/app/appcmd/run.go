@@ -8,6 +8,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/app/appgithub"
+	"github.com/cidverse/cid/pkg/app/appgitlab"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"github.com/cidverse/go-vcsapp/pkg/task/taskcommon"
 	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
@@ -81,13 +82,10 @@ func processRepository(platform api.Platform, repo api.Repository, channel strin
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 	if platform.Slug() == "github" {
-		err = appgithub.GitHubWorkflowTask(taskContext)
-		if err != nil {
-			return err
-		}
+		return appgithub.GitHubWorkflowTask(taskContext)
+	} else if platform.Slug() == "gitlab" {
+		return appgitlab.GitLabWorkflowTask(taskContext)
 	} else {
 		return fmt.Errorf("platform %s not supported", platform.Slug())
 	}
-
-	return nil
 }
