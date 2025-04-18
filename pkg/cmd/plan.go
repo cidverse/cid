@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
+	"path/filepath"
 
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/context"
@@ -85,23 +87,33 @@ func planExecuteCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			stages, _ := cmd.Flags().GetStringArray("stage")
 			steps, _ := cmd.Flags().GetStringArray("step")
-			planFile, _ := cmd.Flags().GetString("plan-file")
+			stateWfName, _ := cmd.Flags().GetString("state-wf-name")
 
 			// app context
 			cid, err := context.NewAppContext()
 			if err != nil {
-				log.Fatal().Err(err).Msg("failed to prepare app context")
+				slog.With("err", err).Error("failed to prepare app context")
 				os.Exit(1)
 			}
 
-			// TODO: generate plan or take from input file
 			// read plan file
 			var plan plangenerate.Plan
-			if planFile != "" {
-				// read plan file
-				plan, err = appconfig.LoadPlan(cid.ProjectDir, planFile)
-				if err != nil {
-					log.Fatal().Err(err).Msg("failed to load plan file")
+			if stateWfName != "" {
+				state, stateReadErr := appconfig.ReadWorkflowState(filepath.Join(cid.ProjectDir, ".cid", "state.json"))
+				if stateReadErr != nil {
+					log.Fatal().Err(stateReadErr).Msg("failed to read workflow state file")
+					os.Exit(1)
+				}
+
+				// iterate over all workflows to match via workflow key
+				for pair := state.Workflows.Newest(); pair != nil; pair = pair.Prev() {
+					if pair.Value.WorkflowKey == stateWfName {
+						plan = pair.Value.Plan
+						break
+					}
+				}
+				if plan.Name == "" {
+					slog.With("workflow_key", stateWfName).Error("workflow key not found in state file")
 					os.Exit(1)
 				}
 			} else {
@@ -137,7 +149,7 @@ func planExecuteCmd() *cobra.Command {
 
 	cmd.Flags().StringArrayP("stage", "s", []string{}, "limit execution to the specified stage(s)")
 	cmd.Flags().StringArray("step", []string{}, "limit execution to the specified step(s)")
-	cmd.Flags().String("plan-file", "", "plan file to execute")
+	cmd.Flags().String("state-wf-name", "", "workflow name, MUST BE present in .cid/state.json")
 
 	return cmd
 }

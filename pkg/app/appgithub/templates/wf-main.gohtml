@@ -159,7 +159,7 @@ jobs:
           {{- end }}
           {{- end }}
         run: |
-          cid --log-level=${CID_LOGLEVEL:-info} plan execute --plan-file ".github/cid/plans/{{ $root.WorkflowKey }}.json" --step "{{ $step.Slug }}"
+          cid --log-level=${CID_LOGLEVEL:-info} plan execute --state-wf-name "{{ $root.WorkflowKey }}" --step "{{ $step.Slug }}"
       - name: Upload Outputs
         uses: {{ $uploadArtifactAction.Id }}@{{ $uploadArtifactAction.Hash }} # {{ $uploadArtifactAction.Version }}
         with:
