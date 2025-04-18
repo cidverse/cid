@@ -1,7 +1,6 @@
 package appgitlab
 
 import (
-	"bytes"
 	"fmt"
 	"log/slog"
 	"path/filepath"
@@ -11,49 +10,21 @@ import (
 	"github.com/cidverse/cid/pkg/app/appmergerequest"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/context"
-	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/go-vcsapp/pkg/task/simpletask"
 	"github.com/cidverse/go-vcsapp/pkg/task/taskcommon"
-	"github.com/elliotchance/orderedmap/v3"
 	"gopkg.in/yaml.v3"
 )
 
 func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 	helper := simpletask.New(taskContext)
-	var generatedContent string
+	workflowState := appconfig.NewWorkflowState()
 
 	// read config
-	workflowMap := orderedmap.NewOrderedMap[string, appconfig.WorkflowConfig]()
-	workflowMap.Set("Main", appconfig.WorkflowConfig{
-		Type:                "main",
-		TriggerManual:       true,
-		TriggerPush:         true,
-		TriggerPushBranches: []string{taskContext.Repository.DefaultBranch},
-	})
-	workflowMap.Set("Release", appconfig.WorkflowConfig{
-		Type:               "release",
-		TriggerManual:      true,
-		TriggerPush:        true,
-		TriggerPushTags:    []string{"v*.*.*"},
-		EnvironmentPattern: "release-.*",
-	})
-	workflowMap.Set("Pull Request", appconfig.WorkflowConfig{
-		Type:               "pull-request",
-		TriggerPullRequest: true,
-		EnvironmentPattern: "pr-.*",
-	})
-	workflowMap.Set("Nightly", appconfig.WorkflowConfig{
-		Type:                "nightly",
-		TriggerManual:       true,
-		TriggerSchedule:     true,
-		TriggerScheduleCron: "@daily",
-		EnvironmentPattern:  "nightly-.*",
-	})
 	conf := appconfig.Config{
 		Version:      constants.Version,
 		JobTimeout:   10,
 		EgressPolicy: "block",
-		Workflows:    workflowMap,
+		Workflows:    appconfig.DefaultWorkflowConfig(taskContext.Repository.DefaultBranch),
 	}
 	content, err := taskContext.Platform.FileContent(taskContext.Repository, taskContext.Repository.DefaultBranch, appcommon.ConfigFileName)
 	if err == nil {
@@ -107,7 +78,10 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 	if conf.Workflows != nil {
 		var workflowTemplateData []appconfig.WorkflowData
 
-		for wfKey, wfConfig := range conf.Workflows.AllFromFront() {
+		for pair := conf.Workflows.Newest(); pair != nil; pair = pair.Prev() {
+			wfKey := pair.Key
+			wfConfig := pair.Value
+
 			filteredEnvs, wfErr := appcommon.FilterVCSEnvironments(environments, wfConfig.EnvironmentPattern)
 			if wfErr != nil {
 				return fmt.Errorf("failed to filter workflow environments [%s]: %w", wfKey, err)
@@ -119,6 +93,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 			}
 
 			workflowTemplateData = append(workflowTemplateData, wtd)
+			workflowState.Workflows.Set(wfKey, wtd)
 		}
 
 		// render workflow
@@ -128,19 +103,21 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 		}
 	}
 
+	// write workflow state
+	previousState, _ := appconfig.ReadWorkflowState(filepath.Join(taskContext.Directory, ".cid", "state.json"))
+	err = appconfig.WriteWorkflowState(workflowState, filepath.Join(taskContext.Directory, ".cid", "state.json"))
+	if err != nil {
+		return fmt.Errorf("failed to write workflow state: %w", err)
+	}
+
 	// description
-	/*
-		cl, err := changelog.GetChangelog()
-		if err != nil {
-			return fmt.Errorf("failed to get changelog: %w", err)
-		}*/
-	title, description, err := appmergerequest.TitleAndDescription("0.0.0", conf.Version, []string{"workflow", "githubactions"}, nil) // TODO: previous version lookup
+	title, description, err := appmergerequest.TitleAndDescription("0.0.0", conf.Version, workflowState, previousState, mergeRequestFooter)
 	if err != nil {
 		return fmt.Errorf("failed to get merge request description: %w", err)
 	}
 
 	// hash workflow
-	workflowHash, err := hash.SHA256Hash(bytes.NewReader([]byte(generatedContent)))
+	workflowHash, err := workflowState.Hash()
 	if err != nil {
 		return fmt.Errorf("failed to hash workflow contents: %w", err)
 	}

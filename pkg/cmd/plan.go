@@ -113,6 +113,7 @@ func planExecuteCmd() *cobra.Command {
 					Env:             cid.Env,
 					Executables:     cid.Executables,
 					PinVersions:     false,
+					Environments:    nil,
 					WorkflowVariant: "",
 				})
 				if err != nil {

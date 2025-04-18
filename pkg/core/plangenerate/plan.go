@@ -2,6 +2,7 @@ package plangenerate
 
 import (
 	"fmt"
+	"log/slog"
 	"slices"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
@@ -11,6 +12,8 @@ import (
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/go-ptr"
+	"github.com/cidverse/go-vcsapp/pkg/platform/api"
+	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 )
@@ -37,6 +40,68 @@ func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
 	}
 	ruleContext := rules.GetRuleContext(request.Env)
 	ruleContext["VARIANT"] = request.WorkflowVariant
+
+	// lookup environment info via api - TODO: move to a separate function
+	if request.Environments == nil {
+		var platform api.Platform
+
+		if request.Env["NCI_REPOSITORY_HOST_SERVER"] == "github.com" && request.Env["NCI_REPOSITORY_HOST_TYPE"] == "github" { // github
+			ghToken := request.Env["GH_TOKEN"]
+			if ghToken != "" {
+				p, err := vcsapp.NewPlatform(vcsapp.PlatformConfig{
+					GitHubUsername: "oauth2",
+					GitHubToken:    ghToken,
+				})
+				if err != nil {
+					return Plan{}, err
+				}
+
+				platform = p
+			}
+		} else if request.Env["NCI_REPOSITORY_HOST_TYPE"] == "gitlab" { // gitlab
+			ciJobToken := request.Env["CI_JOB_TOKEN"]
+			if ciJobToken != "" {
+				p, err := vcsapp.NewPlatform(vcsapp.PlatformConfig{
+					GitLabServer:      request.Env["NCI_REPOSITORY_HOST_SERVER"],
+					GitLabAccessToken: ciJobToken,
+				})
+				if err != nil {
+					return Plan{}, err
+				}
+
+				platform = p
+			}
+		}
+		if platform != nil {
+			repo, err := platform.FindRepository(request.Env["NCI_PROJECT_PATH"])
+			if err != nil {
+				return Plan{}, err
+			}
+
+			envs, err := platform.Environments(repo)
+			if err != nil {
+				return Plan{}, fmt.Errorf("failed to get environments: %w", err)
+			}
+
+			environments := make(map[string]appcommon.VCSEnvironment, len(envs))
+			for _, e := range envs {
+				// fetch environment variables
+				vars, err := platform.EnvironmentVariables(repo, e.Name)
+				if err != nil {
+					return Plan{}, fmt.Errorf("failed to get environment variables: %w", err)
+				}
+
+				environments[e.Name] = appcommon.VCSEnvironment{
+					Env:  e,
+					Vars: vars,
+				}
+			}
+
+			request.Environments = environments
+		} else {
+			slog.Debug("cannot enrich environments for plan generation")
+		}
+	}
 
 	// select workflow
 	workflow, err := selectWorkflow(planContext, ruleContext)

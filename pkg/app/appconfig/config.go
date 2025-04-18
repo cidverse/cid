@@ -10,7 +10,7 @@ import (
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
-	"github.com/elliotchance/orderedmap/v3"
+	orderedmap "github.com/wk8/go-ordered-map/v2"
 )
 
 type Config struct {
@@ -23,14 +23,14 @@ type Config struct {
 
 type WorkflowConfig struct {
 	Type                string   `json:"type"` // e.g. "cron", "dispatch", "manual"
-	TriggerManual       bool     `json:"trigger_manual"`
-	TriggerSchedule     bool     `json:"trigger_cron"`
-	TriggerScheduleCron string   `json:"trigger_cron_schedule"`
-	TriggerPush         bool     `json:"trigger_push"`
-	TriggerPushBranches []string `json:"trigger_push_branches"`
-	TriggerPushTags     []string `json:"trigger_push_tags"`
-	TriggerPullRequest  bool     `json:"trigger_pull_request"`
-	EnvironmentPattern  string   `json:"environment_pattern"` // EnvironmentPattern can be a regex or glob pattern to match which environments should be deployed from this workflow
+	TriggerManual       bool     `json:"trigger_manual,omitempty"`
+	TriggerSchedule     bool     `json:"trigger_cron,omitempty"`
+	TriggerScheduleCron string   `json:"trigger_cron_schedule,omitempty"`
+	TriggerPush         bool     `json:"trigger_push,omitempty"`
+	TriggerPushBranches []string `json:"trigger_push_branches,omitempty"`
+	TriggerPushTags     []string `json:"trigger_push_tags,omitempty"`
+	TriggerPullRequest  bool     `json:"trigger_pull_request,omitempty"`
+	EnvironmentPattern  string   `json:"environment_pattern,omitempty"` // EnvironmentPattern can be a regex or glob pattern to match which environments should be deployed from this workflow
 }
 
 func PreProcessWorkflowConfig(wfConfig WorkflowConfig, repo api.Repository) WorkflowConfig {
@@ -50,6 +50,37 @@ type WorkflowDependency struct {
 	Type    string `json:"type"`
 	Hash    string `json:"hash"`
 	Version string `json:"version"`
+}
+
+func DefaultWorkflowConfig(defaultBranch string) *orderedmap.OrderedMap[string, WorkflowConfig] {
+	workflowMap := orderedmap.New[string, WorkflowConfig]()
+	workflowMap.Set("Main", WorkflowConfig{
+		Type:                "main",
+		TriggerManual:       true,
+		TriggerPush:         true,
+		TriggerPushBranches: []string{defaultBranch},
+	})
+	workflowMap.Set("Release", WorkflowConfig{
+		Type:               "release",
+		TriggerManual:      true,
+		TriggerPush:        true,
+		TriggerPushTags:    []string{"v*.*.*"},
+		EnvironmentPattern: "release-.*",
+	})
+	workflowMap.Set("Pull Request", WorkflowConfig{
+		Type:               "pull-request",
+		TriggerPullRequest: true,
+		EnvironmentPattern: "pr-.*",
+	})
+	workflowMap.Set("Nightly", WorkflowConfig{
+		Type:                "nightly",
+		TriggerManual:       true,
+		TriggerSchedule:     true,
+		TriggerScheduleCron: "@daily",
+		EnvironmentPattern:  "nightly-.*",
+	})
+
+	return workflowMap
 }
 
 // PersistPlan saves the workflow plan to a file in the specified project directory.
