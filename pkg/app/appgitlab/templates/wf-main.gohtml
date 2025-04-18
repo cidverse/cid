@@ -53,7 +53,7 @@ stages:
 "{{ $wf.NameSlug }}/{{ $step.Name }}":
     <<: *default_job
     stage: {{ $step.Stage }}
-    needs: [{{ join $step.RunAfter ", " }}]
+    needs: [{{- range $index, $elem := $step.RunAfter }}{{ if $index }}, {{ end }}"{{ $wf.NameSlug }}/{{ $elem }}"{{ end -}}]
     {{- if $step.Environment }}
     environment:
       name: {{ $step.Environment}}

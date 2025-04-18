@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/constants"
@@ -35,8 +36,14 @@ func renderWorkflow(data []appconfig.WorkflowData, templateFile string, outputFi
 		return RenderWorkflowResult{}, fmt.Errorf("failed to read workflow template %s: %w", templateFile, err)
 	}
 
+	var wfStages []string
 	wfDependencies := make(map[string]appconfig.WorkflowDependency)
 	for _, wf := range data {
+		for _, s := range wf.Plan.Stages {
+			if !slices.Contains(wfStages, s) {
+				wfStages = append(wfStages, s)
+			}
+		}
 		for k, v := range wf.WorkflowDependency {
 			wfDependencies[k] = v
 		}
@@ -44,7 +51,7 @@ func renderWorkflow(data []appconfig.WorkflowData, templateFile string, outputFi
 
 	template, err := vcsapp.Render(string(content), TemplateData{
 		Version:            constants.Version,
-		Stages:             data[0].Plan.Stages, // stages should be the same for all workflows
+		Stages:             wfStages,
 		Workflows:          data,
 		WorkflowDependency: wfDependencies,
 	})

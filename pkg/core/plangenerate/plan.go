@@ -118,7 +118,7 @@ func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
 	log.Debug().Int("actions", len(actions)).Msg("workflow actions loaded")
 
 	// generate plan
-	steps, err := generateFlatExecutionPlan(planContext, actions, request.Executables, request.PinVersions)
+	steps, err := generateFlatExecutionPlan(planContext, actions, request.Executables, request.PinVersions, request.WorkflowType)
 	if err != nil {
 		return Plan{}, err
 	}
@@ -126,12 +126,14 @@ func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
 
 	// determine dependencies
 	steps = assignStepDependencies(steps, planContext)
+	log.Debug().Int("steps", len(steps)).Msg("workflow step dependencies assigned")
 
 	// sort steps topologically
 	steps, err = SortSteps(steps)
 	if err != nil {
 		return Plan{}, err
 	}
+	log.Debug().Int("steps", len(steps)).Msg("workflow steps sorted topologically")
 
 	// collect stages
 	var stages []string
@@ -148,7 +150,7 @@ func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
 	}, nil
 }
 
-func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAction, executables []executable.Executable, pinVersions bool) ([]Step, error) {
+func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAction, executables []executable.Executable, pinVersions bool, workflowType string) ([]Step, error) {
 	var steps []Step
 
 	// create steps for each action, respecting dependencies
@@ -190,6 +192,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 		// create steps without stage grouping, but store the stage name
 		if catalogAction.Metadata.Scope == catalog.ActionScopeProject {
 			ruleContext := rules.GetProjectRuleContext(ctx.Env, ctx.Modules)
+			ruleContext["CID_WORKFLOW_TYPE"] = workflowType
 
 			// check if the action rules match, if not check again for each environment
 			if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext) {
@@ -210,6 +213,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 					}
 
 					envRuleContext := rules.GetProjectRuleContext(vcsEnv, ctx.Modules)
+					envRuleContext["CID_WORKFLOW_TYPE"] = workflowType
 					if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), envRuleContext) {
 						steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, "", env.Env.Name, executableConstraints))
 					} else {
@@ -221,6 +225,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 			for _, m := range ctx.Modules {
 				moduleRef := ptr.Value(m)
 				ruleContext := rules.GetModuleRuleContext(ctx.Env, &moduleRef)
+				ruleContext["CID_WORKFLOW_TYPE"] = workflowType
 
 				// check if the action rules match, if not check again for each environment
 				if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext) {
@@ -241,6 +246,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 						}
 
 						envRuleContext := rules.GetModuleRuleContext(vcsEnv, &moduleRef)
+						envRuleContext["CID_WORKFLOW_TYPE"] = workflowType
 						if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), envRuleContext) {
 							steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, moduleRef.ID, env.Env.Name, executableConstraints))
 						} else {
