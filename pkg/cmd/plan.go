@@ -51,13 +51,13 @@ func planGenerateCmd() *cobra.Command {
 
 			// data
 			plan, err := plangenerate.GeneratePlan(plangenerate.GeneratePlanRequest{
-				Modules:         cid.Modules,
-				Registry:        cid.Config.Registry,
-				ProjectDir:      cid.ProjectDir,
-				Env:             cid.Env,
-				Executables:     cid.Executables,
-				PinVersions:     pin,
-				WorkflowVariant: "",
+				Modules:      cid.Modules,
+				Registry:     cid.Config.Registry,
+				ProjectDir:   cid.ProjectDir,
+				Env:          cid.Env,
+				Executables:  cid.Executables,
+				PinVersions:  pin,
+				WorkflowType: "",
 			})
 			if err != nil {
 				log.Fatal().Err(err).Msg("failed to generate action plan")
@@ -119,14 +119,14 @@ func planExecuteCmd() *cobra.Command {
 			} else {
 				// generate
 				plan, err = plangenerate.GeneratePlan(plangenerate.GeneratePlanRequest{
-					Modules:         cid.Modules,
-					Registry:        cid.Config.Registry,
-					ProjectDir:      cid.ProjectDir,
-					Env:             cid.Env,
-					Executables:     cid.Executables,
-					PinVersions:     false,
-					Environments:    nil,
-					WorkflowVariant: "",
+					Modules:      cid.Modules,
+					Registry:     cid.Config.Registry,
+					ProjectDir:   cid.ProjectDir,
+					Env:          cid.Env,
+					Executables:  cid.Executables,
+					PinVersions:  false,
+					Environments: nil,
+					WorkflowType: "",
 				})
 				if err != nil {
 					log.Fatal().Err(err).Msg("failed to generate action plan")

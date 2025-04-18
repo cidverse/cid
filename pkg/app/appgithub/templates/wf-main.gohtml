@@ -87,7 +87,6 @@ concurrency:
 
 env:
   CID_WORKFLOW: 'main'
-  CID_VERSION: 'v{{ $cidDep.Version }}'
   CID_LOGLEVEL: "{{ printf "%s" "${{ github.event.inputs.loglevel || 'info' }}" }}"
   # allowed modes are 'block' and 'audit'. Using https://github.com/step-security/harden-runner to harden the runner.
   EGRESS_POLICY: 'block'
@@ -131,7 +130,7 @@ jobs:
       - name: Setup Tools
         uses: {{ $cidSetupAction.Id }}@{{ $cidSetupAction.Hash }} # {{ $cidSetupAction.Version }}
         with:
-          version: "{{ printf "%s" "${{ env.CID_VERSION }}" }}"
+          version: "v{{ $cidDep.Version }}"
       - name: Checkout
         uses: {{ $checkoutAction.Id }}@{{ $checkoutAction.Hash }} # {{ $checkoutAction.Version }}
         with:

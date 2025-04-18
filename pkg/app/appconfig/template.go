@@ -40,14 +40,14 @@ func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon
 
 	// generate plan
 	plan, err := plangenerate.GeneratePlan(plangenerate.GeneratePlanRequest{
-		Modules:         cidContext.Modules,
-		Registry:        cidContext.Config.Registry,
-		ProjectDir:      taskContext.Directory,
-		Env:             cidContext.Env,
-		Executables:     cidContext.Executables,
-		Environments:    environments,
-		PinVersions:     false,
-		WorkflowVariant: wfConfig.Type,
+		Modules:      cidContext.Modules,
+		Registry:     cidContext.Config.Registry,
+		ProjectDir:   taskContext.Directory,
+		Env:          cidContext.Env,
+		Executables:  cidContext.Executables,
+		Environments: environments,
+		PinVersions:  false,
+		WorkflowType: wfConfig.Type,
 	})
 	if err != nil {
 		return WorkflowData{}, err

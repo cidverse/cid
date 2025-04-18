@@ -19,14 +19,14 @@ import (
 )
 
 type GeneratePlanRequest struct {
-	Modules         []*analyzerapi.ProjectModule        `json:"modules"`
-	Registry        catalog.Config                      `json:"registry"`
-	ProjectDir      string                              `json:"project_dir"`
-	Env             map[string]string                   `json:"env"`
-	Executables     []executable.Executable             `json:"executables"`
-	PinVersions     bool                                `json:"pin_versions"`
-	Environments    map[string]appcommon.VCSEnvironment `json:"environments"`
-	WorkflowVariant string                              `json:"workflow_variant"`
+	Modules      []*analyzerapi.ProjectModule        `json:"modules"`
+	Registry     catalog.Config                      `json:"registry"`
+	ProjectDir   string                              `json:"project_dir"`
+	Env          map[string]string                   `json:"env"`
+	Executables  []executable.Executable             `json:"executables"`
+	PinVersions  bool                                `json:"pin_versions"`
+	Environments map[string]appcommon.VCSEnvironment `json:"environments"`
+	WorkflowType string                              `json:"workflow_type"`
 }
 
 func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
@@ -39,7 +39,7 @@ func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
 		Modules:         request.Modules,
 	}
 	ruleContext := rules.GetRuleContext(request.Env)
-	ruleContext["VARIANT"] = request.WorkflowVariant
+	ruleContext["CID_WORKFLOW_TYPE"] = request.WorkflowType
 
 	// lookup environment info via api - TODO: move to a separate function
 	if request.Environments == nil {
