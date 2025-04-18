@@ -1,25 +1,17 @@
 {{- /*gotype: github.com/cidverse/cid-app/pkg/githubworkflow.WorkflowDescriptionData*/ -}}
-{{ if eq .PreviousVersion "0.0.0" }}
-This PR adds the cid workflow in version `v{{ .Version }}`.
+### Changes
 
----
+{{ if .ChangesByGroup }}
+{{ range $key, $changes := .ChangesByGroup -}}
+**Workflow: {{ $key }}**
 
-The cid workflow is an automatically generated GitHub Workflow based on your project.
+{{ range $change := $changes -}}
+- {{ $change.Scope }}: {{ $change.Message }}
+{{ end }}
+
+{{ end }}
 {{ else }}
-This PR updates the cid workflow from `v{{ .PreviousVersion }}` to `v{{ .Version }}`.
-
----
-
-### Changelog
-
-{{ range $change := .Changelog }}
-#### v{{ $change.Version }}
-
-{{ range $commit := $change.Commits -}}
-- {{ $commit.Group }}: {{ $commit.Message | removeIssueMentions }}
-{{ end }}
-{{ end }}
-
+- No changes detected, please review the diff.
 {{ end }}
 
 ---

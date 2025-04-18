@@ -87,7 +87,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 				return fmt.Errorf("failed to filter workflow environments [%s]: %w", wfKey, err)
 			}
 
-			wtd, wfErr := appconfig.GenerateWorkflowData(cid, taskContext, conf, wfKey, wfConfig, filteredEnvs, nil, gitlabNetworkAllowList)
+			wtd, wfErr := appconfig.GenerateWorkflowData(cid, taskContext, conf, wfKey, wfConfig, filteredEnvs, gitlabWorkflowDependencies, gitlabNetworkAllowList)
 			if wfErr != nil {
 				return fmt.Errorf("failed to generate workflow template [%s]: %w", wfKey, wfErr)
 			}
@@ -111,7 +111,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 	}
 
 	// description
-	title, description, err := appmergerequest.TitleAndDescription("0.0.0", conf.Version, workflowState, previousState, mergeRequestFooter)
+	title, description, err := appmergerequest.TitleAndDescription(conf.Version, workflowState, previousState, mergeRequestFooter)
 	if err != nil {
 		return fmt.Errorf("failed to get merge request description: %w", err)
 	}

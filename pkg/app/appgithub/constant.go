@@ -21,6 +21,11 @@ var githubNetworkAllowList = []catalog.ActionAccessNetwork{
 }
 
 var githubWorkflowDependencies = map[string]appconfig.WorkflowDependency{
+	"cid": {
+		Id:      "cid",
+		Type:    "binary",
+		Version: "0.5.0",
+	},
 	"actions/checkout": {
 		Id:      "actions/checkout",
 		Type:    "github-action",

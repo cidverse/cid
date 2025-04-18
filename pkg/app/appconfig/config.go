@@ -48,8 +48,8 @@ func PreProcessWorkflowConfig(wfConfig WorkflowConfig, repo api.Repository) Work
 type WorkflowDependency struct {
 	Id      string `json:"id"`
 	Type    string `json:"type"`
-	Hash    string `json:"hash"`
-	Version string `json:"version"`
+	Version string `json:"version,omitempty"`
+	Hash    string `json:"hash,omitempty"`
 }
 
 func DefaultWorkflowConfig(defaultBranch string) *orderedmap.OrderedMap[string, WorkflowConfig] {
@@ -76,7 +76,7 @@ func DefaultWorkflowConfig(defaultBranch string) *orderedmap.OrderedMap[string, 
 		Type:                "nightly",
 		TriggerManual:       true,
 		TriggerSchedule:     true,
-		TriggerScheduleCron: "@daily",
+		TriggerScheduleCron: "@weekly",
 		EnvironmentPattern:  "nightly-.*",
 	})
 

@@ -17,9 +17,10 @@ import (
 var embedFS embed.FS
 
 type TemplateData struct {
-	Version   string                   `json:"version"`
-	Stages    []string                 `json:"stages"`
-	Workflows []appconfig.WorkflowData `json:"workflows"`
+	Version            string                                  `json:"version"`
+	Stages             []string                                `json:"stages"`
+	Workflows          []appconfig.WorkflowData                `json:"workflows"`
+	WorkflowDependency map[string]appconfig.WorkflowDependency `json:"workflow_dependency"`
 }
 
 type RenderWorkflowResult struct {
@@ -33,10 +34,19 @@ func renderWorkflow(data []appconfig.WorkflowData, templateFile string, outputFi
 	if err != nil {
 		return RenderWorkflowResult{}, fmt.Errorf("failed to read workflow template %s: %w", templateFile, err)
 	}
+
+	wfDependencies := make(map[string]appconfig.WorkflowDependency)
+	for _, wf := range data {
+		for k, v := range wf.WorkflowDependency {
+			wfDependencies[k] = v
+		}
+	}
+
 	template, err := vcsapp.Render(string(content), TemplateData{
-		Version:   constants.Version,
-		Stages:    data[0].Plan.Stages, // stages should be the same for all workflows
-		Workflows: data,
+		Version:            constants.Version,
+		Stages:             data[0].Plan.Stages, // stages should be the same for all workflows
+		Workflows:          data,
+		WorkflowDependency: wfDependencies,
 	})
 	if err != nil {
 		return RenderWorkflowResult{}, fmt.Errorf("failed to render template %s: %w", templateFile, err)

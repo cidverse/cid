@@ -1,5 +1,6 @@
 {{- /*gotype: github.com/cidverse/cid/pkg/app/appgithub.WorkflowTemplateData*/ -}}
 {{- $root := . -}}
+{{- $cidDep := index $root.WorkflowDependency "cid" -}}
 {{- $checkoutAction := index $root.WorkflowDependency "actions/checkout" -}}
 {{- $downloadArtifactAction := index $root.WorkflowDependency "actions/download-artifact" -}}
 {{- $uploadArtifactAction := index $root.WorkflowDependency "actions/upload-artifact" -}}
@@ -86,7 +87,7 @@ concurrency:
 
 env:
   CID_WORKFLOW: 'main'
-  CID_VERSION: 'v{{ .Version }}'
+  CID_VERSION: 'v{{ $cidDep.Version }}'
   CID_LOGLEVEL: "{{ printf "%s" "${{ github.event.inputs.loglevel || 'info' }}" }}"
   # allowed modes are 'block' and 'audit'. Using https://github.com/step-security/harden-runner to harden the runner.
   EGRESS_POLICY: 'block'
