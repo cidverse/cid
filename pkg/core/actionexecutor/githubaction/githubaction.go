@@ -3,6 +3,7 @@ package githubaction
 import (
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/cid/pkg/core/state"
 )
 
@@ -20,6 +21,6 @@ func (e Executor) GetType() string {
 	return string(catalog.ActionTypeGitHubAction)
 }
 
-func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action) error {
+func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, step plangenerate.Step) error {
 	return nil
 }

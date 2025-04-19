@@ -23,6 +23,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/actionexecutor/api"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/config"
+	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/cid/pkg/core/restapi"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/util"
@@ -51,7 +52,7 @@ func (e Executor) GetType() string {
 	return string(catalog.ActionTypeContainer)
 }
 
-func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action) error {
+func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, step plangenerate.Step) error {
 	// api (port or socket)
 	freePort, err := network.FreePort()
 	if err != nil {
@@ -113,6 +114,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		JobID:                jobID,
 		ProjectDir:           ctx.ProjectDir,
 		Modules:              ctx.Modules,
+		Step:                 step,
 		CurrentModule:        ctx.CurrentModule,
 		CurrentAction:        catalogAction,
 		Env:                  ctx.Env,

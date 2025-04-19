@@ -96,14 +96,9 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 				return fmt.Errorf("failed to generate workflow template [%s]: %w", wfKey, wfErr)
 			}
 
-			data, wfErr := renderWorkflow(workflowTemplateData, "wf-main.gohtml", filepath.Join(taskContext.Directory, fmt.Sprintf(".github/workflows/cid-%s.yml", slug.Make(wfKey))))
+			_, wfErr = renderWorkflow(workflowTemplateData, "wf-main.gohtml", filepath.Join(taskContext.Directory, fmt.Sprintf(".github/workflows/cid-%s.yml", slug.Make(wfKey))))
 			if wfErr != nil {
 				return fmt.Errorf("failed to render workflow [%s]: %w", wfKey, wfErr)
-			}
-
-			err = appconfig.PersistPlan(data.Plan, filepath.Join(taskContext.Directory, fmt.Sprintf(".github/cid/plans/%s.json", slug.Make(wfKey))))
-			if err != nil {
-				return fmt.Errorf("failed to persist workflow plan [%s]: %w", wfKey, err)
 			}
 
 			workflowState.Workflows.Set(wfKey, workflowTemplateData)

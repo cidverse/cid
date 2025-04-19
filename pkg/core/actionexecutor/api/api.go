@@ -3,6 +3,7 @@ package api
 import (
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/cid/pkg/core/state"
 )
 
@@ -18,5 +19,5 @@ type ActionExecutor interface {
 	GetType() string
 
 	// Execute will run the action
-	Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action) error
+	Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, step plangenerate.Step) error
 }

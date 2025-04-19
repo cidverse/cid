@@ -143,6 +143,7 @@ func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
 		}
 	}
 
+	log.Debug().Int("stages", len(stages)).Msg("workflow plan finalized")
 	return Plan{
 		Name:   workflow.Name,
 		Stages: stages,
@@ -196,7 +197,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 
 			// check if the action rules match, if not check again for each environment
 			if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext) {
-				steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, "", "", executableConstraints))
+				steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, nil, "", executableConstraints))
 			} else {
 				for _, env := range context.VCSEnvironments {
 					vcsEnv := util.CloneMap(ctx.Env)
@@ -215,7 +216,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 					envRuleContext := rules.GetProjectRuleContext(vcsEnv, ctx.Modules)
 					envRuleContext["CID_WORKFLOW_TYPE"] = workflowType
 					if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), envRuleContext) {
-						steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, "", env.Env.Name, executableConstraints))
+						steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, nil, env.Env.Name, executableConstraints))
 					} else {
 						log.Debug().Str("action", action.ID).Str("environment", env.Env.Name).Msg("action skipped by environment filter")
 					}
@@ -229,7 +230,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 
 				// check if the action rules match, if not check again for each environment
 				if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext) {
-					steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, moduleRef.ID, "", executableConstraints))
+					steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, &moduleRef, "", executableConstraints))
 				} else {
 					for _, env := range context.VCSEnvironments {
 						vcsEnv := util.CloneMap(ctx.Env)
@@ -248,7 +249,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 						envRuleContext := rules.GetModuleRuleContext(vcsEnv, &moduleRef)
 						envRuleContext["CID_WORKFLOW_TYPE"] = workflowType
 						if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), envRuleContext) {
-							steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, moduleRef.ID, env.Env.Name, executableConstraints))
+							steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, &moduleRef, env.Env.Name, executableConstraints))
 						} else {
 							log.Debug().Str("action", action.ID).Str("environment", env.Env.Name).Msg("action skipped by environment filter")
 						}
@@ -267,10 +268,12 @@ func assignStepDependencies(steps []Step, context PlanContext) []Step {
 	actionInstances := make(map[string][]string)   // Track instances of each action
 	artifactProducers := make(map[string][]string) // Track artifact producers
 	stepsByStage := make(map[string][]string)      // Track steps by stage
+	stepSlugToName := make(map[string]string)      // Map step slugs to names
 
 	// track action instances and artifact producers
 	for _, step := range steps {
 		stepsByStage[step.Stage] = append(stepsByStage[step.Stage], step.Slug)
+		stepSlugToName[step.Slug] = step.Name
 
 		catalogAction := ptr.Value(context.Registry.FindAction(step.Action))
 		actionInstances[step.Action] = append(actionInstances[step.Action], step.Slug)
@@ -319,10 +322,24 @@ func assignStepDependencies(steps []Step, context PlanContext) []Step {
 		}
 
 		steps[i].RunAfter = util.CompactAndSort(dependencies)
+		steps[i].RunAfterByName = slicesReplaceByLookup(steps[i].RunAfter, stepSlugToName)
 		steps[i].UsesOutputOf = util.CompactAndSort(usesOutputOf)
+		steps[i].UsesOutputOfByName = slicesReplaceByLookup(steps[i].UsesOutputOf, stepSlugToName)
 	}
 
 	return steps
+}
+
+func slicesReplaceByLookup(slice []string, lookup map[string]string) []string {
+	result := make([]string, len(slice))
+	copy(result, slice)
+
+	for i, v := range result {
+		if replacement, ok := lookup[v]; ok {
+			result[i] = replacement
+		}
+	}
+	return result
 }
 
 func shouldEnforceStageOrdering(stage string) bool {

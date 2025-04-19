@@ -113,8 +113,7 @@ func (hc *APIConfig) artifactDownload(c echo.Context) error {
 		})
 	}
 
-	artifactFile := path.Join(hc.ArtifactDir, artifact.Module, artifact.Type, artifact.Name)
-	return c.File(artifactFile)
+	return c.File(artifact.Path)
 }
 
 // storeArtifact stores an artifact on the local filesystem
@@ -123,7 +122,7 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 	contentReader := io.TeeReader(content, &hashReader)
 
 	// target dir
-	targetDir := path.Join(hc.ArtifactDir, moduleSlug, fileType)
+	targetDir := path.Join(hc.ArtifactDir, hc.Step.Slug, fileType)
 	targetFile := path.Join(targetDir, name)
 	_ = os.MkdirAll(targetDir, os.ModePerm)
 
@@ -148,10 +147,12 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 	hc.State.Artifacts[fmt.Sprintf("%s|%s|%s", moduleSlug, fileType, name)] = state.ActionArtifact{
 		BuildID:       hc.BuildID,
 		JobID:         hc.JobID,
+		StepSlug:      hc.Step.Slug,
 		ArtifactID:    fmt.Sprintf("%s|%s|%s", moduleSlug, fileType, name),
 		Module:        moduleSlug,
 		Type:          fileType,
 		Name:          name,
+		Path:          targetFile,
 		Format:        format,
 		FormatVersion: formatVersion,
 		SHA256:        fileHash,

@@ -142,7 +142,7 @@ jobs:
         uses: {{ $downloadArtifactAction.Id }}@{{ $downloadArtifactAction.Hash }} # {{ $downloadArtifactAction.Version }}
         with:
           name: "{{ $prevStepSlug }}-{{ printf "%s" "${{ github.run_id }}" }}"
-          path: .dist
+          path: ".dist/{{ $prevStepSlug }}"
         continue-on-error: true
       {{- end }}
       {{- end }}
@@ -164,7 +164,7 @@ jobs:
         uses: {{ $uploadArtifactAction.Id }}@{{ $uploadArtifactAction.Hash }} # {{ $uploadArtifactAction.Version }}
         with:
           name: "{{ $step.Slug }}-{{ printf "%s" "${{ github.run_id }}" }}"
-          path: .dist/
+          path: ".dist/{{ $step.Slug }}/"
           retention-days: 1
           if-no-files-found: ignore
           compression-level: 6

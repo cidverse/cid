@@ -52,8 +52,8 @@ stages:
 "{{ $wf.NameSlug }}/{{ $step.Name }}":
     <<: *default_job
     stage: {{ $step.Stage }}
-    needs: [{{- range $index, $elem := $step.RunAfter }}{{ if $index }}, {{ end }}"{{ $wf.NameSlug }}/{{ $elem }}"{{ end -}}]
-    dependencies: [{{- range $index, $elem := $step.UsesOutputOf }}{{ if $index }}, {{ end }}"{{ $wf.NameSlug }}/{{ $elem }}"{{ end -}}]
+    needs: [{{- range $index, $elem := $step.RunAfterByName }}{{ if $index }}, {{ end }}"{{ $wf.NameSlug }}/{{ $elem }}"{{ end -}}]
+    dependencies: [{{- range $index, $elem := $step.UsesOutputOfByName }}{{ if $index }}, {{ end }}"{{ $wf.NameSlug }}/{{ $elem }}"{{ end -}}]
     {{- if $step.Environment }}
     environment:
       name: {{ $step.Environment}}
@@ -84,7 +84,7 @@ stages:
     artifacts:
       name: "{{ $wf.NameSlug }}/{{ $step.Name }}"
       paths:
-        - .dist/
+        - .dist/{{ $step.Slug }}/
       expire_in: 1 day
 {{- end }}
 {{- end }}

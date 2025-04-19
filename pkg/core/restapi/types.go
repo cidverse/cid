@@ -3,6 +3,7 @@ package restapi
 import (
 	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
@@ -12,6 +13,7 @@ type APIConfig struct {
 	JobID                string
 	ProjectDir           string
 	Modules              []*analyzerapi.ProjectModule
+	Step                 plangenerate.Step
 	CurrentModule        *analyzerapi.ProjectModule
 	CurrentAction        *catalog.Action
 	Env                  map[string]string

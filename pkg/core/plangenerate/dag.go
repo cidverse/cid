@@ -1,6 +1,8 @@
 package plangenerate
 
 import (
+	"fmt"
+
 	"github.com/heimdalr/dag"
 	"github.com/rs/zerolog/log"
 )
@@ -13,20 +15,25 @@ func SortSteps(steps []Step) ([]Step, error) {
 
 	// add vertices
 	for _, step := range steps {
-		err := d.AddVertexByID(step.ID, step.Name)
+		err := d.AddVertexByID(step.ID, step.Slug)
 		if err != nil {
 			return nil, err
 		}
 
-		log.Trace().Str("step", step.Name).Str("id", step.ID).Msg("adding step to dag")
+		log.Trace().Str("step", step.Slug).Str("id", step.ID).Msg("adding step to dag")
 		stepMap[step.ID] = step
-		vertexIds[step.Name] = step.ID
+		vertexIds[step.Slug] = step.ID
 	}
 
 	// add edges
 	for _, step := range steps {
 		for _, dep := range step.RunAfter {
-			log.Trace().Str("from", vertexIds[dep]).Str("from_name", dep).Str("to", step.ID).Str("to_name", step.Name).Msg("adding dep for step")
+			fromID, ok := vertexIds[dep]
+			if !ok {
+				return nil, fmt.Errorf("dependency %q not found in vertexIds", dep)
+			}
+
+			log.Trace().Str("from", fromID).Str("from_name", dep).Str("to", step.ID).Str("to_name", step.Slug).Msg("adding dep for step")
 			if err := d.AddEdge(vertexIds[dep], step.ID); err != nil {
 				return nil, err
 			}

@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/cidverse/cid/pkg/common/api"
@@ -139,7 +138,7 @@ func RunAction(actionContext api.ActionExecutionContext, catalogAction *catalog.
 	// execute
 	actionExecutor := actionexecutor.FindExecutorByType(string(catalogAction.Type))
 	if actionExecutor != nil {
-		err := actionExecutor.Execute(&actionContext, &localState, catalogAction)
+		err := actionExecutor.Execute(&actionContext, &localState, catalogAction, step)
 		if err != nil {
 			// TODO: handle error
 			log.Fatal().Err(err).Str("action", step.Name).Str("duration", time.Since(start).String()).Str("module", currentModule).Msg("action error")
@@ -150,11 +149,12 @@ func RunAction(actionContext api.ActionExecutionContext, catalogAction *catalog.
 	}
 
 	// state: store
-	stateFile := filepath.Join(actionContext.Paths.Artifact, "state.json")
-	if !strings.HasPrefix(actionContext.Env["NCI_SERVICE_SLUG"], "local") {
-		stateFile = filepath.Join(actionContext.Paths.Artifact, fmt.Sprintf("state-%s.json", actionContext.Env["NCI_PIPELINE_JOB_ID"]))
+	stateFile := filepath.Join(actionContext.Paths.Artifact, step.Slug, "state.json")
+	err := state.WriteStateFile(stateFile, localState)
+	if err != nil {
+		log.Error().Err(err).Str("action", step.Name).Str("duration", time.Since(start).String()).Str("module", currentModule).Msg("failed to write state file")
+		os.Exit(1)
 	}
-	state.PersistStateToFile(stateFile, localState)
 
 	// complete
 	log.Info().Str("action", step.Name).Str("duration", time.Since(start).String()).Str("module", currentModule).Msg("action completed")

@@ -12,6 +12,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/actionexecutor"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/cidverse/repoanalyzer/analyzer"
@@ -110,7 +111,7 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		// execute
 		actionExecutor := actionexecutor.FindExecutorByType(string(catalogAction.Type))
 		if actionExecutor != nil {
-			err := actionExecutor.Execute(ctx, &localState, catalogAction)
+			err := actionExecutor.Execute(ctx, &localState, catalogAction, plangenerate.Step{})
 			if err != nil {
 				slog.With("err", err).With("action", action.ID).Error("action execution failed")
 				os.Exit(1)
@@ -125,7 +126,11 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		if !strings.HasPrefix(ctx.Env["NCI_SERVICE_SLUG"], "local") {
 			stateFile = filepath.Join(ctx.Paths.Artifact, fmt.Sprintf("state-%s.json", ctx.Env["NCI_PIPELINE_JOB_ID"]))
 		}
-		state.PersistStateToFile(stateFile, localState)
+		err := state.WriteStateFile(stateFile, localState)
+		if err != nil {
+			slog.With("action", action.ID).With("module", currentModule).Error("failed to write state file")
+			os.Exit(1)
+		}
 
 		// complete
 		log.Info().Str("action", action.ID).Str("duration", time.Since(start).String()).Str("module", currentModule).Msg("action completed")
