@@ -12,6 +12,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/util"
+	"github.com/cidverse/cidverseutils/redact"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 )
@@ -77,7 +78,7 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 				"binary":  selectedCandidate.GetName(),
 				"version": selectedCandidate.GetVersion(),
 				"uri":     selectedCandidate.GetUri(),
-				"command": replaceCommandPlaceholders(req.Command, hc.ActionEnv),
+				"command": redact.Redact(replaceCommandPlaceholders(req.Command, hc.ActionEnv)),
 			},
 		})
 	}

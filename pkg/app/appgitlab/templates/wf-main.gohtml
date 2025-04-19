@@ -33,7 +33,6 @@ stages:
 {{- end }}
 
 # configuration snippets
-
 .default-job: &default_job
   allow_failure: false
   interruptible: true
@@ -54,6 +53,7 @@ stages:
     <<: *default_job
     stage: {{ $step.Stage }}
     needs: [{{- range $index, $elem := $step.RunAfter }}{{ if $index }}, {{ end }}"{{ $wf.NameSlug }}/{{ $elem }}"{{ end -}}]
+    dependencies: [{{- range $index, $elem := $step.UsesOutputOf }}{{ if $index }}, {{ end }}"{{ $wf.NameSlug }}/{{ $elem }}"{{ end -}}]
     {{- if $step.Environment }}
     environment:
       name: {{ $step.Environment}}
@@ -66,7 +66,7 @@ stages:
         when: always
         {{- end }}
         {{- range $tag := $wf.WorkflowConfig.TriggerPushTags }}
-      - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TAG == "{{ $tag }}"'
+      - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TAG =~ /^{{ $tag }}$/'
         when: always
         {{- end }}
       {{- end }}
@@ -81,5 +81,10 @@ stages:
       - when: never
     script:
         - cid --log-level=${CID_LOGLEVEL:-info} plan execute --state-wf-name "{{ $wf.WorkflowKey }}" --step "{{ $step.Slug }}"
+    artifacts:
+      name: "{{ $wf.NameSlug }}/{{ $step.Name }}"
+      paths:
+        - .dist/
+      expire_in: 1 day
 {{- end }}
 {{- end }}

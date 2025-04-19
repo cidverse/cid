@@ -64,7 +64,7 @@ func DefaultWorkflowConfig(defaultBranch string) *orderedmap.OrderedMap[string, 
 		Type:               "release",
 		TriggerManual:      true,
 		TriggerPush:        true,
-		TriggerPushTags:    []string{"v*.*.*"},
+		TriggerPushTags:    []string{"v[0-9]+.[0-9]+.[0-9]+"}, // try to use patterns that are compatible with regex (gitlab) and glob (github)
 		EnvironmentPattern: "release-.*",
 	})
 	workflowMap.Set("Pull Request", WorkflowConfig{
