@@ -5,6 +5,7 @@ import (
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,7 +24,7 @@ func (e mockExecutor) GetType() string {
 	return "mock"
 }
 
-func (e mockExecutor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action) error {
+func (e mockExecutor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, step plangenerate.Step) error {
 	return nil
 }
 
@@ -32,5 +33,5 @@ func TestActionExecutor(t *testing.T) {
 	assert.Equal(t, "MockExecutor", executor.GetName())
 	assert.Equal(t, "1.0", executor.GetVersion())
 	assert.Equal(t, "mock", executor.GetType())
-	assert.Nil(t, executor.Execute(nil, nil, nil))
+	assert.Nil(t, executor.Execute(nil, nil, nil, plangenerate.Step{}))
 }

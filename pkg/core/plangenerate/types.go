@@ -49,6 +49,16 @@ type Step struct {
 	Config             interface{}          `json:"config,omitempty"`
 }
 
+func (s *Step) HasOutputWithTypeAndFormat(artifactType string, artifactFormat string) bool {
+	for _, artifact := range s.Outputs.Artifacts {
+		if artifact.Type == artifactType && artifact.Format == artifactFormat {
+			return true
+		}
+	}
+
+	return false
+}
+
 func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id int, name string, moduleRef *analyzerapi.ProjectModule, environment string, executableConstraints []catalog.ActionAccessExecutable) Step {
 	moduleName := ""
 	if moduleRef != nil {
