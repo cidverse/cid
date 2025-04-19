@@ -276,9 +276,7 @@ func assignStepDependencies(steps []Step, context PlanContext) []Step {
 		actionInstances[step.Action] = append(actionInstances[step.Action], step.Slug)
 
 		for _, artifact := range catalogAction.Metadata.Output.Artifacts {
-			if catalogAction.Metadata.Scope == catalog.ActionScopeProject {
-				artifactProducers[artifact.Key()] = append(artifactProducers[artifact.Key()], step.Slug)
-			}
+			artifactProducers[artifact.Key()] = append(artifactProducers[artifact.Key()], step.Slug)
 		}
 	}
 
@@ -320,8 +318,8 @@ func assignStepDependencies(steps []Step, context PlanContext) []Step {
 			}
 		}
 
-		steps[i].RunAfter = dependencies
-		steps[i].UsesOutputOf = usesOutputOf
+		steps[i].RunAfter = util.CompactAndSort(dependencies)
+		steps[i].UsesOutputOf = util.CompactAndSort(usesOutputOf)
 	}
 
 	return steps
