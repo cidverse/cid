@@ -75,7 +75,7 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 	defer src.Close()
 
 	// store
-	fileHash, err := hc.storeArtifact(moduleSlug, fileType, format, formatVersion, file.Filename, src, extractFileBool)
+	_, fileHash, err := hc.storeArtifact(moduleSlug, fileType, format, formatVersion, file.Filename, src, extractFileBool)
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 			return provErr
 		}
 
-		_, err = hc.storeArtifact(moduleSlug, "attestation", "provenance", v1.PredicateSLSAProvenance, file.Filename, bytes.NewReader(provJSON), false)
+		_, _, err = hc.storeArtifact(moduleSlug, "attestation", "provenance", v1.PredicateSLSAProvenance, file.Filename, bytes.NewReader(provJSON), false)
 		if err != nil {
 			return err
 		}
@@ -118,7 +118,7 @@ func (hc *APIConfig) artifactDownload(c echo.Context) error {
 }
 
 // storeArtifact stores an artifact on the local filesystem
-func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format string, formatVersion string, name string, content io.Reader, extract bool) (string, error) {
+func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format string, formatVersion string, name string, content io.Reader, extract bool) (string, string, error) {
 	var hashReader bytes.Buffer
 	contentReader := io.TeeReader(content, &hashReader)
 
@@ -130,17 +130,17 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 	// store file
 	dst, err := os.Create(targetFile)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	defer dst.Close()
 	if _, err = io.Copy(dst, contentReader); err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	// sha256 hash
 	fileHash, err := hash.SHA256Hash(&hashReader)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	// store into state
@@ -166,15 +166,15 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 		if format == "tar" {
 			err = compress.TARExtract(targetFile, extractTargetDir)
 			if err != nil {
-				return "", err
+				return "", "", err
 			}
 		} else if format == "zip" {
 			err = compress.ZIPExtract(targetFile, extractTargetDir)
 			if err != nil {
-				return "", err
+				return "", "", err
 			}
 		}
 	}
 
-	return fileHash, nil
+	return targetFile, fileHash, nil
 }
