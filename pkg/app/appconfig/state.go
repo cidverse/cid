@@ -37,8 +37,14 @@ func (w *WorkflowState) Hash() (string, error) {
 func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 	var changes []ChangeEntry
 
+	// w can be null, if this is the initial run for a project
+	prevWorkflows := w.Workflows
+	if prevWorkflows == nil {
+		prevWorkflows = orderedmap.New[string, WorkflowData]()
+	}
+
 	// detect removed workflows
-	for pair := w.Workflows.Oldest(); pair != nil; pair = pair.Prev() {
+	for pair := prevWorkflows.Oldest(); pair != nil; pair = pair.Prev() {
 		key := pair.Key
 		if _, exists := other.Workflows.Get(key); !exists {
 			changes = append(changes, ChangeEntry{Workflow: key, Scope: "workflow", Message: fmt.Sprintf("removed workflow [%s]", key)})
@@ -49,7 +55,7 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 	for pair := other.Workflows.Oldest(); pair != nil; pair = pair.Next() {
 		key := pair.Key
 		newWf := pair.Value
-		oldWf, exists := w.Workflows.Get(key)
+		oldWf, exists := prevWorkflows.Get(key)
 
 		if !exists {
 			changes = append(changes, ChangeEntry{Workflow: key, Scope: "workflow", Message: fmt.Sprintf("added workflow [%s]", key)})

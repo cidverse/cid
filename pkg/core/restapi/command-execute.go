@@ -2,8 +2,10 @@ package restapi
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"os/exec"
+	"slices"
 	"strings"
 	"time"
 
@@ -51,6 +53,27 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 		}
 	}
 
+	// constraints
+	cmdBinary := strings.Split(req.Command, " ")[0]
+	var allowedExecutables []string
+	constraints := make(map[string]string)
+	for _, e := range hc.Step.Access.Executables {
+		allowedExecutables = append(allowedExecutables, e.Name)
+		if e.Constraint != "" {
+			constraints[e.Name] = e.Constraint
+		} else {
+			constraints[e.Name] = executable.AnyVersionConstraint
+		}
+	}
+
+	if !slices.Contains(allowedExecutables, cmdBinary) {
+		return c.JSON(http.StatusBadRequest, apiError{
+			Status:  400,
+			Title:   "bad request",
+			Details: fmt.Sprintf("command [%s] by [%s] not allowed", cmdBinary, hc.Step.Slug),
+		})
+	}
+
 	// execute
 	exitCode := 0
 	var errorMessage = ""
@@ -65,7 +88,7 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 		CaptureOutput:          req.CaptureOutput,
 		Ports:                  req.Ports,
 		UserProvidedConstraint: req.Constraint,
-		Constraints:            config.Current.Dependencies,
+		Constraints:            constraints,
 		Stdin:                  nil,
 	})
 	var exitErr *exec.ExitError

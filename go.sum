@@ -50,8 +50,8 @@ github.com/cidverse/cidverseutils/network v0.1.0 h1:8AL6asRt7V1VOe/4hvrZ0UBxtIE6
 github.com/cidverse/cidverseutils/network v0.1.0/go.mod h1:LYPCE5T+fLI5LdZXwFWkVWnxheR1ppPpmxKtXKBqKsw=
 github.com/cidverse/cidverseutils/redact v0.1.0 h1:+6AshqcT9iZiTxB/zgxsn27BkLdUxyjnjf+x5INhWOQ=
 github.com/cidverse/cidverseutils/redact v0.1.0/go.mod h1:vmnvyZGgLGgrx0H0uzrm99qPtQWOziYlJ9Qmx0txHBo=
-github.com/cidverse/cidverseutils/version v0.1.0 h1:+t9AaSW+++38SnlzF4x12E7oAdvXFw6HY7ujwBN7HCA=
-github.com/cidverse/cidverseutils/version v0.1.0/go.mod h1:PbRN1pUYDBOT5uZXmOlQBCIoNJm6ubHJsg6Thgaq0TU=
+github.com/cidverse/cidverseutils/version v0.1.1-0.20250420190557-91249a22dcfe h1:SQ2cObJj3i2ouZqQpMwH0RbtbvN74aKwcHKngG6zomI=
+github.com/cidverse/cidverseutils/version v0.1.1-0.20250420190557-91249a22dcfe/go.mod h1:8go8YXJTFNg36/otHM5ai2zOo+9EyS2S5mbdggGKK88=
 github.com/cidverse/cidverseutils/zerologconfig v0.1.2-0.20250329161944-cee6e2f5f53c h1:2uzINHpS2hQPhQf7YGJxihkGH6EPrABXGEZ8leCsBkA=
 github.com/cidverse/cidverseutils/zerologconfig v0.1.2-0.20250329161944-cee6e2f5f53c/go.mod h1:I/h+gJTYpeik0i0ElSOSzWLvbxGtfq2yjeZyEqClhB0=
 github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf h1:/DLETx+e0J8mWZyOOK8dAOMrdHUpJo8KQRuMt1IymtE=

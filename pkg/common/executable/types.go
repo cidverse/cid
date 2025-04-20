@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-const AnyVersionConstraint = ">= 0.0.0"
+const AnyVersionConstraint = ">= 0.0.0-0"
 
 type PreferVersion string
 

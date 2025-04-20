@@ -14,7 +14,7 @@ const (
 	ExecutionExec      CandidateType = "exec"
 	ExecutionContainer CandidateType = "container"
 	ExecutionNixStore  CandidateType = "nix-store"
-	ExecutionNixShell CandidateType = "nix-shell"
+	ExecutionNixShell  CandidateType = "nix-shell"
 )
 
 type RunParameters struct {
