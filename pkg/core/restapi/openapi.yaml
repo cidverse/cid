@@ -904,7 +904,15 @@ components:
             example: ">= 1.0.0, < 2.0.0"
         capture_output:
           type: boolean
-          description: capture and return the output (stdout and stderr will be passed thru if not set)
+          description: capture and return the output
+          default: false
+        hide_stdout:
+          type: boolean
+          description: hide stdout (unrelated to capture-output)
+          default: false
+        hide_stderr:
+          type: boolean
+          description: hide stderr (unrelated to capture-output)
           default: false
         work_dir:
           type: string

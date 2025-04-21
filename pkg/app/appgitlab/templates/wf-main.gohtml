@@ -86,10 +86,13 @@ stages:
       paths:
         - .dist/{{ $step.Slug }}/
       expire_in: 1 day
-      {{- if $step.HasOutputWithTypeAndFormat "report" "gl-codequality" }}
+      {{- if or ($step.HasOutputWithTypeAndFormat "report" "gl-codequality") ($step.HasOutputWithTypeAndFormat "report" "junit") }}
       reports:
         {{- if $step.HasOutputWithTypeAndFormat "report" "gl-codequality" }}
-        codequality: .dist/{{ $step.Slug }}/report/gl-code-quality-report.json
+        codequality: .dist/{{ $step.Slug }}/report/gl-codequality/gl-code-quality-report.json
+        {{- end }}
+        {{- if $step.HasOutputWithTypeAndFormat "report" "junit" }}
+        junit: .dist/{{ $step.Slug }}/report/junit/TEST-*.xml
         {{- end }}
       {{- end }}
 {{- end }}

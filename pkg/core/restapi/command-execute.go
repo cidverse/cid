@@ -3,6 +3,7 @@ package restapi
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os/exec"
 	"slices"
@@ -20,12 +21,14 @@ import (
 )
 
 type executeRequest struct {
-	WorkDir       string            `json:"work_dir"`
-	Command       string            `json:"command"`
-	CaptureOutput bool              `json:"capture_output"`
-	Env           map[string]string `json:"env"`
-	Ports         []int             `json:"ports"`
-	Constraint    string            `json:"constraint"`
+	WorkDir            string            `json:"work_dir"`
+	Command            string            `json:"command"`
+	CaptureOutput      bool              `json:"capture_output"`
+	HideStandardOutput bool              `json:"hide_stdout"`
+	HideStandardError  bool              `json:"hide_stderr"`
+	Env                map[string]string `json:"env"`
+	Ports              []int             `json:"ports"`
+	Constraint         string            `json:"constraint"`
 }
 
 // commandExecute runs a command in the project directory (blocking until the command exits, returns the response code)
@@ -67,6 +70,7 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 	}
 
 	if !slices.Contains(allowedExecutables, cmdBinary) {
+		slog.With("command", cmdBinary).With("allowed_commands", allowedExecutables).With("step", hc.Step.Slug).Error("[API] command not allowed by step")
 		return c.JSON(http.StatusBadRequest, apiError{
 			Status:  400,
 			Title:   "bad request",
@@ -86,6 +90,8 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 		WorkDir:                execDir,
 		TempDir:                hc.TempDir,
 		CaptureOutput:          req.CaptureOutput,
+		HideStandardOutput:     req.HideStandardOutput,
+		HideStandardError:      req.HideStandardError,
 		Ports:                  req.Ports,
 		UserProvidedConstraint: req.Constraint,
 		Constraints:            constraints,

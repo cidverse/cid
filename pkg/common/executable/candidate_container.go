@@ -41,16 +41,14 @@ func (c ContainerCandidate) GetUri() string {
 func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 	log.Debug().Msgf("Running ContainerCandidate %s with args %v", c.Image, opts.Args)
 
-	var stdoutWriter io.Writer
-	var stderrWriter io.Writer
-	var stdoutBuffer bytes.Buffer
-	var stderrBuffer bytes.Buffer
-	if opts.CaptureOutput {
-		stdoutWriter = redact.NewProtectedWriter(nil, &stdoutBuffer, &sync.Mutex{}, nil)
-		stderrWriter = redact.NewProtectedWriter(nil, &stderrBuffer, &sync.Mutex{}, nil)
-	} else {
-		stdoutWriter = redact.NewProtectedWriter(os.Stdout, nil, &sync.Mutex{}, nil)
-		stderrWriter = redact.NewProtectedWriter(os.Stderr, nil, &sync.Mutex{}, nil)
+	var stdoutBuffer, stderrBuffer bytes.Buffer
+	var stdoutWriter = io.MultiWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), &stdoutBuffer)
+	var stderrWriter = io.MultiWriter(redact.NewProtectedWriter(nil, os.Stderr, &sync.Mutex{}, nil), &stderrBuffer)
+	if opts.HideStdOut {
+		stdoutWriter = &stdoutBuffer
+	}
+	if opts.HideStdErr {
+		stderrWriter = &stderrBuffer
 	}
 
 	// overwrite binary for alias use-case

@@ -7,9 +7,11 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"sync"
 
 	"github.com/cidverse/cid/pkg/common/shellcommand"
 	"github.com/cidverse/cid/pkg/util"
+	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
 )
 
@@ -31,13 +33,13 @@ func (c NixShellCandidate) Run(opts RunParameters) (string, string, error) {
 	log.Debug().Msgf("Running NixShellCandidate %s %s with args %v", c.Package, c.PackageVersion, opts.Args)
 
 	var stdoutBuffer, stderrBuffer bytes.Buffer
-	var stdoutWriter, stderrWriter io.Writer
-	if opts.CaptureOutput {
+	var stdoutWriter = io.MultiWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), &stdoutBuffer)
+	var stderrWriter = io.MultiWriter(redact.NewProtectedWriter(nil, os.Stderr, &sync.Mutex{}, nil), &stderrBuffer)
+	if opts.HideStdOut {
 		stdoutWriter = &stdoutBuffer
+	}
+	if opts.HideStdErr {
 		stderrWriter = &stderrBuffer
-	} else {
-		stdoutWriter = io.MultiWriter(os.Stdout, &stdoutBuffer)
-		stderrWriter = io.MultiWriter(os.Stderr, &stderrBuffer)
 	}
 
 	var nixShellArgs = []string{"nix-shell"}

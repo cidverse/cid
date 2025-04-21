@@ -123,6 +123,9 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 
 	// target dir
 	targetDir := path.Join(hc.ArtifactDir, hc.Step.Slug, fileType)
+	if format != "" {
+		targetDir = path.Join(targetDir, format)
+	}
 	targetFile := path.Join(targetDir, name)
 	_ = os.MkdirAll(targetDir, os.ModePerm)
 

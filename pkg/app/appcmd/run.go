@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/app/appgithub"
@@ -23,6 +24,7 @@ func RunCmd() *cobra.Command {
 		GroupID: "vcsapp",
 		Run: func(cmd *cobra.Command, args []string) {
 			channel, _ := cmd.Flags().GetString("channel")
+			expr, _ := cmd.Flags().GetString("expr")
 
 			// platform
 			platform, err := vcsapp.GetPlatformFromEnvironment()
@@ -43,6 +45,14 @@ func RunCmd() *cobra.Command {
 
 			// execute task for each repository
 			for _, repo := range repos {
+				if expr != "" {
+					e := regexp.MustCompile(expr)
+					if !e.Match([]byte(repo.Name)) {
+						slog.With("repository", fmt.Sprintf("%s/%s", repo.Namespace, repo.Name)).Debug("Skipping repository due to regex mismatch")
+						continue
+					}
+				}
+
 				err = processRepository(platform, repo, channel)
 				if err != nil {
 					slog.With("repository", fmt.Sprintf("%s/%s", repo.Namespace, repo.Name)).With("err", err).Warn("Failed to process repository")
@@ -52,6 +62,7 @@ func RunCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringP("channel", "c", "", "Channel")
+	cmd.Flags().StringP("expr", "e", "", "Regex expression to filter repositories")
 
 	return cmd
 }

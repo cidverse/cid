@@ -23,6 +23,8 @@ type Opts struct {
 	WorkDir                string
 	TempDir                string
 	CaptureOutput          bool
+	HideStandardOutput     bool
+	HideStandardError      bool
 	Ports                  []int
 	UserProvidedConstraint string
 	Constraints            map[string]string
@@ -74,6 +76,8 @@ func Execute(opts Opts) (stdout string, stderr string, cand executable.Executabl
 		WorkDir:       opts.WorkDir,
 		TempDir:       opts.TempDir,
 		CaptureOutput: opts.CaptureOutput,
+		HideStdOut:    opts.HideStandardOutput,
+		HideStdErr:    opts.HideStandardError,
 	})
 	if err != nil {
 		return stdout, stderr, cand, err

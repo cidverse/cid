@@ -29,6 +29,8 @@ type RunParameters struct {
 	Stdout        io.Writer
 	Stderr        io.Writer
 	CaptureOutput bool
+	HideStdOut    bool
+	HideStdErr    bool
 }
 
 type Executable interface {
