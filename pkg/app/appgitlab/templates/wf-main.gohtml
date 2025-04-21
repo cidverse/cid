@@ -86,13 +86,27 @@ stages:
       paths:
         - .dist/{{ $step.Slug }}/
       expire_in: 1 day
-      {{- if or ($step.HasOutputWithTypeAndFormat "report" "gl-codequality") ($step.HasOutputWithTypeAndFormat "report" "junit") }}
+      {{- if or
+        ($step.HasOutputWithTypeAndFormat "report" "gl-codequality")
+        ($step.HasOutputWithTypeAndFormat "report" "junit")
+        ($step.HasOutputWithTypeAndFormat "report" "jacoco")
+        ($step.HasOutputWithTypeAndFormat "report" "cobertura")
+      }}
       reports:
         {{- if $step.HasOutputWithTypeAndFormat "report" "gl-codequality" }}
-        codequality: .dist/{{ $step.Slug }}/report/gl-codequality/gl-code-quality-report.json
+        codequality: .dist/{{ $step.Slug }}/report/gl-codequality/*.json
         {{- end }}
         {{- if $step.HasOutputWithTypeAndFormat "report" "junit" }}
-        junit: .dist/{{ $step.Slug }}/report/junit/TEST-*.xml
+        junit: .dist/{{ $step.Slug }}/report/junit/*.xml
+        {{- end }}
+        {{- if $step.HasOutputWithTypeAndFormat "report" "jacoco" }}
+        coverage_report:
+          coverage_format: jacoco
+          path: .dist/{{ $step.Slug }}/report/jacoco/*.xml
+        {{- else if $step.HasOutputWithTypeAndFormat "report" "cobertura" }}
+        coverage_report:
+          coverage_format: cobertura
+          path: .dist/{{ $step.Slug }}/report/cobertura/*.xml
         {{- end }}
       {{- end }}
 {{- end }}
