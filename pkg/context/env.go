@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/core/config"
-	"github.com/cidverse/cid/pkg/core/secret"
+	"github.com/cidverse/cid/pkg/lib/secret"
 	"github.com/cidverse/normalizeci/pkg/envstruct"
 	"github.com/cidverse/normalizeci/pkg/normalizer"
 	"github.com/cidverse/normalizeci/pkg/normalizer/api"

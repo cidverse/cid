@@ -390,21 +390,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-                  description: File (if multiple files should be archived)
-                type:
-                  type: string
-                  description: Artifact Type (binary, report)
-                format:
-                  type: string
-                  description: Content Format (Sarif, Syft SBOM, ...)
-                format_version:
-                  type: string
-                  description: Content Format Version
+              $ref: '#/components/schemas/ArtifactUploadBody'
       responses:
         201:
           description: Null response
@@ -685,40 +671,56 @@ components:
       items:
         $ref: '#/components/schemas/Artifact'
     Artifact:
-        type: object
-        properties:
-          build_id:
-            type: string
-            description: build id
-            example: 1234
-          job_id:
-            type: string
-            description: job id
-            example: 1234
-          id:
-            type: string
-            description: artifact id
-            example: 1234
-          module:
-            type: string
-            description: module slug
-            example: root
-          type:
-            type: string
-            description: artifact type
-            example: binary
-          name:
-            type: string
-            description: artifact name
-            example: report.sarif
-          format:
-            type: string
-            description: artifact format
-            example: sarif
-          format_version:
-            type: string
-            description: artifact format version
-            example: 2.1.0
+      type: object
+      properties:
+        build_id:
+          type: string
+          description: build id
+          example: 1234
+        job_id:
+          type: string
+          description: job id
+          example: 1234
+        id:
+          type: string
+          description: artifact id
+          example: 1234
+        module:
+          type: string
+          description: module slug
+          example: root
+        type:
+          type: string
+          description: artifact type
+          example: binary
+        name:
+          type: string
+          description: artifact name
+          example: report.sarif
+        format:
+          type: string
+          description: artifact format
+          example: sarif
+        format_version:
+          type: string
+          description: artifact format version
+          example: 2.1.0
+    ArtifactUploadBody:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: File (if multiple files should be archived)
+        type:
+          type: string
+          description: Artifact Type (binary, report)
+        format:
+          type: string
+          description: Content Format (Sarif, Syft SBOM, ...)
+        format_version:
+          type: string
+          description: Content Format Version
     # vcs
     VCSCommitList:
       type: array
@@ -896,7 +898,6 @@ components:
         command:
           type: string
           description: command
-          required: true
           example: npm install
         constraint:
             type: string
@@ -929,6 +930,8 @@ components:
           items:
             type: integer
             format: int32
+      required:
+        - command
     ExecuteCommandResult:
       type: object
       properties:

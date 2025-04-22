@@ -16,8 +16,8 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/state"
-	"github.com/cidverse/cid/pkg/lib/cobertura"
-	"github.com/cidverse/cid/pkg/lib/jacoco"
+	"github.com/cidverse/cid/pkg/lib/formats/cobertura"
+	"github.com/cidverse/cid/pkg/lib/formats/jacoco"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/compress"
 	"github.com/cidverse/cidverseutils/hash"

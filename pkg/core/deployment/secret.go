@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cidverse/cid/pkg/core/secret"
+	"github.com/cidverse/cid/pkg/lib/secret"
 )
 
 type DecodeSecretsConfig struct {
