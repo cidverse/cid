@@ -16,6 +16,8 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/state"
+	"github.com/cidverse/cid/pkg/lib/cobertura"
+	"github.com/cidverse/cid/pkg/lib/jacoco"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/compress"
 	"github.com/cidverse/cidverseutils/hash"
@@ -75,7 +77,7 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 	defer src.Close()
 
 	// store
-	_, fileHash, err := hc.storeArtifact(moduleSlug, fileType, format, formatVersion, file.Filename, src, extractFileBool)
+	targetFile, fileHash, err := hc.storeArtifact(moduleSlug, fileType, format, formatVersion, file.Filename, src, extractFileBool)
 	if err != nil {
 		return err
 	}
@@ -94,6 +96,12 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	// post-process artifacts
+	err = postProcessArtifact(targetFile, fileType, format, formatVersion)
+	if err != nil {
+		slog.With("err", err).Warn("failed to post-process artifact")
 	}
 
 	return nil
@@ -181,4 +189,28 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 	}
 
 	return targetFile, fileHash, nil
+}
+
+func postProcessArtifact(targetFile string, fileType string, format string, formatVersion string) error {
+	switch {
+	case fileType == "report" && format == "jacoco":
+		coverage, err := jacoco.ParseCoverageFromFile(targetFile)
+		if err != nil {
+			return fmt.Errorf("failed to parse jacoco report: %w", err)
+		}
+
+		slog.With("file", targetFile).With("coverage", coverage).Info("[API] calculated coverage from jacoco report")
+		fmt.Printf("Test-Coverage:%.2f%%\n", coverage) // some platforms parse the test-coverage from stdout (e.g. GitLab)
+
+	case fileType == "report" && format == "cobertura":
+		coverage, err := cobertura.ParseCoverageFromFile(targetFile)
+		if err != nil {
+			return fmt.Errorf("failed to parse cobertura report: %w", err)
+		}
+
+		slog.With("file", targetFile).With("coverage", coverage).Info("[API] calculated coverage from cobertura report")
+		fmt.Printf("Test-Coverage:%.2f%%\n", coverage) // some platforms parse the test-coverage from stdout (e.g. GitLab)
+	}
+
+	return nil
 }

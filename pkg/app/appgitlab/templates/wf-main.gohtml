@@ -34,6 +34,8 @@ stages:
 
 # configuration snippets
 .default-job: &default_job
+  tags:
+    - saas-linux-small-amd64
   allow_failure: false
   interruptible: true
   retry:
@@ -81,6 +83,12 @@ stages:
       - when: never
     script:
         - cid --log-level=${CID_LOGLEVEL:-info} plan execute --state-wf-name "{{ $wf.WorkflowKey }}" --step "{{ $step.Slug }}"
+    {{- if or
+        ($step.HasOutputWithTypeAndFormat "report" "jacoco")
+        ($step.HasOutputWithTypeAndFormat "report" "cobertura")
+    }}
+    coverage: /Test-Coverage:(\d+\.\d+)%/ # used for percentage
+    {{- end }}
     artifacts:
       name: "{{ $wf.NameSlug }}/{{ $step.Name }}"
       paths:
@@ -100,11 +108,11 @@ stages:
         junit: .dist/{{ $step.Slug }}/report/junit/*.xml
         {{- end }}
         {{- if $step.HasOutputWithTypeAndFormat "report" "jacoco" }}
-        coverage_report:
+        coverage_report: # used for visualization only
           coverage_format: jacoco
           path: .dist/{{ $step.Slug }}/report/jacoco/*.xml
         {{- else if $step.HasOutputWithTypeAndFormat "report" "cobertura" }}
-        coverage_report:
+        coverage_report: # used for visualization only
           coverage_format: cobertura
           path: .dist/{{ $step.Slug }}/report/cobertura/*.xml
         {{- end }}

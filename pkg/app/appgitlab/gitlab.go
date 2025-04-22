@@ -15,6 +15,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// GitLabWorkflowTask generates a project-specific GitLab workflow file and creates a pull request
+//
+// Links of interest:
+// https://gitlab.com/gitlab-org/gitlab/-/tree/master/doc/ci/runners/hosted_runners?ref_type=heads for all available runner tags
 func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 	helper := simpletask.New(taskContext)
 	workflowState := appconfig.NewWorkflowState()

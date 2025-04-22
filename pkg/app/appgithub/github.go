@@ -19,7 +19,7 @@ import (
 // GitHubWorkflowTask generates a project-specific GitHub workflow file and creates a pull request
 //
 // Links of interest:
-// https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md?plain=1
+// https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md?plain=1 for runner preinstalled software
 func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 	helper := simpletask.New(taskContext)
 	workflowState := appconfig.NewWorkflowState()
