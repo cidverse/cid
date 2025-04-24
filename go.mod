@@ -24,7 +24,7 @@ require (
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
 	github.com/cidverse/go-vcs v0.0.0-20250416055844-4218094c633e
-	github.com/cidverse/go-vcsapp v0.0.0-20250417143403-7a77ec7caaa7
+	github.com/cidverse/go-vcsapp v0.0.0-20250424191714-080b11bb3c59
 	github.com/cidverse/normalizeci v1.1.1-0.20250404004516-fc8cf82ecb99
 	github.com/cidverse/repoanalyzer v0.1.1-0.20250320224038-fc4c20e388a4
 	github.com/go-resty/resty/v2 v2.16.5
