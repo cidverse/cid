@@ -453,6 +453,7 @@ paths:
 components:
   schemas:
     Error:
+      title: Error
       type: object
       properties:
         status:
@@ -474,6 +475,7 @@ components:
           type: string
           example: up
     LogMessagePayload:
+      title: LogMessagePayload
       required:
         - level
         - message
@@ -493,11 +495,14 @@ components:
           type: string
           example: hello world
         context:
+          $ref: '#/components/schemas/ContextMap'
+    ContextMap:
+      title: ContextMap
+      type: object
+      additionalProperties:
           type: object
-          description: dynamic key value properties / log context
-          additionalProperties:
-            type: object
     ModuleActionData:
+      title: ModuleActionData
       type: object
       properties:
         project-dir:
@@ -513,6 +518,7 @@ components:
         deployment:
           $ref: '#/components/schemas/ProjectDeployment'
     ProjectActionData:
+      title: ProjectActionData
       type: object
       properties:
         project-dir:
@@ -524,6 +530,7 @@ components:
         env:
           $ref: '#/components/schemas/ProjectEnv'
     ActionConfig:
+      title: ActionConfig
       type: object
       properties:
         debug:
@@ -531,10 +538,7 @@ components:
           description: enables debug logs for the action / logic
           default: false
         log:
-          type: object
-          description: "requested loglevel for specific components, prefixes: bin-"
-          additionalProperties:
-            type: string
+          $ref: '#/components/schemas/LogMap'
         project_dir:
           type: string
           description: project root directory
@@ -564,15 +568,26 @@ components:
           description: group id
           example: 1000
         config:
-          type: object
-          description: dynamic configuration options for the action
-          additionalProperties:
-            type: object
+          $ref: '#/components/schemas/ConfigMap'
+    LogMap:
+      title: LogMap
+      type: object
+      description: "requested loglevel for specific components, prefixes: bin-"
+      additionalProperties:
+        type: string
+    ConfigMap:
+      title: ConfigMap
+      type: object
+      description: "requested config for specific components, prefixes: bin-"
+      additionalProperties:
+          type: string
     ProjectEnv:
+      title: ProjectEnv
       type: object
       additionalProperties:
         type: string
     ProjectDependency:
+      title: ProjectDependency
       type: object
       properties:
         type:
@@ -585,6 +600,7 @@ components:
           type: string
           example: v1.3.0
     ProjectModule:
+      title: ProjectModule
       type: object
       properties:
         project_dir:
@@ -642,10 +658,7 @@ components:
           description: deployment environment, e.g. dev, prod, ...
           example: dev
         language:
-          type: object
-          additionalProperties:
-            type: string
-          description: languages used in the project
+          $ref: '#/components/schemas/LanguageMap'
         dependencies:
           type: array
           items:
@@ -662,15 +675,23 @@ components:
             type: string
             example: "/projects/my-project/Dockerfile"
           description: all files in the project directory
+    LanguageMap:
+      title: LanguageMap
+      type: object
+      additionalProperties:
+          type: string
     ProjectModuleList:
+      title: ProjectModuleList
       type: array
       items:
         $ref: '#/components/schemas/ProjectModule'
     ArtifactList:
+      title: ArtifactList
       type: array
       items:
         $ref: '#/components/schemas/Artifact'
     Artifact:
+      title: Artifact
       type: object
       properties:
         build_id:
@@ -706,6 +727,7 @@ components:
           description: artifact format version
           example: 2.1.0
     ArtifactUploadBody:
+      title: ArtifactUploadBody
       type: object
       properties:
         file:
@@ -723,10 +745,12 @@ components:
           description: Content Format Version
     # vcs
     VCSCommitList:
+      title: VCSCommitList
       type: array
       items:
         $ref: '#/components/schemas/VCSCommit'
     VCSCommit:
+      title: VCSCommit
       type: object
       properties:
         hash_short:
@@ -762,6 +786,7 @@ components:
           description: committed at
           example: "2022-11-21T23:55:08+01:00"
     VCSAuthor:
+      title: VCSAuthor
       type: object
       properties:
         name:
@@ -773,10 +798,12 @@ components:
           description: email
           example: noreply@examplee.com
     VCSTagList:
+      title: VCSTagList
       type: array
       items:
         $ref: '#/components/schemas/VCSTag'
     VCSTag:
+      title: VCSTag
       type: object
       properties:
         type:
@@ -792,10 +819,12 @@ components:
           description: vcs hash of the tag
           example: e7fccc74858e1e59225d9998e86949572b9c4332
     VCSReleaseList:
+      title: VCSReleaseList
       type: array
       items:
         $ref: '#/components/schemas/VCSRelease'
     VCSRelease:
+      title: VCSRelease
       type: object
       properties:
         version:
@@ -805,6 +834,7 @@ components:
         ref:
           $ref: '#/components/schemas/VCSTag'
     VCSDiff:
+      title: VCSDiff
       type: object
       properties:
         file_from:
@@ -820,6 +850,7 @@ components:
         - file_from
         - file_to
     VCSDiffLine:
+      title: VCSDiffLine
       type: object
       properties:
         operation:
@@ -832,6 +863,7 @@ components:
         - operation
         - content
     CommitFile:
+      title: CommitFile
       type: object
       properties:
         path:
@@ -845,8 +877,7 @@ components:
         - sha
     # files
     File:
-      required:
-        - path
+      title: File
       type: object
       properties:
         file:
@@ -865,15 +896,15 @@ components:
           type: string
           description: file extension
           example: java
+      required:
+        - path
     FileList:
+      title: FileList
       type: array
       items:
         $ref: '#/components/schemas/File'
     FileContent:
-      required:
-        - path
-        - format
-        - content
+      title: FileContent
       type: object
       properties:
         path:
@@ -888,11 +919,17 @@ components:
           type: string
           description: full content of the file
           example: print("Goodbye, World!")
+      required:
+        - path
+        - format
+        - content
     FileContentList:
+      title: FileContentList
       type: array
       items:
         $ref: '#/components/schemas/FileContent'
     ExecuteCommand:
+      title: ExecuteCommand
       type: object
       properties:
         command:
@@ -920,10 +957,7 @@ components:
           description: directory to execute the command in (default = project root)
           example: /projects/my-project
         env:
-          type: object
-          additionalProperties:
-            type: string
-          description: directory to execute the command in (default = project root)
+          $ref: '#/components/schemas/EnvMap'
         ports:
           type: array
           description: expose container ports
@@ -932,7 +966,13 @@ components:
             format: int32
       required:
         - command
+    EnvMap:
+      title: EnvMap
+      type: object
+      additionalProperties:
+          type: string
     ExecuteCommandResult:
+      title: ExecuteCommandResult
       type: object
       properties:
         code:
@@ -962,6 +1002,7 @@ components:
           description: error output (if capture-output was request, empty otherwise)
           example: ""
     ProjectDeployment:
+      title: ProjectDeployment
       type: object
       nullable: true
       properties:
@@ -978,7 +1019,10 @@ components:
           description: path to the deployment spec file
           example: /projects/my-project/.env-dev
         properties:
-            type: object
-            description: a key value map of additional properties
-            additionalProperties:
-                type: string
+          $ref: '#/components/schemas/PropertiesMap'
+    PropertiesMap:
+      title: PropertiesMap
+      type: object
+      description: a key value map of additional properties
+      additionalProperties:
+          type: string

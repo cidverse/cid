@@ -3,6 +3,7 @@ package appgithub
 import (
 	"fmt"
 	"log/slog"
+	"os"
 	"path/filepath"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
@@ -106,8 +107,9 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 	}
 
 	// write workflow state
-	previousState, _ := appconfig.ReadWorkflowState(filepath.Join(taskContext.Directory, ".cid", "state.json"))
-	err = appconfig.WriteWorkflowState(workflowState, filepath.Join(taskContext.Directory, ".cid", "state.json"))
+	_ = os.Remove(filepath.Join(taskContext.Directory, ".cid", "state.json"))
+	previousState, _ := appconfig.ReadWorkflowState(filepath.Join(taskContext.Directory, ".cid", "state-github.json"))
+	err = appconfig.WriteWorkflowState(workflowState, filepath.Join(taskContext.Directory, ".cid", "state-github.json"))
 	if err != nil {
 		return fmt.Errorf("failed to write workflow state: %w", err)
 	}

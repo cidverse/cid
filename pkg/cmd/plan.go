@@ -87,7 +87,11 @@ func planExecuteCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			stages, _ := cmd.Flags().GetStringArray("stage")
 			steps, _ := cmd.Flags().GetStringArray("step")
+			stateFile, _ := cmd.Flags().GetString("state-file")
 			stateWfName, _ := cmd.Flags().GetString("state-wf-name")
+			if stateFile == "" {
+				stateFile = filepath.Join(".cid", "state.json")
+			}
 
 			// app context
 			cid, err := context.NewAppContext()
@@ -99,7 +103,7 @@ func planExecuteCmd() *cobra.Command {
 			// read plan file
 			var plan plangenerate.Plan
 			if stateWfName != "" {
-				state, stateReadErr := appconfig.ReadWorkflowState(filepath.Join(cid.ProjectDir, ".cid", "state.json"))
+				state, stateReadErr := appconfig.ReadWorkflowState(filepath.Join(cid.ProjectDir, stateFile))
 				if stateReadErr != nil {
 					log.Fatal().Err(stateReadErr).Msg("failed to read workflow state file")
 					os.Exit(1)
@@ -149,6 +153,7 @@ func planExecuteCmd() *cobra.Command {
 
 	cmd.Flags().StringArrayP("stage", "s", []string{}, "limit execution to the specified stage(s)")
 	cmd.Flags().StringArray("step", []string{}, "limit execution to the specified step(s)")
+	cmd.Flags().String("state-file", "", "path to the state file, defaults to .cid/state.json")
 	cmd.Flags().String("state-wf-name", "", "workflow name, MUST BE present in .cid/state.json")
 
 	return cmd

@@ -82,7 +82,7 @@ stages:
 {{- end }}
       - when: never
     script:
-        - cid --log-level=${CID_LOGLEVEL:-info} plan execute --state-wf-name "{{ $wf.WorkflowKey }}" --step "{{ $step.Slug }}"
+        - cid --log-level=${CID_LOGLEVEL:-info} plan execute --state-file ".cid/state-gitlab.json" --state-wf-name "{{ $wf.WorkflowKey }}" --step "{{ $step.Slug }}"
     {{- if or
         ($step.HasOutputWithTypeAndFormat "report" "jacoco")
         ($step.HasOutputWithTypeAndFormat "report" "cobertura")
