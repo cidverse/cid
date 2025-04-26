@@ -1,10 +1,10 @@
 package restapi
 
 import (
+	"github.com/cidverse/cid/internal/state"
 	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
-	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 

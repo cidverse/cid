@@ -3,6 +3,7 @@ package restapi
 import (
 	"errors"
 	"fmt"
+	"github.com/cidverse/cid/internal/state"
 	"log/slog"
 	"net/http"
 	"os/exec"
@@ -13,7 +14,6 @@ import (
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/core/config"
-	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/labstack/echo/v4"

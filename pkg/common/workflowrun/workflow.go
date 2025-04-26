@@ -3,6 +3,7 @@ package workflowrun
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/cidverse/cid/internal/state"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -13,7 +14,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/actionexecutor"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
-	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/cidverse/repoanalyzer/analyzer"
 

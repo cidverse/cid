@@ -1,12 +1,12 @@
 package api
 
 import (
+	"github.com/cidverse/cid/internal/state"
 	"testing"
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
-	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/stretchr/testify/assert"
 )
 

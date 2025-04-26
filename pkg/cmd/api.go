@@ -1,13 +1,13 @@
 package cmd
 
 import (
+	"github.com/cidverse/cid/internal/state"
 	"os"
 	"path/filepath"
 
 	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cid/pkg/core/restapi"
-	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer/analyzer"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"

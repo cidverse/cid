@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/cidverse/cid/internal/state"
 	"os/user"
 	"path/filepath"
 	"regexp"
@@ -8,7 +9,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/config"
-	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/repoanalyzer/analyzerapi"

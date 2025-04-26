@@ -1,10 +1,10 @@
 package api
 
 import (
+	"github.com/cidverse/cid/internal/state"
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
-	"github.com/cidverse/cid/pkg/core/state"
 )
 
 // ActionExecutor is the interface that needs to be implemented by all action executors

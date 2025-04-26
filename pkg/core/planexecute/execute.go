@@ -2,6 +2,7 @@ package planexecute
 
 import (
 	"fmt"
+	"github.com/cidverse/cid/internal/state"
 	"os"
 	"path/filepath"
 	"slices"
@@ -12,7 +13,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
-	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/cidverse/cid/internal/state"
 	"io"
 	"log/slog"
 	"net/http"
@@ -15,7 +16,6 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/core/provenance"
-	"github.com/cidverse/cid/pkg/core/state"
 	"github.com/cidverse/cid/pkg/lib/formats/cobertura"
 	"github.com/cidverse/cid/pkg/lib/formats/jacoco"
 	"github.com/cidverse/cid/pkg/util"
