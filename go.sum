@@ -32,8 +32,8 @@ github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgIS
 github.com/bwmarrin/snowflake v0.3.0/go.mod h1:NdZxfVWX+oR6y2K0o6qAYv6gIOP9rjG0/E9WsDpxqwE=
 github.com/charlievieth/fastwalk v1.0.10 h1:0qUbvA2O+K+X+IrTfZTC0UH2DK5MOA+KjVfStAHUnGg=
 github.com/charlievieth/fastwalk v1.0.10/go.mod h1:yGy1zbxog41ZVMcKA/i8ojXLFsuayX5VvwhQVoj9PBI=
-github.com/cidverse/cid-sdk-go v0.0.0-20250426133422-753869400406 h1:Njcy6X+z/Idwxej9VGmfdgstXFws7L0uw1DRGb2G66M=
-github.com/cidverse/cid-sdk-go v0.0.0-20250426133422-753869400406/go.mod h1:mfBWclQu5ECrRJajg35gEXoFt5fgH8m109BpelTQgSY=
+github.com/cidverse/cid-sdk-go v0.0.0-20250426194403-2c7ccb7ff47a h1:HNLi3rrD5v59rgclCo0ZXgh2UurgCdW/j/yF/6/M1DM=
+github.com/cidverse/cid-sdk-go v0.0.0-20250426194403-2c7ccb7ff47a/go.mod h1:mfBWclQu5ECrRJajg35gEXoFt5fgH8m109BpelTQgSY=
 github.com/cidverse/cidverseutils/ci v0.1.0 h1:vLxi+T3Oj2uJzO8KWLLRUzgEfC8y2hoS14AE9pCr2ew=
 github.com/cidverse/cidverseutils/ci v0.1.0/go.mod h1:uOMGB2Kh/0HA936tlnzgBvrxv4hmXYeSbJxP383nHKU=
 github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842 h1:G7E9P9kcLs/bMGf8BMtOXc+QbRM8w2/3/5D8HkWmJtQ=
@@ -66,8 +66,8 @@ github.com/cidverse/go-vcsapp v0.0.0-20250424191714-080b11bb3c59 h1:gssk15Z64L31
 github.com/cidverse/go-vcsapp v0.0.0-20250424191714-080b11bb3c59/go.mod h1:71yMD+rZqTYuyMxnPfn+85AXo/GTsu+qc/MhzijmP/g=
 github.com/cidverse/normalizeci v1.1.1-0.20250404004516-fc8cf82ecb99 h1:7JF0LaBuRB4+T5MICLMY41WNup3T3dVB21BmKVfLmXI=
 github.com/cidverse/normalizeci v1.1.1-0.20250404004516-fc8cf82ecb99/go.mod h1:O9eI8rNRnucCflg4wtuiVOXuLHrpLaWrW0xppqCGwTY=
-github.com/cidverse/repoanalyzer v0.1.1-0.20250426011833-e56cbfaa472d h1:0XJgRlXtpUeVdXBw1iEHzRoO81i/Zt12uGV61v3egv8=
-github.com/cidverse/repoanalyzer v0.1.1-0.20250426011833-e56cbfaa472d/go.mod h1:/pONnWnJQS6NDTMLmpcqVI5L4lLuyk8lz6TREgAeVOw=
+github.com/cidverse/repoanalyzer v0.1.1-0.20250426193409-a90f43d67543 h1:E0mpqR4AzVxJwBhhD3S60PpDoEzpYMoe830TNc3d/KY=
+github.com/cidverse/repoanalyzer v0.1.1-0.20250426193409-a90f43d67543/go.mod h1:/pONnWnJQS6NDTMLmpcqVI5L4lLuyk8lz6TREgAeVOw=
 github.com/cloudflare/circl v1.6.1 h1:zqIqSPIndyBh1bjLVVDHMPpVKqp8Su/V+6MeDzzQBQ0=
 github.com/cloudflare/circl v1.6.1/go.mod h1:uddAzsPgqdMAYatqJ0lsjX1oECcQLIlRpzZh3pJrofs=
 github.com/codahale/rfc6979 v0.0.0-20141003034818-6a90f24967eb h1:EDmT6Q9Zs+SbUoc7Ik9EfrFqcylYqgPZ9ANSbTAntnE=

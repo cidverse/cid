@@ -11,7 +11,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v3 v3.2.0
 	github.com/adrg/xdg v0.5.3
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/cidverse/cid-sdk-go v0.0.0-20250426133422-753869400406
+	github.com/cidverse/cid-sdk-go v0.0.0-20250426194403-2c7ccb7ff47a
 	github.com/cidverse/cidverseutils/ci v0.1.0
 	github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842
 	github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4
@@ -27,7 +27,8 @@ require (
 	github.com/cidverse/go-vcs v0.0.0-20250416055844-4218094c633e
 	github.com/cidverse/go-vcsapp v0.0.0-20250424191714-080b11bb3c59
 	github.com/cidverse/normalizeci v1.1.1-0.20250404004516-fc8cf82ecb99
-	github.com/cidverse/repoanalyzer v0.1.1-0.20250426011833-e56cbfaa472d
+	github.com/cidverse/repoanalyzer v0.1.1-0.20250426193409-a90f43d67543
+	github.com/go-playground/validator/v10 v10.26.0
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/google/uuid v1.6.0
 	github.com/gosimple/slug v1.15.0
@@ -71,7 +72,6 @@ require (
 	github.com/go-git/go-git/v5 v5.16.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.26.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/cel-go v0.25.0 // indirect

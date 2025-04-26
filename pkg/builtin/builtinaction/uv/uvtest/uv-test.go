@@ -1,4 +1,4 @@
-package poetrytest
+package uvtest
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
-const URI = "builtin://actions/poetry-test"
+const URI = "builtin://actions/uv-test"
 
 type Action struct {
 	Sdk cidsdk.SDKClient
@@ -18,21 +18,24 @@ type Config struct {
 
 func (a Action) Metadata() cidsdk.ActionMetadata {
 	return cidsdk.ActionMetadata{
-		Name:        "poetry-test",
-		Description: "Runs tests using Poetry.",
+		Name:        "uv-test",
+		Description: "Runs tests using UV.",
 		Category:    "test",
 		Scope:       cidsdk.ActionScopeModule,
+		Links: map[string]string{
+			"project": "https://github.com/astral-sh/uv",
+		},
 		Rules: []cidsdk.ActionRule{
 			{
 				Type:       "cel",
-				Expression: `MODULE_BUILD_SYSTEM == "pyproject-poetry"`,
+				Expression: `MODULE_BUILD_SYSTEM == "pyproject-uv"`,
 			},
 		},
 		Access: cidsdk.ActionAccess{
 			Environment: []cidsdk.ActionAccessEnv{},
 			Executables: []cidsdk.ActionAccessExecutable{
 				{
-					Name: "poetry",
+					Name: "uv",
 				},
 			},
 		},
@@ -82,20 +85,10 @@ func (a Action) Execute() (err error) {
 	reportFile := cidsdk.JoinPath(d.Config.TempDir, "pytest.junit.xml")
 	coverageFile := cidsdk.JoinPath(d.Config.TempDir, "pytest.coverage.xml")
 
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-		Command: `poetry install`,
-		WorkDir: d.Module.ModuleDir,
-	})
-	if err != nil {
-		return err
-	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("command failed, exit code %d", cmdResult.Code)
-	}
-
 	if d.Module.HasDependencyByTypeAndId("pypi", "pytest") {
 		if d.Module.HasDependencyByTypeAndId("pypi", "pytest-cov") {
-			cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-				Command: fmt.Sprintf(`poetry run pytest -v --cov --cov-report term --cov-report xml:%q --junit-xml=%q`, coverageFile, reportFile),
+			cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+				Command: fmt.Sprintf(`uv run pytest -v --cov --cov-report term --cov-report xml:%q --junit-xml=%q`, coverageFile, reportFile),
 				WorkDir: d.Module.ModuleDir,
 			})
 			if err != nil {
@@ -114,8 +107,8 @@ func (a Action) Execute() (err error) {
 				return err
 			}
 		} else {
-			cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-				Command: fmt.Sprintf(`poetry run pytest -v --junit-xml=%q`, reportFile),
+			cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+				Command: fmt.Sprintf(`uv run pytest -v --junit-xml=%q`, reportFile),
 				WorkDir: d.Module.ModuleDir,
 			})
 			if err != nil {

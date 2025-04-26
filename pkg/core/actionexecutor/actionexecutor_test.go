@@ -8,9 +8,10 @@ import (
 
 func TestGetExecutors(t *testing.T) {
 	executors := GetExecutors()
-	assert.Equal(t, 2, len(executors))
-	assert.Equal(t, "container", executors[0].GetType())
-	assert.Equal(t, "githubaction", executors[1].GetType())
+	assert.Equal(t, 3, len(executors))
+	assert.Equal(t, "builtin", executors[0].GetType())
+	assert.Equal(t, "container", executors[1].GetType())
+	assert.Equal(t, "githubaction", executors[2].GetType())
 }
 
 func TestFindExecutorByType(t *testing.T) {

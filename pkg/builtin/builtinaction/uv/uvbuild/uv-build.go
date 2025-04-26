@@ -1,4 +1,4 @@
-package poetrybuild
+package uvbuild
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
-const URI = "builtin://actions/poetry-build"
+const URI = "builtin://actions/uv-build"
 
 type Action struct {
 	Sdk cidsdk.SDKClient
@@ -18,21 +18,24 @@ type Config struct {
 
 func (a Action) Metadata() cidsdk.ActionMetadata {
 	return cidsdk.ActionMetadata{
-		Name:        "poetry-build",
-		Description: "Build a Python project using Poetry.",
+		Name:        "uv-build",
+		Description: "Build a Python project using uv.",
 		Category:    "build",
 		Scope:       cidsdk.ActionScopeModule,
+		Links: map[string]string{
+			"project": "https://github.com/astral-sh/uv",
+		},
 		Rules: []cidsdk.ActionRule{
 			{
 				Type:       "cel",
-				Expression: `MODULE_BUILD_SYSTEM == "pyproject-poetry"`,
+				Expression: `MODULE_BUILD_SYSTEM == "pyproject-uv"`,
 			},
 		},
 		Access: cidsdk.ActionAccess{
 			Environment: []cidsdk.ActionAccessEnv{},
 			Executables: []cidsdk.ActionAccessExecutable{
 				{
-					Name: "poetry",
+					Name: "uv",
 				},
 			},
 		},
@@ -67,17 +70,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-		Command: `poetry install`,
-		WorkDir: d.Module.ModuleDir,
-	})
-	if err != nil {
-		return err
-	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("command failed, exit code %d", cmdResult.Code)
-	}
-
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-		Command: `poetry build`,
+		Command: `uv build`,
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {

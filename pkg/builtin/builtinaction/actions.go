@@ -4,6 +4,8 @@ import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvtest"
 )
 
 // GetActionsMetadata returns a map of all actions with their metadata
@@ -19,6 +21,9 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		// python-poetry
 		poetrybuild.Action{Sdk: *sdk},
 		poetrytest.Action{Sdk: *sdk},
+		// python-uv
+		uvbuild.Action{Sdk: *sdk},
+		uvtest.Action{Sdk: *sdk},
 	}
 
 	// as map

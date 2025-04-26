@@ -1,8 +1,8 @@
-package poetrybuild
+package uvbuild
 
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrycommon"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvcommon"
 	"testing"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -11,13 +11,9 @@ import (
 
 func TestRequirementsBuild(t *testing.T) {
 	sdk := common.TestSetup(t)
-	sdk.On("ModuleActionDataV1").Return(poetrycommon.TestModuleData(), nil)
+	sdk.On("ModuleActionDataV1").Return(uvcommon.TestModuleData(), nil)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
-		Command: "poetry install",
-		WorkDir: "/my-project",
-	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0}, nil)
-	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
-		Command: "poetry build",
+		Command: "uv build",
 		WorkDir: "/my-project",
 	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0}, nil)
 
