@@ -2,6 +2,9 @@ package builtinworkflow
 
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlebuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlepublish"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradletest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
@@ -33,7 +36,7 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// java
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+gradle-build",
+						ID: gradlebuild.URI,
 					},
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+maven-build",
@@ -78,7 +81,7 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// java
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+gradle-test",
+						ID: gradletest.URI,
 					},
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+maven-test",
@@ -164,7 +167,7 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// java library - publish
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+gradle-publish",
+						ID: gradlepublish.URI,
 					},
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+maven-publish",

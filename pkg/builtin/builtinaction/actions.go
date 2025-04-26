@@ -3,6 +3,9 @@ package builtinaction
 import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlebuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlepublish"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradletest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
@@ -24,18 +27,22 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 	actions := []cidsdk.Action{
 		// gitleaks
 		gitleaksscan.Action{Sdk: sdk},
+		// gradle
+		gradlebuild.Action{Sdk: sdk},
+		gradletest.Action{Sdk: sdk},
+		gradlepublish.Action{Sdk: sdk},
 		// python-poetry
-		poetrybuild.Action{Sdk: *sdk},
-		poetrytest.Action{Sdk: *sdk},
+		poetrybuild.Action{Sdk: sdk},
+		poetrytest.Action{Sdk: sdk},
 		// python-uv
-		uvbuild.Action{Sdk: *sdk},
-		uvtest.Action{Sdk: *sdk},
+		uvbuild.Action{Sdk: sdk},
+		uvtest.Action{Sdk: sdk},
 		// semgrep
-		semgrepscan.Action{Sdk: *sdk},
+		semgrepscan.Action{Sdk: sdk},
 		// trivy
-		trivyfsscan.Action{Sdk: *sdk},
+		trivyfsscan.Action{Sdk: sdk},
 		// zizmor
-		zizmorscan.Action{Sdk: *sdk},
+		zizmorscan.Action{Sdk: sdk},
 	}
 
 	// as map
