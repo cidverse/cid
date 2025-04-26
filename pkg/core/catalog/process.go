@@ -7,19 +7,9 @@ import (
 
 func ProcessCatalog(catalog *Config) *Config {
 	result := Config{
-		Actions:     nil,
-		Workflows:   nil,
-		Executables: nil,
-	}
-
-	// actions
-	for _, sourceAction := range catalog.Actions {
-		result.Actions = append(result.Actions, sourceAction)
-	}
-
-	// workflows
-	for _, sourceWorkflow := range catalog.Workflows {
-		result.Workflows = append(result.Workflows, sourceWorkflow)
+		Actions:     catalog.Actions,
+		Workflows:   catalog.Workflows,
+		Executables: catalog.Executables,
 	}
 
 	// executable-discovery
@@ -36,11 +26,6 @@ func ProcessCatalog(catalog *Config) *Config {
 		}
 	} else {
 		log.Debug().Msg("no container packages defined in executable-discovery")
-	}
-
-	// executables
-	for _, sourceExecutable := range catalog.Executables {
-		result.Executables = append(result.Executables, sourceExecutable)
 	}
 
 	return &result

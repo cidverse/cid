@@ -2,8 +2,8 @@ package config
 
 import (
 	"embed"
+	"github.com/cidverse/cid/pkg/builtin/builtincatalog"
 
-	"github.com/cidverse/cid/pkg/actions"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/jinzhu/configor"
@@ -38,16 +38,17 @@ func LoadConfig(projectDirectory string) *CIDConfig {
 	catalogSources := catalog.LoadSources()
 	cfg.CatalogSources = catalogSources
 	data := catalog.LoadCatalogs(catalogSources)
-	log.Debug().Int("catalogs", len(cfg.CatalogSources)).Int("actions", len(data.Actions)).Int("workflows", len(data.Workflows)).Int("executables", len(data.Executables)).Msg("loaded catalog from registries")
+	log.Debug().Int("catalogs", len(cfg.CatalogSources)).Int("action", len(data.Actions)).Int("workflows", len(data.Workflows)).Int("executables", len(data.Executables)).Msg("loaded catalog from registries")
 
 	cfg.Registry.Actions = append(cfg.Registry.Actions, data.Actions...)
-	cfg.Registry.Workflows = append(cfg.Registry.Workflows, data.Workflows...)
+	//cfg.Registry.Workflows = append(cfg.Registry.Workflows, data.Workflows...)
 	cfg.Registry.Executables = append(cfg.Registry.Executables, data.Executables...)
 
 	// internal catalog
-	internalCatalog := actions.InternalCatalog()
+	internalCatalog := builtincatalog.InternalCatalog()
 	cfg.Registry.Actions = append(cfg.Registry.Actions, internalCatalog.Actions...)
 	cfg.Registry.Workflows = append(cfg.Registry.Workflows, internalCatalog.Workflows...)
+	cfg.Registry.Executables = append(cfg.Registry.Executables, internalCatalog.Executables...)
 
 	// load project config
 	if filesystem.FileExists(projectDirectory + "/cid.yml") {

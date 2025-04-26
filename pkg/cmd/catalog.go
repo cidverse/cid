@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/cidverse/cid/pkg/lib/files"
 	"os"
 	"strings"
 	"sync"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
-	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/core/clioutputwriter"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
@@ -143,8 +143,8 @@ func catalogProcessFileCmd() *cobra.Command {
 			// process
 			fileRegistry = catalog.ProcessCatalog(fileRegistry)
 
-			// store output
-			err = util.StructToJsonFile(fileRegistry, dir+"/cid-index.json")
+			// files output
+			err = files.WriteJsonFile(dir+"/cid-index.json", fileRegistry)
 			if err != nil {
 				log.Fatal().Str("file", dir).Err(err).Msg("failed to save registry file")
 			}

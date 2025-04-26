@@ -1,0 +1,110 @@
+# container executables
+executable-discovery:
+  container:
+    packages:
+      - binary: ["kubectl"]
+        image: "ghcr.io/cidverse/kubectl"
+      - binary: ["mockery"]
+        image: "ghcr.io/cidverse/mockery"
+      - binary: ["twitch"]
+        image: "ghcr.io/cidverse/twitch-cli"
+      - binary: ["syft"]
+        image: "ghcr.io/cidverse/syft"
+      - binary: ["trivy"]
+        image: "ghcr.io/cidverse/trivy"
+      - binary: ["wrangler"]
+        image: "ghcr.io/cidverse/wrangler"
+      - binary: ["shellcheck"]
+        image: "ghcr.io/cidverse/shellcheck"
+      - binary: ["flake8"]
+        image: "ghcr.io/cidverse/flake8"
+      - binary: ["renovate"]
+        image: "ghcr.io/cidverse/renovate"
+      - binary: ["oc"]
+        image: "ghcr.io/cidverse/openshift"
+      - binary: ["poetry"]
+        image: "ghcr.io/cidverse/poetry"
+      - binary: ["pipenv"]
+        image: "ghcr.io/cidverse/pipenv"
+      - binary: ["aws"]
+        image: "ghcr.io/cidverse/aws"
+      - binary: ["gosec"]
+        image: "ghcr.io/cidverse/gosec"
+      - binary: ["ansible"]
+        image: "ghcr.io/cidverse/ansible"
+      - binary: ["ansible-lint"]
+        image: "ghcr.io/cidverse/ansible-lint"
+      - binary: ["osv-scanner"]
+        image: "ghcr.io/cidverse/osv-scanner"
+      - binary: ["upx"]
+        image: "ghcr.io/cidverse/upx"
+      - binary: ["gh"]
+        image: "ghcr.io/cidverse/gh"
+      - binary: ["gitleaks"]
+        image: "ghcr.io/cidverse/gitleaks"
+      - binary: ["glab"]
+        image: "ghcr.io/cidverse/glab"
+      - binary: ["oras"]
+        image: "ghcr.io/cidverse/oras"
+      - binary: ["slsa-verifier"]
+        image: "ghcr.io/cidverse/slsa-verifier"
+      - binary: ["kubeseal"]
+        image: "ghcr.io/cidverse/kubeseal"
+      - binary: ["semgrep"]
+        image: "ghcr.io/cidverse/semgrep"
+      - binary: ["scorecard"]
+        image: "ghcr.io/cidverse/scorecard"
+      - binary: ["hugo"]
+        image: "ghcr.io/cidverse/hugo"
+      - binary: ["grype"]
+        image: "ghcr.io/cidverse/grype"
+      - binary: ["ggshield"]
+        image: "ghcr.io/cidverse/ggshield"
+      - binary: ["runpodctl"]
+        image: "ghcr.io/cidverse/runpodctl"
+      - binary: ["cue"]
+        image: "ghcr.io/cidverse/cue"
+      - binary: ["hadolint"]
+        image: "ghcr.io/cidverse/hadolint"
+      - binary: ["liquibase"]
+        image: "ghcr.io/cidverse/liquibase"
+      - binary: ["cosign"]
+        image: "ghcr.io/cidverse/cosign"
+      - binary: ["rekor-cli"]
+        image: "ghcr.io/cidverse/rekor-cli"
+      - binary: ["buildah"]
+        image: "ghcr.io/cidverse/buildah"
+      - binary: ["helmfile"]
+        image: "ghcr.io/cidverse/helmfile"
+      - binary: ["mc"]
+        image: "ghcr.io/cidverse/minio-client"
+      - binary: ["rundeck-cli"]
+        image: "ghcr.io/cidverse/rundeck-cli"
+      - binary: ["appinspector"]
+        image: "ghcr.io/cidverse/appinspector"
+      - binary: ["codecov"]
+        image: "ghcr.io/cidverse/codecov-cli"
+      - binary: ["sonar-scanner"]
+        image: "ghcr.io/cidverse/sonarscanner-cli"
+      - binary: ["helm"]
+        image: "ghcr.io/cidverse/helm"
+      - binary: ["fossa-cli"]
+        image: "ghcr.io/cidverse/fossa-cli"
+      - binary: ["sarifrs"]
+        image: "ghcr.io/cidverse/sarifrs"
+      - binary: ["skopeo"]
+        image: "ghcr.io/cidverse/skopeo"
+      - binary: ["zizmor"]
+        image: "ghcr.io/cidverse/zizmor"
+      - binary: ["qodana"]
+        image: "ghcr.io/cidverse/qodana"
+      - binary: ["go-junit-report"]
+        image: "ghcr.io/cidverse/go-junit-report"
+      - binary: ["gocover-cobertura"]
+        image: "ghcr.io/cidverse/gocover-cobertura"
+      - binary: ["gitlab-sarif-converter"]
+        image: "ghcr.io/cidverse/gitlab-sarif-converter"
+      - binary: ["java"]
+        image: "ghcr.io/cidverse/jdk"
+      - binary: ["go"]
+        image: "ghcr.io/cidverse/build-go"

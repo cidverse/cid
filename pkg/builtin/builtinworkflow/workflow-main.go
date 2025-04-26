@@ -1,8 +1,8 @@
-package actions
+package builtinworkflow
 
 import (
-	"github.com/cidverse/cid/pkg/actions/poetry/poetrybuild"
-	"github.com/cidverse/cid/pkg/actions/poetry/poetrytest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
 )

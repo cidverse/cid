@@ -1,0 +1,1041 @@
+{
+  "executables": [
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "kubectl",
+        "Version": "1.32.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/kubectl:1.32.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "kubectl",
+        "Version": "1.32.2",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/kubectl:1.32.2",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "kubectl",
+        "Version": "1.32.3",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/kubectl:1.32.3",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "mockery",
+        "Version": "2.50.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/mockery:2.50.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "twitch",
+        "Version": "1.1.24",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/twitch-cli:1.1.24",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "syft",
+        "Version": "1.18.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/syft:1.18.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "trivy",
+        "Version": "0.61.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/trivy:0.61.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "wrangler",
+        "Version": "3.80.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/wrangler:3.80.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "shellcheck",
+        "Version": "0.10.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/shellcheck:0.10.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "flake8",
+        "Version": "7.1.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/flake8:7.1.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "renovate",
+        "Version": "39.82.6",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/renovate:39.82.6",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "oc",
+        "Version": "4.16.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/openshift:4.16.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "poetry",
+        "Version": "1.8.5",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/poetry:1.8.5",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "poetry",
+        "Version": "2.1.2",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/poetry:2.1.2",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "pipenv",
+        "Version": "2024.2.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/pipenv:2024.2.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "aws",
+        "Version": "2.22.13",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/aws:2.22.13",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "gosec",
+        "Version": "2.21.4",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/gosec:2.21.4",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "ansible",
+        "Version": "2.18.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/ansible:2.18.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "ansible-lint",
+        "Version": "24.9.2",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/ansible-lint:24.9.2",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "osv-scanner",
+        "Version": "1.9.2",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/osv-scanner:1.9.2",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "upx",
+        "Version": "4.2.4",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/upx:4.2.4",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "gh",
+        "Version": "2.64.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/gh:2.64.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "gitleaks",
+        "Version": "8.22.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/gitleaks:8.22.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "gitleaks",
+        "Version": "8.24.3",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/gitleaks:8.24.3",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "glab",
+        "Version": "1.51.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/glab:1.51.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "glab",
+        "Version": "1.55.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/glab:1.55.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "oras",
+        "Version": "1.2.2",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/oras:1.2.2",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "slsa-verifier",
+        "Version": "2.6.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/slsa-verifier:2.6.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "kubeseal",
+        "Version": "0.27.3",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/kubeseal:0.27.3",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "semgrep",
+        "Version": "1.74.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/semgrep:1.74.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "semgrep",
+        "Version": "1.104.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/semgrep:1.104.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "scorecard",
+        "Version": "5.0.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/scorecard:5.0.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "hugo",
+        "Version": "0.140.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/hugo:0.140.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "grype",
+        "Version": "0.86.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/grype:0.86.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "ggshield",
+        "Version": "1.34.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/ggshield:1.34.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "runpodctl",
+        "Version": "1.14.4",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/runpodctl:1.14.4",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "cue",
+        "Version": "0.11.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/cue:0.11.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "hadolint",
+        "Version": "2.12.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/hadolint:2.12.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "liquibase",
+        "Version": "4.29.2",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/liquibase:4.29.2",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "cosign",
+        "Version": "2.4.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/cosign:2.4.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "rekor-cli",
+        "Version": "1.3.7",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/rekor-cli:1.3.7",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "buildah",
+        "Version": "1.38.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/buildah:1.38.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "helmfile",
+        "Version": "0.169.2",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/helmfile:0.169.2",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "mc",
+        "Version": "2025.01.17",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/minio-client:2025.01.17",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "rundeck-cli",
+        "Version": "2.0.8",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/rundeck-cli:2.0.8",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "appinspector",
+        "Version": "1.9.30",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/appinspector:1.9.30",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "codecov",
+        "Version": "9.1.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/codecov-cli:9.1.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "sonar-scanner",
+        "Version": "6.2.1.4610",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/sonarscanner-cli:6.2.1.4610",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "helm",
+        "Version": "3.16.4",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/helm:3.16.4",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "helm",
+        "Version": "3.17.3",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/helm:3.17.3",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "fossa-cli",
+        "Version": "3.9.42",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/fossa-cli:3.9.42",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "sarifrs",
+        "Version": "v0.7.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/sarifrs:v0.7.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "skopeo",
+        "Version": "1.17.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/skopeo:1.17.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "zizmor",
+        "Version": "1.3.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/zizmor:1.3.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "zizmor",
+        "Version": "1.5.2",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/zizmor:1.5.2",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "qodana",
+        "Version": "2024.3.5",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/qodana:2024.3.5",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "go-junit-report",
+        "Version": "2.1.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/go-junit-report:2.1.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "gocover-cobertura",
+        "Version": "1.3.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/gocover-cobertura:1.3.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "gitlab-sarif-converter",
+        "Version": "0.9.4",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/gitlab-sarif-converter:0.9.4",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "java",
+        "Version": "21.0.5-patch.11",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/jdk:21.0.5-patch.11",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "go",
+        "Version": "1.24.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/build-go:1.24.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    }
+  ]
+}

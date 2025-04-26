@@ -1,47 +1,29 @@
-package actions
+package builtincatalog
 
 import (
+	_ "embed"
 	cidsdk "github.com/cidverse/cid-sdk-go"
-	"github.com/cidverse/cid/pkg/actions/poetry/poetrybuild"
-	"github.com/cidverse/cid/pkg/actions/poetry/poetrytest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction"
+	"github.com/cidverse/cid/pkg/builtin/builtinworkflow"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/lib/files"
+	"log/slog"
+	"os"
 )
 
-// GetActionsMetadata returns a map of all actions with their metadata
-func GetActionsMetadata() map[string]cidsdk.Action {
-	sdk, _ := cidsdk.NewSDK()
-	return GetActions(sdk)
-}
-
-// GetActions returns a map of all actions initialized with the given SDK
-func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
-	// actions
-	actions := []cidsdk.Action{
-		// python-poetry
-		poetrybuild.Action{Sdk: *sdk},
-		poetrytest.Action{Sdk: *sdk},
-	}
-
-	// as map
-	actionMap := make(map[string]cidsdk.Action, len(actions))
-	for _, action := range actions {
-		actionMap[action.Metadata().Name] = action
-	}
-
-	return actionMap
-}
+//go:embed files/cid-index.json
+var indexJSON []byte
 
 // InternalCatalog returns a virtual catalog with all built-in actions and workflows
 func InternalCatalog() catalog.Config {
 	var actions []catalog.Action
-
-	for _, action := range GetActionsMetadata() {
+	for _, action := range builtinaction.GetActionsMetadata() {
 		am := action.Metadata()
 		catalogActionMetadata := convertActionMetadata(am)
 
 		act := catalog.Action{
-			Repository: "",
+			Repository: "builtin",
 			URI:        "builtin://actions/" + am.Name,
 			Type:       catalog.ActionTypeBuiltIn,
 			Container:  catalog.ContainerAction{},
@@ -52,11 +34,17 @@ func InternalCatalog() catalog.Config {
 		actions = append(actions, act)
 	}
 
+	embeddedCatalog, err := files.ReadJson[catalog.Config](indexJSON)
+	if err != nil {
+		slog.With("err", err).Error("failed to read embedded json index")
+		os.Exit(1)
+	}
+
 	return catalog.Config{
 		Actions:             actions,
-		Workflows:           GetWorkflows(),
+		Workflows:           builtinworkflow.GetWorkflows(),
 		ExecutableDiscovery: nil,
-		Executables:         nil,
+		Executables:         embeddedCatalog.Executables,
 	}
 }
 

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/internal/state"
-	"github.com/cidverse/cid/pkg/actions"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction"
 	"os"
 	"path"
 	"path/filepath"
@@ -149,7 +149,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	}
 
 	// lookup in action by name map - TODO: make function in actions for lookup
-	actionLookup := actions.GetActions(sdk)
+	actionLookup := builtinaction.GetActions(sdk)
 	action, ok := actionLookup[catalogAction.Metadata.Name]
 	if !ok {
 		return fmt.Errorf("action %s not found", catalogAction.Metadata.Name)

@@ -1,16 +1,16 @@
-package poetrybuild
+package poetrytest
 
 import (
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrycommon"
 	"testing"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
-	"github.com/cidverse/cid/pkg/actions/common"
-	"github.com/cidverse/cid/pkg/actions/poetry/poetrycommon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-func TestRequirementsBuild(t *testing.T) {
+func TestPythonTest(t *testing.T) {
 	sdk := common.TestSetup(t)
 	sdk.On("ModuleAction", mock.Anything).Return(poetrycommon.TestModuleData(), nil)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
@@ -18,7 +18,7 @@ func TestRequirementsBuild(t *testing.T) {
 		WorkDir: "/my-project",
 	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0}, nil)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
-		Command: "poetry build",
+		Command: "poetry run pytest",
 		WorkDir: "/my-project",
 	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0}, nil)
 
