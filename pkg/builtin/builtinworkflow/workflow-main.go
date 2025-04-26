@@ -1,6 +1,7 @@
 package builtinworkflow
 
 import (
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
@@ -129,7 +130,7 @@ func GetWorkflows() []catalog.Workflow {
 				Name: "scan",
 				Actions: []catalog.WorkflowAction{
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+gitleaks-scan",
+						ID: gitleaksscan.URI,
 					},
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+semgrep-scan",

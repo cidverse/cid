@@ -99,7 +99,7 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 	}
 
 	// post-process artifacts
-	err = postProcessArtifact(targetFile, fileType, format, formatVersion)
+	err = postProcessArtifact(hc, targetFile, fileType, format, formatVersion)
 	if err != nil {
 		slog.With("err", err).Warn("failed to post-process artifact")
 	}
@@ -191,7 +191,7 @@ func (hc *APIConfig) storeArtifact(moduleSlug string, fileType string, format st
 	return targetFile, fileHash, nil
 }
 
-func postProcessArtifact(targetFile string, fileType string, format string, formatVersion string) error {
+func postProcessArtifact(hc *APIConfig, targetFile string, fileType string, format string, formatVersion string) error {
 	switch {
 	case fileType == "report" && format == "jacoco":
 		coverage, err := jacoco.ParseCoverageFromFile(targetFile)

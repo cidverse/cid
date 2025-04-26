@@ -3,7 +3,7 @@ module github.com/cidverse/cid
 //go:platform linux/amd64
 //go:platform darwin/amd64
 
-go 1.23.4
+go 1.24
 
 toolchain go1.24.0
 
@@ -41,6 +41,7 @@ require (
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/oriser/regroup v0.0.0-20240925165441-f6bb0e08289e
+	github.com/owenrumney/go-sarif/v3 v3.1.4
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
@@ -96,7 +97,7 @@ require (
 	github.com/pjbgf/sha1cd v0.3.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 // indirect
-	github.com/samber/lo v1.49.1 // indirect
+	github.com/samber/lo v1.50.0 // indirect
 	github.com/samber/slog-common v0.18.1 // indirect
 	github.com/samber/slog-zerolog/v2 v2.7.3 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.9.0 // indirect
@@ -109,6 +110,9 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
+	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
+	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
+	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	gitlab.com/gitlab-org/api/client-go v0.128.0 // indirect
 	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect

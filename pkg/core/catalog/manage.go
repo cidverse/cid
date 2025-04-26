@@ -35,6 +35,7 @@ func LoadSources() map[string]*Source {
 
 	// file doesn't exist yet
 	if _, err := os.Stat(repositoryConfigFile); os.IsNotExist(err) {
+		sources["cid-actions"] = &Source{URI: "oci://ghcr.io/cidverse/cid-actions-go:0.1.0", AddedAt: time.Now().Format(time.RFC3339), UpdatedAt: time.Now().Format(time.RFC3339), SHA256: ""}
 		return sources
 	}
 

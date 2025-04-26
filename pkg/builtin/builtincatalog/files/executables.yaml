@@ -27,6 +27,8 @@ executable-discovery:
         cache:
           - id: "pypoetry-virtualenvs"
             dir: "/home/appuser/.cache/pypoetry/virtualenvs"
+      - binary: ["uv"]
+        image: "ghcr.io/cidverse/uv"
       - binary: ["pipenv"]
         image: "ghcr.io/cidverse/pipenv"
       - binary: ["aws"]

@@ -251,6 +251,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "uv",
+        "Version": "0.6.16",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/uv:0.6.16",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "pipenv",
         "Version": "2024.2.0",
         "Type": "container",
