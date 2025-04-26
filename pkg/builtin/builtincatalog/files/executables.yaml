@@ -24,6 +24,9 @@ executable-discovery:
         image: "ghcr.io/cidverse/openshift"
       - binary: ["poetry"]
         image: "ghcr.io/cidverse/poetry"
+        cache:
+          - id: "pypoetry-virtualenvs"
+            dir: "/home/appuser/.cache/pypoetry/virtualenvs"
       - binary: ["pipenv"]
         image: "ghcr.io/cidverse/pipenv"
       - binary: ["aws"]

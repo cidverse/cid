@@ -23,9 +23,9 @@ type ContainerMount struct {
 }
 
 type ContainerCache struct {
-	ID            string `yaml:"id"`
-	ContainerPath string `yaml:"dir"`
-	MountType     string `yaml:"type,omitempty"`
+	ID            string `yaml:"id" json:"id"`
+	ContainerPath string `yaml:"dir" json:"dir"`
+	MountType     string `yaml:"type,omitempty" json:"type,omitempty"`
 }
 
 type ContainerCerts struct {

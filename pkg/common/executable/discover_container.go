@@ -11,6 +11,7 @@ import (
 type ContainerPackage struct {
 	Binary []string
 	Image  string
+	Cache  []ContainerCache
 }
 
 type DiscoverContainerOptions struct {
@@ -33,6 +34,11 @@ func DiscoverContainerCandidates(opts *DiscoverContainerOptions) []Executable {
 			log.Error().Err(err).Msgf("failed to find tags for image %s", containerImage.Image)
 		}
 
+		cacheMounts := make([]ContainerCache, 0)
+		for _, cache := range containerImage.Cache {
+			cacheMounts = append(cacheMounts, cache)
+		}
+
 		log.Info().Msgf("Discovering container candidates for image %s", containerImage.Image)
 		for _, tag := range tags {
 			if strings.HasPrefix(tag.Tag, "sha256-") {
@@ -48,7 +54,7 @@ func DiscoverContainerCandidates(opts *DiscoverContainerOptions) []Executable {
 						Type:    ExecutionContainer,
 					},
 					Image:      fmt.Sprintf("%s:%s", containerImage.Image, tag.Tag),
-					ImageCache: make([]ContainerCache, 0),
+					ImageCache: cacheMounts,
 					Mounts:     make([]ContainerMount, 0),
 					Security:   ContainerSecurity{},
 					Entrypoint: nil,
