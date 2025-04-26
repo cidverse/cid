@@ -88,6 +88,7 @@ func (a ActionArtifactType) Key() string {
 type ActionType string
 
 const (
+	ActionTypeBuiltIn      ActionType = "builtin"
 	ActionTypeContainer    ActionType = "container"
 	ActionTypeGitHubAction ActionType = "githubaction"
 )

@@ -3,6 +3,7 @@ package config
 import (
 	"embed"
 
+	"github.com/cidverse/cid/pkg/actions"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/jinzhu/configor"
@@ -42,6 +43,11 @@ func LoadConfig(projectDirectory string) *CIDConfig {
 	cfg.Registry.Actions = append(cfg.Registry.Actions, data.Actions...)
 	cfg.Registry.Workflows = append(cfg.Registry.Workflows, data.Workflows...)
 	cfg.Registry.Executables = append(cfg.Registry.Executables, data.Executables...)
+
+	// internal catalog
+	internalCatalog := actions.InternalCatalog()
+	cfg.Registry.Actions = append(cfg.Registry.Actions, internalCatalog.Actions...)
+	cfg.Registry.Workflows = append(cfg.Registry.Workflows, internalCatalog.Workflows...)
 
 	// load project config
 	if filesystem.FileExists(projectDirectory + "/cid.yml") {

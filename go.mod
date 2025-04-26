@@ -11,6 +11,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v3 v3.2.0
 	github.com/adrg/xdg v0.5.3
 	github.com/bwmarrin/snowflake v0.3.0
+	github.com/cidverse/cid-sdk-go v0.0.0-20250426133422-753869400406
 	github.com/cidverse/cidverseutils/ci v0.1.0
 	github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842
 	github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4
@@ -26,7 +27,7 @@ require (
 	github.com/cidverse/go-vcs v0.0.0-20250416055844-4218094c633e
 	github.com/cidverse/go-vcsapp v0.0.0-20250424191714-080b11bb3c59
 	github.com/cidverse/normalizeci v1.1.1-0.20250404004516-fc8cf82ecb99
-	github.com/cidverse/repoanalyzer v0.1.1-0.20250320224038-fc4c20e388a4
+	github.com/cidverse/repoanalyzer v0.1.1-0.20250426011833-e56cbfaa472d
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/google/uuid v1.6.0
 	github.com/gosimple/slug v1.15.0
@@ -89,6 +90,8 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
+	github.com/otiai10/copy v1.14.1 // indirect
+	github.com/otiai10/mint v1.6.3 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/pjbgf/sha1cd v0.3.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -116,8 +119,8 @@ require (
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250422160041-2d3770c4ea7f // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250422160041-2d3770c4ea7f // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250425173222-7b384671a197 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250425173222-7b384671a197 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )

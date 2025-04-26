@@ -3,7 +3,6 @@ package appgitlab
 import (
 	"fmt"
 	"log/slog"
-	"os"
 	"path/filepath"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
@@ -109,7 +108,6 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 	}
 
 	// write workflow state
-	_ = os.Remove(filepath.Join(taskContext.Directory, ".cid", "state.json"))
 	previousState, _ := appconfig.ReadWorkflowState(filepath.Join(taskContext.Directory, ".cid", "state-gitlab.json"))
 	err = appconfig.WriteWorkflowState(workflowState, filepath.Join(taskContext.Directory, ".cid", "state-gitlab.json"))
 	if err != nil {
