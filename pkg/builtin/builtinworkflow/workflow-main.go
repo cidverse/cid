@@ -4,8 +4,11 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/trivy/trivyfsscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvtest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/zizmor/zizmorscan"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
 )
@@ -133,10 +136,10 @@ func GetWorkflows() []catalog.Workflow {
 						ID: gitleaksscan.URI,
 					},
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+semgrep-scan",
+						ID: semgrepscan.URI,
 					},
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+trivyfs-scan",
+						ID: trivyfsscan.URI,
 					},
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+sonarqube-scan",
@@ -145,7 +148,7 @@ func GetWorkflows() []catalog.Workflow {
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+qodana-scan",
 					},
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+zizmor-scan",
+						ID: zizmorscan.URI,
 					},
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+github-sarif-upload",

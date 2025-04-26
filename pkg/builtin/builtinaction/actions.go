@@ -2,10 +2,14 @@ package builtinaction
 
 import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/trivy/trivyfsscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvtest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/zizmor/zizmorscan"
 )
 
 // GetActionsMetadata returns a map of all actions with their metadata
@@ -18,12 +22,20 @@ func GetActionsMetadata() map[string]cidsdk.Action {
 func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 	// actions
 	actions := []cidsdk.Action{
+		// gitleaks
+		gitleaksscan.Action{Sdk: sdk},
 		// python-poetry
 		poetrybuild.Action{Sdk: *sdk},
 		poetrytest.Action{Sdk: *sdk},
 		// python-uv
 		uvbuild.Action{Sdk: *sdk},
 		uvtest.Action{Sdk: *sdk},
+		// semgrep
+		semgrepscan.Action{Sdk: *sdk},
+		// trivy
+		trivyfsscan.Action{Sdk: *sdk},
+		// zizmor
+		zizmorscan.Action{Sdk: *sdk},
 	}
 
 	// as map
