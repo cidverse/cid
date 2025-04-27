@@ -164,9 +164,6 @@ func GetWorkflows() []catalog.Workflow {
 					{
 						ID: zizmorscan.URI,
 					},
-					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+github-sarif-upload",
-					},
 				},
 			},
 			{

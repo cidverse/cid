@@ -4,6 +4,7 @@
 {{- $checkoutAction := index $root.WorkflowDependency "actions/checkout" -}}
 {{- $downloadArtifactAction := index $root.WorkflowDependency "actions/download-artifact" -}}
 {{- $uploadArtifactAction := index $root.WorkflowDependency "actions/upload-artifact" -}}
+{{- $uploadSarifAction := index $root.WorkflowDependency "github/codeql-action/upload-sarif" -}}
 {{- $hardenRunnerAction := index $root.WorkflowDependency "step-security/harden-runner" -}}
 {{- $cidSetupAction := index $root.WorkflowDependency "cidverse/ghact-cid-setup" -}}
 # cid-workflow-version: {{ .Version }}

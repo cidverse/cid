@@ -14,7 +14,7 @@ func TestGoModLint(t *testing.T) {
 	sdk.On("ModuleActionDataV1").Return(golangcommon.ModuleTestData(), nil)
 	sdk.On("FileExists", "/my-project/.golangci.yml").Return(true)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
-		Command: `golangci-lint run --sort-results --output.text.path stdout --output.sarif.path "/my-project/.tmp/golangci-lint.sarif.json" --issues-exit-code 0`,
+		Command: `golangci-lint run --output.text.path stdout --output.sarif.path "/my-project/.tmp/golangci-lint.sarif.json" --issues-exit-code 0`,
 		WorkDir: "/my-project",
 	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0}, nil)
 

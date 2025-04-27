@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cidverse/cid/internal/state"
+	"github.com/cidverse/cid/pkg/lib/githublib"
 	"io"
 	"log/slog"
 	"net/http"
@@ -210,7 +211,12 @@ func postProcessArtifact(hc *APIConfig, targetFile string, fileType string, form
 
 		slog.With("file", targetFile).With("coverage", coverage).Info("[API] calculated coverage from cobertura report")
 		fmt.Printf("Test-Coverage:%.2f%%\n", coverage) // some platforms parse the test-coverage from stdout (e.g. GitLab)
-	}
+
+	case fileType == "report" && format == "sarif" && formatVersion == "2.1.0" && hc.NCI.Repository.HostType == "github":
+		err := githublib.GitHubCodeSecuritySarifUpload(os.Getenv("GITHUB_TOKEN"), targetFile, hc.NCI)
+		if err != nil {
+			return fmt.Errorf("failed to upload sarif report to github: %w", err)
+		}
 
 	return nil
 }

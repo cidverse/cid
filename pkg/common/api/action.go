@@ -2,6 +2,9 @@ package api
 
 import (
 	"github.com/cidverse/cid/internal/state"
+	"github.com/cidverse/normalizeci/pkg/envstruct"
+	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
+	"log/slog"
 	"os/user"
 	"path/filepath"
 	"regexp"
@@ -38,6 +41,7 @@ type ActionExecutionContext struct {
 	Paths           config.PathConfig            // Paths holds the path configuration
 	ProjectDir      string                       // ProjectDir holds the project directory
 	WorkDir         string                       // WorkDir holds the current working directory
+	NCI             nci.Spec                     // NCI contains the NCI spec
 	Config          interface{}                  // Config holds the json configuration passed to this action
 	Args            []string                     // Args holds the arguments passed to the action
 	Env             map[string]string            // Env contains the full environment
@@ -95,6 +99,11 @@ func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, e
 		}
 	}
 
+	var nciSpec nci.Spec
+	err := envstruct.EnvMapToStruct(&nciSpec, env)
+	if err != nil {
+		slog.With("err", err).Error("Failed to unmarshal nci spec in action context")
+	}
 	return ActionExecutionContext{
 		Paths: config.PathConfig{
 			Artifact: filepath.Join(projectDir, ".dist"),
@@ -103,6 +112,7 @@ func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, e
 		},
 		ProjectDir:      projectDir,
 		WorkDir:         filesystem.WorkingDirOrPanic(),
+		NCI:             nciSpec,
 		Config:          "",
 		Args:            nil,
 		Env:             env,
