@@ -2,6 +2,9 @@ package builtinworkflow
 
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangbuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golanglint"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangtest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlebuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradletest"
@@ -35,7 +38,7 @@ func GetWorkflows() []catalog.Workflow {
 				Actions: []catalog.WorkflowAction{
 					// go
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+go-build",
+						ID: golangbuild.URI,
 					},
 					// java
 					{
@@ -80,7 +83,7 @@ func GetWorkflows() []catalog.Workflow {
 				Actions: []catalog.WorkflowAction{
 					// go
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+go-test",
+						ID: golangtest.URI,
 					},
 					// java
 					{
@@ -105,6 +108,11 @@ func GetWorkflows() []catalog.Workflow {
 			{
 				Name: "lint",
 				Actions: []catalog.WorkflowAction{
+					// go
+					{
+						ID: golanglint.URI,
+					},
+					// others
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+ansible-lint",
 					},

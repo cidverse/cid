@@ -115,3 +115,5 @@ executable-discovery:
         image: "ghcr.io/cidverse/maven"
       - binary: ["go"]
         image: "ghcr.io/cidverse/build-go"
+      - binary: ["golangci-lint"]
+        image: "ghcr.io/cidverse/golangci-lint"

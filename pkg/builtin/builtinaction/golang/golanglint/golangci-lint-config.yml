@@ -1,0 +1,45 @@
+version: "2"
+run:
+  concurrency: 4
+  tests: true
+linters:
+  default: none
+  enable:
+    - errcheck
+    - gocritic
+    - gosec
+    - govet
+    - revive
+    - staticcheck
+    - unused
+  settings:
+    gocritic:
+      enabled-checks:
+        - hugeParam
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - vendor/
+      - tmp/
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofumpt
+  settings:
+    gofumpt:
+      module-path: ""
+  exclusions:
+    generated: lax
+    paths:
+      - vendor/
+      - tmp/
+      - third_party$
+      - builtin$
+      - examples$

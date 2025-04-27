@@ -1080,6 +1080,23 @@
         "Entrypoint": null,
         "Certs": []
       }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "golangci-lint",
+        "Version": "2.1.2",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/golangci-lint:2.1.2",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
     }
   ]
 }
