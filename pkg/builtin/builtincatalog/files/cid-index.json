@@ -1097,6 +1097,36 @@
         "Entrypoint": null,
         "Certs": []
       }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "dotnet",
+        "Version": "9.0.203",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/dotnet-sdk:9.0.203",
+        "ImageCache": [
+          {
+            "id": "home-nuget",
+            "dir": "/home/appuser/.nuget"
+          },
+          {
+            "id": "home-dotnet",
+            "dir": "/home/appuser/.dotnet"
+          },
+          {
+            "id": "local-share-nuget",
+            "dir": "/home/appuser/.local/share/NuGet"
+          }
+        ],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
     }
   ]
 }

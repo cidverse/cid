@@ -2,6 +2,8 @@ package builtinaction
 
 import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnetbuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnettest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangcilint"
@@ -31,6 +33,9 @@ func GetActionsMetadata() map[string]cidsdk.Action {
 func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 	// actions
 	actions := []cidsdk.Action{
+		// dotnet
+		dotnetbuild.Action{Sdk: sdk},
+		dotnettest.Action{Sdk: sdk},
 		// gitleaks
 		gitleaksscan.Action{Sdk: sdk},
 		// go

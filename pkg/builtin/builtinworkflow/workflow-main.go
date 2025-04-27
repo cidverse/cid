@@ -1,6 +1,8 @@
 package builtinworkflow
 
 import (
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnetbuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnettest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangcilint"
@@ -49,7 +51,7 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// dotnet
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+dotnet-build",
+						ID: dotnetbuild.URI,
 					},
 					// python
 					{
@@ -94,7 +96,7 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// dotnet
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+dotnet-test",
+						ID: dotnettest.URI,
 					},
 					// python
 					{

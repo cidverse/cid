@@ -117,3 +117,12 @@ executable-discovery:
         image: "ghcr.io/cidverse/build-go"
       - binary: ["golangci-lint"]
         image: "ghcr.io/cidverse/golangci-lint"
+      - binary: ["dotnet"]
+        image: "ghcr.io/cidverse/dotnet-sdk"
+        cache:
+          - id: "home-nuget"
+            dir: "/home/appuser/.nuget"
+          - id: "home-dotnet"
+            dir: "/home/appuser/.dotnet"
+          - id: "local-share-nuget"
+            dir: "/home/appuser/.local/share/NuGet"

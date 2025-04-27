@@ -52,12 +52,16 @@ func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 	}
 
 	// overwrite binary for alias use-case
+	containerUser := util.GetContainerUser()
+	if opts.Executable == "dotnet" { // TODO: add to config, temporary workaround for dotnet perm issues
+		containerUser = "0"
+	}
 	containerExec := containerruntime.Container{
 		Image:            c.Image,
 		WorkingDirectory: ci.ToUnixPath(opts.WorkDir),
 		Entrypoint:       c.Entrypoint,
 		Command:          ci.ToUnixPathArgs(strings.Join(opts.Args, " ")),
-		User:             util.GetContainerUser(),
+		User:             containerUser,
 	}
 
 	// interactive?
