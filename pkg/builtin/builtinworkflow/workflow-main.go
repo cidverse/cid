@@ -5,6 +5,9 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlebuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradletest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenbuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenpublish"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/maventest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
@@ -39,7 +42,7 @@ func GetWorkflows() []catalog.Workflow {
 						ID: gradlebuild.URI,
 					},
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+maven-build",
+						ID: mavenbuild.URI,
 					},
 					// dotnet
 					{
@@ -84,7 +87,7 @@ func GetWorkflows() []catalog.Workflow {
 						ID: gradletest.URI,
 					},
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+maven-test",
+						ID: maventest.URI,
 					},
 					// dotnet
 					{
@@ -170,7 +173,7 @@ func GetWorkflows() []catalog.Workflow {
 						ID: gradlepublish.URI,
 					},
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+maven-publish",
+						ID: mavenpublish.URI,
 					},
 					// helm charts
 					{

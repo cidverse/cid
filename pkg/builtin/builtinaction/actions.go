@@ -6,6 +6,9 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlebuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradletest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenbuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenpublish"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/maventest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
@@ -31,6 +34,10 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		gradlebuild.Action{Sdk: sdk},
 		gradletest.Action{Sdk: sdk},
 		gradlepublish.Action{Sdk: sdk},
+		// maven
+		mavenbuild.Action{Sdk: sdk},
+		maventest.Action{Sdk: sdk},
+		mavenpublish.Action{Sdk: sdk},
 		// python-poetry
 		poetrybuild.Action{Sdk: sdk},
 		poetrytest.Action{Sdk: sdk},

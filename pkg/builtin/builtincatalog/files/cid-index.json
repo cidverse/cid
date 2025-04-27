@@ -1050,6 +1050,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "mvn",
+        "Version": "3.9.9",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/maven:3.9.9",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "go",
         "Version": "1.24.1",
         "Type": "container",

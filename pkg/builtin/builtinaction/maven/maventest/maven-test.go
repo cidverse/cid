@@ -1,0 +1,157 @@
+package maventest
+
+import (
+	"fmt"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlecommon"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavencommon"
+	"regexp"
+	"strings"
+
+	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/go-playground/validator/v10"
+)
+
+const URI = "builtin://actions/maven-test"
+
+var junitRegex = regexp.MustCompile(`target/surefire-reports/TEST-.*\.xml$`)
+
+type Action struct {
+	Sdk cidsdk.SDKClient
+}
+
+type Config struct {
+	MavenVersion        string `json:"maven_version"        env:"MAVEN_VERSION"`
+	WrapperVerification bool   `json:"wrapper_verification" env:"WRAPPER_VERIFICATION"`
+}
+
+func (a Action) Metadata() cidsdk.ActionMetadata {
+	return cidsdk.ActionMetadata{
+		Name:        "maven-test",
+		Description: `Tests the java module using the configured build system.`,
+		Category:    "test",
+		Scope:       cidsdk.ActionScopeModule,
+		Rules: []cidsdk.ActionRule{
+			{
+				Type:       "cel",
+				Expression: `MODULE_BUILD_SYSTEM == "maven"`,
+			},
+		},
+		Access: cidsdk.ActionAccess{
+			Environment: []cidsdk.ActionAccessEnv{},
+			Executables: []cidsdk.ActionAccessExecutable{
+				{
+					Name: "java",
+				},
+				{
+					Name: "mvn",
+				},
+			},
+			Network: common.MergeActionAccessNetwork(gradlecommon.NetworkJvm, gradlecommon.NetworkGradle),
+		},
+		Output: cidsdk.ActionOutput{
+			Artifacts: []cidsdk.ActionArtifactType{
+				{
+					Type:   "report",
+					Format: "jacoco",
+				},
+				{
+					Type:   "report",
+					Format: "junit",
+				},
+			},
+		},
+	}
+}
+
+func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+	cfg := Config{}
+	cidsdk.PopulateFromEnv(&cfg, d.Env)
+
+	// version
+	if cfg.MavenVersion == "" {
+		cfg.MavenVersion = gradlecommon.GetVersion(d.Env["NCI_COMMIT_REF_TYPE"], d.Env["NCI_COMMIT_REF_RELEASE"], d.Env["NCI_COMMIT_HASH_SHORT"])
+	}
+
+	// validate
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	err := validate.Struct(cfg)
+	if err != nil {
+		return cfg, err
+	}
+
+	return cfg, nil
+}
+
+func (a Action) Execute() (err error) {
+	// query action data
+	d, err := a.Sdk.ModuleActionDataV1()
+	if err != nil {
+		return err
+	}
+
+	// parse config
+	cfg, err := a.GetConfig(d)
+	if err != nil {
+		return err
+	}
+
+	// wrapper
+	mavenWrapper := cidsdk.JoinPath(d.Module.ModuleDir, "mvnw")
+	isUsingWrapper := a.Sdk.FileExists(mavenWrapper)
+
+	// version
+	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, fmt.Sprintf("versions:set -DnewVersion=%q", cfg.MavenVersion)),
+		WorkDir: d.Module.ModuleDir,
+	})
+	if err != nil {
+		return err
+	} else if cmdResult.Code != 0 {
+		return fmt.Errorf("maven build failed, exit code %d", cmdResult.Code)
+	}
+
+	// test
+	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, `test --batch-mode`),
+		WorkDir: d.Module.ModuleDir,
+	})
+	if err != nil {
+		return err
+	} else if cmdResult.Code != 0 {
+		return fmt.Errorf("maven build failed, exit code %d", cmdResult.Code)
+	}
+
+	// collect and store test reports for Gradle and Maven
+	testReports, err := a.Sdk.FileList(cidsdk.FileRequest{Directory: d.Module.ModuleDir, Extensions: []string{".xml", ".sarif"}})
+	if err != nil {
+		return err
+	}
+	for _, report := range testReports {
+		path := report.Path
+
+		if strings.HasSuffix(path, cidsdk.JoinPath("target", "site", "jacoco", "jacoco.xml")) {
+			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+				File:   path,
+				Module: d.Module.Slug,
+				Type:   "report",
+				Format: "jacoco",
+			})
+			if err != nil {
+				return err
+			}
+		} else if junitRegex.MatchString(path) {
+			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+				File:   path,
+				Module: d.Module.Slug,
+				Type:   "report",
+				Format: "junit",
+			})
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
