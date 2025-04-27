@@ -1,9 +1,9 @@
-package golangbuild
+package gobuild
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangcommon"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gocommon"
 	"github.com/go-playground/validator/v10"
 	"github.com/sourcegraph/conc/pool"
 	"runtime"
@@ -18,7 +18,7 @@ type Action struct {
 }
 
 type Config struct {
-	Platform []golangcommon.Platform `json:"platform"`
+	Platform []gocommon.Platform `json:"platform"`
 }
 
 func (a Action) Metadata() cidsdk.ActionMetadata {
@@ -100,7 +100,7 @@ func (a Action) Execute() (err error) {
 	if len(cfg.Platform) == 0 {
 		// parse platform comment from go.mod
 		if len(d.Module.Discovery) > 0 && d.Module.Discovery[0].File != "" {
-			platforms, err := golangcommon.DiscoverPlatformsFromGoMod(d.Module.Discovery[0].File)
+			platforms, err := gocommon.DiscoverPlatformsFromGoMod(d.Module.Discovery[0].File)
 			if err != nil {
 				return err
 			}
@@ -109,12 +109,12 @@ func (a Action) Execute() (err error) {
 
 		// default to current platform
 		if len(cfg.Platform) == 0 {
-			cfg.Platform = append(cfg.Platform, golangcommon.Platform{Goos: runtime.GOOS, Goarch: runtime.GOARCH})
+			cfg.Platform = append(cfg.Platform, gocommon.Platform{Goos: runtime.GOOS, Goarch: runtime.GOARCH})
 		}
 	}
 
 	// don't build libraries
-	if golangcommon.IsGoLibrary(d.Module) {
+	if gocommon.IsGoLibrary(d.Module) {
 		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "no go files in module root, not attempting to build library projects"})
 		return nil
 	}

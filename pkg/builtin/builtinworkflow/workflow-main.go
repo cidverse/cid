@@ -2,9 +2,9 @@ package builtinworkflow
 
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangbuild"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golanglint"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangtest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gobuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangcilint"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gotest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlebuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradletest"
@@ -38,7 +38,7 @@ func GetWorkflows() []catalog.Workflow {
 				Actions: []catalog.WorkflowAction{
 					// go
 					{
-						ID: golangbuild.URI,
+						ID: gobuild.URI,
 					},
 					// java
 					{
@@ -83,7 +83,7 @@ func GetWorkflows() []catalog.Workflow {
 				Actions: []catalog.WorkflowAction{
 					// go
 					{
-						ID: golangtest.URI,
+						ID: gotest.URI,
 					},
 					// java
 					{
@@ -110,7 +110,7 @@ func GetWorkflows() []catalog.Workflow {
 				Actions: []catalog.WorkflowAction{
 					// go
 					{
-						ID: golanglint.URI,
+						ID: golangcilint.URI,
 					},
 					// others
 					{

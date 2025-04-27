@@ -1,8 +1,8 @@
-package golangtest
+package gotest
 
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangcommon"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gocommon"
 	"testing"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -11,7 +11,7 @@ import (
 
 func TestGoModTest(t *testing.T) {
 	sdk := common.TestSetup(t)
-	sdk.On("ModuleActionDataV1").Return(golangcommon.ModuleTestData(), nil)
+	sdk.On("ModuleActionDataV1").Return(gocommon.ModuleTestData(), nil)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
 		Command: `go get -v -t ./...`,
 		WorkDir: "/my-project",

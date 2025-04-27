@@ -3,9 +3,9 @@ package builtinaction
 import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangbuild"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golanglint"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangtest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gobuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangcilint"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gotest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlebuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradletest"
@@ -34,9 +34,9 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		// gitleaks
 		gitleaksscan.Action{Sdk: sdk},
 		// go
-		golangbuild.Action{Sdk: sdk},
-		golangtest.Action{Sdk: sdk},
-		golanglint.Action{Sdk: sdk},
+		gobuild.Action{Sdk: sdk},
+		gotest.Action{Sdk: sdk},
+		golangcilint.Action{Sdk: sdk},
 		// gradle
 		gradlebuild.Action{Sdk: sdk},
 		gradletest.Action{Sdk: sdk},

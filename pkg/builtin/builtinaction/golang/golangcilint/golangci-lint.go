@@ -1,4 +1,4 @@
-package golanglint
+package golangcilint
 
 import (
 	_ "embed"
@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-const URI = "builtin://actions/go-lint"
+const URI = "builtin://actions/golangci-lint"
 
 //go:embed golangci-lint-config.yml
 var defaultConfig []byte
@@ -25,8 +25,8 @@ type Config struct {
 
 func (a Action) Metadata() cidsdk.ActionMetadata {
 	return cidsdk.ActionMetadata{
-		Name:        "go-lint",
-		Description: "Runs the golangci-lint tool on your go project.",
+		Name:        "golangci-lint",
+		Description: "Runs golangci-lint to check the code quality of your go project.",
 		Category:    "sast",
 		Scope:       cidsdk.ActionScopeModule,
 		Rules: []cidsdk.ActionRule{

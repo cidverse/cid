@@ -1,4 +1,4 @@
-package golangcommon
+package gocommon
 
 import (
 	cidsdk "github.com/cidverse/cid-sdk-go"

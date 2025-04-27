@@ -1,4 +1,4 @@
-package golangtest
+package gotest
 
 import (
 	"errors"

@@ -1,8 +1,8 @@
-package golanglint
+package golangcilint
 
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangcommon"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gocommon"
 	"testing"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -11,7 +11,7 @@ import (
 
 func TestGoModLint(t *testing.T) {
 	sdk := common.TestSetup(t)
-	sdk.On("ModuleActionDataV1").Return(golangcommon.ModuleTestData(), nil)
+	sdk.On("ModuleActionDataV1").Return(gocommon.ModuleTestData(), nil)
 	sdk.On("FileExists", "/my-project/.golangci.yml").Return(true)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
 		Command: `golangci-lint run --output.text.path stdout --output.sarif.path "/my-project/.tmp/golangci-lint.sarif.json" --issues-exit-code 0`,
