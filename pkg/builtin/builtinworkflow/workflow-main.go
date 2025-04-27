@@ -3,6 +3,8 @@ package builtinworkflow
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnetbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnettest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/github/githubreleasepublish"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitlab/gitlabreleasepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangcilint"
@@ -195,10 +197,10 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// release
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+github-release-publish",
+						ID: githubreleasepublish.URI,
 					},
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+gitlab-release-publish",
+						ID: gitlabreleasepublish.URI,
 					},
 				},
 			},

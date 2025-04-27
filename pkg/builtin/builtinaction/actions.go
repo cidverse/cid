@@ -4,6 +4,8 @@ import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnetbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnettest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/github/githubreleasepublish"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitlab/gitlabreleasepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangcilint"
@@ -38,6 +40,10 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		dotnettest.Action{Sdk: sdk},
 		// gitleaks
 		gitleaksscan.Action{Sdk: sdk},
+		// github
+		githubreleasepublish.Action{Sdk: sdk},
+		// gitlab
+		gitlabreleasepublish.Action{Sdk: sdk},
 		// go
 		gobuild.Action{Sdk: sdk},
 		gotest.Action{Sdk: sdk},
