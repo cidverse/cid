@@ -15,9 +15,9 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenpublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/maventest"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodebuild"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodelint"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodetest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/npm/npmbuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/npm/npmlint"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/npm/npmtest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
@@ -67,7 +67,7 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// node
 					{
-						ID: nodebuild.URI,
+						ID: npmbuild.URI,
 					},
 					// helm
 					{
@@ -112,7 +112,7 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// node
 					{
-						ID: nodetest.URI,
+						ID: npmtest.URI,
 					},
 				},
 			},
@@ -125,7 +125,7 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// node
 					{
-						ID: nodelint.URI,
+						ID: npmlint.URI,
 					},
 					// others
 					{

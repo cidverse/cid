@@ -1,13 +1,14 @@
-package nodelint
+package npmtest
 
 import (
 	"fmt"
 	cidsdk "github.com/cidverse/cid-sdk-go"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodecommon"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/npm/npmcommon"
 	"github.com/go-playground/validator/v10"
+	"strings"
 )
 
-const URI = "builtin://actions/node-lint"
+const URI = "builtin://actions/npm-test"
 
 type Action struct {
 	Sdk cidsdk.SDKClient
@@ -18,9 +19,9 @@ type Config struct {
 
 func (a Action) Metadata() cidsdk.ActionMetadata {
 	return cidsdk.ActionMetadata{
-		Name:        "node-lint",
-		Description: "Run linting for a node module",
-		Category:    "lint",
+		Name:        "npm-test",
+		Description: "Run tests for a npm module",
+		Category:    "test",
 		Scope:       cidsdk.ActionScopeModule,
 		Rules: []cidsdk.ActionRule{
 			{
@@ -48,7 +49,11 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 			Artifacts: []cidsdk.ActionArtifactType{
 				{
 					Type:   "report",
-					Format: "sarif",
+					Format: "cobertura",
+				},
+				{
+					Type:   "report",
+					Format: "junit",
 				},
 			},
 		},
@@ -87,15 +92,15 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
-	pkg, err := nodecommon.ParsePackageJSON(content)
+	pkg, err := npmcommon.ParsePackageJSON(content)
 	if err != nil {
 		return err
 	}
 
 	// check if script is present
-	_, scriptFound := pkg.Scripts[`lint`]
+	_, scriptFound := pkg.Scripts[`test`]
 	if !scriptFound {
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "warn", Message: "No lint script found in package.json"})
+		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "warn", Message: "No test script found in package.json"})
 		return nil
 	}
 
@@ -110,32 +115,43 @@ func (a Action) Execute() (err error) {
 		return fmt.Errorf("npm install failed, exit code %d", cmdResult.Code)
 	}
 
-	// lint
+	// test
 	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-		Command: `npm run lint`,
+		Command: `npm test`,
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
 		return err
 	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("npm lint failed, exit code %d", cmdResult.Code)
+		return fmt.Errorf("npm test failed, exit code %d", cmdResult.Code)
 	}
 
 	// collect and store jacoco test reports
 	testReports, err := a.Sdk.FileList(cidsdk.FileRequest{
 		Directory:  d.Module.ModuleDir,
-		Extensions: []string{".sarif"},
+		Extensions: []string{".xml"},
 	})
 	for _, report := range testReports {
-		err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
-			File:          report.Path,
-			Module:        d.Module.Slug,
-			Type:          "report",
-			Format:        "sarif",
-			FormatVersion: "2.1.0",
-		})
-		if err != nil {
-			return err
+		if strings.HasSuffix(report.Path, "cobertura-coverage.xml") {
+			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+				File:   report.Path,
+				Module: d.Module.Slug,
+				Type:   "report",
+				Format: "cobertura",
+			})
+			if err != nil {
+				return err
+			}
+		} else if strings.HasSuffix(report.Path, "junit.xml") {
+			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+				File:   report.Path,
+				Module: d.Module.Slug,
+				Type:   "report",
+				Format: "junit",
+			})
+			if err != nil {
+				return err
+			}
 		}
 	}
 

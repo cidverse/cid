@@ -1,4 +1,4 @@
-package nodecommon
+package npmcommon
 
 import cidsdk "github.com/cidverse/cid-sdk-go"
 
@@ -10,7 +10,7 @@ func TestModuleData() *cidsdk.ModuleActionData {
 			Discovery:         []cidsdk.ProjectModuleDiscovery{{File: "/my-project/package.json"}},
 			Name:              "my-package",
 			Slug:              "my-package",
-			BuildSystem:       "node",
+			BuildSystem:       "npm",
 			BuildSystemSyntax: "default",
 			Language:          &map[string]string{},
 			Submodules:        nil,

@@ -1,8 +1,8 @@
-package nodebuild
+package npmbuild
 
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodecommon"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/npm/npmcommon"
 	"testing"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -11,7 +11,7 @@ import (
 
 func TestNodeBuild(t *testing.T) {
 	sdk := common.TestSetup(t)
-	sdk.On("ModuleActionDataV1").Return(nodecommon.TestModuleData(), nil)
+	sdk.On("ModuleActionDataV1").Return(npmcommon.TestModuleData(), nil)
 	sdk.On("FileRead", "/my-project/package.json").Return(`{"scripts": {"build": ""}}`, nil)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
 		Command: "npm install",
@@ -29,7 +29,7 @@ func TestNodeBuild(t *testing.T) {
 
 func TestNodeBuildNoScript(t *testing.T) {
 	sdk := common.TestSetup(t)
-	sdk.On("ModuleActionDataV1").Return(nodecommon.TestModuleData(), nil)
+	sdk.On("ModuleActionDataV1").Return(npmcommon.TestModuleData(), nil)
 	sdk.On("FileRead", "/my-project/package.json").Return(`{}`, nil)
 
 	action := Action{Sdk: sdk}

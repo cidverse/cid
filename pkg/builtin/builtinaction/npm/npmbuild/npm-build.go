@@ -1,13 +1,13 @@
-package nodebuild
+package npmbuild
 
 import (
 	"fmt"
 	cidsdk "github.com/cidverse/cid-sdk-go"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodecommon"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/npm/npmcommon"
 	"github.com/go-playground/validator/v10"
 )
 
-const URI = "builtin://actions/node-build"
+const URI = "builtin://actions/npm-build"
 
 type Action struct {
 	Sdk cidsdk.SDKClient
@@ -18,8 +18,8 @@ type Config struct {
 
 func (a Action) Metadata() cidsdk.ActionMetadata {
 	return cidsdk.ActionMetadata{
-		Name:        "node-build",
-		Description: "Builds a node.js project",
+		Name:        "npm-build",
+		Description: "Builds a npm.js project",
 		Category:    "build",
 		Scope:       cidsdk.ActionScopeModule,
 		Rules: []cidsdk.ActionRule{
@@ -79,7 +79,7 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
-	pkg, err := nodecommon.ParsePackageJSON(content)
+	pkg, err := npmcommon.ParsePackageJSON(content)
 	if err != nil {
 		return err
 	}

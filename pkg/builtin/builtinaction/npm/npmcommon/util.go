@@ -1,4 +1,4 @@
-package nodecommon
+package npmcommon
 
 import (
 	"encoding/json"
