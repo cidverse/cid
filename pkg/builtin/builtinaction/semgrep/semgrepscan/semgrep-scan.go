@@ -2,7 +2,6 @@ package semgrepscan
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"strconv"
 	"strings"
 
@@ -48,9 +47,6 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				{
 					Name: "semgrep",
 				},
-				{
-					Name: "gitlab-sarif-converter",
-				},
 			},
 			Network: []cidsdk.ActionAccessNetwork{
 				{
@@ -63,10 +59,6 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				{
 					Type:   "report",
 					Format: "sarif",
-				},
-				{
-					Type:   "report",
-					Format: "gl-codequality",
 				},
 			},
 		},
@@ -148,12 +140,6 @@ func (a Action) Execute() (err error) {
 	})
 	if err != nil {
 		return fmt.Errorf("failed to upload report %s: %w", reportFile, err)
-	}
-
-	// optional report conversion
-	err = common.GLCodeQualityConversion(a.Sdk, *d, reportFile)
-	if err != nil {
-		return err
 	}
 
 	return nil

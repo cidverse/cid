@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"fmt"
 	cidsdk "github.com/cidverse/cid-sdk-go"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/go-playground/validator/v10"
 	"os"
 	"path"
@@ -41,9 +40,6 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				{
 					Name: "golangci-lint",
 				},
-				{
-					Name: "gitlab-sarif-converter",
-				},
 			},
 		},
 		Output: cidsdk.ActionOutput{
@@ -51,10 +47,6 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				{
 					Type:   "report",
 					Format: "sarif",
-				},
-				{
-					Type:   "report",
-					Format: "gl-codequality",
 				},
 			},
 		},
@@ -129,12 +121,6 @@ func (a Action) Execute() (err error) {
 		Format:        "sarif",
 		FormatVersion: "2.1.0",
 	})
-	if err != nil {
-		return err
-	}
-
-	// optional report conversion
-	err = common.GLCodeQualityConversionForModule(a.Sdk, *d, reportFile)
 	if err != nil {
 		return err
 	}

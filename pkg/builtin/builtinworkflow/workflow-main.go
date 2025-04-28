@@ -15,6 +15,9 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenpublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/maventest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodebuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodelint"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodetest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
@@ -64,7 +67,7 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// node
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+node-build",
+						ID: nodebuild.URI,
 					},
 					// helm
 					{
@@ -107,6 +110,10 @@ func GetWorkflows() []catalog.Workflow {
 					{
 						ID: uvtest.URI,
 					},
+					// node
+					{
+						ID: nodetest.URI,
+					},
 				},
 			},
 			{
@@ -115,6 +122,10 @@ func GetWorkflows() []catalog.Workflow {
 					// go
 					{
 						ID: golangcilint.URI,
+					},
+					// node
+					{
+						ID: nodelint.URI,
 					},
 					// others
 					{

@@ -2,7 +2,6 @@ package zizmorscan
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"strings"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -61,9 +60,6 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Name:       "zizmor",
 					Constraint: "=> 1.4.1",
 				},
-				{
-					Name: "gitlab-sarif-converter",
-				},
 			},
 		},
 		Output: cidsdk.ActionOutput{
@@ -71,10 +67,6 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				{
 					Type:   "report",
 					Format: "sarif",
-				},
-				{
-					Type:   "report",
-					Format: "gl-codequality",
 				},
 			},
 		},
@@ -153,12 +145,6 @@ func (a Action) Execute() (err error) {
 		Format:        "sarif",
 		FormatVersion: "2.1.0",
 	})
-	if err != nil {
-		return err
-	}
-
-	// optional report conversion
-	err = common.GLCodeQualityConversion(a.Sdk, *d, reportFile)
 	if err != nil {
 		return err
 	}

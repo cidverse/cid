@@ -2,7 +2,6 @@ package trivyfsscan
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"strings"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -37,9 +36,6 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Name:       "trivy",
 					Constraint: "=> 0.61.0",
 				},
-				{
-					Name: "gitlab-sarif-converter",
-				},
 			},
 			Network: []cidsdk.ActionAccessNetwork{
 				{
@@ -52,10 +48,6 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				{
 					Type:   "report",
 					Format: "sarif",
-				},
-				{
-					Type:   "report",
-					Format: "gl-codequality",
 				},
 			},
 		},
@@ -117,12 +109,6 @@ func (a Action) Execute() (err error) {
 		Format:        "sarif",
 		FormatVersion: "2.1.0",
 	})
-	if err != nil {
-		return err
-	}
-
-	// optional report conversion
-	err = common.GLCodeQualityConversion(a.Sdk, *d, reportFile)
 	if err != nil {
 		return err
 	}

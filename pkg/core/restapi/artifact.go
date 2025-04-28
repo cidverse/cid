@@ -201,7 +201,9 @@ func postProcessArtifact(hc *APIConfig, targetFile string, fileType string, form
 		}
 
 		slog.With("file", targetFile).With("coverage", coverage).Info("[API] calculated coverage from jacoco report")
-		fmt.Printf("Test-Coverage:%.2f%%\n", coverage) // some platforms parse the test-coverage from stdout (e.g. GitLab)
+		if hc.NCI.Repository.HostType == "gitlab" {
+			fmt.Printf("Test-Coverage:%.2f%%\n", coverage) // some platforms parse the test-coverage from stdout (e.g. GitLab)
+		}
 
 	case fileType == "report" && format == "cobertura":
 		coverage, err := cobertura.ParseCoverageFromFile(targetFile)
@@ -210,14 +212,44 @@ func postProcessArtifact(hc *APIConfig, targetFile string, fileType string, form
 		}
 
 		slog.With("file", targetFile).With("coverage", coverage).Info("[API] calculated coverage from cobertura report")
-		fmt.Printf("Test-Coverage:%.2f%%\n", coverage) // some platforms parse the test-coverage from stdout (e.g. GitLab)
+		if hc.NCI.Repository.HostType == "gitlab" {
+			fmt.Printf("Test-Coverage:%.2f%%\n", coverage) // some platforms parse the test-coverage from stdout (e.g. GitLab)
+		}
+
+	case fileType == "report" && format == "sarif" && formatVersion == "2.1.0" && hc.NCI.Repository.HostType == "gitlab": // TD-001: automatic conversion of SARIF to GitLab Code Quality due to missing SARIF support in GitLab
+		// temp file
+		codeQualityFile, err := os.CreateTemp(os.TempDir(), "gl-code-quality-report-*.json")
+		if err != nil {
+			return fmt.Errorf("failed to create temporary file: %w", err)
+		}
+		defer codeQualityFile.Close() // Ensure the temporary file is closed when done
+
+		// code-quality report
+		cmdResult, err := hc.executeCommand(executeRequest{
+			WorkDir: hc.ProjectDir,
+			Command: fmt.Sprintf("gitlab-sarif-converter --type=codequality %q %q", targetFile, codeQualityFile.Name()),
+		})
+		if err != nil {
+			return fmt.Errorf("failed to execute gitlab-sarif-converter: %w", err)
+		} else if cmdResult.Code != 0 {
+			return fmt.Errorf("gitlab-sarif-converter failed, exit code %d: %s", cmdResult.Code, cmdResult.Error)
+		}
+
+		// upload
+		moduleSlug := ""
+		if hc.CurrentModule != nil {
+			moduleSlug = hc.CurrentModule.Slug
+		}
+		_, _, err = hc.storeArtifact(moduleSlug, "report", "gl-codequality", "", path.Base(codeQualityFile.Name()), codeQualityFile, false)
+		if err != nil {
+			return fmt.Errorf("failed to store converted code quality report: %w", err)
+		}
 
 	case fileType == "report" && format == "sarif" && formatVersion == "2.1.0" && hc.NCI.Repository.HostType == "github":
 		err := githublib.GitHubCodeSecuritySarifUpload(os.Getenv("GITHUB_TOKEN"), targetFile, hc.NCI)
 		if err != nil {
 			return fmt.Errorf("failed to upload sarif report to github: %w", err)
 		}
-
 	}
 
 	return nil

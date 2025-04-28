@@ -31,6 +31,15 @@ type executeRequest struct {
 	Constraint         string            `json:"constraint"`
 }
 
+type executeResponse struct {
+	Dir     string `json:"dir"`
+	Command string `json:"command"`
+	Code    int    `json:"code"`
+	Stdout  string `json:"stdout"`
+	Stderr  string `json:"stderr"`
+	Error   string `json:"error"`
+}
+
 // commandExecute runs a command in the project directory (blocking until the command exits, returns the response code)
 func (hc *APIConfig) commandExecute(c echo.Context) error {
 	var req executeRequest
@@ -42,6 +51,20 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 			Details: "bad request, " + err.Error(),
 		})
 	}
+
+	resp, err := hc.executeCommand(req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, apiError{
+			Status:  400,
+			Title:   "bad request",
+			Details: err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}
+
+func (hc *APIConfig) executeCommand(req executeRequest) (executeResponse, error) {
 	execDir := util.GetStringOrDefault(req.WorkDir, hc.ProjectDir)
 	log.Debug().Str("work_dir", execDir).Str("constraint", req.Constraint).Str("command", req.Command).Interface("env", req.Env).Msg("[API] execute command")
 
@@ -71,11 +94,7 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 
 	if !slices.Contains(allowedExecutables, cmdBinary) {
 		slog.With("command", cmdBinary).With("allowed_commands", allowedExecutables).With("step", hc.Step.Slug).Error("[API] command not allowed by step")
-		return c.JSON(http.StatusBadRequest, apiError{
-			Status:  400,
-			Title:   "bad request",
-			Details: fmt.Sprintf("command [%s] by [%s] not allowed", cmdBinary, hc.Step.Slug),
-		})
+		return executeResponse{}, fmt.Errorf("command [%s] by [%s] not allowed", cmdBinary, hc.Step.Slug)
 	}
 
 	// execute
@@ -120,17 +139,14 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 		errorMessage = cmdErr.Error()
 	}
 
-	// response
-	res := map[string]interface{}{
-		"dir":     execDir,
-		"command": req.Command,
-		"code":    exitCode,
-		"stdout":  stdout,
-		"stderr":  stderr,
-		"error":   errorMessage,
-	}
-
-	return c.JSON(http.StatusOK, res)
+	return executeResponse{
+		Dir:     execDir,
+		Command: req.Command,
+		Code:    exitCode,
+		Stdout:  stdout,
+		Stderr:  stderr,
+		Error:   errorMessage,
+	}, nil
 }
 
 // replace placeholders in command

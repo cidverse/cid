@@ -64,6 +64,15 @@ type ActionOutput struct {
 	Artifacts []ActionArtifactType `json:"artifacts,omitempty"`
 }
 
+func (a ActionOutput) ContainsArtifactWithTypeAndFormat(artifactType string, artifactFormat string) bool {
+	for _, artifact := range a.Artifacts {
+		if artifact.Type == artifactType && artifact.Format == artifactFormat {
+			return true
+		}
+	}
+	return false
+}
+
 type ActionArtifactType struct {
 	Type          string `json:"type"`             // Type, e.g. "report", "binary"
 	Format        string `json:"format,omitempty"` // Format, e.g. "sarif"

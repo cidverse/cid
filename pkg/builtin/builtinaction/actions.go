@@ -16,6 +16,9 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenpublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/maventest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodebuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodelint"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/node/nodetest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
@@ -56,6 +59,10 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		mavenbuild.Action{Sdk: sdk},
 		maventest.Action{Sdk: sdk},
 		mavenpublish.Action{Sdk: sdk},
+		// node
+		nodebuild.Action{Sdk: sdk},
+		nodetest.Action{Sdk: sdk},
+		nodelint.Action{Sdk: sdk},
 		// python-poetry
 		poetrybuild.Action{Sdk: sdk},
 		poetrytest.Action{Sdk: sdk},

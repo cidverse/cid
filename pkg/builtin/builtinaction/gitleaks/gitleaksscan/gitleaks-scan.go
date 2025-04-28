@@ -2,7 +2,6 @@ package gitleaksscan
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/go-playground/validator/v10"
 	"strings"
 
@@ -37,9 +36,6 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				{
 					Name: "gitleaks",
 				},
-				{
-					Name: "gitlab-sarif-converter",
-				},
 			},
 		},
 		Output: cidsdk.ActionOutput{
@@ -47,10 +43,6 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				{
 					Type:   "report",
 					Format: "sarif",
-				},
-				{
-					Type:   "report",
-					Format: "gl-codequality",
 				},
 			},
 		},
@@ -128,12 +120,6 @@ func (a Action) Execute() (err error) {
 		Format:        "sarif",
 		FormatVersion: report.Version,
 	})
-	if err != nil {
-		return err
-	}
-
-	// optional report conversion
-	err = common.GLCodeQualityConversion(a.Sdk, *d, reportFile)
 	if err != nil {
 		return err
 	}

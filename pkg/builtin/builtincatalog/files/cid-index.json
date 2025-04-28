@@ -1127,6 +1127,74 @@
         "Entrypoint": null,
         "Certs": []
       }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "node",
+        "Version": "23.11.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/node-sdk:23.11.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "npm",
+        "Version": "23.11.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/node-sdk:23.11.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "npx",
+        "Version": "23.11.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/node-sdk:23.11.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "yarn",
+        "Version": "23.11.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/node-sdk:23.11.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
     }
   ]
 }
