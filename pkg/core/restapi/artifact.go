@@ -218,5 +218,7 @@ func postProcessArtifact(hc *APIConfig, targetFile string, fileType string, form
 			return fmt.Errorf("failed to upload sarif report to github: %w", err)
 		}
 
+	}
+
 	return nil
 }
