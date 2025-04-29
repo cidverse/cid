@@ -3,7 +3,9 @@ package util
 import (
 	"bytes"
 	"regexp"
+	"strings"
 	"text/template"
+	"unicode"
 )
 
 // RegexFormat will evaluate a regex expr to render a template
@@ -26,4 +28,12 @@ func RegexFormat(input string, regexExpr string, outputTemplate string) (string,
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+func TrimLeftEachLine(s string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		lines[i] = strings.TrimLeftFunc(line, unicode.IsSpace)
+	}
+	return strings.Join(lines, "\n")
 }

@@ -14,6 +14,11 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlebuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradletest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmbuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmdeploy"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmlint"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmpublishnexus"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmpublishregistry"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenpublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/maventest"
@@ -77,17 +82,7 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// helm
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+helm-build",
-					},
-					// static site generators
-					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+hugo-build",
-					},
-					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+mkdocs-build",
-					},
-					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+techdocs-build",
+						ID: helmbuild.URI,
 					},
 				},
 			},
@@ -137,12 +132,13 @@ func GetWorkflows() []catalog.Workflow {
 					{
 						ID: npmlint.URI,
 					},
+					// helm
+					{
+						ID: helmlint.URI,
+					},
 					// others
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+ansible-lint",
-					},
-					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+helm-lint",
 					},
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+helmfile-lint",
@@ -207,10 +203,10 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// helm charts
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+helm-publish-nexus",
+						ID: helmpublishnexus.URI,
 					},
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+helm-publish-registry",
+						ID: helmpublishregistry.URI,
 					},
 					// changelog
 					{
@@ -232,7 +228,7 @@ func GetWorkflows() []catalog.Workflow {
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+ansible-deploy",
 					},
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+helm-deploy",
+						ID: helmdeploy.URI,
 					},
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+helmfile-deploy",

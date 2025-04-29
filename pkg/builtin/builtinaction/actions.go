@@ -15,6 +15,11 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlebuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradletest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmbuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmdeploy"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmlint"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmpublishnexus"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmpublishregistry"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenpublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/maventest"
@@ -80,6 +85,12 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		trivyfsscan.Action{Sdk: sdk},
 		// zizmor
 		zizmorscan.Action{Sdk: sdk},
+		// helm
+		helmbuild.Action{Sdk: sdk},
+		helmlint.Action{Sdk: sdk},
+		helmpublishnexus.Action{Sdk: sdk},
+		helmpublishregistry.Action{Sdk: sdk},
+		helmdeploy.Action{Sdk: sdk},
 	}
 
 	// as map
