@@ -53,7 +53,7 @@ func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 
 	// overwrite binary for alias use-case
 	containerUser := util.GetContainerUser()
-	if opts.Executable == "dotnet" { // TODO: add to config, temporary workaround for dotnet perm issues
+	if opts.Executable == "dotnet" || opts.Executable == "npm" || opts.Executable == "cargo" { // TD-002: fix permission issues or add uid to image config
 		containerUser = "0"
 	}
 	containerExec := containerruntime.Container{

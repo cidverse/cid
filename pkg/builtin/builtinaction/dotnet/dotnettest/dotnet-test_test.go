@@ -3,7 +3,7 @@ package dotnettest
 import (
 	_ "embed"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnetcommon"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnetcommon"
 	"testing"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -18,7 +18,7 @@ func TestDotNetTest(t *testing.T) {
 		WorkDir: "/my-project",
 	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0}, nil)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
-		Command: `dotnet test --logger:"junit;LogFilePath=/my-project/.tmp/junit.xml" --collect "Code Coverage;Format=cobertura"`,
+		Command: `dotnet test --logger:"junit;LogFilePath=/my-project/.tmp/junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose" --collect "Code Coverage;Format=cobertura"`,
 		WorkDir: "/my-project",
 	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0}, nil)
 	sdk.On("ArtifactUpload", cidsdk.ArtifactUploadRequest{

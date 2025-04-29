@@ -1195,6 +1195,40 @@
         "Entrypoint": null,
         "Certs": []
       }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "cargo",
+        "Version": "1.86.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/cargo:1.86.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "cargo-nextest",
+        "Version": "1.86.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/cargo:1.86.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
     }
   ]
 }

@@ -128,3 +128,5 @@ executable-discovery:
             dir: "/home/appuser/.local/share/NuGet"
       - binary: ["node", "npm", "npx", "yarn"]
         image: "ghcr.io/cidverse/node-sdk"
+      - binary: ["cargo", "cargo-nextest"]
+        image: "ghcr.io/cidverse/cargo"

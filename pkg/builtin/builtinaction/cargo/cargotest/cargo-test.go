@@ -1,13 +1,17 @@
-package dotnettest
+package cargotest
 
 import (
+	_ "embed"
 	"fmt"
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/go-playground/validator/v10"
-	"strings"
+	"path"
 )
 
-const URI = "builtin://actions/dotnet-test"
+const URI = "builtin://actions/cargo-test"
+
+//go:embed nextest.toml
+var nextestBytes []byte
 
 type Action struct {
 	Sdk cidsdk.SDKClient
@@ -18,26 +22,26 @@ type Config struct {
 
 func (a Action) Metadata() cidsdk.ActionMetadata {
 	return cidsdk.ActionMetadata{
-		Name:        "dotnet-test",
-		Description: `Runs the dotnet test command`,
+		Name:        "cargo-test",
+		Description: "Tests a Rust project",
 		Category:    "test",
 		Scope:       cidsdk.ActionScopeModule,
 		Rules: []cidsdk.ActionRule{
 			{
 				Type:       "cel",
-				Expression: `MODULE_BUILD_SYSTEM == "dotnet"`,
+				Expression: `MODULE_BUILD_SYSTEM == "cargo"`,
 			},
 		},
 		Access: cidsdk.ActionAccess{
 			Environment: []cidsdk.ActionAccessEnv{},
 			Executables: []cidsdk.ActionAccessExecutable{
 				{
-					Name: "dotnet",
+					Name: "cargo",
 				},
 			},
 			Network: []cidsdk.ActionAccessNetwork{
 				{
-					Host: "api.nuget.org:443",
+					Host: "crates.io:443",
 				},
 			},
 		},
@@ -46,10 +50,6 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				{
 					Type:   "report",
 					Format: "junit",
-				},
-				{
-					Type:   "report",
-					Format: "cobertura",
 				},
 			},
 		},
@@ -83,59 +83,32 @@ func (a Action) Execute() (err error) {
 		return err
 	}
 
-	// files
-	junitReport := cidsdk.JoinPath(d.Config.TempDir, "junit.xml")
-
-	// restore
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-		Command: fmt.Sprintf(`dotnet restore`),
-		WorkDir: d.Module.ModuleDir,
-	})
+	// create ci config
+	configFile := cidsdk.JoinPath(d.Config.TempDir, "nextest.toml")
+	err = a.Sdk.FileWrite(configFile, nextestBytes)
 	if err != nil {
-		return err
-	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("dotnet restore failed, exit code %d", cmdResult.Code)
+		return fmt.Errorf("error writing nextest config %s: %w", configFile, err)
 	}
 
 	// test
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-		Command: fmt.Sprintf(`dotnet test --logger:"junit;LogFilePath=%s" --collect "Code Coverage;Format=cobertura"`, junitReport),
+	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+		Command: fmt.Sprintf(`cargo nextest run --profile=ci --tool-config-file ci:%s`, configFile),
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
 		return err
 	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("dotnet test failed, exit code %d", cmdResult.Code)
+		return fmt.Errorf("cargo test failed, exit code %d", cmdResult.Code)
 	}
 
-	// store report
+	// junit report
 	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
-		File:   junitReport,
-		Module: d.Module.Slug,
+		File:   path.Join(d.Module.ModuleDir, "target", "nextest", "ci", "junit.xml"),
 		Type:   "report",
 		Format: "junit",
 	})
 	if err != nil {
 		return err
-	}
-
-	// collect and store cobertura reports
-	testReports, err := a.Sdk.FileList(cidsdk.FileRequest{
-		Directory:  d.Module.ModuleDir,
-		Extensions: []string{".xml"},
-	})
-	for _, report := range testReports {
-		if strings.HasSuffix(report.Path, ".cobertura.xml") {
-			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
-				File:   report.Path,
-				Module: d.Module.Slug,
-				Type:   "report",
-				Format: "cobertura",
-			})
-			if err != nil {
-				return err
-			}
-		}
 	}
 
 	return nil

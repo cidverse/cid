@@ -1,8 +1,10 @@
 package builtinworkflow
 
 import (
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnetbuild"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnettest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargotest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnetbuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnettest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/github/githubreleasepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitlab/gitlabreleasepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
@@ -69,6 +71,10 @@ func GetWorkflows() []catalog.Workflow {
 					{
 						ID: npmbuild.URI,
 					},
+					// rust
+					{
+						ID: cargobuild.URI,
+					},
 					// helm
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+helm-build",
@@ -113,6 +119,10 @@ func GetWorkflows() []catalog.Workflow {
 					// node
 					{
 						ID: npmtest.URI,
+					},
+					// rust
+					{
+						ID: cargotest.URI,
 					},
 				},
 			},

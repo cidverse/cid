@@ -2,8 +2,10 @@ package builtinaction
 
 import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnetbuild"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnettest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargotest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnetbuild"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnettest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/github/githubreleasepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitlab/gitlabreleasepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
@@ -69,6 +71,9 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		// python-uv
 		uvbuild.Action{Sdk: sdk},
 		uvtest.Action{Sdk: sdk},
+		// rust
+		cargobuild.Action{Sdk: sdk},
+		cargotest.Action{Sdk: sdk},
 		// semgrep
 		semgrepscan.Action{Sdk: sdk},
 		// trivy

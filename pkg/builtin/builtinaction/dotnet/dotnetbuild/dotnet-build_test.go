@@ -3,7 +3,7 @@ package dotnetbuild
 import (
 	_ "embed"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/donet/dotnetcommon"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnetcommon"
 	"testing"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"

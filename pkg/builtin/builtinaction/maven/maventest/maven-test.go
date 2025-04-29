@@ -15,6 +15,7 @@ import (
 const URI = "builtin://actions/maven-test"
 
 var junitRegex = regexp.MustCompile(`target/surefire-reports/TEST-.*\.xml$`)
+var junitFailSafeRegex = regexp.MustCompile(`target/failsafe-reports/TEST-.*\.xml$`)
 
 type Action struct {
 	Sdk cidsdk.SDKClient
@@ -140,7 +141,7 @@ func (a Action) Execute() (err error) {
 			if err != nil {
 				return err
 			}
-		} else if junitRegex.MatchString(path) {
+		} else if junitRegex.MatchString(path) || junitFailSafeRegex.MatchString(path) {
 			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
 				File:   path,
 				Module: d.Module.Slug,
