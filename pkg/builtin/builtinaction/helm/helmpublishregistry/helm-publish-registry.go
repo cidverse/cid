@@ -44,6 +44,14 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				},
 			},
 		},
+		Input: cidsdk.ActionInput{
+			Artifacts: []cidsdk.ActionArtifactType{
+				{
+					Type:   "helm-chart",
+					Format: "tgz",
+				},
+			},
+		},
 	}
 }
 

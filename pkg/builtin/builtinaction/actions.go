@@ -20,6 +20,8 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmlint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmpublishnexus"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmpublishregistry"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helmfile/helmfiledeploy"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helmfile/helmfilelint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenpublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/maventest"
@@ -91,6 +93,9 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		helmpublishnexus.Action{Sdk: sdk},
 		helmpublishregistry.Action{Sdk: sdk},
 		helmdeploy.Action{Sdk: sdk},
+		// helmfile
+		helmfilelint.Action{Sdk: sdk},
+		helmfiledeploy.Action{Sdk: sdk},
 	}
 
 	// as map

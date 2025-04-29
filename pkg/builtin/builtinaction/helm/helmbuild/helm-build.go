@@ -38,6 +38,14 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				},
 			},
 		},
+		Output: cidsdk.ActionOutput{
+			Artifacts: []cidsdk.ActionArtifactType{
+				{
+					Type:   "helm-chart",
+					Format: "tgz",
+				},
+			},
+		},
 	}
 }
 

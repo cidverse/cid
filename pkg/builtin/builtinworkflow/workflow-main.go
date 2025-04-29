@@ -19,6 +19,8 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmlint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmpublishnexus"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmpublishregistry"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helmfile/helmfiledeploy"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helmfile/helmfilelint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavenpublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/maventest"
@@ -136,12 +138,12 @@ func GetWorkflows() []catalog.Workflow {
 					{
 						ID: helmlint.URI,
 					},
+					{
+						ID: helmfilelint.URI,
+					},
 					// others
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+ansible-lint",
-					},
-					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+helmfile-lint",
 					},
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+renovate-lint",
@@ -227,11 +229,12 @@ func GetWorkflows() []catalog.Workflow {
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+ansible-deploy",
 					},
+					// helm
 					{
 						ID: helmdeploy.URI,
 					},
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+helmfile-deploy",
+						ID: helmfiledeploy.URI,
 					},
 				},
 			},
