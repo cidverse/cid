@@ -3,6 +3,7 @@ package builtinworkflow
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargotest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/changelog/changeloggenerate"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnetbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnettest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/github/githubreleasepublish"
@@ -212,7 +213,7 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					// changelog
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+changelog-generate",
+						ID: changeloggenerate.URI,
 					},
 					// release
 					{
@@ -226,6 +227,7 @@ func GetWorkflows() []catalog.Workflow {
 			{
 				Name: "deploy",
 				Actions: []catalog.WorkflowAction{
+					// ansible
 					{
 						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+ansible-deploy",
 					},

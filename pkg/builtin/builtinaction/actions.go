@@ -4,6 +4,7 @@ import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargotest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/changelog/changeloggenerate"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnetbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnettest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/github/githubreleasepublish"
@@ -87,6 +88,8 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		trivyfsscan.Action{Sdk: sdk},
 		// zizmor
 		zizmorscan.Action{Sdk: sdk},
+		// changelog
+		changeloggenerate.Action{Sdk: sdk},
 		// helm
 		helmbuild.Action{Sdk: sdk},
 		helmlint.Action{Sdk: sdk},

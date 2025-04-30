@@ -1,0 +1,17 @@
+{{- if .CommitGroups -}}
+{{ range  $groupName, $commits := .CommitGroups -}}
+## {{ $groupName }}
+{{ range $commits -}}
+- {{ if index .Context "scope" }}**{{ index .Context "scope" }}:** {{ end }}{{ index .Context "subject" }}
+{{ end }}
+{{ end -}}
+{{ end -}}
+
+{{- if .NoteGroups -}}
+{{ range  $groupName, $notes := .NoteGroups -}}
+## {{ $groupName }}
+{{ range $notes -}}
+- {{ . }}
+{{ end -}}
+{{ end -}}
+{{ end -}}
