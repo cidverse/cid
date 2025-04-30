@@ -35,6 +35,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/renovate/renovatelint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/sonarqube/sonarqubescan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/trivy/trivyfsscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvtest"
@@ -85,6 +86,8 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		// rust
 		cargobuild.Action{Sdk: sdk},
 		cargotest.Action{Sdk: sdk},
+		// sonarqube
+		sonarqubescan.Action{Sdk: sdk},
 		// semgrep
 		semgrepscan.Action{Sdk: sdk},
 		// trivy

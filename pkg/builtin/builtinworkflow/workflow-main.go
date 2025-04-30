@@ -34,6 +34,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/renovate/renovatelint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/sonarqube/sonarqubescan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/trivy/trivyfsscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvtest"
@@ -156,24 +157,13 @@ func GetWorkflows() []catalog.Workflow {
 				},
 			},
 			{
-				Name: "package",
-				Actions: []catalog.WorkflowAction{
-					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+upx-optimize",
-					},
-					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+buildah-build",
-						Config: map[string]interface{}{
-							"no-cache": false,
-							"squash":   true,
-							"rebuild":  true,
-						},
-					},
-				},
+				Name:    "package",
+				Actions: []catalog.WorkflowAction{},
 			},
 			{
 				Name: "scan",
 				Actions: []catalog.WorkflowAction{
+					// secret scanning
 					{
 						ID: gitleaksscan.URI,
 					},
@@ -183,11 +173,9 @@ func GetWorkflows() []catalog.Workflow {
 					{
 						ID: trivyfsscan.URI,
 					},
+					// sonarqube
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+sonarqube-scan",
-					},
-					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+qodana-scan",
+						ID: sonarqubescan.URI,
 					},
 					{
 						ID: zizmorscan.URI,
@@ -197,10 +185,6 @@ func GetWorkflows() []catalog.Workflow {
 			{
 				Name: "publish",
 				Actions: []catalog.WorkflowAction{
-					// container - publish to registry
-					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+buildah-publish",
-					},
 					// java library - publish
 					{
 						ID: gradlepublish.URI,
