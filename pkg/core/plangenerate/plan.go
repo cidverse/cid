@@ -3,7 +3,6 @@ package plangenerate
 import (
 	"fmt"
 	"log/slog"
-	"slices"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	actionApi "github.com/cidverse/cid/pkg/common/api"
@@ -135,15 +134,8 @@ func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
 	}
 	log.Debug().Int("steps", len(steps)).Msg("workflow steps sorted topologically")
 
-	// collect stages
-	var stages []string
-	for _, step := range steps {
-		if !slices.Contains(stages, step.Stage) {
-			stages = append(stages, step.Stage)
-		}
-	}
-
-	log.Debug().Int("stages", len(stages)).Msg("workflow plan finalized")
+	stages := filterStages(steps, planContext.Stages)
+	log.Debug().Strs("stages", stages).Msg("workflow plan finalized")
 	return Plan{
 		Name:   workflow.Name,
 		Stages: stages,
@@ -328,6 +320,22 @@ func assignStepDependencies(steps []Step, context PlanContext) []Step {
 	}
 
 	return steps
+}
+
+// filterStages returns only the stages from desiredOrder that are actually used in the steps.
+func filterStages(steps []Step, desiredOrder []string) []string {
+	seen := map[string]bool{}
+	for _, step := range steps {
+		seen[step.Stage] = true
+	}
+
+	var filtered []string
+	for _, stage := range desiredOrder {
+		if seen[stage] {
+			filtered = append(filtered, stage)
+		}
+	}
+	return filtered
 }
 
 func slicesReplaceByLookup(slice []string, lookup map[string]string) []string {

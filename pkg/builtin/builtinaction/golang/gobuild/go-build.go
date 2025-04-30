@@ -1,10 +1,9 @@
 package gobuild
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gocommon"
-	"github.com/go-playground/validator/v10"
 	"github.com/sourcegraph/conc/pool"
 	"runtime"
 
@@ -65,18 +64,8 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 
 func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 	cfg := Config{}
-	if d.Config.Config != "" {
-		err := json.Unmarshal([]byte(d.Config.Config), &cfg)
-		if err != nil {
-			return cfg, fmt.Errorf("failed to parse config: %w", err)
-		}
-	}
-	cidsdk.PopulateFromEnv(&cfg, d.Env)
 
-	// validate
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	err := validate.Struct(cfg)
-	if err != nil {
+	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
 		return cfg, err
 	}
 

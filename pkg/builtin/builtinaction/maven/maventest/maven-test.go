@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
-	"github.com/go-playground/validator/v10"
 )
 
 const URI = "builtin://actions/maven-test"
@@ -67,17 +66,11 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 
 func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 	cfg := Config{}
-	cidsdk.PopulateFromEnv(&cfg, d.Env)
-
-	// version
 	if cfg.MavenVersion == "" {
 		cfg.MavenVersion = gradlecommon.GetVersion(d.Env["NCI_COMMIT_REF_TYPE"], d.Env["NCI_COMMIT_REF_RELEASE"], d.Env["NCI_COMMIT_HASH_SHORT"])
 	}
 
-	// validate
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	err := validate.Struct(cfg)
-	if err != nil {
+	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
 		return cfg, err
 	}
 

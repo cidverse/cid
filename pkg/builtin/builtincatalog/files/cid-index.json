@@ -336,10 +336,44 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "ansible",
+        "Version": "2.18.4",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/ansible:2.18.4",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "ansible-lint",
         "Version": "24.9.2",
         "Type": "container",
         "Image": "ghcr.io/cidverse/ansible-lint:24.9.2",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "ansible-lint",
+        "Version": "25.2.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/ansible-lint:25.2.1",
         "ImageCache": [],
         "Mounts": [],
         "Security": {

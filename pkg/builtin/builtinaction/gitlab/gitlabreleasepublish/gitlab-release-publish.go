@@ -3,13 +3,13 @@ package gitlabreleasepublish
 import (
 	"bytes"
 	"fmt"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"net/http"
 	"os"
 	"strconv"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cidverseutils/core/ci"
-	"github.com/go-playground/validator/v10"
 	gitlab "gitlab.com/gitlab-org/api/client-go"
 )
 
@@ -72,12 +72,8 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 
 func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
 	cfg := Config{}
-	cidsdk.PopulateFromEnv(&cfg, d.Env)
 
-	// validate
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	err := validate.Struct(cfg)
-	if err != nil {
+	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
 		return cfg, err
 	}
 

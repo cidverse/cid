@@ -48,6 +48,7 @@ func renderWorkflow(data []appconfig.WorkflowData, templateFile string, outputFi
 			wfDependencies[k] = v
 		}
 	}
+	wfStages = getOrderedStages(wfStages) // TODO: this is not ideal, but returns the correct order for now
 
 	template, err := vcsapp.Render(string(content), TemplateData{
 		Version:            constants.Version,

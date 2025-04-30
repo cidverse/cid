@@ -8,6 +8,7 @@ go 1.24
 toolchain go1.24.0
 
 require (
+	github.com/BurntSushi/toml v1.5.0
 	github.com/ProtonMail/gopenpgp/v3 v3.2.0
 	github.com/adrg/xdg v0.5.3
 	github.com/bwmarrin/snowflake v0.3.0
@@ -27,7 +28,7 @@ require (
 	github.com/cidverse/go-vcs v0.0.0-20250416055844-4218094c633e
 	github.com/cidverse/go-vcsapp v0.0.0-20250424191714-080b11bb3c59
 	github.com/cidverse/normalizeci v1.1.1-0.20250404004516-fc8cf82ecb99
-	github.com/cidverse/repoanalyzer v0.1.1-0.20250426193409-a90f43d67543
+	github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/google/go-github/v71 v71.0.0
@@ -42,6 +43,7 @@ require (
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/oriser/regroup v0.0.0-20240925165441-f6bb0e08289e
+	github.com/otiai10/copy v1.14.1
 	github.com/owenrumney/go-sarif/v3 v3.1.4
 	github.com/rs/zerolog v1.34.0
 	github.com/sourcegraph/conc v0.3.0
@@ -57,7 +59,6 @@ require (
 require (
 	cel.dev/expr v0.23.1 // indirect
 	dario.cat/mergo v1.0.1 // indirect
-	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.2.0 // indirect
@@ -94,7 +95,6 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/otiai10/copy v1.14.1 // indirect
 	github.com/otiai10/mint v1.6.3 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/pjbgf/sha1cd v0.3.2 // indirect

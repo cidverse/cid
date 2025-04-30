@@ -4,8 +4,8 @@ import (
 	"fmt"
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargocommon"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/lib/formats/cargotoml"
-	"github.com/go-playground/validator/v10"
 )
 
 const URI = "builtin://actions/cargo-build"
@@ -50,17 +50,11 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 
 func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 	cfg := Config{}
-	cidsdk.PopulateFromEnv(&cfg, d.Env)
-
-	// version
 	if cfg.CargoVersion == "" {
 		cfg.CargoVersion = cargocommon.GetVersion(d.Env["NCI_COMMIT_REF_TYPE"], d.Env["NCI_COMMIT_REF_RELEASE"], d.Env["NCI_COMMIT_HASH_SHORT"])
 	}
 
-	// validate
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	err := validate.Struct(cfg)
-	if err != nil {
+	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
 		return cfg, err
 	}
 

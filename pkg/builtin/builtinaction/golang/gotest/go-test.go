@@ -3,7 +3,7 @@ package gotest
 import (
 	"errors"
 	"fmt"
-	"github.com/go-playground/validator/v10"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"path/filepath"
 	"strings"
 
@@ -78,12 +78,8 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 
 func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 	cfg := Config{}
-	cidsdk.PopulateFromEnv(&cfg, d.Env)
 
-	// validate
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	err := validate.Struct(cfg)
-	if err != nil {
+	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
 		return cfg, err
 	}
 
