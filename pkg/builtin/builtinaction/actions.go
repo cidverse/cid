@@ -2,6 +2,8 @@ package builtinaction
 
 import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/ansible/ansibledeploy"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/ansible/ansiblelint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargotest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/changelog/changeloggenerate"
@@ -31,6 +33,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/npm/npmtest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/renovate/renovatelint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/trivy/trivyfsscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
@@ -88,6 +91,8 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		trivyfsscan.Action{Sdk: sdk},
 		// zizmor
 		zizmorscan.Action{Sdk: sdk},
+		// renovate
+		renovatelint.Action{Sdk: sdk},
 		// changelog
 		changeloggenerate.Action{Sdk: sdk},
 		// helm
@@ -99,6 +104,9 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		// helmfile
 		helmfilelint.Action{Sdk: sdk},
 		helmfiledeploy.Action{Sdk: sdk},
+		// ansible
+		ansiblelint.Action{Sdk: sdk},
+		ansibledeploy.Action{Sdk: sdk},
 	}
 
 	// as map

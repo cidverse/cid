@@ -1,6 +1,8 @@
 package builtinworkflow
 
 import (
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/ansible/ansibledeploy"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/ansible/ansiblelint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargotest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/changelog/changeloggenerate"
@@ -30,6 +32,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/npm/npmtest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/renovate/renovatelint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/trivy/trivyfsscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
@@ -142,12 +145,13 @@ func GetWorkflows() []catalog.Workflow {
 					{
 						ID: helmfilelint.URI,
 					},
-					// others
+					// ansible
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+ansible-lint",
+						ID: ansiblelint.URI,
 					},
+					// renovate
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+renovate-lint",
+						ID: renovatelint.URI,
 					},
 				},
 			},
@@ -229,7 +233,7 @@ func GetWorkflows() []catalog.Workflow {
 				Actions: []catalog.WorkflowAction{
 					// ansible
 					{
-						ID: "container://ghcr.io/cidverse/cid-actions-go:0.1.0+ansible-deploy",
+						ID: ansibledeploy.URI,
 					},
 					// helm
 					{
