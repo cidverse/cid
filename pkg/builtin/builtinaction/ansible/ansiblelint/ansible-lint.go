@@ -16,7 +16,8 @@ type Action struct {
 }
 
 type Config struct {
-	LintProfile string `json:"ansible_lint_profile"  env:"ANSIBLE_LINT_PROFILE"`
+	LintProfile    string `json:"ansible_lint_profile"  env:"ANSIBLE_LINT_PROFILE"`
+	GalaxyRolesDir string `json:"ansible_galaxy_roles_dir"  env:"ANSIBLE_GALAXY_ROLES_DIR"`
 }
 
 func (a Action) Metadata() cidsdk.ActionMetadata {
@@ -53,9 +54,9 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 }
 
 func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
-	cfg := Config{}
-	if cfg.LintProfile == "" {
-		cfg.LintProfile = "production"
+	cfg := Config{
+		LintProfile:    "production",
+		GalaxyRolesDir: "roles",
 	}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -81,10 +82,10 @@ func (a Action) Execute() (err error) {
 	// files
 	reportFile := cidsdk.JoinPath(d.Config.TempDir, "ansiblelint.sarif.json")
 
-	// role and collection requirements
-	if a.Sdk.FileExists(path.Join(d.Module.ModuleDir, "requirements.yml")) {
+	// role requirements
+	if a.Sdk.FileExists(path.Join(d.Module.ModuleDir, cfg.GalaxyRolesDir, "requirements.yml")) {
 		_, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-			Command: `ansible-galaxy collection install -r requirements.yml`,
+			Command: fmt.Sprintf(`ansible-galaxy install -g -f -r %s/requirements.yml -p %s`, cfg.GalaxyRolesDir, cfg.GalaxyRolesDir),
 			WorkDir: d.Module.ModuleDir,
 		})
 		if err != nil {
@@ -94,12 +95,14 @@ func (a Action) Execute() (err error) {
 
 	// lint
 	// config lookup: https://ansible.readthedocs.io/projects/lint/configuring/#using-local-configuration-files
-	_, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
 		Command: fmt.Sprintf(`ansible-lint --project . --profile %q --sarif-file %q`, cfg.LintProfile, reportFile),
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
 		return err
+	} else if cmdResult.Code != 0 && cmdResult.Code != 2 { // 0 = success, 2 = linting errors
+		return fmt.Errorf("ansible-lint failed with exit code %d", cmdResult.Code)
 	}
 
 	// parse report

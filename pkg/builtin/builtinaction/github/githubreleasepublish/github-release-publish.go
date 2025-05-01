@@ -28,7 +28,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 		Rules: []cidsdk.ActionRule{
 			{
 				Type:       "cel",
-				Expression: `hasPrefix(ENV["NCI_REPOSITORY_REMOTE"], "https://github.com/") && CID_WORKFLOW_TYPE == "release"`,
+				Expression: `hasPrefix(ENV["NCI_REPOSITORY_REMOTE"], "https://github.com/")`,
 			},
 		},
 		Access: cidsdk.ActionAccess{

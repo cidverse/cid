@@ -30,7 +30,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 		Rules: []cidsdk.ActionRule{
 			{
 				Type:       "cel",
-				Expression: `MODULE_DEPLOYMENT_TYPE == "helmfile" && CID_WORKFLOW_TYPE == "release"`,
+				Expression: `MODULE_DEPLOYMENT_TYPE == "helmfile"`,
 			},
 		},
 		Access: cidsdk.ActionAccess{

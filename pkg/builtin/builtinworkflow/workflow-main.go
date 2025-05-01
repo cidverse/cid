@@ -130,6 +130,12 @@ func GetWorkflows() []catalog.Workflow {
 			},
 			{
 				Name: "lint",
+				Rules: []catalog.WorkflowRule{
+					{
+						Type:       "cel",
+						Expression: `CID_WORKFLOW_TYPE != "release"`,
+					},
+				},
 				Actions: []catalog.WorkflowAction{
 					// go
 					{
@@ -184,6 +190,12 @@ func GetWorkflows() []catalog.Workflow {
 			},
 			{
 				Name: "publish",
+				Rules: []catalog.WorkflowRule{
+					{
+						Type:       "cel",
+						Expression: `CID_WORKFLOW_TYPE == "main" || CID_WORKFLOW_TYPE == "release"`,
+					},
+				},
 				Actions: []catalog.WorkflowAction{
 					// java library - publish
 					{
@@ -202,18 +214,42 @@ func GetWorkflows() []catalog.Workflow {
 					// changelog
 					{
 						ID: changeloggenerate.URI,
+						Rules: []catalog.WorkflowRule{
+							{
+								Type:       "cel",
+								Expression: `CID_WORKFLOW_TYPE == "release"`,
+							},
+						},
 					},
 					// release
 					{
 						ID: githubreleasepublish.URI,
+						Rules: []catalog.WorkflowRule{
+							{
+								Type:       "cel",
+								Expression: `CID_WORKFLOW_TYPE == "release"`,
+							},
+						},
 					},
 					{
 						ID: gitlabreleasepublish.URI,
+						Rules: []catalog.WorkflowRule{
+							{
+								Type:       "cel",
+								Expression: `CID_WORKFLOW_TYPE == "release"`,
+							},
+						},
 					},
 				},
 			},
 			{
 				Name: "deploy",
+				Rules: []catalog.WorkflowRule{
+					{
+						Type:       "cel",
+						Expression: `CID_WORKFLOW_TYPE == "release"`,
+					},
+				},
 				Actions: []catalog.WorkflowAction{
 					// ansible
 					{

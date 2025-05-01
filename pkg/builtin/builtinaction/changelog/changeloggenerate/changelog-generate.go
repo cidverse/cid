@@ -30,12 +30,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 		Description: `Generates a changelog based on the commit history. The default regex expression supports parsing semantic commit messages.`,
 		Category:    "build",
 		Scope:       cidsdk.ActionScopeProject,
-		Rules: []cidsdk.ActionRule{
-			{
-				Type:       "cel",
-				Expression: `CID_WORKFLOW_TYPE == "release"`,
-			},
-		},
+		Rules:       []cidsdk.ActionRule{},
 		Access: cidsdk.ActionAccess{
 			Environment: []cidsdk.ActionAccessEnv{},
 			Executables: []cidsdk.ActionAccessExecutable{},

@@ -16,11 +16,11 @@ var reportJson string
 func TestAnsibleLint(t *testing.T) {
 	sdk := common.TestSetup(t)
 	sdk.On("ModuleActionDataV1").Return(ansiblecommon.ModuleTestData(), nil)
-	sdk.On("FileExists", "/my-project/playbook-a/requirements.yml").Return(false)
+	sdk.On("FileExists", "/my-project/playbook-a/roles/requirements.yml").Return(false)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
 		Command: `ansible-lint --project . --profile "production" --sarif-file "/my-project/.tmp/ansiblelint.sarif.json"`,
 		WorkDir: "/my-project/playbook-a",
-	}).Return(nil, nil)
+	}).Return(&cidsdk.ExecuteCommandResponse{Code: 2}, nil)
 	sdk.On("FileRead", "/my-project/.tmp/ansiblelint.sarif.json").Return(reportJson, nil)
 	sdk.On("ArtifactUpload", cidsdk.ArtifactUploadRequest{
 		File:          "/my-project/.tmp/ansiblelint.sarif.json",
@@ -37,15 +37,15 @@ func TestAnsibleLint(t *testing.T) {
 func TestAnsibleLintWithDependencies(t *testing.T) {
 	sdk := common.TestSetup(t)
 	sdk.On("ModuleActionDataV1").Return(ansiblecommon.ModuleTestData(), nil)
-	sdk.On("FileExists", "/my-project/playbook-a/requirements.yml").Return(true)
+	sdk.On("FileExists", "/my-project/playbook-a/roles/requirements.yml").Return(true)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
-		Command: "ansible-galaxy collection install -r requirements.yml",
+		Command: "ansible-galaxy install -g -f -r roles/requirements.yml -p roles",
 		WorkDir: "/my-project/playbook-a",
-	}).Return(nil, nil)
+	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0}, nil)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
 		Command: `ansible-lint --project . --profile "production" --sarif-file "/my-project/.tmp/ansiblelint.sarif.json"`,
 		WorkDir: "/my-project/playbook-a",
-	}).Return(nil, nil)
+	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0}, nil)
 	sdk.On("FileRead", "/my-project/.tmp/ansiblelint.sarif.json").Return(reportJson, nil)
 	sdk.On("ArtifactUpload", cidsdk.ArtifactUploadRequest{
 		File:          "/my-project/.tmp/ansiblelint.sarif.json",

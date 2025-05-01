@@ -21,10 +21,14 @@ func selectWorkflow(context PlanContext, ruleContext map[string]interface{}) (ca
 	return catalog.Workflow{}, ErrNoSuitableWorkflowFound
 }
 
-func getWorkflowActions(workflow catalog.Workflow) ([]catalog.WorkflowAction, error) {
+func getWorkflowActions(workflow catalog.Workflow, ruleContext map[string]interface{}) ([]catalog.WorkflowAction, error) {
 	var actions []catalog.WorkflowAction
 
 	for _, stage := range workflow.Stages {
+		if !rules.AnyRuleMatches(stage.Rules, ruleContext) {
+			continue
+		}
+
 		for _, action := range stage.Actions {
 			action.Stage = stage.Name
 			actions = append(actions, action)

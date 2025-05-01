@@ -110,7 +110,7 @@ func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
 	log.Debug().Str("workflow-name", workflow.Name).Msg("selected workflow")
 
 	// collect all actions
-	actions, err := getWorkflowActions(workflow)
+	actions, err := getWorkflowActions(workflow, ruleContext)
 	if err != nil {
 		return Plan{}, err
 	}
@@ -188,7 +188,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 			ruleContext["CID_WORKFLOW_TYPE"] = workflowType
 
 			// check if the action rules match, if not check again for each environment
-			if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext) {
+			if rules.AnyRuleMatches(catalogAction.Metadata.Rules, ruleContext) && rules.AnyRuleMatches(action.Rules, ruleContext) {
 				steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, nil, "", executableConstraints))
 			} else {
 				for _, env := range context.VCSEnvironments {
@@ -207,7 +207,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 
 					envRuleContext := rules.GetProjectRuleContext(vcsEnv, ctx.Modules)
 					envRuleContext["CID_WORKFLOW_TYPE"] = workflowType
-					if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), envRuleContext) {
+					if rules.AnyRuleMatches(catalogAction.Metadata.Rules, envRuleContext) && rules.AnyRuleMatches(action.Rules, envRuleContext) {
 						steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, nil, env.Env.Name, executableConstraints))
 					} else {
 						log.Debug().Str("action", action.ID).Str("environment", env.Env.Name).Msg("action skipped by environment filter")
@@ -221,7 +221,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 				ruleContext["CID_WORKFLOW_TYPE"] = workflowType
 
 				// check if the action rules match, if not check again for each environment
-				if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext) {
+				if rules.AnyRuleMatches(catalogAction.Metadata.Rules, ruleContext) && rules.AnyRuleMatches(action.Rules, ruleContext) {
 					steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, &moduleRef, "", executableConstraints))
 				} else {
 					for _, env := range context.VCSEnvironments {
@@ -240,7 +240,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 
 						envRuleContext := rules.GetModuleRuleContext(vcsEnv, &moduleRef)
 						envRuleContext["CID_WORKFLOW_TYPE"] = workflowType
-						if rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), envRuleContext) {
+						if rules.AnyRuleMatches(catalogAction.Metadata.Rules, envRuleContext) && rules.AnyRuleMatches(action.Rules, envRuleContext) {
 							steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, &moduleRef, env.Env.Name, executableConstraints))
 						} else {
 							log.Debug().Str("action", action.ID).Str("environment", env.Env.Name).Msg("action skipped by environment filter")

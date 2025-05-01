@@ -15,8 +15,9 @@ type Action struct {
 }
 
 type Config struct {
-	PlaybookFile  string `json:"ansible_playbook"  env:"ANSIBLE_PLAYBOOK"`
-	InventoryFile string `json:"ansible_inventory"  env:"ANSIBLE_INVENTORY"`
+	PlaybookFile   string `json:"ansible_playbook"  env:"ANSIBLE_PLAYBOOK"`
+	InventoryFile  string `json:"ansible_inventory"  env:"ANSIBLE_INVENTORY"`
+	GalaxyRolesDir string `json:"ansible_galaxy_roles_dir"  env:"ANSIBLE_GALAXY_ROLES_DIR"`
 }
 
 func (a Action) Metadata() cidsdk.ActionMetadata {
@@ -55,12 +56,10 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 }
 
 func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
-	cfg := Config{}
-	if cfg.PlaybookFile == "" {
-		cfg.PlaybookFile = path.Join(d.Module.ModuleDir, "playbook.yml")
-	}
-	if cfg.InventoryFile == "" {
-		cfg.InventoryFile = path.Join(path.Dir(cfg.PlaybookFile), "inventory")
+	cfg := Config{
+		PlaybookFile:   path.Join(d.Module.ModuleDir, "playbook.yml"),
+		InventoryFile:  path.Join(d.Module.ModuleDir, "inventory"),
+		GalaxyRolesDir: "roles",
 	}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -83,10 +82,10 @@ func (a Action) Execute() (err error) {
 		return err
 	}
 
-	// role and collection requirements
-	if a.Sdk.FileExists(path.Join(d.Module.ModuleDir, "requirements.yml")) {
+	// role requirements
+	if a.Sdk.FileExists(path.Join(d.Module.ModuleDir, cfg.GalaxyRolesDir, "requirements.yml")) {
 		_, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-			Command: `ansible-galaxy collection install -r requirements.yml`,
+			Command: fmt.Sprintf(`ansible-galaxy install -g -f -r %s/requirements.yml -p %s`, cfg.GalaxyRolesDir, cfg.GalaxyRolesDir),
 			WorkDir: d.Module.ModuleDir,
 		})
 		if err != nil {
@@ -95,12 +94,14 @@ func (a Action) Execute() (err error) {
 	}
 
 	// deploy
-	_, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
 		Command: fmt.Sprintf(`ansible-playbook %q -i %q`, cfg.PlaybookFile, cfg.InventoryFile),
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
 		return err
+	} else if cmdResult.Code != 0 {
+		return fmt.Errorf("ansible-playbook failed: %d", cmdResult.Code)
 	}
 
 	return nil
