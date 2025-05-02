@@ -1,6 +1,9 @@
 package plangenerate
 
 import (
+	"github.com/cidverse/cid/pkg/app/appcommon"
+	"github.com/cidverse/cid/pkg/util"
+	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"slices"
 	"strings"
 
@@ -44,4 +47,52 @@ func isReservedVariable(name string) bool {
 	}
 
 	return slices.Contains(rules.ReservedVariables, name)
+}
+
+func projectEnv(env map[string]string, vars []api.CIVariable) map[string]string {
+	result := util.CloneMap(env)
+
+	for _, v := range vars {
+		if isReservedVariable(v.Name) {
+			continue
+		}
+
+		if v.IsSecret {
+			result[v.Name] = "***"
+		} else {
+			result[v.Name] = v.Value
+		}
+	}
+
+	return result
+}
+
+func projectEnvironmentEnv(env map[string]string, vars []api.CIVariable, environment appcommon.VCSEnvironment) map[string]string {
+	result := util.CloneMap(env)
+
+	for _, v := range vars {
+		if isReservedVariable(v.Name) {
+			continue
+		}
+
+		if v.IsSecret {
+			result[v.Name] = "***"
+		} else {
+			result[v.Name] = v.Value
+		}
+	}
+
+	for _, v := range environment.Vars {
+		if isReservedVariable(v.Name) {
+			continue
+		}
+
+		if v.IsSecret {
+			result[v.Name] = "***"
+		} else {
+			result[v.Name] = v.Value
+		}
+	}
+
+	return result
 }

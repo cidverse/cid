@@ -59,12 +59,17 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 		return err
 	}
 
+	// vars
+	vars, err := taskContext.Platform.Variables(taskContext.Repository)
+	if err != nil {
+		return fmt.Errorf("failed to get variables: %w", err)
+	}
+
 	// env
 	envs, err := taskContext.Platform.Environments(taskContext.Repository)
 	if err != nil {
 		return fmt.Errorf("failed to get environments: %w", err)
 	}
-
 	environments := make(map[string]appcommon.VCSEnvironment, len(envs))
 	for _, e := range envs {
 		// fetch environment variables
@@ -92,7 +97,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 				return fmt.Errorf("failed to filter workflow environments [%s]: %w", wfKey, err)
 			}
 
-			wtd, wfErr := appconfig.GenerateWorkflowData(cid, taskContext, conf, wfKey, wfConfig, filteredEnvs, gitlabWorkflowDependencies, gitlabNetworkAllowList)
+			wtd, wfErr := appconfig.GenerateWorkflowData(cid, taskContext, conf, wfKey, wfConfig, vars, filteredEnvs, gitlabWorkflowDependencies, gitlabNetworkAllowList)
 			if wfErr != nil {
 				return fmt.Errorf("failed to generate workflow template [%s]: %w", wfKey, wfErr)
 			}

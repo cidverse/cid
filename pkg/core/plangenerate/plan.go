@@ -24,6 +24,7 @@ type GeneratePlanRequest struct {
 	Env          map[string]string                   `json:"env"`
 	Executables  []executable.Executable             `json:"executables"`
 	PinVersions  bool                                `json:"pin_versions"`
+	Variables    []api.CIVariable                    `json:"variables"`
 	Environments map[string]appcommon.VCSEnvironment `json:"environments"`
 	WorkflowType string                              `json:"workflow_type"`
 }
@@ -34,6 +35,7 @@ func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
 		Registry:        request.Registry,
 		Environment:     request.Env,
 		Stages:          []string{"build", "test", "lint", "scan", "package", "publish", "deploy"},
+		VCSVariables:    request.Variables,
 		VCSEnvironments: request.Environments,
 		Modules:         request.Modules,
 	}
@@ -184,7 +186,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 
 		// create steps without stage grouping, but store the stage name
 		if catalogAction.Metadata.Scope == catalog.ActionScopeProject {
-			ruleContext := rules.GetProjectRuleContext(ctx.Env, ctx.Modules)
+			ruleContext := rules.GetProjectRuleContext(projectEnv(ctx.Env, context.VCSVariables), ctx.Modules)
 			ruleContext["CID_WORKFLOW_TYPE"] = workflowType
 
 			// check if the action rules match, if not check again for each environment
@@ -192,20 +194,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 				steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, nil, "", executableConstraints))
 			} else {
 				for _, env := range context.VCSEnvironments {
-					vcsEnv := util.CloneMap(ctx.Env)
-					for _, e := range env.Vars {
-						if isReservedVariable(e.Name) {
-							continue
-						}
-
-						if e.IsSecret {
-							vcsEnv[e.Name] = "***"
-						} else {
-							vcsEnv[e.Name] = e.Value
-						}
-					}
-
-					envRuleContext := rules.GetProjectRuleContext(vcsEnv, ctx.Modules)
+					envRuleContext := rules.GetProjectRuleContext(projectEnvironmentEnv(ctx.Env, context.VCSVariables, env), ctx.Modules)
 					envRuleContext["CID_WORKFLOW_TYPE"] = workflowType
 					if rules.AnyRuleMatches(catalogAction.Metadata.Rules, envRuleContext) && rules.AnyRuleMatches(action.Rules, envRuleContext) {
 						steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, nil, env.Env.Name, executableConstraints))
@@ -217,7 +206,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 		} else if catalogAction.Metadata.Scope == catalog.ActionScopeModule {
 			for _, m := range ctx.Modules {
 				moduleRef := ptr.Value(m)
-				ruleContext := rules.GetModuleRuleContext(ctx.Env, &moduleRef)
+				ruleContext := rules.GetModuleRuleContext(projectEnv(ctx.Env, context.VCSVariables), &moduleRef)
 				ruleContext["CID_WORKFLOW_TYPE"] = workflowType
 
 				// check if the action rules match, if not check again for each environment
@@ -225,20 +214,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 					steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, &moduleRef, "", executableConstraints))
 				} else {
 					for _, env := range context.VCSEnvironments {
-						vcsEnv := util.CloneMap(ctx.Env)
-						for _, e := range env.Vars {
-							if isReservedVariable(e.Name) {
-								continue
-							}
-
-							if e.IsSecret {
-								vcsEnv[e.Name] = "***"
-							} else {
-								vcsEnv[e.Name] = e.Value
-							}
-						}
-
-						envRuleContext := rules.GetModuleRuleContext(vcsEnv, &moduleRef)
+						envRuleContext := rules.GetModuleRuleContext(projectEnvironmentEnv(ctx.Env, context.VCSVariables, env), &moduleRef)
 						envRuleContext["CID_WORKFLOW_TYPE"] = workflowType
 						if rules.AnyRuleMatches(catalogAction.Metadata.Rules, envRuleContext) && rules.AnyRuleMatches(action.Rules, envRuleContext) {
 							steps = append(steps, buildStep(catalogAction, action, len(steps), catalogAction.Metadata.Name, &moduleRef, env.Env.Name, executableConstraints))

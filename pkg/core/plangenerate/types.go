@@ -3,6 +3,7 @@ package plangenerate
 import (
 	"errors"
 	"fmt"
+	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"strconv"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
@@ -99,6 +100,7 @@ type PlanContext struct {
 	ProjectDir      string
 	Environment     map[string]string
 	Stages          []string
+	VCSVariables    []api.CIVariable
 	VCSEnvironments map[string]appcommon.VCSEnvironment
 	Registry        catalog.Config
 	Modules         []*analyzerapi.ProjectModule

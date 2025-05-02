@@ -59,23 +59,28 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 		return err
 	}
 
+	// vars
+	vars, err := taskContext.Platform.Variables(taskContext.Repository)
+	if err != nil {
+		return fmt.Errorf("failed to get variables: %w", err)
+	}
+
 	// env
 	envs, err := taskContext.Platform.Environments(taskContext.Repository)
 	if err != nil {
 		return fmt.Errorf("failed to get environments: %w", err)
 	}
-
 	environments := make(map[string]appcommon.VCSEnvironment, len(envs))
 	for _, e := range envs {
 		// fetch environment variables
-		vars, err := taskContext.Platform.EnvironmentVariables(taskContext.Repository, e.Name)
+		envVars, err := taskContext.Platform.EnvironmentVariables(taskContext.Repository, e.Name)
 		if err != nil {
 			return fmt.Errorf("failed to get environment variables: %w", err)
 		}
 
 		environments[e.Name] = appcommon.VCSEnvironment{
 			Env:  e,
-			Vars: vars,
+			Vars: envVars,
 		}
 	}
 
@@ -91,7 +96,7 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 				return fmt.Errorf("failed to filter workflow environments [%s]: %w", wfKey, err)
 			}
 
-			workflowTemplateData, wfErr := appconfig.GenerateWorkflowData(cid, taskContext, conf, wfKey, wfConfig, filteredEnvs, githubWorkflowDependencies, githubNetworkAllowList)
+			workflowTemplateData, wfErr := appconfig.GenerateWorkflowData(cid, taskContext, conf, wfKey, wfConfig, vars, filteredEnvs, githubWorkflowDependencies, githubNetworkAllowList)
 			if wfErr != nil {
 				return fmt.Errorf("failed to generate workflow template [%s]: %w", wfKey, wfErr)
 			}
