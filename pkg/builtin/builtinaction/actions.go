@@ -7,6 +7,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargotest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/changelog/changeloggenerate"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/codecov/codecovupload"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnetbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnettest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/github/githubreleasepublish"
@@ -98,6 +99,8 @@ func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
 		renovatelint.Action{Sdk: sdk},
 		// changelog
 		changeloggenerate.Action{Sdk: sdk},
+		// codecov
+		codecovupload.Action{Sdk: sdk},
 		// helm
 		helmbuild.Action{Sdk: sdk},
 		helmlint.Action{Sdk: sdk},

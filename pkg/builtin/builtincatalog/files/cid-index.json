@@ -863,6 +863,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "codecov",
+        "Version": "10.4.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/codecov-cli:10.4.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "sonar-scanner",
         "Version": "6.2.1.4610",
         "Type": "container",

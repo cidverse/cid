@@ -110,6 +110,9 @@ jobs:
       {{- if and (eq $step.Stage "publish") (ne $root.WorkflowConfig.Type "pull-request") }}
       packages: write # upload packages
       {{- end }}
+      {{- if eq $step.Name "github-pr-comment" }}
+      pull-requests: write # post pr comment
+      {{- end }}
     timeout-minutes: {{ $root.JobTimeout }}
     {{- if $step.Environment }}
     environment:

@@ -6,6 +6,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargotest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/changelog/changeloggenerate"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/codecov/codecovupload"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnetbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnettest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/github/githubreleasepublish"
@@ -185,6 +186,10 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					{
 						ID: zizmorscan.URI,
+					},
+					// reporting
+					{
+						ID: codecovupload.URI,
 					},
 				},
 			},

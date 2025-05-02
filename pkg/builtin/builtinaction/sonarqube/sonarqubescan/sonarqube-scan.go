@@ -35,7 +35,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 		Rules: []cidsdk.ActionRule{
 			{
 				Type:       "cel",
-				Expression: `ENV["SONAR_TOKEN"] != "" && NCI_COMMIT_REF_TYPE == "branch"`,
+				Expression: `NCI_COMMIT_REF_TYPE == "branch" && getMapValue(ENV, "SONAR_TOKEN") != ""`,
 			},
 		},
 		Access: cidsdk.ActionAccess{
