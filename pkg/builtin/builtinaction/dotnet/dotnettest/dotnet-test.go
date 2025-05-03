@@ -81,6 +81,7 @@ func (a Action) Execute() (err error) {
 
 	// files
 	junitReport := cidsdk.JoinPath(d.Config.TempDir, "junit.xml")
+	trxReport := cidsdk.JoinPath(d.Config.TempDir, "vstest.trx")
 
 	// restore
 	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
@@ -95,7 +96,7 @@ func (a Action) Execute() (err error) {
 
 	// test
 	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-		Command: fmt.Sprintf(`dotnet test --logger:"junit;LogFilePath=%s;MethodFormat=Class;FailureBodyFormat=Verbose" --collect "Code Coverage;Format=cobertura"`, junitReport),
+		Command: fmt.Sprintf(`dotnet test --logger:"junit;LogFilePath=%s;MethodFormat=Class;FailureBodyFormat=Verbose" --logger:"trx;LogFileName=%s" --collect "Code Coverage;Format=cobertura"`, junitReport, trxReport),
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
@@ -105,6 +106,15 @@ func (a Action) Execute() (err error) {
 	}
 
 	// store report
+	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+		File:   trxReport,
+		Module: d.Module.Slug,
+		Type:   "report",
+		Format: "trx",
+	})
+	if err != nil {
+		return err
+	}
 	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
 		File:   junitReport,
 		Module: d.Module.Slug,

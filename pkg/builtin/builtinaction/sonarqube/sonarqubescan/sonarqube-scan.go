@@ -32,6 +32,10 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 		Description: "Scans the repository for security issues using SonarQube.",
 		Category:    "sast",
 		Scope:       cidsdk.ActionScopeProject,
+		Links: map[string]string{
+			"Test Coverage Parameters":  "https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/test-coverage/overview/",
+			"Test Execution Parameters": "https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/test-coverage/test-execution-parameters/",
+		},
 		Rules: []cidsdk.ActionRule{
 			{
 				Type:       "cel",
@@ -97,6 +101,10 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				{
 					Type:   "report",
 					Format: "jacoco",
+				},
+				{
+					Type:   "report",
+					Format: "trx",
 				},
 			},
 		},
@@ -173,7 +181,7 @@ func (a Action) Execute() (err error) {
 			TargetFile: targetFile,
 		})
 		if dlErr != nil {
-			_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "warn", Message: "failed to retrieve jacoco report", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
+			_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "warn", Message: "failed to retrieve report", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
 			continue
 		}
 
@@ -187,6 +195,10 @@ func (a Action) Execute() (err error) {
 			files["java-jacoco"] = append(files["java-jacoco"], targetFile)
 		} else if artifact.Format == "cobertura" {
 			files["cobertura"] = append(files["cobertura"], targetFile)
+		} else if artifact.Format == "junit" {
+			files["junit"] = append(files["junit"], targetFile)
+		} else if artifact.Format == "trx" {
+			files["trx"] = append(files["trx"], targetFile)
 		}
 	}
 	if len(files["sarif"]) > 0 {
@@ -203,6 +215,12 @@ func (a Action) Execute() (err error) {
 	}
 	if len(files["cobertura"]) > 0 {
 		scanArgs = append(scanArgs, `-D sonar.python.coverage.reportPaths=`+strings.Join(files["cobertura"], ","))
+	}
+	if len(files["junit"]) > 0 {
+		scanArgs = append(scanArgs, `-D sonar.junit.reportPaths=`+strings.Join(files["junit"], ","))
+	}
+	if len(files["trx"]) > 0 {
+		scanArgs = append(scanArgs, `-D sonar.cs.vstest.reportsPaths=`+strings.Join(files["trx"], ","))
 	}
 
 	// module specific parameters
@@ -257,6 +275,10 @@ func (a Action) Execute() (err error) {
 		}
 		if _, ok := d.Env["NCI_MERGE_REQUEST_TARGET_BRANCH_NAME"]; ok {
 			scanArgs = append(scanArgs, `-D sonar.pullrequest.base=`+d.Env["NCI_MERGE_REQUEST_TARGET_BRANCH_NAME"])
+		}
+
+		if d.Env["NCI_REPOSITORY_HOST_TYPE"] == "github" {
+			scanArgs = append(scanArgs, `-D sonar.pullrequest.github.repository=`+d.Env["NCI_PROJECT_PATH"])
 		}
 	} else {
 		scanArgs = append(scanArgs, fmt.Sprintf(`-D sonar.branch.name=%q`, d.Env["NCI_COMMIT_REF_NAME"]))

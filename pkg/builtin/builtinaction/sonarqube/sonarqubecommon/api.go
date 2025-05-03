@@ -3,7 +3,6 @@ package sonarqubecommon
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/go-resty/resty/v2"
 )
 
@@ -111,28 +110,6 @@ func DeleteBranch(server string, accessToken string, projectKey string, name str
 	}
 	if !resp.IsSuccess() {
 		return fmt.Errorf("SonarQube DeleteBranch failed - HTTP %d: %s", resp.StatusCode(), string(resp.Body()))
-	}
-
-	return nil
-}
-
-func SetGitLabBinding(server string, accessToken string, projectKey string, vcsHost string, vcsRepoId string) error {
-	resp, err := ApiClient.R().
-		SetQueryParams(map[string]string{
-			"almSetting": vcsHost,
-			"project":    projectKey,
-			"repository": vcsRepoId,
-			"monorepo":   "false",
-		}).
-		SetHeader("Accept", "application/json").
-		SetHeader("Content-Type", "application/json").
-		SetBasicAuth(accessToken, "").
-		Post(server + "/api/alm_settings/set_gitlab_binding")
-	if err != nil {
-		return err
-	}
-	if !resp.IsSuccess() {
-		return fmt.Errorf("SonarQube SetGitLabBinding failed - HTTP %d: %s", resp.StatusCode(), string(resp.Body()))
 	}
 
 	return nil

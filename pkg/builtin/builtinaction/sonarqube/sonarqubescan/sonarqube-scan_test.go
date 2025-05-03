@@ -59,10 +59,11 @@ func TestSonarqubeScanGoMod(t *testing.T) {
 		TargetFile: "/my-project/.tmp/root-coverage.json",
 	}).Return(nil)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
-		Command: `sonar-scanner -X -D sonar.host.url=https://sonarcloud.local -D sonar.token=my-token -D sonar.projectKey=my-project-key -D sonar.projectName=my-project-name -D sonar.sources=. -D sonar.organization=my-org -D sonar.sarifReportPaths=/my-project/.tmp/root-test.sarif.json -D sonar.go.coverage.reportPaths=/my-project/.tmp/root-coverage.out -D sonar.go.tests.reportPaths=/my-project/.tmp/root-coverage.json -D sonar.exclusions=**/.git/**,**/*_test.go,**/vendor/**,**/mocks/**,**/testdata/* -D sonar.test.inclusions=**/*_test.go -D sonar.test.exclusions=**/vendor/** -D sonar.branch.name="main"`,
+		Command: `sonar-scanner -X -D sonar.host.url=https://sonarcloud.local -D sonar.projectKey=my-project-key -D sonar.projectName=my-project-name -D sonar.sources=. -D sonar.organization=my-org -D sonar.sarifReportPaths=/my-project/.tmp/root-test.sarif.json -D sonar.go.coverage.reportPaths=/my-project/.tmp/root-coverage.out -D sonar.go.tests.reportPaths=/my-project/.tmp/root-coverage.json -D sonar.exclusions=**/.git/**,**/*_test.go,**/vendor/**,**/mocks/**,**/testdata/* -D sonar.test.inclusions=**/*_test.go -D sonar.test.exclusions=**/vendor/** -D sonar.branch.name="main"`,
 		WorkDir: "/my-project",
 		Env: map[string]string{
 			"SONAR_SCANNER_OPTS": " ",
+			"SONAR_TOKEN":        "my-token",
 		},
 	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0}, nil)
 
