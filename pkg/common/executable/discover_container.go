@@ -47,10 +47,12 @@ func DiscoverContainerCandidates(opts *DiscoverContainerOptions) []Executable {
 
 			log.Info().Msgf("Found tag %s for image %s", tag.Tag, containerImage.Image)
 			for _, bin := range containerImage.Binary {
+				semverVersion := convertToSemver(tag.Tag)
+
 				result = append(result, ContainerCandidate{
 					BaseCandidate: BaseCandidate{
 						Name:    bin,
-						Version: tag.Tag,
+						Version: semverVersion,
 						Type:    ExecutionContainer,
 					},
 					Image:      fmt.Sprintf("%s:%s", containerImage.Image, tag.Tag),

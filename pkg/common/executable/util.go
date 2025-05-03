@@ -2,6 +2,7 @@ package executable
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -93,6 +94,35 @@ func ReplaceCommandPlaceholders(input string, env map[string]string) string {
 	// env
 	for k, v := range env {
 		input = strings.ReplaceAll(input, "{"+k+"}", v)
+	}
+
+	return input
+}
+
+var versionPatterns = []struct {
+	Pattern *regexp.Regexp
+	Format  func(matches []string) string
+}{
+	{
+		// Convert "a.b.c.d" to "a.b.c+build"
+		Pattern: regexp.MustCompile(`^(\d+)\.(\d+)\.(\d+)\.(\d+)$`),
+		Format: func(matches []string) string {
+			return fmt.Sprintf("%s.%s.%s+%s", matches[1], matches[2], matches[3], matches[4])
+		},
+	},
+}
+
+func convertToSemver(input string) string {
+	input = strings.TrimSpace(input)
+	if input == "" {
+		return ""
+	}
+
+	for _, pattern := range versionPatterns {
+		matches := pattern.Pattern.FindStringSubmatch(input)
+		if len(matches) > 0 {
+			return pattern.Format(matches)
+		}
 	}
 
 	return input

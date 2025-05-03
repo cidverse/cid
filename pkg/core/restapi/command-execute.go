@@ -54,11 +54,15 @@ func (hc *APIConfig) commandExecute(c echo.Context) error {
 
 	resp, err := hc.executeCommand(req)
 	if err != nil {
+		slog.With("err", err.Error()).Warn("[API] execute command request failed")
 		return c.JSON(http.StatusBadRequest, apiError{
-			Status:  400,
-			Title:   "bad request",
+			Status:  500,
+			Title:   "command execution failed",
 			Details: err.Error(),
 		})
+	}
+	if resp.Error != "" {
+		slog.With("error", resp.Error).Warn("[API] execute command request returned error")
 	}
 
 	return c.JSON(http.StatusOK, resp)

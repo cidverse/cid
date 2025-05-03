@@ -881,9 +881,26 @@
       "type": "executable.ContainerCandidate",
       "candidate": {
         "Name": "sonar-scanner",
-        "Version": "6.2.1.4610",
+        "Version": "6.2.1+4610",
         "Type": "container",
         "Image": "ghcr.io/cidverse/sonarscanner-cli:6.2.1.4610",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "sonar-scanner",
+        "Version": "7.1.0+4889",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/sonarscanner-cli:7.1.0.4889",
         "ImageCache": [],
         "Mounts": [],
         "Security": {
