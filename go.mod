@@ -9,7 +9,7 @@ toolchain go1.24.0
 
 require (
 	github.com/BurntSushi/toml v1.5.0
-	github.com/ProtonMail/gopenpgp/v3 v3.2.0
+	github.com/ProtonMail/gopenpgp/v3 v3.2.1
 	github.com/adrg/xdg v0.5.3
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cid-sdk-go v0.0.0-20250426194403-2c7ccb7ff47a
