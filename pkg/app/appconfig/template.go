@@ -12,22 +12,33 @@ import (
 )
 
 type WorkflowData struct {
-	Version            string                        `json:"version"`
-	Name               string                        `json:"name"`
-	NameSlug           string                        `json:"name_slug"`
-	JobTimeout         int                           `json:"job_timeout"`
-	DefaultBranch      string                        `json:"default_branch"`
-	WorkflowKey        string                        `json:"workflow_key"`
-	WorkflowConfig     WorkflowConfig                `json:"workflow_config"`
-	Plan               plangenerate.Plan             `json:"plan"`
-	WorkflowDependency map[string]WorkflowDependency `json:"workflow_dependency"`
-	IgnoreFiles        []string                      `json:"ignore_files"`
+	Version                      string                        `json:"version"`
+	Name                         string                        `json:"name"`
+	NameSlug                     string                        `json:"name_slug"`
+	JobTimeout                   int                           `json:"job_timeout"`
+	DefaultBranch                string                        `json:"default_branch"`
+	WorkflowKey                  string                        `json:"workflow_key"`
+	WorkflowConfig               WorkflowConfig                `json:"workflow_config"`
+	Plan                         plangenerate.Plan             `json:"plan"`
+	WorkflowDependency           map[string]WorkflowDependency `json:"-"`
+	ReferencedWorkflowDependency map[string]WorkflowDependency `json:"workflow_dependency"`
+	IgnoreFiles                  []string                      `json:"ignore_files"`
 }
 
-type TemplateData struct {
-	Version   string         `json:"version"`
-	Stages    []string       `json:"stages"`
-	Workflows []WorkflowData `json:"workflows"`
+func (t *WorkflowData) GetDependencyReference(key string) string {
+	if dep, ok := t.WorkflowDependency[key]; ok {
+		t.ReferencedWorkflowDependency[key] = dep
+		return FormatDependencyReference(dep)
+	}
+	return ""
+}
+
+func (t *WorkflowData) GetDependency(key string) WorkflowDependency {
+	if dep, ok := t.WorkflowDependency[key]; ok {
+		t.ReferencedWorkflowDependency[key] = dep
+		return dep
+	}
+	return WorkflowDependency{}
 }
 
 type RenderWorkflowResult struct {
@@ -63,15 +74,16 @@ func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon
 
 	// render workflow template
 	data := WorkflowData{
-		Version:            constants.Version,
-		Name:               wfName,
-		NameSlug:           slug.Make(wfName),
-		JobTimeout:         conf.JobTimeout,
-		DefaultBranch:      taskContext.Repository.DefaultBranch,
-		WorkflowKey:        slug.Make(wfName),
-		WorkflowConfig:     wfConfig,
-		Plan:               plan,
-		WorkflowDependency: wfDependencies,
+		Version:                      constants.Version,
+		Name:                         wfName,
+		NameSlug:                     slug.Make(wfName),
+		JobTimeout:                   conf.JobTimeout,
+		DefaultBranch:                taskContext.Repository.DefaultBranch,
+		WorkflowKey:                  slug.Make(wfName),
+		WorkflowConfig:               wfConfig,
+		Plan:                         plan,
+		WorkflowDependency:           wfDependencies,
+		ReferencedWorkflowDependency: make(map[string]WorkflowDependency),
 		IgnoreFiles: []string{
 			"README.md",
 			"LICENSE",

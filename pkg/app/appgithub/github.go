@@ -101,12 +101,12 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 				return fmt.Errorf("failed to generate workflow template [%s]: %w", wfKey, wfErr)
 			}
 
-			_, wfErr = renderWorkflow(workflowTemplateData, "wf-main.gohtml", filepath.Join(taskContext.Directory, fmt.Sprintf(".github/workflows/cid-%s.yml", slug.Make(wfKey))))
+			_, wfErr = renderWorkflow(&workflowTemplateData, "wf-main.gohtml", filepath.Join(taskContext.Directory, fmt.Sprintf(".github/workflows/cid-%s.yml", slug.Make(wfKey))))
 			if wfErr != nil {
 				return fmt.Errorf("failed to render workflow [%s]: %w", wfKey, wfErr)
 			}
 
-			workflowState.Workflows.Set(wfKey, workflowTemplateData)
+			workflowState.Workflows.Set(wfKey, &workflowTemplateData)
 		}
 	}
 

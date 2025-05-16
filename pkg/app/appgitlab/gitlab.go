@@ -110,7 +110,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 			}
 
 			workflowTemplateData = append(workflowTemplateData, wtd)
-			workflowState.Workflows.Set(wfKey, wtd)
+			workflowState.Workflows.Set(wfKey, &wtd)
 		}
 
 		// render workflow

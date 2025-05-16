@@ -12,7 +12,7 @@ import (
 )
 
 type WorkflowState struct {
-	Workflows *orderedmap.OrderedMap[string, WorkflowData] `json:"workflows"`
+	Workflows *orderedmap.OrderedMap[string, *WorkflowData] `json:"workflows"`
 }
 
 type ChangeEntry struct {
@@ -40,7 +40,7 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 	// w can be null, if this is the initial run for a project
 	prevWorkflows := w.Workflows
 	if prevWorkflows == nil {
-		prevWorkflows = orderedmap.New[string, WorkflowData]()
+		prevWorkflows = orderedmap.New[string, *WorkflowData]()
 	}
 
 	// detect removed workflows
@@ -74,8 +74,8 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 		addChange(&changes, key, "config", "TriggerPullRequest", oldWf.WorkflowConfig.TriggerPullRequest, newWf.WorkflowConfig.TriggerPullRequest)
 
 		// Compare Dependencies
-		for depKey, newDep := range newWf.WorkflowDependency {
-			oldDep, exists := oldWf.WorkflowDependency[depKey]
+		for depKey, newDep := range newWf.ReferencedWorkflowDependency {
+			oldDep, exists := oldWf.ReferencedWorkflowDependency[depKey]
 			if !exists {
 				changes = append(changes, ChangeEntry{
 					Workflow: key,
@@ -99,8 +99,8 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 				})
 			}
 		}
-		for depKey := range oldWf.WorkflowDependency {
-			if _, exists := newWf.WorkflowDependency[depKey]; !exists {
+		for depKey := range oldWf.ReferencedWorkflowDependency {
+			if _, exists := newWf.ReferencedWorkflowDependency[depKey]; !exists {
 				changes = append(changes, ChangeEntry{
 					Workflow: key,
 					Scope:    "dependency",
@@ -141,7 +141,7 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 
 func NewWorkflowState() WorkflowState {
 	return WorkflowState{
-		Workflows: orderedmap.New[string, WorkflowData](),
+		Workflows: orderedmap.New[string, *WorkflowData](),
 	}
 }
 

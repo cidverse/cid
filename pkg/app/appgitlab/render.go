@@ -3,25 +3,47 @@ package appgitlab
 import (
 	"embed"
 	"fmt"
-	"os"
-	"path"
-	"path/filepath"
-	"slices"
-
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
+	"os"
+	"path"
+	"path/filepath"
+	"slices"
 )
 
 //go:embed templates/*
 var embedFS embed.FS
 
 type TemplateData struct {
-	Version            string                                  `json:"version"`
-	Stages             []string                                `json:"stages"`
-	Workflows          []appconfig.WorkflowData                `json:"workflows"`
-	WorkflowDependency map[string]appconfig.WorkflowDependency `json:"workflow_dependency"`
+	Version                      string                                  `json:"version"`
+	Stages                       []string                                `json:"stages"`
+	Workflows                    []appconfig.WorkflowData                `json:"workflows"`
+	WorkflowDependency           map[string]appconfig.WorkflowDependency `json:"workflow_dependency"`
+	ReferencedWorkflowDependency map[string]appconfig.WorkflowDependency `json:"-"`
+}
+
+func (t *TemplateData) GetDependencyReference(key string) string {
+	if dep, ok := t.WorkflowDependency[key]; ok {
+		t.ReferencedWorkflowDependency[key] = dep
+		for _, w := range t.Workflows {
+			w.ReferencedWorkflowDependency[key] = dep
+		}
+		return appconfig.FormatDependencyReference(dep)
+	}
+	return ""
+}
+
+func (t *TemplateData) GetDependency(key string) appconfig.WorkflowDependency {
+	if dep, ok := t.WorkflowDependency[key]; ok {
+		t.ReferencedWorkflowDependency[key] = dep
+		for _, w := range t.Workflows {
+			w.ReferencedWorkflowDependency[key] = dep
+		}
+		return dep
+	}
+	return appconfig.WorkflowDependency{}
 }
 
 type RenderWorkflowResult struct {
@@ -50,15 +72,18 @@ func renderWorkflow(data []appconfig.WorkflowData, templateFile string, outputFi
 	}
 	wfStages = getOrderedStages(wfStages) // TODO: this is not ideal, but returns the correct order for now
 
-	template, err := vcsapp.Render(string(content), TemplateData{
-		Version:            constants.Version,
-		Stages:             wfStages,
-		Workflows:          data,
-		WorkflowDependency: wfDependencies,
-	})
+	templateData := &TemplateData{
+		Version:                      constants.Version,
+		Stages:                       wfStages,
+		Workflows:                    data,
+		WorkflowDependency:           wfDependencies,
+		ReferencedWorkflowDependency: make(map[string]appconfig.WorkflowDependency),
+	}
+	template, err := vcsapp.Render(string(content), templateData)
 	if err != nil {
 		return RenderWorkflowResult{}, fmt.Errorf("failed to render template %s: %w", templateFile, err)
 	}
+	templateString := string(template)
 
 	// write workflow file
 	if outputFile != "" {
@@ -73,6 +98,5 @@ func renderWorkflow(data []appconfig.WorkflowData, templateFile string, outputFi
 		}
 	}
 
-	// TODO: data.Plan
-	return RenderWorkflowResult{WorkflowContent: string(template)}, nil
+	return RenderWorkflowResult{WorkflowContent: templateString}, nil
 }

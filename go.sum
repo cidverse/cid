@@ -40,8 +40,8 @@ github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842 
 github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842/go.mod h1:Xga0FDD+hHizd9zH99+DrbqXTAsblYQVEolYiOCN/Ug=
 github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4 h1:kmqVOqeuz1Bis0v4nb9o28fZIv/dQuyKBlBXEz1pSc0=
 github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4/go.mod h1:uS1HruKWaR4YluZgGgvEPWwfHutw0KsuBTyehewcdbo=
-github.com/cidverse/cidverseutils/core v0.0.0-20250506220239-6d744259b074 h1:whW0h27iLMdjjb0YDPPHNAK/X8f4Z6oHqMTdYZjBxfE=
-github.com/cidverse/cidverseutils/core v0.0.0-20250506220239-6d744259b074/go.mod h1:ce0txxfVVA+69HYQGpedk2W2TwRdsoLT5NFfZU8uuoI=
+github.com/cidverse/cidverseutils/core v0.0.0-20250515224405-f0d5bb2468e1 h1:xZ6K/xnX/s3gFUJBtbxHuplxTxrX42w7xXDtYnTsjjY=
+github.com/cidverse/cidverseutils/core v0.0.0-20250515224405-f0d5bb2468e1/go.mod h1:ce0txxfVVA+69HYQGpedk2W2TwRdsoLT5NFfZU8uuoI=
 github.com/cidverse/cidverseutils/exec v0.1.0 h1:KbCnDISptCrFJFHDrA9efNM0GWNLVkon3yEzehisETY=
 github.com/cidverse/cidverseutils/exec v0.1.0/go.mod h1:pBST2lLq7AnIZ6xM0foiz1VSUamGswN1csT/2MJAHHI=
 github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20241219211714-77ae5cef4073 h1:Cu62vJAf2N2SWgYKiIntX5hXaDf+8H/A4GO1BuF+7OM=

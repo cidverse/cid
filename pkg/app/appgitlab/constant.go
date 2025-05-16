@@ -32,4 +32,10 @@ var gitlabWorkflowDependencies = map[string]appconfig.WorkflowDependency{
 		Version: "v5.4.2-immutable",
 		Hash:    "642704dd0bcd909b722a06e0dbe199bc74163047886c3d5c869fe2c0d8e3d4d5",
 	},
+	"docker.io/docker": {
+		Id:      "docker.io/docker",
+		Type:    "oci-container",
+		Version: "28.1.1-dind",
+		Hash:    "3a861ec98623bd6014610291123751dc19e0c6d474ac3b38767771791ac0eb5e",
+	},
 }
