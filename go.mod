@@ -40,7 +40,7 @@ require (
 	github.com/jarcoal/httpmock v1.4.0
 	github.com/jinzhu/configor v1.2.2
 	github.com/joho/godotenv v1.5.1
-	github.com/labstack/echo/v4 v4.13.3
+	github.com/labstack/echo/v4 v4.13.4
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/oriser/regroup v0.0.0-20240925165441-f6bb0e08289e
 	github.com/otiai10/copy v1.14.1
