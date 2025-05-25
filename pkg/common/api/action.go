@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/cidverse/cid/internal/state"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/normalizeci/pkg/envstruct"
 	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
 	"log/slog"
@@ -70,9 +71,6 @@ func RegisterBuiltinAction(action ActionStep) {
 func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, env map[string]string, access catalog.ActionAccess) ActionExecutionContext {
 	actionEnv := make(map[string]string)
 
-	// user
-	currentUser, _ := user.Current()
-
 	// only pass allowed env variables
 	for k, v := range env {
 		if strings.HasPrefix(k, "NCI_") {
@@ -118,7 +116,7 @@ func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, e
 		Env:             env,
 		ActionEnv:       actionEnv,
 		Parallelization: DefaultParallelization,
-		CurrentUser:     *currentUser,
+		CurrentUser:     util.GetCurrentUser(),
 		Modules:         modules,
 		CurrentModule:   nil,
 	}

@@ -9,7 +9,7 @@ toolchain go1.24.3
 
 require (
 	github.com/BurntSushi/toml v1.5.0
-	github.com/ProtonMail/gopenpgp/v3 v3.2.1
+	github.com/ProtonMail/gopenpgp/v3 v3.3.0
 	github.com/adrg/xdg v0.5.3
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cidverse/cid-sdk-go v0.0.0-20250506220131-bd50d99d4d21
@@ -26,7 +26,7 @@ require (
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
 	github.com/cidverse/go-vcs v0.0.0-20250507195358-a7132966bd41
-	github.com/cidverse/go-vcsapp v0.0.0-20250508200924-dde10fe5886f
+	github.com/cidverse/go-vcsapp v0.0.0-20250519210617-ecc2637d9fc8
 	github.com/cidverse/normalizeci v1.1.1-0.20250501143256-e98d5431deb0
 	github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3
 	github.com/go-playground/validator/v10 v10.26.0
@@ -41,7 +41,7 @@ require (
 	github.com/jarcoal/httpmock v1.4.0
 	github.com/jinzhu/configor v1.2.2
 	github.com/joho/godotenv v1.5.1
-	github.com/labstack/echo/v4 v4.13.3
+	github.com/labstack/echo/v4 v4.13.4
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/oriser/regroup v0.0.0-20240925165441-f6bb0e08289e
 	github.com/otiai10/copy v1.14.1
@@ -51,7 +51,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/wk8/go-ordered-map/v2 v2.1.8
-	gitlab.com/gitlab-org/api/client-go v0.128.0
+	gitlab.com/gitlab-org/api/client-go v0.129.0
 	golang.org/x/oauth2 v0.30.0
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.6.0
@@ -62,7 +62,7 @@ require (
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
-	github.com/ProtonMail/go-crypto v1.2.0 // indirect
+	github.com/ProtonMail/go-crypto v1.3.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/bradleyfalzon/ghinstallation/v2 v2.15.0 // indirect
@@ -125,8 +125,8 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250512202823-5a2f75b736a9 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250512202823-5a2f75b736a9 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250519155744-55703ea1f237 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250519155744-55703ea1f237 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )

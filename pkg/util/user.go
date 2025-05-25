@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"os"
 	"os/user"
 )
 
@@ -13,4 +14,19 @@ func GetContainerUser() string {
 	}
 
 	return result
+}
+
+func GetCurrentUser() user.User {
+	currentUser, err := user.Current()
+	if err != nil {
+		return user.User{
+			Uid:      "0",
+			Gid:      "0",
+			Username: "root",
+			Name:     "root",
+			HomeDir:  os.Getenv("HOME"),
+		}
+	}
+
+	return *currentUser
 }

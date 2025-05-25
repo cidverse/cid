@@ -18,6 +18,7 @@ var embedFS embed.FS
 
 type TemplateData struct {
 	Version                      string                                  `json:"version"`
+	ContainerRuntime             string                                  `json:"container_runtime"`
 	Stages                       []string                                `json:"stages"`
 	Workflows                    []appconfig.WorkflowData                `json:"workflows"`
 	WorkflowDependency           map[string]appconfig.WorkflowDependency `json:"workflow_dependency"`
@@ -58,9 +59,11 @@ func renderWorkflow(data []appconfig.WorkflowData, templateFile string, outputFi
 		return RenderWorkflowResult{}, fmt.Errorf("failed to read workflow template %s: %w", templateFile, err)
 	}
 
+	var containerRuntime string
 	var wfStages []string
 	wfDependencies := make(map[string]appconfig.WorkflowDependency)
 	for _, wf := range data {
+		containerRuntime = wf.ContainerRuntime
 		for _, s := range wf.Plan.Stages {
 			if !slices.Contains(wfStages, s) {
 				wfStages = append(wfStages, s)
@@ -74,6 +77,7 @@ func renderWorkflow(data []appconfig.WorkflowData, templateFile string, outputFi
 
 	templateData := &TemplateData{
 		Version:                      constants.Version,
+		ContainerRuntime:             containerRuntime,
 		Stages:                       wfStages,
 		Workflows:                    data,
 		WorkflowDependency:           wfDependencies,

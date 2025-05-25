@@ -142,7 +142,7 @@ func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 		return "", "", containerCmdErr
 	}
 
-	cmd, err := shellcommand.PrepareCommand(containerCmd, runtime.GOOS, "", false, map[string]string{"PODMAN_IGNORE_CGROUPSV1_WARNING": "true"}, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
+	cmd, err := shellcommand.PrepareCommand(containerCmd, runtime.GOOS, "", true, map[string]string{"PODMAN_IGNORE_CGROUPSV1_WARNING": "true"}, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
 	if err != nil {
 		return "", "", err
 	}

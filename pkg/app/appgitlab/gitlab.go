@@ -26,10 +26,11 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 
 	// read config
 	conf := appconfig.Config{
-		Version:      constants.Version,
-		JobTimeout:   10,
-		EgressPolicy: "block",
-		Workflows:    appconfig.DefaultWorkflowConfig(taskContext.Repository.DefaultBranch),
+		Version:          constants.Version,
+		JobTimeout:       10,
+		EgressPolicy:     "block",
+		ContainerRuntime: "podman",
+		Workflows:        appconfig.DefaultWorkflowConfig(taskContext.Repository.DefaultBranch),
 	}
 	content, err := taskContext.Platform.FileContent(taskContext.Repository, taskContext.Repository.DefaultBranch, appcommon.ConfigFileName)
 	if err == nil {

@@ -387,6 +387,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "ansible-lint",
+        "Version": "25.4.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/ansible-lint:25.4.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "osv-scanner",
         "Version": "1.9.2",
         "Type": "container",
@@ -459,6 +476,23 @@
         "Version": "8.24.3",
         "Type": "container",
         "Image": "ghcr.io/cidverse/gitleaks:8.24.3",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "gitleaks",
+        "Version": "8.26.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/gitleaks:8.26.0",
         "ImageCache": [],
         "Mounts": [],
         "Security": {

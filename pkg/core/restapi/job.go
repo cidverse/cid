@@ -3,7 +3,6 @@ package restapi
 import (
 	"net/http"
 	"os"
-	"os/user"
 	"path"
 	"path/filepath"
 
@@ -79,7 +78,7 @@ func (hc *APIConfig) jobConfigV1(c echo.Context) error {
 
 func JobConfigDataV1(projectDir string, tempDir string, actionConfig string) map[string]interface{} {
 	host, _ := os.Hostname()
-	currentUser, _ := user.Current()
+	currentUser := util.GetCurrentUser()
 
 	result := map[string]interface{}{
 		// enable debugging

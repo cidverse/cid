@@ -38,4 +38,16 @@ var gitlabWorkflowDependencies = map[string]appconfig.WorkflowDependency{
 		Version: "28.1.1-dind",
 		Hash:    "3a861ec98623bd6014610291123751dc19e0c6d474ac3b38767771791ac0eb5e",
 	},
+	"registry.gitlab.com/cidverse/container-images/ci-gitlab": {
+		Id:      "registry.gitlab.com/cidverse/container-images/ci-gitlab",
+		Type:    "oci-container",
+		Version: "0.1.0",
+		//Hash:    "",
+	},
+	"registry.gitlab.com/cidverse/container-images/ci-gitlab-docker": {
+		Id:      "registry.gitlab.com/cidverse/container-images/ci-gitlab-docker",
+		Type:    "oci-container",
+		Version: "0.1.0",
+		//Hash:    "",
+	},
 }

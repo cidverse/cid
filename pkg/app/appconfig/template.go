@@ -17,6 +17,7 @@ type WorkflowData struct {
 	NameSlug                     string                        `json:"name_slug"`
 	JobTimeout                   int                           `json:"job_timeout"`
 	DefaultBranch                string                        `json:"default_branch"`
+	ContainerRuntime             string                        `json:"container_runtime"`
 	WorkflowKey                  string                        `json:"workflow_key"`
 	WorkflowConfig               WorkflowConfig                `json:"workflow_config"`
 	Plan                         plangenerate.Plan             `json:"plan"`
@@ -79,6 +80,7 @@ func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon
 		NameSlug:                     slug.Make(wfName),
 		JobTimeout:                   conf.JobTimeout,
 		DefaultBranch:                taskContext.Repository.DefaultBranch,
+		ContainerRuntime:             conf.ContainerRuntime,
 		WorkflowKey:                  slug.Make(wfName),
 		WorkflowConfig:               wfConfig,
 		Plan:                         plan,

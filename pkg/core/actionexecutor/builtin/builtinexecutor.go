@@ -7,6 +7,7 @@ import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/internal/state"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction"
+	"github.com/cidverse/cid/pkg/util"
 	"os"
 	"path"
 	"path/filepath"
@@ -50,11 +51,10 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	}
 	apiPort := strconv.Itoa(freePort)
 
-	// temp dir override
-	osTempDir := os.TempDir()
-	if os.Getenv("CID_TEMP_DIR") != "" {
-		osTempDir = os.Getenv("CID_TEMP_DIR")
-		log.Debug().Str("dir", osTempDir).Msg("overriding temp dir")
+	// temp dir
+	tempBaseDir, err := util.CITempDir(ctx.NCI.ServiceSlug)
+	if err != nil {
+		return err
 	}
 
 	// properties
@@ -62,7 +62,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	buildID := api.GenerateSnowflakeId()
 	jobID := api.GenerateSnowflakeId()
 	artifactDir := filepath.Join(ctx.ProjectDir, ".dist")
-	tempDir, err := os.MkdirTemp(osTempDir, "cid-job-")
+	tempDir, err := os.MkdirTemp(tempBaseDir, "cid-job-")
 	if err != nil {
 		return fmt.Errorf("failed to create temporary directory: %w", err)
 	}

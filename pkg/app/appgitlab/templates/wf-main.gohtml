@@ -7,7 +7,11 @@
 
 # global defaults
 default:
+{{- if eq $root.ContainerRuntime "podman" }}
   image: {{ $root.GetDependencyReference "quay.io/podman/stable" }}
+{{- else if eq $root.ContainerRuntime "docker" }}
+  image: {{ $root.GetDependencyReference "registry.gitlab.com/cidverse/container-images/ci-gitlab-docker" }}
+{{- end }}
   before_script:
     - curl -L -o /usr/local/bin/cid https://github.com/cidverse/cid/releases/download/v{{ ($root.GetDependency "cid").Version }}/linux_amd64
     - chmod +x /usr/local/bin/cid
@@ -21,6 +25,19 @@ variables:
   # git settings
   GIT_STRATEGY: clone
   GIT_DEPTH: 10
+  {{- if eq $root.ContainerRuntime "docker" }}
+  # docker-in-docker
+  SERVICE_PORT_2376_TCP_PORT: 2375
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  {{- end }}
+
+{{- if eq $root.ContainerRuntime "docker" }}
+# services
+services:
+- name: {{ $root.GetDependencyReference "docker.io/docker" }}
+  alias: docker
+{{- end }}
 
 # stages
 stages:

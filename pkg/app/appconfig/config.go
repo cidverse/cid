@@ -14,9 +14,10 @@ import (
 )
 
 type Config struct {
-	Version      string `json:"version" env:"CLI_VERSION" validate:"required"`         // Version of this project
-	JobTimeout   int    `json:"job_timeout" env:"JOB_TIMEOUT" validate:"required"`     // Timeout for the job in minutes
-	EgressPolicy string `json:"egress_policy" env:"EGRESS_POLICY" validate:"required"` // Egress policy for network traffic (block, audit, ...)
+	Version          string `json:"version" env:"CLI_VERSION" validate:"required"`         // Version of this project
+	JobTimeout       int    `json:"job_timeout" env:"JOB_TIMEOUT" validate:"required"`     // Timeout for the job in minutes
+	EgressPolicy     string `json:"egress_policy" env:"EGRESS_POLICY" validate:"required"` // Egress policy for network traffic (block, audit, ...)
+	ContainerRuntime string `json:"container_runtime" env:"CONTAINER_RUNTIME" validate:"required,oneof=podman docker"`
 
 	Workflows *orderedmap.OrderedMap[string, WorkflowConfig] `json:"workflows"`
 }
