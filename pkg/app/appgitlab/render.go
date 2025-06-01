@@ -3,14 +3,15 @@ package appgitlab
 import (
 	"embed"
 	"fmt"
-	"github.com/cidverse/cid/pkg/app/appconfig"
-	"github.com/cidverse/cid/pkg/constants"
-	"github.com/cidverse/cid/pkg/core/plangenerate"
-	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
 	"os"
 	"path"
 	"path/filepath"
 	"slices"
+
+	"github.com/cidverse/cid/pkg/app/appconfig"
+	"github.com/cidverse/cid/pkg/constants"
+	"github.com/cidverse/cid/pkg/core/plangenerate"
+	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
 )
 
 //go:embed templates/*
@@ -19,6 +20,7 @@ var embedFS embed.FS
 type TemplateData struct {
 	Version                      string                                  `json:"version"`
 	ContainerRuntime             string                                  `json:"container_runtime"`
+	RunnerTags                   []string                                `json:"runner_tags,omitempty"`
 	Stages                       []string                                `json:"stages"`
 	Workflows                    []appconfig.WorkflowData                `json:"workflows"`
 	WorkflowDependency           map[string]appconfig.WorkflowDependency `json:"workflow_dependency"`
@@ -78,6 +80,7 @@ func renderWorkflow(data []appconfig.WorkflowData, templateFile string, outputFi
 	templateData := &TemplateData{
 		Version:                      constants.Version,
 		ContainerRuntime:             containerRuntime,
+		RunnerTags:                   []string{"saas-linux-small-amd64"},
 		Stages:                       wfStages,
 		Workflows:                    data,
 		WorkflowDependency:           wfDependencies,

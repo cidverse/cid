@@ -49,8 +49,12 @@ stages:
 
 # configuration snippets
 .default-job: &default_job
+  {{ if .RunnerTags }}
   tags:
-    - saas-linux-small-amd64
+    {{- range $tag := .RunnerTags }}
+    - {{ $tag }}
+    {{- end }}
+  {{- end }}
   allow_failure: false
   interruptible: true
   retry:
