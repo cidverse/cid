@@ -26,7 +26,7 @@ require (
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc
 	github.com/cidverse/go-vcs v0.0.0-20250611141350-4aa2017b054f
-	github.com/cidverse/go-vcsapp v0.0.0-20250610231318-a191a8585efa
+	github.com/cidverse/go-vcsapp v0.0.0-20250612151125-7a62a87bee9d
 	github.com/cidverse/normalizeci v1.1.1-0.20250501143256-e98d5431deb0
 	github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3
 	github.com/go-playground/validator/v10 v10.26.0
@@ -51,7 +51,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/wk8/go-ordered-map/v2 v2.1.8
-	gitlab.com/gitlab-org/api/client-go v0.130.0
+	gitlab.com/gitlab-org/api/client-go v0.130.1
 	golang.org/x/oauth2 v0.30.0
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.6.0

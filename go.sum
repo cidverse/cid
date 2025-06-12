@@ -62,8 +62,8 @@ github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc h1:eVuHW4U9Boiqj
 github.com/cidverse/go-rules v0.0.0-20231112122021-075e5e6f8abc/go.mod h1:1E+4h0XkcYJVq3RHoYQradnCt7wk3JgnuRRnfeiwAzE=
 github.com/cidverse/go-vcs v0.0.0-20250611141350-4aa2017b054f h1:gMP0nnBEAhMv2L6JsU7rW4T0+qSuLpF++xR53oR6+Uw=
 github.com/cidverse/go-vcs v0.0.0-20250611141350-4aa2017b054f/go.mod h1:JVM+GqAENp7f9feteKOGanQ7QgH/RCuWrzkfMzZMYRU=
-github.com/cidverse/go-vcsapp v0.0.0-20250610231318-a191a8585efa h1:hjzBxD7kw9PO0MZoB5XIfa8TxFACqXdsk2JV2hYBQUI=
-github.com/cidverse/go-vcsapp v0.0.0-20250610231318-a191a8585efa/go.mod h1:T0bOKx7Q+EISzL5Wt3vr3K6DPhhISdOzpQJu6klfpi8=
+github.com/cidverse/go-vcsapp v0.0.0-20250612151125-7a62a87bee9d h1:fmCs3Tb8NLuTWSYOkHJSdv3EIQz0iH8K7jdifR4tqXQ=
+github.com/cidverse/go-vcsapp v0.0.0-20250612151125-7a62a87bee9d/go.mod h1:dMy6OkjtSeemvAfQSa2oa2LexbgndGJY0YvqYVATwGg=
 github.com/cidverse/normalizeci v1.1.1-0.20250501143256-e98d5431deb0 h1:YcHM4VI3E0bR0onMfGuhHO4OId+EL/q3Z6itsDrTisw=
 github.com/cidverse/normalizeci v1.1.1-0.20250501143256-e98d5431deb0/go.mod h1:p4f2Ncf1S8iUbmwURzvpa5scuzjDk3rfim9q+G/xJv8=
 github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3 h1:NMbXJuXbE9exXeWBKyNStBrr7CG7Fk18K6yRVDZb44c=
@@ -262,8 +262,8 @@ github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 h1:EzJWgHo
 github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415/go.mod h1:GwrjFmJcFw6At/Gs6z4yjiIwzuJ1/+UwLxMQDVQXShQ=
 github.com/xeipuuv/gojsonschema v1.2.0 h1:LhYJRs+L4fBtjZUfuSZIKGeVu0QRy8e5Xi7D17UxZ74=
 github.com/xeipuuv/gojsonschema v1.2.0/go.mod h1:anYRn/JVcOK2ZgGU+IjEV4nwlhoK5sQluxsYJ78Id3Y=
-gitlab.com/gitlab-org/api/client-go v0.130.0 h1:vFyEiJ3a9KvXKUDAyU560WPZws078fPI+4SA2Kl78Rs=
-gitlab.com/gitlab-org/api/client-go v0.130.0/go.mod h1:ZhSxLAWadqP6J9lMh40IAZOlOxBLPRh7yFOXR/bMJWM=
+gitlab.com/gitlab-org/api/client-go v0.130.1 h1:1xF5C5Zq3sFeNg3PzS2z63oqrxifne3n/OnbI7nptRc=
+gitlab.com/gitlab-org/api/client-go v0.130.1/go.mod h1:ZhSxLAWadqP6J9lMh40IAZOlOxBLPRh7yFOXR/bMJWM=
 go.uber.org/multierr v1.11.0 h1:blXXJkSxSSfBVBlC76pxqeO+LN3aDfLQo+309xJstO0=
 go.uber.org/multierr v1.11.0/go.mod h1:20+QtiLqy0Nd6FdQB9TLXag12DsQkrbs3htMFfDN80Y=
 golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
