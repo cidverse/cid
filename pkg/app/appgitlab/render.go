@@ -55,7 +55,7 @@ type RenderWorkflowResult struct {
 }
 
 // renderWorkflow renders the workflow template and returns the rendered template and the hash
-func renderWorkflow(data []appconfig.WorkflowData, templateFile string, outputFile string) (RenderWorkflowResult, error) {
+func renderWorkflow(data []appconfig.WorkflowData, runnerTags []string, templateFile string, outputFile string) (RenderWorkflowResult, error) {
 	content, err := embedFS.ReadFile(path.Join("templates", templateFile))
 	if err != nil {
 		return RenderWorkflowResult{}, fmt.Errorf("failed to read workflow template %s: %w", templateFile, err)
@@ -80,7 +80,7 @@ func renderWorkflow(data []appconfig.WorkflowData, templateFile string, outputFi
 	templateData := &TemplateData{
 		Version:                      constants.Version,
 		ContainerRuntime:             containerRuntime,
-		RunnerTags:                   []string{"saas-linux-small-amd64"},
+		RunnerTags:                   runnerTags,
 		Stages:                       wfStages,
 		Workflows:                    data,
 		WorkflowDependency:           wfDependencies,

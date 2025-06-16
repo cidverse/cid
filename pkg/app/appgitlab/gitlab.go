@@ -2,9 +2,10 @@ package appgitlab
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/pkg/core/catalog"
 	"log/slog"
 	"path/filepath"
+
+	"github.com/cidverse/cid/pkg/core/catalog"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/app/appconfig"
@@ -28,6 +29,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 	conf := appconfig.Config{
 		Version:          constants.Version,
 		JobTimeout:       10,
+		RunnerTags:       []string{"saas-linux-small-amd64"},
 		EgressPolicy:     "block",
 		ContainerRuntime: "podman",
 		Workflows:        appconfig.DefaultWorkflowConfig(taskContext.Repository.DefaultBranch),
@@ -115,7 +117,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext) error {
 		}
 
 		// render workflow
-		_, wfErr := renderWorkflow(workflowTemplateData, "wf-main.gohtml", filepath.Join(taskContext.Directory, ".gitlab-ci.yml"))
+		_, wfErr := renderWorkflow(workflowTemplateData, conf.RunnerTags, "wf-main.gohtml", filepath.Join(taskContext.Directory, ".gitlab-ci.yml"))
 		if wfErr != nil {
 			return fmt.Errorf("failed to render [gitlab-ci.yml]: %w", wfErr)
 		}
