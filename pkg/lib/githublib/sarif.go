@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/cidverse/cidverseutils/compress"
 	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
-	"github.com/google/go-github/v72/github"
+	"github.com/google/go-github/v73/github"
 	"golang.org/x/oauth2"
 	"log/slog"
 	"os"
