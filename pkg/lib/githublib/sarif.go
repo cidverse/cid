@@ -3,14 +3,15 @@ package githublib
 import (
 	"context"
 	"fmt"
-	"github.com/cidverse/cidverseutils/compress"
-	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
-	"github.com/google/go-github/v72/github"
-	"golang.org/x/oauth2"
 	"log/slog"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/cidverse/cidverseutils/compress"
+	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
+	"github.com/google/go-github/v73/github"
+	"golang.org/x/oauth2"
 )
 
 func GitHubCodeSecuritySarifUpload(githubToken string, sarifFile string, nci nci.Spec) error {
