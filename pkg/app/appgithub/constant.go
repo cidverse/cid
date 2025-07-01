@@ -47,8 +47,8 @@ var githubWorkflowDependencies = map[string]appconfig.WorkflowDependency{
 	"step-security/harden-runner": {
 		Id:      "step-security/harden-runner",
 		Type:    "github-action",
-		Version: "v2.12.1",
-		Hash:    "002fdce3c6a235733a90a27c80493a3241e56863",
+		Version: "v2.12.2",
+		Hash:    "6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 ",
 	},
 	"cidverse/ghact-cid-setup": {
 		Id:      "cidverse/ghact-cid-setup",
