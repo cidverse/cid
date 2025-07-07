@@ -139,8 +139,8 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 	return changes
 }
 
-func NewWorkflowState() WorkflowState {
-	return WorkflowState{
+func NewWorkflowState() *WorkflowState {
+	return &WorkflowState{
 		Workflows: orderedmap.New[string, *WorkflowData](),
 	}
 }
@@ -160,7 +160,7 @@ func ReadWorkflowState(file string) (WorkflowState, error) {
 	return state, nil
 }
 
-func WriteWorkflowState(state WorkflowState, file string) error {
+func WriteWorkflowState(state *WorkflowState, file string) error {
 	err := os.MkdirAll(filepath.Dir(file), 0755)
 	if err != nil {
 		return fmt.Errorf("failed to create directory for workflow plan [%s]: %w", file, err)
@@ -177,4 +177,18 @@ func WriteWorkflowState(state WorkflowState, file string) error {
 	}
 
 	return nil
+}
+
+func WorkflowStateJSON(state *WorkflowState) (string, error) {
+	// output
+	buffer := &bytes.Buffer{}
+	encoder := json.NewEncoder(buffer)
+	encoder.SetIndent("", "  ")
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(state)
+	if err != nil {
+		return "", fmt.Errorf("failed to encode workflow state to JSON: %w", err)
+	}
+
+	return buffer.String(), nil
 }

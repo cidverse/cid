@@ -10,7 +10,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/constants"
-	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
 )
 
@@ -50,7 +49,6 @@ func (t *TemplateData) GetDependency(key string) appconfig.WorkflowDependency {
 }
 
 type RenderWorkflowResult struct {
-	Plan            plangenerate.Plan
 	WorkflowContent string
 }
 

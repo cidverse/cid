@@ -120,7 +120,7 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 	}
 
 	// description
-	title, description, err := appmergerequest.TitleAndDescription(conf.Version, workflowState, previousState, mergeRequestFooter)
+	title, description, err := appmergerequest.TitleAndDescription(conf.Version, *workflowState, previousState, mergeRequestFooter)
 	if err != nil {
 		return fmt.Errorf("failed to get merge request description: %w", err)
 	}

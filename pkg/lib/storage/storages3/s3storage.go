@@ -1,4 +1,4 @@
-package s3storage
+package storages3
 
 import (
 	"context"

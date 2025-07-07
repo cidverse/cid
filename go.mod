@@ -25,11 +25,11 @@ require (
 	github.com/cidverse/cidverseutils/zerologconfig v0.1.2-0.20250329161944-cee6e2f5f53c
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812
-	github.com/cidverse/go-vcs v0.0.0-20250627221403-562f793a5ce5
-	github.com/cidverse/go-vcsapp v0.0.0-20250624203626-ff184644f507
+	github.com/cidverse/go-vcs v0.0.0-20250706134612-0bfe27a102ce
+	github.com/cidverse/go-vcsapp v0.0.0-20250707173907-2031953406e7
 	github.com/cidverse/normalizeci v1.1.1-0.20250501143256-e98d5431deb0
 	github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3
-	github.com/go-playground/validator/v10 v10.26.0
+	github.com/go-playground/validator/v10 v10.27.0
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/google/go-github/v71 v71.0.0
 	github.com/google/go-github/v73 v73.0.0
@@ -52,7 +52,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/wk8/go-ordered-map/v2 v2.1.8
-	gitlab.com/gitlab-org/api/client-go v0.131.0
+	gitlab.com/gitlab-org/api/client-go v0.134.0
 	golang.org/x/oauth2 v0.30.0
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.6.0
@@ -137,8 +137,8 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250707201910-8d1bb00bc6a7 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250707201910-8d1bb00bc6a7 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
