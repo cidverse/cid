@@ -15,6 +15,7 @@ var githubNetworkAllowList = []catalog.ActionAccessNetwork{
 	{Host: "uploads.github.com:443"},
 	{Host: "objects.githubusercontent.com:443"},
 	{Host: "raw.githubusercontent.com:443"},
+	{Host: "release-assets.githubusercontent.com:443"},
 	// GitHub Container Registry
 	{Host: "ghcr.io:443"},
 	{Host: "pkg-containers.githubusercontent.com:443"},
