@@ -26,11 +26,12 @@ require (
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812
 	github.com/cidverse/go-vcs v0.0.0-20250709174645-b748b55c4cde
-	github.com/cidverse/go-vcsapp v0.0.0-20250721224830-4587344a71f4
+	github.com/cidverse/go-vcsapp v0.0.0-20250723203101-b585ebdba44a
 	github.com/cidverse/normalizeci v1.1.1-0.20250501143256-e98d5431deb0
 	github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/go-resty/resty/v2 v2.16.5
+	github.com/google/go-github/v71 v71.0.0
 	github.com/google/go-github/v74 v74.0.0
 	github.com/google/uuid v1.6.0
 	github.com/gosimple/slug v1.15.0
@@ -85,9 +86,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/cel-go v0.26.0 // indirect
-	github.com/google/go-github/v71 v71.0.0 // indirect
 	github.com/google/go-github/v72 v72.0.0 // indirect
-	github.com/google/go-github/v73 v73.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
@@ -102,7 +101,7 @@ require (
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/minio/crc64nvme v1.0.2 // indirect
+	github.com/minio/crc64nvme v1.1.0 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/otiai10/mint v1.6.3 // indirect
@@ -115,7 +114,7 @@ require (
 	github.com/samber/lo v1.51.0 // indirect
 	github.com/samber/slog-common v0.19.0 // indirect
 	github.com/samber/slog-zerolog/v2 v2.7.3 // indirect
-	github.com/secure-systems-lab/go-securesystemslib v0.9.0 // indirect
+	github.com/secure-systems-lab/go-securesystemslib v0.9.1 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/shibumi/go-pathspec v1.3.0 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
@@ -138,8 +137,8 @@ require (
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250721164621-a45f3dfb1074 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250721164621-a45f3dfb1074 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250804133106-a7a43d27e69b // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250804133106-a7a43d27e69b // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
