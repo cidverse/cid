@@ -30,8 +30,8 @@ var githubWorkflowDependencies = map[string]appconfig.WorkflowDependency{
 	"actions/checkout": {
 		Id:      "actions/checkout",
 		Type:    "github-action",
-		Version: "v4.2.2",
-		Hash:    "11bd71901bbe5b1630ceea73d27597364c9af683",
+		Version: "v5.0.0",
+		Hash:    "08c6903cd8c0fde910a37f88322edcfb5dd907a8",
 	},
 	"actions/download-artifact": {
 		Id:      "actions/download-artifact",
