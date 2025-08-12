@@ -2,8 +2,8 @@ package helmbuild
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmcommon"
-	"os"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
@@ -60,10 +60,6 @@ func (a Action) Execute() (err error) {
 	cfg := BuildConfig{}
 	cidsdk.PopulateFromEnv(&cfg, d.Env)
 
-	// globals
-	chartsDir := cidsdk.JoinPath(d.Config.TempDir, "helm-charts")
-	_ = os.MkdirAll(chartsDir, 0755)
-
 	// restore the charts/ directory based on the Chart.lock file
 	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
 		Command: `helm dependency build .`,
@@ -95,18 +91,7 @@ func (a Action) Execute() (err error) {
 
 	// package
 	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-		Command: `helm package . --version ` + chartVersion + ` --destination ` + chartsDir,
-		WorkDir: d.Module.ModuleDir,
-	})
-	if err != nil {
-		return err
-	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("command failed, exit code %d", cmdResult.Code)
-	}
-
-	// update index
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-		Command: `helm repo index ` + chartsDir,
+		Command: `helm package . --version ` + chartVersion + ` --destination ` + d.Config.TempDir,
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
@@ -117,7 +102,7 @@ func (a Action) Execute() (err error) {
 
 	// upload charts
 	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
-		File:   cidsdk.JoinPath(chartsDir, fmt.Sprintf("%s-%s.tgz", chart.Name, chartVersion)),
+		File:   cidsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("%s-%s.tgz", chart.Name, chartVersion)),
 		Module: d.Module.Slug,
 		Type:   "helm-chart",
 		Format: "tgz",

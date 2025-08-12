@@ -29,14 +29,14 @@ var gitlabWorkflowDependencies = map[string]appconfig.WorkflowDependency{
 	"quay.io/podman/stable": {
 		Id:      "quay.io/podman/stable",
 		Type:    "oci-container",
-		Version: "v5.4.2-immutable",
-		Hash:    "642704dd0bcd909b722a06e0dbe199bc74163047886c3d5c869fe2c0d8e3d4d5",
+		Version: "v5.5.2-immutable",
+		Hash:    "866bbcac26adb7ff238145405fa0ade33bd7e9c7bb77a5c05f819dce8a753063",
 	},
 	"docker.io/docker": {
 		Id:      "docker.io/docker",
 		Type:    "oci-container",
-		Version: "28.1.1-dind",
-		Hash:    "3a861ec98623bd6014610291123751dc19e0c6d474ac3b38767771791ac0eb5e",
+		Version: "28.3.3-dind",
+		Hash:    "acf2e2d09cedf21fa8f27bb0962674e33e159c744c152b248f1f7f43623ccd82",
 	},
 	"registry.gitlab.com/cidverse/container-images/ci-gitlab": {
 		Id:      "registry.gitlab.com/cidverse/container-images/ci-gitlab",
