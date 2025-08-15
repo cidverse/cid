@@ -53,9 +53,6 @@ func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 
 	// overwrite binary for alias use-case
 	containerUser := util.GetContainerUser()
-	if opts.Executable == "dotnet" || opts.Executable == "npm" || opts.Executable == "cargo" || opts.Executable == "sonar-scanner" { // TD-002: fix permission issues or add uid to image config
-		containerUser = "0"
-	}
 	containerExec := containerruntime.Container{
 		Image:            c.Image,
 		WorkingDirectory: ci.ToUnixPath(opts.WorkDir),

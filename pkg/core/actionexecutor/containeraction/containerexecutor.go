@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/cidverse/cid/internal/state"
 	"log/slog"
 	"os"
 	"os/exec"
@@ -16,6 +15,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/cidverse/cid/internal/state"
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"

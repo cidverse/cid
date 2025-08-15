@@ -55,6 +55,31 @@ func (a Action) Execute() (err error) {
 	cfg := LintConfig{}
 	cidsdk.PopulateFromEnv(&cfg, d.Env)
 
+	// parse chart
+	chartFile := cidsdk.JoinPath(d.Module.ModuleDir, "Chart.yaml")
+	chartFileContent, err := a.Sdk.FileRead(chartFile)
+	if err != nil {
+		return fmt.Errorf("failed to read chart file: %s", err.Error())
+	}
+	chart, err := helmcommon.ParseChart([]byte(chartFileContent))
+	if err != nil {
+		return err
+	}
+	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "linting chart", Context: map[string]interface{}{"chart-name": chart.Name, "chart-version": chart.Version}})
+
+	// pull dependencies, if any are defined in Chart.yaml
+	if len(chart.Dependencies) > 0 {
+		cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+			Command: `helm dependency build .`,
+			WorkDir: d.Module.ModuleDir,
+		})
+		if err != nil {
+			return err
+		} else if cmdResult.Code != 0 {
+			return fmt.Errorf("command failed, exit code %d", cmdResult.Code)
+		}
+	}
+
 	// lint
 	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
 		Command: `helm lint . --strict`,

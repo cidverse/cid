@@ -33,7 +33,6 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/npm/npmtest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/renovate/renovatelint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/sonarqube/sonarqubescan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/trivy/trivyfsscan"
@@ -158,9 +157,11 @@ func GetWorkflows() []catalog.Workflow {
 						ID: ansiblelint.URI,
 					},
 					// renovate
-					{
-						ID: renovatelint.URI,
-					},
+					/*
+						{
+							ID: renovatelint.URI,
+						},
+					*/
 				},
 			},
 			{

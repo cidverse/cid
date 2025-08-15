@@ -1169,6 +1169,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "helm",
+        "Version": "3.18.5",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/helm:3.18.5",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "fossa-cli",
         "Version": "3.9.42",
         "Type": "container",
@@ -1394,6 +1411,40 @@
         "Version": "1.24.1",
         "Type": "container",
         "Image": "ghcr.io/cidverse/build-go:1.24.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "go",
+        "Version": "1.24.5",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/build-go:1.24.5",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "go",
+        "Version": "1.25.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/build-go:1.25.0",
         "ImageCache": [],
         "Mounts": [],
         "Security": {

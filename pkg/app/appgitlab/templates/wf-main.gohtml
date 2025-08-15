@@ -84,24 +84,10 @@ stages:
 {{- if $wf.WorkflowConfig.TriggerPush }}
       {{- range $branch := $wf.WorkflowConfig.TriggerPushBranches }}
       - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "{{ $branch }}"'
-        {{- if and $step.ModuleDir $step.RunIfChanged }}
-        changes:
-          paths:
-            {{- range $path := $step.RunIfChanged }}
-            - {{ $step.ModuleDir }}/{{ $path }}
-            {{- end }}
-        {{- end }}
         when: always
         {{- end }}
         {{- range $tag := $wf.WorkflowConfig.TriggerPushTags }}
       - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TAG =~ /^{{ $tag }}$/'
-        {{- if and $step.ModuleDir $step.RunIfChanged }}
-        changes:
-          paths:
-            {{- range $path := $step.RunIfChanged }}
-            - {{ $step.ModuleDir }}/{{ $path }}
-            {{- end }}
-        {{- end }}
         when: always
         {{- end }}
       {{- end }}
