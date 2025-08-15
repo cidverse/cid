@@ -29,6 +29,9 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				Expression: `MODULE_BUILD_SYSTEM == "helm"`,
 			},
 		},
+		RunIfChanged: []string{
+			"**/*",
+		},
 		Access: cidsdk.ActionAccess{
 			Environment: []cidsdk.ActionAccessEnv{},
 			Executables: []cidsdk.ActionAccessExecutable{
@@ -87,6 +90,19 @@ func (a Action) Execute() (err error) {
 	chartVersion := chart.Version
 	if chartVersion == "0.0.0" {
 		chartVersion = d.Env["NCI_COMMIT_REF_NAME"]
+	}
+
+	// pull dependencies, if any are defined in Chart.yaml
+	if len(chart.Dependencies) > 0 {
+		cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+			Command: `helm dependency build .`,
+			WorkDir: d.Module.ModuleDir,
+		})
+		if err != nil {
+			return err
+		} else if cmdResult.Code != 0 {
+			return fmt.Errorf("command failed, exit code %d", cmdResult.Code)
+		}
 	}
 
 	// package

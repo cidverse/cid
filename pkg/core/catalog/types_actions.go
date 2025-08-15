@@ -20,10 +20,11 @@ type ActionMetadata struct {
 	Category      string            `json:"category"`
 	Scope         ActionScope       `json:"scope"`
 	Links         map[string]string `json:"links,omitempty"`
-	Rules         []WorkflowRule    `json:"rules,omitempty"`  // Rules define conditions that must be met for the action to be executed
-	Access        ActionAccess      `json:"access,omitempty"` // Access defines resources that the action may access
-	Input         ActionInput       `json:"input,omitempty"`  // Input defines the inputs that the action may consume
-	Output        ActionOutput      `json:"output,omitempty"` // Output defines the outputs that the action may produce
+	Rules         []WorkflowRule    `json:"rules,omitempty"`        // Rules define conditions that must be met for the action to be executed
+	RunIfChanged  []string          `json:"runIfChanged,omitempty"` // RunIfChanged defines files that must be changed for the action to be executed
+	Access        ActionAccess      `json:"access,omitempty"`       // Access defines resources that the action may access
+	Input         ActionInput       `json:"input,omitempty"`        // Input defines the inputs that the action may consume
+	Output        ActionOutput      `json:"output,omitempty"`       // Output defines the outputs that the action may produce
 }
 
 type ActionScope string

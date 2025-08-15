@@ -2,10 +2,11 @@ package gobuild
 
 import (
 	"fmt"
+	"runtime"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gocommon"
 	"github.com/sourcegraph/conc/pool"
-	"runtime"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )

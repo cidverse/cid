@@ -3,20 +3,20 @@ module github.com/cidverse/cid
 //go:platform linux/amd64
 //go:platform darwin/amd64
 
-go 1.24
+go 1.24.0
 
-toolchain go1.24.6
+toolchain go1.25.0
 
 require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/ProtonMail/gopenpgp/v3 v3.3.0
 	github.com/adrg/xdg v0.5.3
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/cidverse/cid-sdk-go v0.0.0-20250806231504-77c300187f5f
+	github.com/cidverse/cid-sdk-go v0.0.0-20250813180439-a9b4d2e78115
 	github.com/cidverse/cidverseutils/ci v0.1.0
 	github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842
 	github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4
-	github.com/cidverse/cidverseutils/core v0.0.0-20250806231537-1d92b2fd5792
+	github.com/cidverse/cidverseutils/core v0.0.0-20250813174942-53da69ce92bd
 	github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20241219211714-77ae5cef4073
 	github.com/cidverse/cidverseutils/hash v0.1.0
 	github.com/cidverse/cidverseutils/network v0.1.0
@@ -25,8 +25,8 @@ require (
 	github.com/cidverse/cidverseutils/zerologconfig v0.1.2-0.20250329161944-cee6e2f5f53c
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812
-	github.com/cidverse/go-vcs v0.0.0-20250807181412-b4188250df39
-	github.com/cidverse/go-vcsapp v0.0.0-20250723203101-b585ebdba44a
+	github.com/cidverse/go-vcs v0.0.0-20250813180412-9ea97687b156
+	github.com/cidverse/go-vcsapp v0.0.0-20250814211510-358abd00913b
 	github.com/cidverse/normalizeci v1.1.1-0.20250501143256-e98d5431deb0
 	github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3
 	github.com/go-playground/validator/v10 v10.27.0
@@ -52,7 +52,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/wk8/go-ordered-map/v2 v2.1.8
-	gitlab.com/gitlab-org/api/client-go v0.138.0
+	gitlab.com/gitlab-org/api/client-go v0.139.2
 	golang.org/x/oauth2 v0.30.0
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.6.0
@@ -130,7 +130,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
-	golang.org/x/exp v0.0.0-20250811191247-51f88131bc50 // indirect
+	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6 // indirect
 	golang.org/x/mod v0.27.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect

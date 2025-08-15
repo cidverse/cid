@@ -2,6 +2,7 @@ package helmlint
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmcommon"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -27,6 +28,9 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "helm"`,
 			},
+		},
+		RunIfChanged: []string{
+			"**/*",
 		},
 		Access: cidsdk.ActionAccess{
 			Environment: []cidsdk.ActionAccessEnv{},

@@ -2,14 +2,15 @@ package builtincatalog
 
 import (
 	_ "embed"
+	"log/slog"
+	"os"
+
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction"
 	"github.com/cidverse/cid/pkg/builtin/builtinworkflow"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/lib/files"
-	"log/slog"
-	"os"
 )
 
 //go:embed files/cid-index.json
@@ -106,6 +107,7 @@ func convertActionMetadata(actionMetadata cidsdk.ActionMetadata) catalog.ActionM
 		Scope:         catalog.ActionScope(actionMetadata.Scope),
 		Links:         actionMetadata.Links,
 		Rules:         workflowRules,
+		RunIfChanged:  actionMetadata.RunIfChanged,
 		Access: catalog.ActionAccess{
 			Environment: accessEnvironment,
 			Executables: accessExecutable,

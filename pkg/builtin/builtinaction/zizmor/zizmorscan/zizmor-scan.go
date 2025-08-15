@@ -2,8 +2,9 @@ package zizmorscan
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"strings"
+
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
@@ -32,7 +33,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 		Rules: []cidsdk.ActionRule{
 			{
 				Type:       "cel",
-				Expression: `contains(PROJECT_CONFIG_TYPES, "github-workflow")`,
+				Expression: `contains(PROJECT_CONFIG_TYPES, "github-workflow") && NCI_REPOSITORY_HOST_TYPE == "github"`,
 			},
 		},
 		Access: cidsdk.ActionAccess{

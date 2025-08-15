@@ -3,8 +3,10 @@ package plangenerate
 import (
 	"errors"
 	"fmt"
-	"github.com/cidverse/go-vcsapp/pkg/platform/api"
+	"path/filepath"
 	"strconv"
+
+	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/common/executable"
@@ -38,8 +40,10 @@ type Step struct {
 	Scope              catalog.ActionScope  `json:"scope"`
 	Action             string               `json:"action"`
 	Module             string               `json:"module,omitempty"`
+	ModuleDir          string               `json:"module-dir,omitempty"`             // Directory of the module, if applicable
 	RunAfter           []string             `json:"run-after,omitempty"`              // List of steps that need to be completed before this step starts (by slug)
 	RunAfterByName     []string             `json:"run-after-by-name,omitempty"`      // List of steps that need to be completed before this step starts (by name)
+	RunIfChanged       []string             `json:"run-if-changed,omitempty"`         // List of files that trigger this step if changed
 	UsesOutputOf       []string             `json:"uses-output-of,omitempty"`         // List of steps whose outputs need to be downloaded (by slug)
 	UsesOutputOfByName []string             `json:"uses-output-of-by-name,omitempty"` // List of steps whose outputs need to be downloaded (by name)
 	Environment        string               `json:"environment,omitempty"`
@@ -62,8 +66,17 @@ func (s *Step) HasOutputWithTypeAndFormat(artifactType string, artifactFormat st
 
 func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id int, name string, moduleRef *analyzerapi.ProjectModule, environment string, executableConstraints []catalog.ActionAccessExecutable) Step {
 	moduleName := ""
+	moduleDir := ""
 	if moduleRef != nil {
 		moduleName = moduleRef.ID
+
+		rel, err := filepath.Rel(moduleRef.RootDirectory, moduleRef.Directory)
+		if err != nil {
+			moduleDir = moduleRef.Directory
+		} else {
+			moduleDir = rel
+		}
+
 		name = fmt.Sprintf("%s [%s]", name, moduleRef.Name)
 	}
 	if environment != "" {
@@ -71,15 +84,17 @@ func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id i
 	}
 
 	return Step{
-		ID:          strconv.Itoa(id),
-		Name:        name,
-		Slug:        slug.Make(name),
-		Stage:       action.Stage,
-		Scope:       catalogAction.Metadata.Scope,
-		Module:      moduleName,
-		Action:      catalogAction.URI,
-		RunAfter:    []string{},
-		Environment: environment,
+		ID:           strconv.Itoa(id),
+		Name:         name,
+		Slug:         slug.Make(name),
+		Stage:        action.Stage,
+		Scope:        catalogAction.Metadata.Scope,
+		Module:       moduleName,
+		ModuleDir:    moduleDir,
+		Action:       catalogAction.URI,
+		RunAfter:     []string{},
+		RunIfChanged: catalogAction.Metadata.RunIfChanged,
+		Environment:  environment,
 		Access: catalog.ActionAccess{
 			Environment: catalogAction.Metadata.Access.Environment,
 			Executables: executableConstraints,
