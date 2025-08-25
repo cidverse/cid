@@ -999,6 +999,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "helmfile",
+        "Version": "1.1.4",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/helmfile:1.1.4",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "mc",
         "Version": "2025.01.17",
         "Type": "container",
@@ -1326,6 +1343,23 @@
         "Version": "1.3.0",
         "Type": "container",
         "Image": "ghcr.io/cidverse/gocover-cobertura:1.3.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "gocover-cobertura",
+        "Version": "1.4.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/gocover-cobertura:1.4.0",
         "ImageCache": [],
         "Mounts": [],
         "Security": {
