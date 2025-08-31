@@ -45,7 +45,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/oriser/regroup v0.0.0-20240925165441-f6bb0e08289e
 	github.com/otiai10/copy v1.14.1
-	github.com/owenrumney/go-sarif/v3 v3.2.2
+	github.com/owenrumney/go-sarif/v3 v3.2.3
 	github.com/rs/zerolog v1.34.0
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cobra v1.9.1
