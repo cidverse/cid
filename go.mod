@@ -48,7 +48,7 @@ require (
 	github.com/owenrumney/go-sarif/v3 v3.2.3
 	github.com/rs/zerolog v1.34.0
 	github.com/sourcegraph/conc v0.3.0
-	github.com/spf13/cobra v1.9.1
+	github.com/spf13/cobra v1.10.1
 	github.com/stretchr/testify v1.11.1
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	gitlab.com/gitlab-org/api/client-go v0.142.5
@@ -118,7 +118,7 @@ require (
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/shibumi/go-pathspec v1.3.0 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
-	github.com/spf13/pflag v1.0.7 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/stoewer/go-strcase v1.3.1 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tinylib/msgp v1.4.0 // indirect
