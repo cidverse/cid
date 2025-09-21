@@ -50,7 +50,7 @@ func RunCmd() *cobra.Command {
 				}
 
 				// only process repositories with a matching channel value
-				if appcommon.GetChannel(platform, repo) != channel {
+				if appcommon.GetChannel(platform, repo) != channel && channel != "all" {
 					slog.With("repository", fmt.Sprintf("%s/%s", repo.Namespace, repo.Name)).Debug("Skipping repository due to channel mismatch")
 					continue
 				}

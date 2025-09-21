@@ -3,11 +3,12 @@ package golangcilint
 import (
 	_ "embed"
 	"fmt"
-	cidsdk "github.com/cidverse/cid-sdk-go"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"os"
 	"path"
 	"strings"
+
+	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 )
 
 const URI = "builtin://actions/golangci-lint"
@@ -39,6 +40,17 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 			Executables: []cidsdk.ActionAccessExecutable{
 				{
 					Name: "golangci-lint",
+				},
+			},
+			Network: []cidsdk.ActionAccessNetwork{
+				{
+					Host: "proxy.golang.org:443",
+				},
+				{
+					Host: "storage.googleapis.com:443",
+				},
+				{
+					Host: "sum.golang.org:443",
 				},
 			},
 		},

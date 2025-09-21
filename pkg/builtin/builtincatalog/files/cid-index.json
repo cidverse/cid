@@ -1509,6 +1509,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "golangci-lint",
+        "Version": "2.4.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/golangci-lint:2.4.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "dotnet",
         "Version": "9.0.203",
         "Type": "container",
