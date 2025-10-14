@@ -3,9 +3,7 @@ module github.com/cidverse/cid
 //go:platform linux/amd64
 //go:platform darwin/amd64
 
-go 1.24.0
-
-toolchain go1.25.0
+go 1.25.0
 
 require (
 	github.com/BurntSushi/toml v1.5.0
@@ -27,7 +25,7 @@ require (
 	github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812
 	github.com/cidverse/go-vcs v0.0.0-20251005222405-c613bd4d3028
 	github.com/cidverse/go-vcsapp v0.0.0-20251013204959-d6d3fdf7e7b2
-	github.com/cidverse/normalizeci v1.1.1-0.20250501143256-e98d5431deb0
+	github.com/cidverse/normalizeci v1.1.1-0.20251014203821-73285145f91b
 	github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3
 	github.com/go-playground/validator/v10 v10.28.0
 	github.com/go-resty/resty/v2 v2.16.5
@@ -137,8 +135,8 @@ require (
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/text v0.30.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20251007200510-49b9836ed3ff // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251007200510-49b9836ed3ff // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20251014184007-4626949a642f // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251014184007-4626949a642f // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
