@@ -3,9 +3,10 @@ package gotest
 import (
 	"errors"
 	"fmt"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"path/filepath"
 	"strings"
+
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
@@ -159,8 +160,11 @@ func (a Action) Execute() (err error) {
 	// json report
 	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "generating json coverage report"})
 	coverageJSONResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
-		Command:       fmt.Sprintf("go test -coverprofile %q -json -covermode=count -parallel=4 -timeout 10s ./...", coverageOut),
-		WorkDir:       d.Module.ModuleDir,
+		Command: fmt.Sprintf("go test -coverprofile %q -json -covermode=count -parallel=4 -timeout 10s ./...", coverageOut),
+		WorkDir: d.Module.ModuleDir,
+		Env: map[string]string{
+			"GOTOOLCHAIN": "local",
+		},
 		CaptureOutput: true,
 	})
 	if err != nil {
@@ -189,6 +193,9 @@ func (a Action) Execute() (err error) {
 	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "generating html coverage report"})
 	_, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
 		Command: fmt.Sprintf("go tool cover -html %q -o %q", coverageOut, coverageHTML),
+		Env: map[string]string{
+			"GOTOOLCHAIN": "local",
+		},
 		WorkDir: d.ProjectDir,
 	})
 	if err != nil {

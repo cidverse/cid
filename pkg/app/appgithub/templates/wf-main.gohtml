@@ -153,7 +153,6 @@ jobs:
         env:
           CID_WORKFLOW: "{{ printf "%s" "${{ env.CID_WORKFLOW }}" }}"
           CID_LOGLEVEL: "{{ printf "%s" "${{ env.CID_LOGLEVEL }}" }}"
-          GITHUB_TOKEN: "{{ printf "%s" "${{ secrets.GITHUB_TOKEN }}" }}"
           {{- range $e := $step.Access.Environment }}
           {{- if and $e.Secret (not $e.Pattern) }}
           {{ $e.Name }}: "{{ printf "${{ secrets.%s }}" $e.Name }}"

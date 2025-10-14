@@ -1,9 +1,10 @@
 package gotest
 
 import (
+	"testing"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gocommon"
-	"testing"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/stretchr/testify/assert"
@@ -35,8 +36,11 @@ func TestGoModTest(t *testing.T) {
 	}).Return(nil)
 
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
-		Command:       `go test -coverprofile "/my-project/.tmp/cover.out" -json -covermode=count -parallel=4 -timeout 10s ./...`,
-		WorkDir:       "/my-project",
+		Command: `go test -coverprofile "/my-project/.tmp/cover.out" -json -covermode=count -parallel=4 -timeout 10s ./...`,
+		WorkDir: "/my-project",
+		Env: map[string]string{
+			"GOTOOLCHAIN": "local",
+		},
 		CaptureOutput: true,
 	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0, Stdout: "{}"}, nil)
 	sdk.On("FileWrite", "/my-project/.tmp/cover.json", []byte("{}")).Return(nil)
@@ -50,6 +54,9 @@ func TestGoModTest(t *testing.T) {
 
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
 		Command: `go tool cover -html "/my-project/.tmp/cover.out" -o "/my-project/.tmp/cover.html"`,
+		Env: map[string]string{
+			"GOTOOLCHAIN": "local",
+		},
 		WorkDir: "/my-project",
 	}).Return(&cidsdk.ExecuteCommandResponse{Code: 0}, nil)
 	sdk.On("ArtifactUpload", cidsdk.ArtifactUploadRequest{

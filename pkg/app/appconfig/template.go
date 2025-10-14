@@ -70,7 +70,7 @@ func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon
 	// pre-process access section for workflow rendering
 	for i := range plan.Steps {
 		plan.Steps[i].Access.Network = append(plan.Steps[i].Access.Network, networkAllowGlobal...)
-		plan.Steps[i].Access.Environment = appcommon.RemoveEnvByName(plan.Steps[i].Access.Environment, []string{"GITHUB_TOKEN"})
+		plan.Steps[i].Access.Environment = appcommon.RemoveEnvByName(plan.Steps[i].Access.Environment, []string{})
 	}
 
 	// render workflow template
@@ -94,6 +94,7 @@ func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon
 			".editorconfig",
 			"renovate.json",
 			"CODEOWNERS",
+			"SECURITY.md",
 		},
 	}
 

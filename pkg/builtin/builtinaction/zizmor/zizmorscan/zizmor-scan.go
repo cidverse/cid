@@ -16,8 +16,9 @@ type Action struct {
 }
 
 type Config struct {
-	GHHost  string `json:"gh_host"  env:"GH_HOST"`
-	GHToken string `json:"gh_token"  env:"GH_TOKEN"`
+	GHHost      string `json:"gh_host"  env:"GH_HOST"`
+	GHToken     string `json:"gh_token"  env:"GH_TOKEN"`
+	GitHubToken string `json:"github_token"  env:"GITHUB_TOKEN"`
 }
 
 func (a Action) Metadata() cidsdk.ActionMetadata {
@@ -44,17 +45,18 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				},
 				{
 					Name:        "GH_TOKEN",
-					Description: "GH_TOKEN is required for some online audits",
+					Description: "GH_TOKEN is required for some online audits. Takes precedence over GITHUB_TOKEN",
+				},
+				{
+					Name:        "GITHUB_TOKEN",
+					Description: "GITHUB_TOKEN is set automatically by GitHub Actions",
 				},
 				/*
 					{
-						Name:        "ZIZMOR_NO_ONLINE_AUDITS",
-						Description: "Disables online audits.",
-					},
-					{
 						Name:        "ZIZMOR_OFFLINE",
 						Description: "Runs in offline mode.",
-					},*/
+					},
+				*/
 			},
 			Executables: []cidsdk.ActionAccessExecutable{
 				{
@@ -84,6 +86,10 @@ func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
 		return cfg, err
 	}
 
+	if cfg.GHToken == "" && cfg.GitHubToken != "" {
+		cfg.GHToken = cfg.GitHubToken
+	}
+
 	return cfg, nil
 }
 
@@ -109,8 +115,7 @@ func (a Action) Execute() (err error) {
 		".",
 		"--format", "sarif",
 		"--persona", "pedantic",
-		"--no-exit-codes",    // don't fail, always report issues
-		"--no-online-audits", // online audits need a non-project token to lookup other repos
+		"--no-exit-codes", // don't fail, always report issues
 	}
 	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
 		Command: strings.Join(opts, " "),

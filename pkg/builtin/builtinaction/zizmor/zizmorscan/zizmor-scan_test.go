@@ -1,8 +1,9 @@
 package zizmorscan
 
 import (
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"testing"
+
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/stretchr/testify/assert"
@@ -12,7 +13,7 @@ func TestZizmorScan(t *testing.T) {
 	sdk := common.TestSetup(t)
 	sdk.On("ProjectActionDataV1").Return(common.TestProjectData(), nil)
 	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
-		Command: `zizmor . --format sarif --persona pedantic --no-exit-codes --no-online-audits`,
+		Command: `zizmor . --format sarif --persona pedantic --no-exit-codes`,
 		WorkDir: "/my-project",
 		Env: map[string]string{
 			"GH_HOST":  "github.com",
