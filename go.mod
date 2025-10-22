@@ -43,7 +43,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/oriser/regroup v0.0.0-20240925165441-f6bb0e08289e
 	github.com/otiai10/copy v1.14.1
-	github.com/owenrumney/go-sarif/v3 v3.2.3
+	github.com/owenrumney/go-sarif/v3 v3.3.0
 	github.com/rs/zerolog v1.34.0
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cobra v1.10.1
@@ -83,7 +83,6 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/cel-go v0.26.1 // indirect
-	github.com/google/go-github/v71 v71.0.0 // indirect
 	github.com/google/go-github/v75 v75.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
