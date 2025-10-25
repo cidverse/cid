@@ -36,14 +36,14 @@ var githubWorkflowDependencies = map[string]appconfig.WorkflowDependency{
 	"actions/download-artifact": {
 		Id:      "actions/download-artifact",
 		Type:    "github-action",
-		Version: "v5.0.0",
-		Hash:    "634f93cb2916e3fdff6788551b99b062d0335ce0",
+		Version: "v6.0.0",
+		Hash:    "018cc2cf5baa6db3ef3c5f8a56943fffe632ef53",
 	},
 	"actions/upload-artifact": {
 		Id:      "actions/upload-artifact",
 		Type:    "github-action",
-		Version: "v4.6.2",
-		Hash:    "ea165f8d65b6e75b540449e92b4886f43607fa02",
+		Version: "v5.0.0",
+		Hash:    "330a01c490aca151604b8cf639adc76d48f6c5d4",
 	},
 	"step-security/harden-runner": {
 		Id:      "step-security/harden-runner",
