@@ -49,14 +49,14 @@ require (
 	github.com/spf13/cobra v1.10.1
 	github.com/stretchr/testify v1.11.1
 	github.com/wk8/go-ordered-map/v2 v2.1.8
-	gitlab.com/gitlab-org/api/client-go v0.159.0
+	gitlab.com/gitlab-org/api/client-go v0.160.0
 	golang.org/x/oauth2 v0.33.0
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.6.0
 )
 
 require (
-	cel.dev/expr v0.25.0 // indirect
+	cel.dev/expr v0.25.1 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
