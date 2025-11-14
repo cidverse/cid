@@ -10,7 +10,7 @@ import (
 
 	"github.com/cidverse/cidverseutils/compress"
 	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
-	"github.com/google/go-github/v78/github"
+	"github.com/google/go-github/v79/github"
 	"golang.org/x/oauth2"
 )
 
