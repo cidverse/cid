@@ -2,10 +2,11 @@ package gradletest
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlecommon"
 	"regexp"
 	"strings"
+
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlecommon"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )

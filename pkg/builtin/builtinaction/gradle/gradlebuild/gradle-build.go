@@ -2,9 +2,10 @@ package gradlebuild
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlecommon"
-	"strings"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )

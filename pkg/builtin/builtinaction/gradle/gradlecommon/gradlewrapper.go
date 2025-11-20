@@ -3,10 +3,11 @@ package gradlecommon
 import (
 	"bufio"
 	"fmt"
-	"github.com/cidverse/cid/pkg/lib/hash"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/cidverse/cid/pkg/lib/hash"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cidverseutils/filesystem"
@@ -34,7 +35,7 @@ func VerifyGradleWrapper(moduleDir string) error {
 	if version == "" {
 		return fmt.Errorf("failed to parse gradle version from distributionUrl: %s", props["distributionUrl"])
 	}
-	release, err := FindGradleRelease(version, true)
+	release, err := FindGradleRelease(version)
 	if err != nil {
 		return fmt.Errorf("failed to find gradle release for version %s: %w", version, err)
 	}

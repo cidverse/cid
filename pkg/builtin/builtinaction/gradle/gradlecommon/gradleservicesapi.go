@@ -1,11 +1,14 @@
 package gradlecommon
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 )
+
+//go:embed wrapper-checksums.json
+var wrapperChecksumsJSON []byte
 
 type GradleRelease struct {
 	Version            string `json:"version"`
@@ -26,7 +29,41 @@ type GradleRelease struct {
 	WrapperChecksum string
 }
 
-func FindGradleRelease(version string, resolve bool) (GradleRelease, error) {
+// FindGradleRelease orchestrates the lookup: local first, then online if needed.
+// If resolve is true, ResolveGradleRelease is called on the found release.
+func FindGradleRelease(version string) (GradleRelease, error) {
+	// try embedded checksums first
+	if release, found, err := findGradleReleaseLocal(version); err == nil && found {
+		return release, nil
+	}
+
+	// fallback to online lookup
+	release, err := findGradleReleaseOnline(version)
+	if err != nil {
+		return GradleRelease{}, err
+	}
+
+	return release, nil
+}
+
+// findGradleReleaseLocal searches for a release in the local JSON file.
+func findGradleReleaseLocal(version string) (GradleRelease, bool, error) {
+	var releases []GradleRelease
+	if err := json.Unmarshal(wrapperChecksumsJSON, &releases); err != nil {
+		return GradleRelease{}, false, fmt.Errorf("failed to parse embedded JSON: %w", err)
+	}
+
+	for _, release := range releases {
+		if release.Version == version {
+			return release, true, nil
+		}
+	}
+
+	return GradleRelease{}, false, nil
+}
+
+// findGradleReleaseOnline searches for a release by querying the Gradle services API.
+func findGradleReleaseOnline(version string) (GradleRelease, error) {
 	url := "https://services.gradle.org/versions/all"
 	resp, err := http.Get(url)
 	if err != nil {
@@ -41,47 +78,9 @@ func FindGradleRelease(version string, resolve bool) (GradleRelease, error) {
 
 	for _, release := range releases {
 		if release.Version == version {
-			if resolve {
-				resolved, err := ResolveGradleRelease(release)
-				return resolved, err
-			} else {
-				return release, nil
-			}
+			return release, nil
 		}
 	}
 
 	return GradleRelease{}, fmt.Errorf("version not found: %s", version)
-}
-
-func ResolveGradleRelease(release GradleRelease) (GradleRelease, error) {
-	// Fetch checksum
-	checksum, err := fetchChecksum(release.ChecksumUrl)
-	if err != nil {
-		return GradleRelease{}, fmt.Errorf("failed to fetch checksum: %v", err)
-	}
-	release.Checksum = checksum
-
-	// Fetch wrapper checksum
-	wrapperChecksum, err := fetchChecksum(release.WrapperChecksumUrl)
-	if err != nil {
-		return GradleRelease{}, fmt.Errorf("failed to fetch wrapper checksum: %v", err)
-	}
-	release.WrapperChecksum = wrapperChecksum
-
-	return release, nil
-}
-
-func fetchChecksum(url string) (string, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	checksum, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	return string(checksum), nil
 }
