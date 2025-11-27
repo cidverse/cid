@@ -10,7 +10,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v3 v3.3.0
 	github.com/adrg/xdg v0.5.3
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/cidverse/cid-sdk-go v0.0.0-20250828204921-aaa482eac4b5
+	github.com/cidverse/cid-sdk-go v0.0.0-20251123150737-f531b82ebbfd
 	github.com/cidverse/cidverseutils/ci v0.1.0
 	github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842
 	github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4
@@ -49,7 +49,7 @@ require (
 	github.com/spf13/cobra v1.10.1
 	github.com/stretchr/testify v1.11.1
 	github.com/wk8/go-ordered-map/v2 v2.1.8
-	gitlab.com/gitlab-org/api/client-go v1.0.1
+	gitlab.com/gitlab-org/api/client-go v1.1.0
 	golang.org/x/oauth2 v0.33.0
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.6.0
@@ -134,8 +134,8 @@ require (
 	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/text v0.31.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20251111163417-95abcf5c77ba // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251111163417-95abcf5c77ba // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20251124214823-79d6a2a48846 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251124214823-79d6a2a48846 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
