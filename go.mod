@@ -32,7 +32,7 @@ require (
 	github.com/google/go-github/v79 v79.0.0
 	github.com/google/uuid v1.6.0
 	github.com/gosimple/slug v1.15.0
-	github.com/hashicorp/go-version v1.7.0
+	github.com/hashicorp/go-version v1.8.0
 	github.com/heimdalr/dag v1.5.0
 	github.com/in-toto/in-toto-golang v0.9.0
 	github.com/jarcoal/httpmock v1.4.1
