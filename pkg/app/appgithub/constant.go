@@ -25,13 +25,13 @@ var githubWorkflowDependencies = map[string]appconfig.WorkflowDependency{
 	"cid": {
 		Id:      "cid",
 		Type:    "binary",
-		Version: "0.5.0",
+		Version: "0.6.0",
 	},
 	"actions/checkout": {
 		Id:      "actions/checkout",
 		Type:    "github-action",
-		Version: "v5.0.0",
-		Hash:    "08c6903cd8c0fde910a37f88322edcfb5dd907a8",
+		Version: "v6.0.1",
+		Hash:    "8e8c483db84b4bee98b60c0593521ed34d9990e8",
 	},
 	"actions/download-artifact": {
 		Id:      "actions/download-artifact",
@@ -48,8 +48,8 @@ var githubWorkflowDependencies = map[string]appconfig.WorkflowDependency{
 	"step-security/harden-runner": {
 		Id:      "step-security/harden-runner",
 		Type:    "github-action",
-		Version: "v2.13.1",
-		Hash:    "f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a",
+		Version: "v2.14.0",
+		Hash:    "20cf305ff2072d973412fa9b1e3a4f227bda3c76",
 	},
 	"cidverse/ghact-cid-setup": {
 		Id:      "cidverse/ghact-cid-setup",

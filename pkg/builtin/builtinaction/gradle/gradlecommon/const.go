@@ -14,15 +14,13 @@ var (
 	NetworkGradle = []cidsdk.ActionAccessNetwork{
 		{Host: "plugins.gradle.org:443"},
 		{Host: "plugins-artifacts.gradle.org:443"},
-		{Host: "services.gradle.org:443"},
+		{Host: "services.gradle.org:443"}, // gradle wrapper checksum verification
 		{Host: "downloads.gradle.org:443"},
 		{Host: "jcenter.bintray.com:443"},
 	}
 
 	NetworkPublish = []cidsdk.ActionAccessNetwork{
-		{Host: "oss.sonatype.org:443"},     // lagcy ossrh
-		{Host: "s01.oss.sonatype.org:443"}, // lagcy ossrh
-		{Host: "central.sonatype.com:443"}, // new mavenCentral
+		{Host: "central.sonatype.com:443"}, // mavenCentral
 		{Host: "maven.pkg.github.com:443"},
 	}
 )
