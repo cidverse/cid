@@ -24,7 +24,7 @@ var gitlabWorkflowDependencies = map[string]appconfig.WorkflowDependency{
 	"cid": {
 		Id:      "cid",
 		Type:    "binary",
-		Version: "0.5.0",
+		Version: "0.6.0",
 	},
 	"quay.io/podman/stable": {
 		Id:      "quay.io/podman/stable",

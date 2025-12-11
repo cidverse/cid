@@ -3,11 +3,13 @@ package appgithub
 import (
 	"fmt"
 	"log/slog"
+	"os"
 	"path/filepath"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/app/appmergerequest"
+	"github.com/cidverse/cid/pkg/app/apptemplate"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/go-vcsapp/pkg/task/simpletask"
@@ -112,6 +114,12 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 		}
 	}
 
+	// support files
+	err = apptemplate.RenderFile("install.gohtml", apptemplate.NewTemplateData(conf), filepath.Join(taskContext.Directory, ".cid", "scripts", "install.sh"))
+	if err != nil {
+		return fmt.Errorf("failed to render install script: %w", err)
+	}
+
 	// write workflow state
 	previousState, _ := appconfig.ReadWorkflowState(filepath.Join(taskContext.Directory, ".cid", "state-github.json"))
 	err = appconfig.WriteWorkflowState(workflowState, filepath.Join(taskContext.Directory, ".cid", "state-github.json"))
@@ -130,6 +138,11 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 	if err != nil {
 		return fmt.Errorf("failed to hash workflow contents: %w", err)
 	}
+
+	// clear old workflow files - TODO: remove once all cidverse repos have migrated
+	_ = os.Remove(filepath.Join(taskContext.Directory, ".github", "workflows", "cid.yml"))
+	_ = os.Remove(filepath.Join(taskContext.Directory, ".github", "workflows", "cid-pullrequest.yml"))
+	_ = os.Remove(filepath.Join(taskContext.Directory, ".github", "workflows", "cid-ossf.yml"))
 
 	// commit push and create or update merge request
 	err = helper.CommitPushAndMergeRequest(title, title, description, fmt.Sprintf("%s-%s", appcommon.MergeRequestId, workflowHash))

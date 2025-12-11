@@ -1,6 +1,6 @@
 {{- /*gotype: github.com/cidverse/cid/pkg/app/appconfig.TemplateData*/ -}}
 {{- $root := . -}}
-{{- $cidDep := $root.GetDependency "cid" -}}
+{{- $cidDep := .GetDependency "cid" -}}
 {{- $checkoutAction := $root.GetDependency "actions/checkout" -}}
 {{- $downloadArtifactAction := $root.GetDependency "actions/download-artifact" -}}
 {{- $uploadArtifactAction := $root.GetDependency "actions/upload-artifact" -}}
@@ -130,15 +130,14 @@ jobs:
             {{ $n.Host }}
             {{- end }}
           {{- end }}
-      - name: Setup Tools
-        uses: {{ $cidSetupAction.Id }}@{{ $cidSetupAction.Hash }} # {{ $cidSetupAction.Version }}
-        with:
-          version: "v{{ $cidDep.Version }}"
       - name: Checkout
         uses: {{ $checkoutAction.Id }}@{{ $checkoutAction.Hash }} # {{ $checkoutAction.Version }}
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Prepare Tooling
+        shell: bash
+        run: bash .cid/scripts/install.sh "{{ $cidDep.Version }}" "{{ $cidDep.Hash }}"
       {{- if $step.UsesOutputOf }}
       {{- range $prevStepSlug := $step.UsesOutputOf }}
       - name: Download Inputs > {{ $prevStepSlug }}

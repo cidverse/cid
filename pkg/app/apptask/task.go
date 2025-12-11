@@ -9,6 +9,7 @@ import (
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/app/appmergerequest"
+	"github.com/cidverse/cid/pkg/app/apptemplate"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"github.com/cidverse/go-vcsapp/pkg/task/simpletask"
@@ -127,6 +128,12 @@ func WorkflowTask(taskContext taskcommon.TaskContext, opts PlatformWorkflowTaskO
 		}
 
 		renderedFiles[".gitlab-ci.yml"] = content
+	}
+
+	// support files
+	err = apptemplate.RenderFile("install.gohtml", apptemplate.NewTemplateData(conf), filepath.Join(taskContext.Directory, ".cid", "scripts", "install.sh"))
+	if err != nil {
+		return WorkflowTaskResult{}, fmt.Errorf("failed to render install script: %w", err)
 	}
 
 	// check if dry run mode is enabled
