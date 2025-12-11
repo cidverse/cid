@@ -27,7 +27,7 @@ curl -fsSL "$GRADLE_VERSIONS_URL" -o "$tmpFile"
 
 # filter to relevant fields only, if jq is available
 if command -v jq >/dev/null 2>&1; then
-    jq '[ .[] | { version, checksum, wrapperChecksum } ]' "$tmpFile" > "$targetFile"
+    jq '[ .[] | select(.nightly != true and .snapshot != true) | { version, checksum, wrapperChecksum } ]' "$tmpFile" > "$targetFile"
 else
     cp "$tmpFile" "$targetFile"
 fi

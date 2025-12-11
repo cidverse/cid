@@ -1,15 +1,5 @@
 [
   {
-    "version": "9.3.0-20251209014223+0000",
-    "checksum": "b224712633644b131c264de1dc7c7908dfc86fdb7091d7af499bd57faaf8eafd",
-    "wrapperChecksum": "b3a875ddc1f044746e1b1a55f645584505f4a10438c1afea9f15e92a7c42ec13"
-  },
-  {
-    "version": "9.4.0-20251209001742+0000",
-    "checksum": "9f1675c88b1dab094935399a375e72807aeb081c338c56b8df739692f4c52e98",
-    "wrapperChecksum": "b3a875ddc1f044746e1b1a55f645584505f4a10438c1afea9f15e92a7c42ec13"
-  },
-  {
     "version": "9.4.0-milestone-3",
     "checksum": "2c2402e0741735bf96742d834ccc236d1b6ebef8f3b249df059a0f19cce07efc",
     "wrapperChecksum": "b3a875ddc1f044746e1b1a55f645584505f4a10438c1afea9f15e92a7c42ec13"
