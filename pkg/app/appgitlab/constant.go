@@ -2,6 +2,7 @@ package appgitlab
 
 import (
 	"github.com/cidverse/cid/pkg/app/appconfig"
+	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
 )
 
@@ -24,7 +25,7 @@ var gitlabWorkflowDependencies = map[string]appconfig.WorkflowDependency{
 	"cid": {
 		Id:      "cid",
 		Type:    "binary",
-		Version: "0.6.0",
+		Version: constants.Version,
 	},
 	"quay.io/podman/stable": {
 		Id:      "quay.io/podman/stable",

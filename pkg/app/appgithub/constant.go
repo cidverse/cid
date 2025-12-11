@@ -2,6 +2,7 @@ package appgithub
 
 import (
 	"github.com/cidverse/cid/pkg/app/appconfig"
+	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
 )
 
@@ -25,7 +26,7 @@ var githubWorkflowDependencies = map[string]appconfig.WorkflowDependency{
 	"cid": {
 		Id:      "cid",
 		Type:    "binary",
-		Version: "0.6.0",
+		Version: constants.Version,
 	},
 	"actions/checkout": {
 		Id:      "actions/checkout",
