@@ -80,7 +80,7 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 				changes = append(changes, ChangeEntry{
 					Workflow: key,
 					Scope:    "dependency",
-					Message:  fmt.Sprintf("added dependency [%s:%s]", newDep.Type, depKey),
+					Message:  fmt.Sprintf("added [%s] version [%s]", newDep.AsPackageUrlNoVersion(), newDep.Version),
 				})
 				continue
 			}
@@ -88,19 +88,19 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 				changes = append(changes, ChangeEntry{
 					Workflow: key,
 					Scope:    "dependency",
-					Message:  fmt.Sprintf("dependency [%s:%s] version and hash changed (%s → %s, %s → %s)", newDep.Type, depKey, oldDep.Version, newDep.Version, oldDep.Hash, newDep.Hash),
+					Message:  fmt.Sprintf("[%s] version and hash changed (%s → %s, %s → %s)", newDep.AsPackageUrlNoVersion(), oldDep.Version, newDep.Version, oldDep.Hash, newDep.Hash),
 				})
 			} else if oldDep.Version != newDep.Version {
 				changes = append(changes, ChangeEntry{
 					Workflow: key,
 					Scope:    "dependency",
-					Message:  fmt.Sprintf("dependency [%s:%s] version changed (%s → %s)", newDep.Type, depKey, oldDep.Version, newDep.Version),
+					Message:  fmt.Sprintf("[%s] version changed (%s → %s)", newDep.AsPackageUrlNoVersion(), oldDep.Version, newDep.Version),
 				})
 			} else if oldDep.Hash != newDep.Hash {
 				changes = append(changes, ChangeEntry{
 					Workflow: key,
 					Scope:    "dependency",
-					Message:  fmt.Sprintf("dependency [%s:%s] hash changed (%s → %s)", newDep.Type, depKey, oldDep.Hash, newDep.Hash),
+					Message:  fmt.Sprintf("[%s] hash changed (%s → %s)", newDep.AsPackageUrlNoVersion(), oldDep.Hash, newDep.Hash),
 				})
 			}
 		}
@@ -109,7 +109,7 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 				changes = append(changes, ChangeEntry{
 					Workflow: key,
 					Scope:    "dependency",
-					Message:  fmt.Sprintf("removed dependency [%s:%s]", oldWf.ReferencedWorkflowDependency[depKey].Type, depKey),
+					Message:  fmt.Sprintf("removed [%s]", oldWf.ReferencedWorkflowDependency[depKey].AsPackageUrlNoVersion()),
 				})
 			}
 		}

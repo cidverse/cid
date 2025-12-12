@@ -2,6 +2,7 @@ package appconfig
 
 import (
 	"github.com/cidverse/cid/pkg/app/appcommon"
+	"github.com/cidverse/cid/pkg/common/dependency"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/context"
 	"github.com/cidverse/cid/pkg/core/catalog"
@@ -12,34 +13,34 @@ import (
 )
 
 type WorkflowData struct {
-	Version                      string                        `json:"version"`
-	Name                         string                        `json:"name"`
-	NameSlug                     string                        `json:"name_slug"`
-	JobTimeout                   int                           `json:"job_timeout"`
-	DefaultBranch                string                        `json:"default_branch"`
-	ContainerRuntime             string                        `json:"container_runtime"`
-	WorkflowKey                  string                        `json:"workflow_key"`
-	WorkflowConfig               WorkflowConfig                `json:"workflow_config"`
-	Plan                         plangenerate.Plan             `json:"plan"`
-	WorkflowDependency           map[string]WorkflowDependency `json:"-"`
-	ReferencedWorkflowDependency map[string]WorkflowDependency `json:"workflow_dependency"`
-	IgnoreFiles                  []string                      `json:"ignore_files"`
+	Version                      string                           `json:"version"`
+	Name                         string                           `json:"name"`
+	NameSlug                     string                           `json:"name_slug"`
+	JobTimeout                   int                              `json:"job_timeout"`
+	DefaultBranch                string                           `json:"default_branch"`
+	ContainerRuntime             string                           `json:"container_runtime"`
+	WorkflowKey                  string                           `json:"workflow_key"`
+	WorkflowConfig               WorkflowConfig                   `json:"workflow_config"`
+	Plan                         plangenerate.Plan                `json:"plan"`
+	WorkflowDependency           map[string]dependency.Dependency `json:"-"`
+	ReferencedWorkflowDependency map[string]dependency.Dependency `json:"workflow_dependency"`
+	IgnoreFiles                  []string                         `json:"ignore_files"`
 }
 
 func (t *WorkflowData) GetDependencyReference(key string) string {
 	if dep, ok := t.WorkflowDependency[key]; ok {
 		t.ReferencedWorkflowDependency[key] = dep
-		return FormatDependencyReference(dep)
+		return dep.AsDependencyReference()
 	}
 	return ""
 }
 
-func (t *WorkflowData) GetDependency(key string) WorkflowDependency {
+func (t *WorkflowData) GetDependency(key string) dependency.Dependency {
 	if dep, ok := t.WorkflowDependency[key]; ok {
 		t.ReferencedWorkflowDependency[key] = dep
 		return dep
 	}
-	return WorkflowDependency{}
+	return dependency.Dependency{}
 }
 
 type RenderWorkflowResult struct {
@@ -48,7 +49,7 @@ type RenderWorkflowResult struct {
 }
 
 // GenerateWorkflowData generates the workflow template data
-func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon.TaskContext, conf Config, wfName string, wfConfig WorkflowConfig, vars []api.CIVariable, environments map[string]appcommon.VCSEnvironment, wfDependencies map[string]WorkflowDependency, networkAllowGlobal []catalog.ActionAccessNetwork) (WorkflowData, error) {
+func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon.TaskContext, conf Config, wfName string, wfConfig WorkflowConfig, vars []api.CIVariable, environments map[string]appcommon.VCSEnvironment, wfDependencies map[string]dependency.Dependency, networkAllowGlobal []catalog.ActionAccessNetwork) (WorkflowData, error) {
 	wfConfig = PreProcessWorkflowConfig(wfConfig, taskContext.Repository)
 
 	// generate plan
@@ -85,7 +86,7 @@ func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon
 		WorkflowConfig:               wfConfig,
 		Plan:                         plan,
 		WorkflowDependency:           wfDependencies,
-		ReferencedWorkflowDependency: make(map[string]WorkflowDependency),
+		ReferencedWorkflowDependency: make(map[string]dependency.Dependency),
 		IgnoreFiles: []string{
 			"README.md",
 			"LICENSE",

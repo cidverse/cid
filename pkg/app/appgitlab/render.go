@@ -9,6 +9,7 @@ import (
 	"slices"
 
 	"github.com/cidverse/cid/pkg/app/appconfig"
+	"github.com/cidverse/cid/pkg/common/dependency"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
 )
@@ -17,13 +18,13 @@ import (
 var embedFS embed.FS
 
 type TemplateData struct {
-	Version                      string                                  `json:"version"`
-	ContainerRuntime             string                                  `json:"container_runtime"`
-	RunnerTags                   []string                                `json:"runner_tags,omitempty"`
-	Stages                       []string                                `json:"stages"`
-	Workflows                    []appconfig.WorkflowData                `json:"workflows"`
-	WorkflowDependency           map[string]appconfig.WorkflowDependency `json:"workflow_dependency"`
-	ReferencedWorkflowDependency map[string]appconfig.WorkflowDependency `json:"-"`
+	Version                      string                           `json:"version"`
+	ContainerRuntime             string                           `json:"container_runtime"`
+	RunnerTags                   []string                         `json:"runner_tags,omitempty"`
+	Stages                       []string                         `json:"stages"`
+	Workflows                    []appconfig.WorkflowData         `json:"workflows"`
+	WorkflowDependency           map[string]dependency.Dependency `json:"workflow_dependency"`
+	ReferencedWorkflowDependency map[string]dependency.Dependency `json:"-"`
 }
 
 func (t *TemplateData) GetDependencyReference(key string) string {
@@ -32,12 +33,12 @@ func (t *TemplateData) GetDependencyReference(key string) string {
 		for _, w := range t.Workflows {
 			w.ReferencedWorkflowDependency[key] = dep
 		}
-		return appconfig.FormatDependencyReference(dep)
+		return dep.AsDependencyReference()
 	}
 	return ""
 }
 
-func (t *TemplateData) GetDependency(key string) appconfig.WorkflowDependency {
+func (t *TemplateData) GetDependency(key string) dependency.Dependency {
 	if dep, ok := t.WorkflowDependency[key]; ok {
 		t.ReferencedWorkflowDependency[key] = dep
 		for _, w := range t.Workflows {
@@ -45,7 +46,7 @@ func (t *TemplateData) GetDependency(key string) appconfig.WorkflowDependency {
 		}
 		return dep
 	}
-	return appconfig.WorkflowDependency{}
+	return dependency.Dependency{}
 }
 
 type RenderWorkflowResult struct {
@@ -61,7 +62,7 @@ func renderWorkflow(data []appconfig.WorkflowData, runnerTags []string, template
 
 	var containerRuntime string
 	var wfStages []string
-	wfDependencies := make(map[string]appconfig.WorkflowDependency)
+	wfDependencies := make(map[string]dependency.Dependency)
 	for _, wf := range data {
 		containerRuntime = wf.ContainerRuntime
 		for _, s := range wf.Plan.Stages {
@@ -82,7 +83,7 @@ func renderWorkflow(data []appconfig.WorkflowData, runnerTags []string, template
 		Stages:                       wfStages,
 		Workflows:                    data,
 		WorkflowDependency:           wfDependencies,
-		ReferencedWorkflowDependency: make(map[string]appconfig.WorkflowDependency),
+		ReferencedWorkflowDependency: make(map[string]dependency.Dependency),
 	}
 	template, err := vcsapp.Render(string(content), templateData)
 	if err != nil {

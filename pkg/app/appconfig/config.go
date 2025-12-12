@@ -48,25 +48,6 @@ func PreProcessWorkflowConfig(wfConfig WorkflowConfig, repo api.Repository) Work
 	return wfConfig
 }
 
-type WorkflowDependency struct {
-	Id      string `json:"id"`
-	Type    string `json:"type"`
-	Version string `json:"version,omitempty"`
-	Hash    string `json:"hash,omitempty"`
-}
-
-func FormatDependencyReference(dep WorkflowDependency) string {
-	if dep.Type == "oci-container" {
-		if dep.Hash != "" {
-			return fmt.Sprintf("%s@sha256:%s # %s", dep.Id, dep.Hash, dep.Version)
-		} else {
-			return fmt.Sprintf("%s:%s", dep.Id, dep.Version)
-		}
-	}
-
-	return fmt.Sprintf("%s:%s", dep.Id, dep.Version)
-}
-
 func DefaultWorkflowConfig(defaultBranch string) *orderedmap.OrderedMap[string, WorkflowConfig] {
 	workflowMap := orderedmap.New[string, WorkflowConfig]()
 	workflowMap.Set("Main", WorkflowConfig{

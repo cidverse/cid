@@ -1,7 +1,7 @@
 package appgitlab
 
 import (
-	"github.com/cidverse/cid/pkg/app/appconfig"
+	"github.com/cidverse/cid/pkg/common/dependency"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
 )
@@ -21,34 +21,49 @@ var gitlabNetworkAllowList = []catalog.ActionAccessNetwork{
 	{Host: "pkg-containers.githubusercontent.com:443"},
 }
 
-var gitlabWorkflowDependencies = map[string]appconfig.WorkflowDependency{
-	"cid": {
-		Id:      "cid",
-		Type:    "binary",
+var gitlabWorkflowDependencyList = []dependency.Dependency{
+	// tools
+	{
+		Id:      "cidverse/cid",
+		Type:    "github",
 		Version: constants.Version,
 	},
-	"quay.io/podman/stable": {
-		Id:      "quay.io/podman/stable",
-		Type:    "oci-container",
-		Version: "v5.5.2-immutable",
-		Hash:    "866bbcac26adb7ff238145405fa0ade33bd7e9c7bb77a5c05f819dce8a753063",
+	// oci-containers
+	{
+		Id:         "podman/stable",
+		Type:       "docker",
+		Version:    "v5.7.0-immutable",
+		Hash:       "e373092f93d45249cb4409d4bff2d71f26d808a1dae18ed78d3f7c18f82c5fea",
+		Repository: "quay.io",
 	},
-	"docker.io/docker": {
-		Id:      "docker.io/docker",
-		Type:    "oci-container",
-		Version: "28.3.3-dind",
-		Hash:    "acf2e2d09cedf21fa8f27bb0962674e33e159c744c152b248f1f7f43623ccd82",
+	{
+		Id:         "docker",
+		Type:       "docker",
+		Version:    "28.3.3-dind",
+		Hash:       "acf2e2d09cedf21fa8f27bb0962674e33e159c744c152b248f1f7f43623ccd82",
+		Repository: "docker.io",
 	},
-	"registry.gitlab.com/cidverse/container-images/ci-gitlab": {
-		Id:      "registry.gitlab.com/cidverse/container-images/ci-gitlab",
-		Type:    "oci-container",
+	{
+		Id:      "cidverse/container-images/ci-gitlab",
+		Type:    "docker",
 		Version: "0.1.0",
 		//Hash:    "",
+		Repository: "registry.gitlab.com",
 	},
-	"registry.gitlab.com/cidverse/container-images/ci-gitlab-docker": {
-		Id:      "registry.gitlab.com/cidverse/container-images/ci-gitlab-docker",
-		Type:    "oci-container",
+	{
+		Id:      "cidverse/container-images/ci-gitlab-docker",
+		Type:    "docker",
 		Version: "0.1.0",
 		//Hash:    "",
+		Repository: "registry.gitlab.com",
 	},
 }
+
+var gitlabWorkflowDependencies = func() map[string]dependency.Dependency {
+	m := make(map[string]dependency.Dependency, len(gitlabWorkflowDependencyList))
+	for _, dep := range gitlabWorkflowDependencyList {
+		//slog.Debug("GitLab Dependency ID: " + dep.AsPackageUrlNoVersion())
+		m[dep.AsPackageUrlNoVersion()] = dep
+	}
+	return m
+}()

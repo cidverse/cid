@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	version = "0.6.0"
+	version = constants.Version
 	commit  = "none"
 	date    = "unknown"
 	status  = "clean"

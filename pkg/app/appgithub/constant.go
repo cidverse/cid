@@ -1,7 +1,7 @@
 package appgithub
 
 import (
-	"github.com/cidverse/cid/pkg/app/appconfig"
+	"github.com/cidverse/cid/pkg/common/dependency"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
 )
@@ -22,40 +22,51 @@ var githubNetworkAllowList = []catalog.ActionAccessNetwork{
 	{Host: "pkg-containers.githubusercontent.com:443"},
 }
 
-var githubWorkflowDependencies = map[string]appconfig.WorkflowDependency{
-	"cid": {
-		Id:      "cid",
-		Type:    "binary",
+var githubWorkflowDependencyList = []dependency.Dependency{
+	// tools
+	{
+		Id:      "cidverse/cid",
+		Type:    "github",
 		Version: constants.Version,
 	},
-	"actions/checkout": {
+	// github-actions
+	{
 		Id:      "actions/checkout",
 		Type:    "github-action",
 		Version: "v6.0.1",
 		Hash:    "8e8c483db84b4bee98b60c0593521ed34d9990e8",
 	},
-	"actions/download-artifact": {
+	{
 		Id:      "actions/download-artifact",
 		Type:    "github-action",
 		Version: "v6.0.0",
 		Hash:    "018cc2cf5baa6db3ef3c5f8a56943fffe632ef53",
 	},
-	"actions/upload-artifact": {
+	{
 		Id:      "actions/upload-artifact",
 		Type:    "github-action",
 		Version: "v5.0.0",
 		Hash:    "330a01c490aca151604b8cf639adc76d48f6c5d4",
 	},
-	"step-security/harden-runner": {
+	{
 		Id:      "step-security/harden-runner",
 		Type:    "github-action",
 		Version: "v2.14.0",
 		Hash:    "20cf305ff2072d973412fa9b1e3a4f227bda3c76",
 	},
-	"cidverse/ghact-cid-setup": {
-		Id:      "cidverse/ghact-cid-setup",
-		Type:    "github-action",
-		Version: "v0.2.0",
-		Hash:    "c6dac0517d28bd8871c195fee9a6bd5a5854d5cb",
+	// see https://github.com/actions/runner-images
+	{
+		Id:      "ubuntu",
+		Type:    "github-action-runner-image",
+		Version: "24.04",
 	},
 }
+
+var githubWorkflowDependencies = func() map[string]dependency.Dependency {
+	m := make(map[string]dependency.Dependency, len(githubWorkflowDependencyList))
+	for _, dep := range githubWorkflowDependencyList {
+		//slog.Debug("GitHub Dependency ID: " + dep.AsPackageUrlNoVersion())
+		m[dep.AsPackageUrlNoVersion()] = dep
+	}
+	return m
+}()
