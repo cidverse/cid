@@ -39,14 +39,14 @@ var githubWorkflowDependencyList = []dependency.Dependency{
 	{
 		Id:      "actions/download-artifact",
 		Type:    "github-action",
-		Version: "v6.0.0",
-		Hash:    "018cc2cf5baa6db3ef3c5f8a56943fffe632ef53",
+		Version: "v7.0.0",
+		Hash:    "37930b1c2abaa49bbe596cd826c3c89aef350131",
 	},
 	{
 		Id:      "actions/upload-artifact",
 		Type:    "github-action",
-		Version: "v5.0.0",
-		Hash:    "330a01c490aca151604b8cf639adc76d48f6c5d4",
+		Version: "v6.0.0",
+		Hash:    "b7c566a772e6b6bfb58ed0dc250532a479d7789f",
 	},
 	{
 		Id:      "step-security/harden-runner",
