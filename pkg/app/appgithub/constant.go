@@ -60,6 +60,11 @@ var githubWorkflowDependencyList = []dependency.Dependency{
 		Type:    "github-action-runner-image",
 		Version: "24.04",
 	},
+	{
+		Id:      "windows",
+		Type:    "github-action-runner-image",
+		Version: "2025",
+	},
 }
 
 var githubWorkflowDependencies = func() map[string]dependency.Dependency {
