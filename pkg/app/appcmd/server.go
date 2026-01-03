@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/cidverse/cid/pkg/app/appserver"
+	"github.com/cidverse/cid/pkg/lib/storage"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
 	"github.com/spf13/cobra"
@@ -35,10 +36,17 @@ func ServerCmd() *cobra.Command {
 			}
 			slog.With("repos", len(repos)).Info("Loaded repositories")
 
+			// init storage client
+			storageClient, err := storage.GetStorageApi()
+			if err != nil {
+				slog.Error("Failed to initialize storage client", "err", err)
+			}
+
 			// listen
 			cfg := &appserver.Config{
-				Platform: platform,
-				Addr:     appserver.DefaultServerAddr,
+				Platform:   platform,
+				Addr:       appserver.DefaultServerAddr,
+				StorageApi: storageClient,
 			}
 			cfg.SetRepositories(repos)
 			srv := appserver.NewServer(cfg)

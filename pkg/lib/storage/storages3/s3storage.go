@@ -2,6 +2,7 @@ package storages3
 
 import (
 	"context"
+	"io"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -20,7 +21,16 @@ func (s3 S3Client) GetObject(ctx context.Context, bucketName string, objectName 
 	return object, nil
 }
 
-func (s3 S3Client) PutObject(ctx context.Context, bucketName string, objectName string, filePath string, contentType string) error {
+func (s3 S3Client) PutObject(ctx context.Context, bucketName string, objectName string, reader io.Reader, contentType string) error {
+	_, err := s3.minioClient.PutObject(ctx, bucketName, objectName, reader, -1, minio.PutObjectOptions{ContentType: contentType})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s3 S3Client) PutObjectFile(ctx context.Context, bucketName string, objectName string, filePath string, contentType string) error {
 	_, err := s3.minioClient.FPutObject(ctx, bucketName, objectName, filePath, minio.PutObjectOptions{ContentType: contentType})
 	if err != nil {
 		return err

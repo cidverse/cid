@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cidverse/cid/pkg/lib/storage/storageapi"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -23,6 +24,7 @@ type Config struct {
 	Repositories     []api.Repository
 	RepositoriesByID map[int64]api.Repository
 	Addr             string
+	StorageApi       storageapi.API
 }
 
 func (c *Config) SetRepositories(repos []api.Repository) {
@@ -48,7 +50,7 @@ func NewServer(cfg *Config) *Server {
 
 	// middleware
 	s.e.Use(middleware.Recover())
-	s.e.Use(middleware.Logger())
+	s.e.Use(middleware.RequestLogger())
 
 	// endpoints
 	s.e.GET("/health", s.healthCheck)
