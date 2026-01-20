@@ -15,7 +15,7 @@ require (
 	github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842
 	github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4
 	github.com/cidverse/cidverseutils/core v0.0.0-20251215203818-9f09acb3083f
-	github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20241219211714-77ae5cef4073
+	github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20260120202941-ba7eef6381fa
 	github.com/cidverse/cidverseutils/hash v0.1.0
 	github.com/cidverse/cidverseutils/network v0.1.0
 	github.com/cidverse/cidverseutils/redact v0.1.0
@@ -26,7 +26,7 @@ require (
 	github.com/cidverse/go-vcs v0.0.0-20251124221937-02ce89b2369d
 	github.com/cidverse/go-vcsapp v0.0.0-20260120184419-de576efcbdc1
 	github.com/cidverse/normalizeci v1.1.1-0.20251209192140-dc3e50a3597b
-	github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3
+	github.com/cidverse/repoanalyzer v0.1.1-0.20260120203123-ae610ccaa5b5
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/go-resty/resty/v2 v2.17.1
 	github.com/google/go-github/v81 v81.0.0

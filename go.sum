@@ -46,6 +46,8 @@ github.com/cidverse/cidverseutils/exec v0.1.0 h1:KbCnDISptCrFJFHDrA9efNM0GWNLVko
 github.com/cidverse/cidverseutils/exec v0.1.0/go.mod h1:pBST2lLq7AnIZ6xM0foiz1VSUamGswN1csT/2MJAHHI=
 github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20241219211714-77ae5cef4073 h1:Cu62vJAf2N2SWgYKiIntX5hXaDf+8H/A4GO1BuF+7OM=
 github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20241219211714-77ae5cef4073/go.mod h1:LEluoAt92YcTw8ESiR6d0WK4X3P0GWRCxYm6iXl+8+g=
+github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20260120202941-ba7eef6381fa h1:RL8P0yg+Mj2Mj6G3v7bJhGlyv98quYei2gnTEx27nBE=
+github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20260120202941-ba7eef6381fa/go.mod h1:gUAZmaUH7gInlSGcPuh4dKH+iRHAF3XSD4vQyW0ijQc=
 github.com/cidverse/cidverseutils/hash v0.1.0 h1:bWZoBCuZDy4HsBLQD4Os5XjpHwqP64GdG1IZytD/GeU=
 github.com/cidverse/cidverseutils/hash v0.1.0/go.mod h1:MiRf2odL+20YA8iFNU14BT3o5d/1IOku+yjMYCxzXxo=
 github.com/cidverse/cidverseutils/network v0.1.0 h1:8AL6asRt7V1VOe/4hvrZ0UBxtIE6aGIJxm5MZJuO0GY=
@@ -68,6 +70,8 @@ github.com/cidverse/normalizeci v1.1.1-0.20251209192140-dc3e50a3597b h1:kEFQf8qs
 github.com/cidverse/normalizeci v1.1.1-0.20251209192140-dc3e50a3597b/go.mod h1:c6dF6s2t5Kb3QdlVl5eYtXWPqKpBXmd9jBAzMtWujCk=
 github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3 h1:NMbXJuXbE9exXeWBKyNStBrr7CG7Fk18K6yRVDZb44c=
 github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3/go.mod h1:/pONnWnJQS6NDTMLmpcqVI5L4lLuyk8lz6TREgAeVOw=
+github.com/cidverse/repoanalyzer v0.1.1-0.20260120203123-ae610ccaa5b5 h1:HanvLJbjP8dBQ2VuGUizBc5T1u0BociBHKXkgiI4Xtc=
+github.com/cidverse/repoanalyzer v0.1.1-0.20260120203123-ae610ccaa5b5/go.mod h1:dm6k3j7qgXi5wirodHRdUnoFII48/M1Tqa1qNMpef8s=
 github.com/cloudflare/circl v1.6.2 h1:hL7VBpHHKzrV5WTfHCaBsgx/HGbBYlgrwvNXEVDYYsQ=
 github.com/cloudflare/circl v1.6.2/go.mod h1:2eXP6Qfat4O/Yhh8BznvKnJ+uzEoTQ6jVKJRn81BiS4=
 github.com/codahale/rfc6979 v0.0.0-20141003034818-6a90f24967eb h1:EDmT6Q9Zs+SbUoc7Ik9EfrFqcylYqgPZ9ANSbTAntnE=
