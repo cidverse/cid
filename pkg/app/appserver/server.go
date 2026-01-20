@@ -9,12 +9,11 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/cidverse/cid/pkg/lib/storage/storageapi"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 const DefaultServerAddr = "0.0.0.0:9056"
@@ -45,8 +44,6 @@ func NewServer(cfg *Config) *Server {
 		cfg: cfg,
 		e:   echo.New(),
 	}
-	s.e.HideBanner = true
-	s.e.HidePort = true
 
 	// middleware
 	s.e.Use(middleware.Recover())
@@ -63,8 +60,17 @@ func (s *Server) start(ctx context.Context) error {
 	serverErrChan := make(chan error, 1)
 	go func() {
 		slog.Info("Starting server", "addr", s.cfg.Addr)
-		err := s.e.Start(s.cfg.Addr)
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+
+		sc := echo.StartConfig{
+			HideBanner: true,
+			HidePort:   true,
+			Address:    s.cfg.Addr,
+		}
+		if err := sc.Start(context.Background(), s.e); err != nil {
+			if errors.Is(err, http.ErrServerClosed) {
+				return
+			}
+
 			serverErrChan <- err
 		}
 		close(serverErrChan)
@@ -72,9 +78,7 @@ func (s *Server) start(ctx context.Context) error {
 
 	select {
 	case <-ctx.Done():
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		return s.e.Shutdown(shutdownCtx)
+		return nil
 	case err := <-serverErrChan:
 		return fmt.Errorf("server failed: %w", err)
 	}

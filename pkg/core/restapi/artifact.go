@@ -24,12 +24,12 @@ import (
 	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/go-rules/pkg/expr"
 	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/rs/zerolog/log"
 )
 
 // artifactList lists all generated reports
-func (hc *APIConfig) artifactList(c echo.Context) error {
+func (hc *APIConfig) artifactList(c *echo.Context) error {
 	// parameters
 	expression := util.GetStringOrDefault(c.QueryParam("query"), "true")
 	log.Debug().Str("query", expression).Msg("[API] artifact list query")
@@ -58,7 +58,7 @@ func (hc *APIConfig) artifactList(c echo.Context) error {
 }
 
 // artifactUpload uploads a report (typically from code scanning)
-func (hc *APIConfig) artifactUpload(c echo.Context) error {
+func (hc *APIConfig) artifactUpload(c *echo.Context) error {
 	moduleSlug := util.GetStringOrDefault(c.FormValue("module"), "root")
 	fileType := c.FormValue("type")
 	format := c.FormValue("format")
@@ -109,7 +109,7 @@ func (hc *APIConfig) artifactUpload(c echo.Context) error {
 }
 
 // artifactDownload uploads a report (typically from code scanning)
-func (hc *APIConfig) artifactDownload(c echo.Context) error {
+func (hc *APIConfig) artifactDownload(c *echo.Context) error {
 	id := c.QueryParam("id")
 	log.Debug().Str("id", id).Msg("[API] artifact download")
 

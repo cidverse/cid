@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -16,7 +16,7 @@ type logRequest struct {
 }
 
 // commandExecute runs a command in the project directory (blocking until the command exits, returns the response code)
-func (hc *APIConfig) logMessage(c echo.Context) error {
+func (hc *APIConfig) logMessage(c *echo.Context) error {
 	var req logRequest
 	err := c.Bind(&req)
 	if err != nil {

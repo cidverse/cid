@@ -1,23 +1,22 @@
 package restapi
 
 import (
-	"net"
+	"context"
+	"errors"
+	"log/slog"
+	"net/http"
 	"os"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/rs/zerolog/log"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 func Setup(handlers *APIConfig) *echo.Echo {
-	// config
 	e := echo.New()
-	e.HideBanner = true
-	e.HidePort = true
 
 	// middlewares
 	e.Use(middleware.Recover())
-	// e.Use(middleware.Logger())
+	//e.Use(middleware.RequestLogger())
 
 	// observability
 	e.GET("/v1/health", handlers.healthCheck)
@@ -66,45 +65,44 @@ func Setup(handlers *APIConfig) *echo.Echo {
 // For invalid key, it sends “401 - Unauthorized” response.
 // For missing key, it sends “400 - Bad Request” response.
 func SecureWithAPIKey(e *echo.Echo, secret string) {
-	e.Use(middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
+	e.Use(middleware.KeyAuth(func(c *echo.Context, key string, source middleware.ExtractorSource) (bool, error) {
 		return key == secret, nil
 	}))
 }
 
 func ListenOnSocket(e *echo.Echo, file string) {
-	// unix socket listener
-	l, err := net.Listen("unix", file)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to listen on unix socket")
-	}
-	e.Listener = l
-
-	// socket permissions
-	err = os.Chmod(file, 0660)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to set socket permissions")
-	}
-
 	// start server
-	startErr := e.Start("")
-	if startErr != nil {
-		// graceful exit
-		if startErr.Error() == "http: Server closed" {
+	sc := echo.StartConfig{
+		HideBanner:      true,
+		HidePort:        true,
+		ListenerNetwork: "unix",
+		Address:         file,
+		BeforeServeFunc: func(s *http.Server) error {
+			return os.Chmod(file, 0660) // socket file chmod
+		},
+	}
+	if err := sc.Start(context.Background(), e); err != nil {
+		if errors.Is(err, http.ErrServerClosed) {
 			return
 		}
 
-		log.Fatal().Err(startErr).Msg("failed to listen on unix socket")
+		slog.Error("failed to start server", "err", err)
+		os.Exit(1)
 	}
 }
 
 func ListenOnAddr(e *echo.Echo, listen string) {
-	startErr := e.Start(listen)
-	if startErr != nil {
-		// graceful exit
-		if startErr.Error() == "http: Server closed" {
+	sc := echo.StartConfig{
+		HideBanner: true,
+		HidePort:   true,
+		Address:    listen,
+	}
+	if err := sc.Start(context.Background(), e); err != nil {
+		if errors.Is(err, http.ErrServerClosed) {
 			return
 		}
 
-		log.Fatal().Err(startErr).Str("listen", listen).Msg("failed to listen on addr")
+		slog.Error("failed to start server", "err", err)
+		os.Exit(1)
 	}
 }

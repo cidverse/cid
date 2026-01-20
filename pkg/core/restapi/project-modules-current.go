@@ -5,11 +5,11 @@ import (
 
 	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // moduleCurrent returns information about the current module if the action is module-scoped (config)
-func (hc *APIConfig) moduleCurrent(c echo.Context) error {
+func (hc *APIConfig) moduleCurrent(c *echo.Context) error {
 	if hc.CurrentModule == nil {
 		return c.JSON(http.StatusBadRequest, apiError{
 			Status:  400,

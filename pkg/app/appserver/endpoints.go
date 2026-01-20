@@ -14,11 +14,11 @@ import (
 
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/app/appcore"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // healthCheck returns a simple up status
-func (s *Server) healthCheck(c echo.Context) error {
+func (s *Server) healthCheck(c *echo.Context) error {
 	res := map[string]interface{}{
 		"status": "up",
 	}
@@ -35,7 +35,7 @@ type PipelineArtifact struct {
 }
 
 // pipelineGenerator
-func (s *Server) pipelineGenerator(c echo.Context) error {
+func (s *Server) pipelineGenerator(c *echo.Context) error {
 	projectIdStr := c.QueryParam("project_id")
 	projectId, err := strconv.ParseInt(projectIdStr, 10, 64)
 	if err != nil {

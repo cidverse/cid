@@ -10,7 +10,7 @@ import (
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 type JobModuleDataResponse struct {
@@ -22,7 +22,7 @@ type JobModuleDataResponse struct {
 }
 
 // jobModuleDataV1 returns data for module-scoped actions
-func (hc *APIConfig) jobModuleDataV1(c echo.Context) error {
+func (hc *APIConfig) jobModuleDataV1(c *echo.Context) error {
 	response := JobModuleDataResponse{
 		ProjectDir: hc.ProjectDir,
 		Config:     JobConfigDataV1(hc.ProjectDir, hc.TempDir, hc.ActionConfig),
@@ -61,7 +61,7 @@ type JobProjectDataResponse struct {
 }
 
 // jobProjectDataV1 returns data for project-scoped actions
-func (hc *APIConfig) jobProjectDataV1(c echo.Context) error {
+func (hc *APIConfig) jobProjectDataV1(c *echo.Context) error {
 	response := JobProjectDataResponse{
 		ProjectDir: hc.ProjectDir,
 		Config:     JobConfigDataV1(hc.ProjectDir, hc.TempDir, hc.ActionConfig),
@@ -71,7 +71,7 @@ func (hc *APIConfig) jobProjectDataV1(c echo.Context) error {
 }
 
 // jobConfigV1 returns the configuration for the current action
-func (hc *APIConfig) jobConfigV1(c echo.Context) error {
+func (hc *APIConfig) jobConfigV1(c *echo.Context) error {
 	response := JobConfigDataV1(hc.ProjectDir, hc.TempDir, hc.ActionConfig)
 	return c.JSON(http.StatusOK, response)
 }
@@ -104,7 +104,7 @@ func JobConfigDataV1(projectDir string, tempDir string, actionConfig string) map
 }
 
 // jobEnvV1 returns the available env for this action
-func (hc *APIConfig) jobEnvV1(c echo.Context) error {
+func (hc *APIConfig) jobEnvV1(c *echo.Context) error {
 	return c.JSON(http.StatusOK, hc.ActionEnv)
 }
 
@@ -117,7 +117,7 @@ type DeploymentResponse struct {
 }
 
 // moduleCurrent returns information about the current module if the action is module-scoped (config)
-func (hc *APIConfig) jobDeploymentV1(c echo.Context) error {
+func (hc *APIConfig) jobDeploymentV1(c *echo.Context) error {
 	var module = hc.CurrentModule
 	if module == nil {
 		return c.JSON(http.StatusBadRequest, apiError{

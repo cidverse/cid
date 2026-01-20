@@ -1,19 +1,19 @@
 package builtin
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	cidsdk "github.com/cidverse/cid-sdk-go"
-	"github.com/cidverse/cid/internal/state"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction"
-	"github.com/cidverse/cid/pkg/util"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"time"
+
+	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/internal/state"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction"
+	"github.com/cidverse/cid/pkg/util"
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
@@ -25,7 +25,6 @@ import (
 	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/cidverseutils/network"
 	"github.com/google/uuid"
-	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 )
 
@@ -124,14 +123,6 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 			restapi.ListenOnSocket(apiEngine, socketFile)
 		}
 	}()
-
-	// shutdown listener
-	defer func(apiEngine *echo.Echo, ctx context.Context) {
-		err = apiEngine.Shutdown(ctx)
-		if err != nil {
-			log.Fatal().Err(err).Msg("failed to shutdown rest api")
-		}
-	}(apiEngine, context.Background())
 
 	// wait a short moment for the unix socket to be created / the api endpoint to be ready
 	time.Sleep(100 * time.Millisecond) // TODO: find a better way to wait for the api to be ready

@@ -8,11 +8,11 @@ import (
 	"github.com/cidverse/go-vcs"
 	"github.com/cidverse/go-vcs/vcsapi"
 	"github.com/hashicorp/go-version"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // vcsCommits returns a list of commits between two refs
-func (hc *APIConfig) vcsCommits(c echo.Context) error {
+func (hc *APIConfig) vcsCommits(c *echo.Context) error {
 	fromRef, err := vcsapi.NewVCSRefFromString(c.QueryParam("from"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, apiError{
@@ -67,7 +67,7 @@ func (hc *APIConfig) vcsCommits(c echo.Context) error {
 }
 
 // vcsCommitByHash retrieves information about a commit by hash
-func (hc *APIConfig) vcsCommitByHash(c echo.Context) error {
+func (hc *APIConfig) vcsCommitByHash(c *echo.Context) error {
 	vcsCommitHash := c.Param("hash")
 	includeChanges := c.QueryParam("changes")
 
@@ -93,7 +93,7 @@ func (hc *APIConfig) vcsCommitByHash(c echo.Context) error {
 }
 
 // vcsTags returns all tags
-func (hc *APIConfig) vcsTags(c echo.Context) error {
+func (hc *APIConfig) vcsTags(c *echo.Context) error {
 	client, clientErr := vcs.GetVCSClient(hc.ProjectDir)
 	if clientErr != nil {
 		return c.JSON(http.StatusInternalServerError, apiError{
@@ -115,7 +115,7 @@ func (a ByVersion) Less(i, j int) bool { return a[i].Compare(a[j]) > 0 }
 func (a ByVersion) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 // vcsTags returns all tags
-func (hc *APIConfig) vcsReleases(c echo.Context) error {
+func (hc *APIConfig) vcsReleases(c *echo.Context) error {
 	releaseType := c.QueryParam("type")
 
 	client, clientErr := vcs.GetVCSClient(hc.ProjectDir)
@@ -166,7 +166,7 @@ func (hc *APIConfig) vcsReleases(c echo.Context) error {
 }
 
 // vcsDiff returns the diff between two refs
-func (hc *APIConfig) vcsDiff(c echo.Context) error {
+func (hc *APIConfig) vcsDiff(c *echo.Context) error {
 	fromRef, err := vcsapi.NewVCSRefFromString(c.QueryParam("from"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, apiError{

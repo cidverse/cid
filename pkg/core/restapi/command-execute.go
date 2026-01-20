@@ -16,7 +16,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/redact"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/rs/zerolog/log"
 )
 
@@ -41,7 +41,7 @@ type executeResponse struct {
 }
 
 // commandExecute runs a command in the project directory (blocking until the command exits, returns the response code)
-func (hc *APIConfig) commandExecute(c echo.Context) error {
+func (hc *APIConfig) commandExecute(c *echo.Context) error {
 	var req executeRequest
 	err := c.Bind(&req)
 	if err != nil {
