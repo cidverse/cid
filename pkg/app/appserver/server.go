@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 const DefaultServerAddr = "0.0.0.0:9056"

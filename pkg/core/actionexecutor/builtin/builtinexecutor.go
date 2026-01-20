@@ -25,7 +25,7 @@ import (
 	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/cidverseutils/network"
 	"github.com/google/uuid"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/rs/zerolog/log"
 )
 

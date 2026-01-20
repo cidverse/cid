@@ -10,7 +10,7 @@ import (
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 type JobModuleDataResponse struct {

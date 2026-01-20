@@ -5,7 +5,7 @@ import (
 
 	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // projectInformation returns all available information about the current project

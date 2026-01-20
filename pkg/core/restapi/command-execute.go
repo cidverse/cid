@@ -16,7 +16,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/redact"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/rs/zerolog/log"
 )
 

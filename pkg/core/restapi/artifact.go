@@ -24,7 +24,7 @@ import (
 	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/go-rules/pkg/expr"
 	"github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/rs/zerolog/log"
 )
 

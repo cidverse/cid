@@ -8,7 +8,7 @@ import (
 	"github.com/cidverse/go-vcs"
 	"github.com/cidverse/go-vcs/vcsapi"
 	"github.com/hashicorp/go-version"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // vcsCommits returns a list of commits between two refs

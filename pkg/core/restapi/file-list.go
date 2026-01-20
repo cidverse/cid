@@ -3,7 +3,7 @@ package restapi
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // fileList retrieves a list of all files

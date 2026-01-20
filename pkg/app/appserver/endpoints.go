@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/cidverse/cid/pkg/app/appcore"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // healthCheck returns a simple up status
