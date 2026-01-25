@@ -55,7 +55,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	// api (port or socket)
 	freePort, err := network.FreePort()
 	if err != nil {
-		log.Fatal().Err(err).Msg("no free ports available")
+		return fmt.Errorf("could not get free port: %w", err)
 	}
 	apiPort := strconv.Itoa(freePort)
 

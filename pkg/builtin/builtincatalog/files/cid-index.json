@@ -2041,6 +2041,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "sonar-scanner",
+        "Version": "8.0.1+6346",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/sonarscanner-cli:8.0.1.6346",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "helm",
         "Version": "3.16.4",
         "Type": "container",
