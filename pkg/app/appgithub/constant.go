@@ -33,8 +33,8 @@ var githubWorkflowDependencyList = []dependency.Dependency{
 	{
 		Id:      "actions/checkout",
 		Type:    "github-action",
-		Version: "v6.0.1",
-		Hash:    "8e8c483db84b4bee98b60c0593521ed34d9990e8",
+		Version: "v6.0.2",
+		Hash:    "de0fac2e4500dabe0009e67214ff5f5447ce83dd",
 	},
 	{
 		Id:      "actions/download-artifact",
