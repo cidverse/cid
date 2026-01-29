@@ -44,8 +44,6 @@ github.com/cidverse/cidverseutils/core v0.0.0-20251215203818-9f09acb3083f h1:cLU
 github.com/cidverse/cidverseutils/core v0.0.0-20251215203818-9f09acb3083f/go.mod h1:sF2J3o+50imXPNtdxtLbNNVgBCdV4sfVDT8gQ6g1FrM=
 github.com/cidverse/cidverseutils/exec v0.1.0 h1:KbCnDISptCrFJFHDrA9efNM0GWNLVkon3yEzehisETY=
 github.com/cidverse/cidverseutils/exec v0.1.0/go.mod h1:pBST2lLq7AnIZ6xM0foiz1VSUamGswN1csT/2MJAHHI=
-github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20241219211714-77ae5cef4073 h1:Cu62vJAf2N2SWgYKiIntX5hXaDf+8H/A4GO1BuF+7OM=
-github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20241219211714-77ae5cef4073/go.mod h1:LEluoAt92YcTw8ESiR6d0WK4X3P0GWRCxYm6iXl+8+g=
 github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20260120202941-ba7eef6381fa h1:RL8P0yg+Mj2Mj6G3v7bJhGlyv98quYei2gnTEx27nBE=
 github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20260120202941-ba7eef6381fa/go.mod h1:gUAZmaUH7gInlSGcPuh4dKH+iRHAF3XSD4vQyW0ijQc=
 github.com/cidverse/cidverseutils/hash v0.1.0 h1:bWZoBCuZDy4HsBLQD4Os5XjpHwqP64GdG1IZytD/GeU=
@@ -68,8 +66,6 @@ github.com/cidverse/go-vcsapp v0.0.0-20260120184419-de576efcbdc1 h1:ovHv6Lx4Gfcy
 github.com/cidverse/go-vcsapp v0.0.0-20260120184419-de576efcbdc1/go.mod h1:RJR3+dkowaVXcLKbGUAkyah3B6oWSwHRCAtYo1VGZ6E=
 github.com/cidverse/normalizeci v1.1.1-0.20251209192140-dc3e50a3597b h1:kEFQf8qs/1r4QmzA/sq4J+M1hixmu8Mj3DFe/BMmxRQ=
 github.com/cidverse/normalizeci v1.1.1-0.20251209192140-dc3e50a3597b/go.mod h1:c6dF6s2t5Kb3QdlVl5eYtXWPqKpBXmd9jBAzMtWujCk=
-github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3 h1:NMbXJuXbE9exXeWBKyNStBrr7CG7Fk18K6yRVDZb44c=
-github.com/cidverse/repoanalyzer v0.1.1-0.20250430192345-f3aaf3eec7f3/go.mod h1:/pONnWnJQS6NDTMLmpcqVI5L4lLuyk8lz6TREgAeVOw=
 github.com/cidverse/repoanalyzer v0.1.1-0.20260120203123-ae610ccaa5b5 h1:HanvLJbjP8dBQ2VuGUizBc5T1u0BociBHKXkgiI4Xtc=
 github.com/cidverse/repoanalyzer v0.1.1-0.20260120203123-ae610ccaa5b5/go.mod h1:dm6k3j7qgXi5wirodHRdUnoFII48/M1Tqa1qNMpef8s=
 github.com/cloudflare/circl v1.6.2 h1:hL7VBpHHKzrV5WTfHCaBsgx/HGbBYlgrwvNXEVDYYsQ=
@@ -285,8 +281,8 @@ github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 h1:EzJWgHo
 github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415/go.mod h1:GwrjFmJcFw6At/Gs6z4yjiIwzuJ1/+UwLxMQDVQXShQ=
 github.com/xeipuuv/gojsonschema v1.2.0 h1:LhYJRs+L4fBtjZUfuSZIKGeVu0QRy8e5Xi7D17UxZ74=
 github.com/xeipuuv/gojsonschema v1.2.0/go.mod h1:anYRn/JVcOK2ZgGU+IjEV4nwlhoK5sQluxsYJ78Id3Y=
-gitlab.com/gitlab-org/api/client-go v1.17.0 h1:4aVMqYyJONZXWHoH78wzhIMzWkzwqJ8cEPhJRQnUPFI=
-gitlab.com/gitlab-org/api/client-go v1.17.0/go.mod h1:ctGKgv9bErQHO0NOrfhoyFtKMAkBhUE7y53F2xHFAkE=
+gitlab.com/gitlab-org/api/client-go v1.24.0 h1:lTTuEw2oA3Ac5UOqLJ80tSusDclgq97zuqCTnXqlfHw=
+gitlab.com/gitlab-org/api/client-go v1.24.0/go.mod h1:ctGKgv9bErQHO0NOrfhoyFtKMAkBhUE7y53F2xHFAkE=
 go.uber.org/multierr v1.11.0 h1:blXXJkSxSSfBVBlC76pxqeO+LN3aDfLQo+309xJstO0=
 go.uber.org/multierr v1.11.0/go.mod h1:20+QtiLqy0Nd6FdQB9TLXag12DsQkrbs3htMFfDN80Y=
 go.yaml.in/yaml/v3 v3.0.4 h1:tfq32ie2Jv2UxXFdLJdh3jXuOzWiL1fo0bu/FbuKpbc=
