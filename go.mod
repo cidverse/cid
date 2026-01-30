@@ -34,7 +34,7 @@ require (
 	github.com/gosimple/slug v1.15.0
 	github.com/hashicorp/go-version v1.8.0
 	github.com/heimdalr/dag v1.5.0
-	github.com/in-toto/in-toto-golang v0.9.0
+	github.com/in-toto/in-toto-golang v0.10.0
 	github.com/jarcoal/httpmock v1.4.1
 	github.com/jinzhu/configor v1.2.2
 	github.com/joho/godotenv v1.5.1
@@ -88,6 +88,7 @@ require (
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
+	github.com/in-toto/attestation v1.1.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.4.0 // indirect
