@@ -24,8 +24,8 @@ require (
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812
 	github.com/cidverse/go-vcs v0.0.0-20251124221937-02ce89b2369d
-	github.com/cidverse/go-vcsapp v0.0.0-20260203230143-70a566921a78
-	github.com/cidverse/normalizeci v1.1.1-0.20251209192140-dc3e50a3597b
+	github.com/cidverse/go-vcsapp v0.0.0-20260207105520-f2416a62813d
+	github.com/cidverse/normalizeci v1.1.1-0.20260207105535-7c401c94adbb
 	github.com/cidverse/repoanalyzer v0.1.1-0.20260120203123-ae610ccaa5b5
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/go-resty/resty/v2 v2.17.1
@@ -83,7 +83,6 @@ require (
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/cel-go v0.27.0 // indirect
 	github.com/google/go-github/v75 v75.0.0 // indirect
-	github.com/google/go-github/v80 v80.0.0 // indirect
 	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
