@@ -28,7 +28,7 @@ require (
 	github.com/cidverse/normalizeci v1.1.1-0.20260207105535-7c401c94adbb
 	github.com/cidverse/repoanalyzer v0.1.1-0.20260120203123-ae610ccaa5b5
 	github.com/go-playground/validator/v10 v10.30.1
-	github.com/go-resty/resty/v2 v2.17.1
+	github.com/go-resty/resty/v2 v2.17.2
 	github.com/google/go-github/v82 v82.0.0
 	github.com/google/uuid v1.6.0
 	github.com/gosimple/slug v1.15.0
