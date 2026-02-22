@@ -127,17 +127,20 @@ func GeneratePlan(request GeneratePlanRequest) (Plan, error) {
 
 	// determine dependencies
 	steps = assignStepDependencies(steps, planContext)
-	log.Debug().Int("steps", len(steps)).Msg("workflow step dependencies assigned")
+	slog.With("step_len", len(steps)).Debug("assigned workflow step dependencies")
+	for _, s := range steps {
+		slog.With("module", s.Module).With("name", s.Name).With("slug", s.Slug).With("run_after", s.RunAfter).With("inputs_from", s.UsesOutputOf).Debug("workflow step")
+	}
 
 	// sort steps topologically
 	steps, err = SortSteps(steps)
 	if err != nil {
 		return Plan{}, err
 	}
-	log.Debug().Int("steps", len(steps)).Msg("workflow steps sorted topologically")
+	slog.With("step_len", len(steps)).Debug("sorted workflow steps topologically")
 
 	stages := filterStages(steps, planContext.Stages)
-	log.Debug().Strs("stages", stages).Msg("workflow plan finalized")
+	slog.With("stages", stages).With("steps_len", len(steps)).Debug("workflow plan finalized")
 	return Plan{
 		Name:   workflow.Name,
 		Stages: stages,

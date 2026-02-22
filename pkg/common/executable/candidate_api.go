@@ -2,6 +2,7 @@ package executable
 
 import (
 	"io"
+	"log/slog"
 	"slices"
 	"sort"
 
@@ -84,6 +85,7 @@ type CandidateFilter struct {
 
 // SelectCandidate selects the first candidate that matches the given requirements
 func SelectCandidate(candidates []Executable, options CandidateFilter) *Executable {
+	slog.With("candidate_len", len(candidates)).With("executable", options.Executable).With("types", options.Types).With("constraint", options.VersionConstraint).Debug("Searching for execution candidate")
 	var filteredCandidates []Executable
 	for _, candidate := range candidates {
 		// type constraint
@@ -98,6 +100,7 @@ func SelectCandidate(candidates []Executable, options CandidateFilter) *Executab
 
 		// version constraint
 		if !version.FulfillsConstraint(candidate.GetVersion(), options.VersionConstraint) {
+			slog.With("candidate", candidate).Debug("candidate not matching version constraint")
 			continue
 		}
 
