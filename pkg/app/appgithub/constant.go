@@ -39,20 +39,20 @@ var githubWorkflowDependencyList = []dependency.Dependency{
 	{
 		Id:      "actions/download-artifact",
 		Type:    "github-action",
-		Version: "v7.0.0",
-		Hash:    "37930b1c2abaa49bbe596cd826c3c89aef350131",
+		Version: "v8.0.0",
+		Hash:    "70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3",
 	},
 	{
 		Id:      "actions/upload-artifact",
 		Type:    "github-action",
-		Version: "v6.0.0",
-		Hash:    "b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+		Version: "v7.0.0",
+		Hash:    "bbbca2ddaa5d8feaa63e36b76fdaad77386f024f",
 	},
 	{
 		Id:      "step-security/harden-runner",
 		Type:    "github-action",
-		Version: "v2.14.2",
-		Hash:    "5ef0c079ce82195b2a36a210272d6b661572d83e",
+		Version: "v2.15.0",
+		Hash:    "a90bcbc6539c36a85cdfeb73f7e2f433735f215b",
 	},
 	// see https://github.com/actions/runner-images
 	{
