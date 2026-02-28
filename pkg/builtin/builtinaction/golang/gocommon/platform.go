@@ -1,7 +1,8 @@
 package gocommon
 
 import (
-	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"strings"
 
 	"github.com/cidverse/cidverseutils/filesystem"
@@ -42,7 +43,7 @@ func parsePlatforms(content string) []Platform {
 	return platforms
 }
 
-func IsGoLibrary(module cidsdk.ProjectModule) bool {
+func IsGoLibrary(module *actionsdk.ProjectModule) bool {
 	for _, path := range module.Files {
 		file := strings.TrimPrefix(strings.TrimPrefix(path, module.ModuleDir), "/")
 

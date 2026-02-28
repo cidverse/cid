@@ -2,7 +2,9 @@ package helmpublishregistry
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmcommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
@@ -10,7 +12,7 @@ import (
 const URI = "builtin://actions/helm-publish-registry"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type PublishRegistryConfig struct {
@@ -57,7 +59,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -67,27 +69,27 @@ func (a Action) Execute() (err error) {
 	cidsdk.PopulateFromEnv(&cfg, d.Env)
 
 	// find charts
-	artifacts, err := a.Sdk.ArtifactList(cidsdk.ArtifactListRequest{Query: `artifact_type == "helm-chart" && format == "tgz"`})
+	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "helm-chart" && format == "tgz"`})
 	if err != nil {
 		return err
 	}
 
 	// publish
-	for _, artifact := range *artifacts {
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "uploading chart", Context: map[string]interface{}{"chart": artifact.Name}})
+	for _, artifact := range artifacts {
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "uploading chart", Context: map[string]interface{}{"chart": artifact.Name}})
 
 		// get chart archive
 		chartArchive := cidsdk.JoinPath(d.Config.TempDir, artifact.Name)
-		err = a.Sdk.ArtifactDownload(cidsdk.ArtifactDownloadRequest{
-			ID:         artifact.ID,
+		_, err = a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
+			ID:         artifact.ArtifactID,
 			TargetFile: chartArchive,
 		})
 		if err != nil {
-			return fmt.Errorf("failed to load artifact with id %s", artifact.ID)
+			return fmt.Errorf("failed to load artifact with id %s", artifact.ArtifactID)
 		}
 
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "uploading chart to registry", Context: map[string]interface{}{"chart": artifact.Name}})
-		_, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "uploading chart to registry", Context: map[string]interface{}{"chart": artifact.Name}})
+		_, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 			Command: fmt.Sprintf(`helm push %s oci://%s`, chartArchive, cfg.OCIRepository),
 			WorkDir: d.Module.ProjectDir,
 		})

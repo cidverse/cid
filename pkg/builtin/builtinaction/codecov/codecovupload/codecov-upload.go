@@ -2,7 +2,10 @@ package codecovupload
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"strings"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -12,7 +15,7 @@ const URI = "builtin://actions/codecov-upload"
 const CodecovCli = `codecov --disable-telem`
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -76,7 +79,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ProjectExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -88,7 +91,7 @@ func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ProjectActionDataV1()
+	d, err := a.Sdk.ProjectExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -103,18 +106,18 @@ func (a Action) Execute() (err error) {
 	var testFiles []string
 	var coverageFiles []string
 
-	artifacts, err := a.Sdk.ArtifactList(cidsdk.ArtifactListRequest{Query: `artifact_type == "report" && (format == "junit" || format == "cobertura" || format == "jacoco")`})
+	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "report" && (format == "junit" || format == "cobertura" || format == "jacoco")`})
 	if err != nil {
 		return err
 	}
-	for _, artifact := range *artifacts {
+	for _, artifact := range artifacts {
 		targetFile := cidsdk.JoinPath(d.Config.TempDir, artifact.Name)
-		var dlErr = a.Sdk.ArtifactDownload(cidsdk.ArtifactDownloadRequest{
-			ID:         artifact.ID,
+		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
+			ID:         artifact.ArtifactID,
 			TargetFile: targetFile,
 		})
 		if dlErr != nil {
-			_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "error", Message: "failed to retrieve artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name), "artifact-id": artifact.ID}})
+			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "error", Message: "failed to retrieve artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name), "artifact-id": artifact.ArtifactID}})
 			return dlErr
 		}
 
@@ -137,8 +140,8 @@ func (a Action) Execute() (err error) {
 
 	// finalize report and send notification
 	if len(testFiles) > 0 || len(coverageFiles) > 0 {
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: fmt.Sprintf("Finalizing report and sending notification to Codecov")})
-		cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: fmt.Sprintf("Finalizing report and sending notification to Codecov")})
+		cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 			Command: fmt.Sprintf(CodecovCli+" create-report-results --git-service %s -r %s --commit-sha %s", d.Env["NCI_REPOSITORY_HOST_TYPE"], d.Env["NCI_PROJECT_PATH"], d.Env["NCI_COMMIT_HASH"]),
 			WorkDir: d.ProjectDir,
 			Env: map[string]string{
@@ -151,7 +154,7 @@ func (a Action) Execute() (err error) {
 			return fmt.Errorf("codecov-upload failed, exit code %d. Stderr: %s", cmdResult.Code, cmdResult.Stderr)
 		}
 
-		cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+		cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 			Command: fmt.Sprintf(CodecovCli+" send-notifications --git-service %s -r %s --commit-sha %s", d.Env["NCI_REPOSITORY_HOST_TYPE"], d.Env["NCI_PROJECT_PATH"], d.Env["NCI_COMMIT_HASH"]),
 			WorkDir: d.ProjectDir,
 			Env: map[string]string{
@@ -168,11 +171,11 @@ func (a Action) Execute() (err error) {
 	return nil
 }
 
-func uploadArtifacts(reportType string, files []string, a Action, d *cidsdk.ProjectActionData, cfg Config) error {
+func uploadArtifacts(reportType string, files []string, a Action, d *actionsdk.ProjectExecutionContextV1Response, cfg Config) error {
 	if len(files) == 0 {
 		return nil
 	}
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: fmt.Sprintf("Uploading %s report(s) to Codecov", reportType), Context: map[string]interface{}{"report_type": reportType, "files": files}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: fmt.Sprintf("Uploading %s report(s) to Codecov", reportType), Context: map[string]interface{}{"report_type": reportType, "files": files}})
 
 	// upload-process internally calls create-commit, create-report and do-upload
 	var opts = []string{
@@ -194,7 +197,7 @@ func uploadArtifacts(reportType string, files []string, a Action, d *cidsdk.Proj
 	if d.Env["NCI_MERGE_REQUEST_ID"] != "" {
 		opts = append(opts, "--pr", d.Env["NCI_MERGE_REQUEST_ID"])
 	}
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: strings.Join(opts, " "),
 		WorkDir: d.ProjectDir,
 		Env: map[string]string{

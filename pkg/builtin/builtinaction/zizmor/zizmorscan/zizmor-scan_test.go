@@ -4,15 +4,15 @@ import (
 	"testing"
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestZizmorScan(t *testing.T) {
 	sdk := common.TestSetup(t)
-	sdk.On("ProjectActionDataV1").Return(common.TestProjectData(), nil)
-	sdk.On("ExecuteCommand", cidsdk.ExecuteCommandRequest{
+	sdk.On("ProjectExecutionContextV1").Return(common.TestProjectData(), nil)
+	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
 		Command: `zizmor . --format sarif --persona pedantic --no-exit-codes`,
 		WorkDir: "/my-project",
 		Env: map[string]string{
@@ -20,16 +20,16 @@ func TestZizmorScan(t *testing.T) {
 			"GH_TOKEN": "",
 		},
 		CaptureOutput: true,
-	}).Return(&cidsdk.ExecuteCommandResponse{
+	}).Return(&actionsdk.ExecuteCommandV1Response{
 		Code: 0,
 	}, nil)
-	sdk.On("FileWrite", "/my-project/.tmp/zizmor.sarif.json", []byte{}).Return(nil)
-	sdk.On("ArtifactUpload", cidsdk.ArtifactUploadRequest{
+	sdk.On("FileWriteV1", "/my-project/.tmp/zizmor.sarif.json", []byte{}).Return(nil)
+	sdk.On("ArtifactUploadV1", actionsdk.ArtifactUploadRequest{
 		File:          "/my-project/.tmp/zizmor.sarif.json",
 		Type:          "report",
 		Format:        "sarif",
 		FormatVersion: "2.1.0",
-	}).Return(nil)
+	}).Return("", "", nil)
 
 	action := Action{Sdk: sdk}
 	err := action.Execute()

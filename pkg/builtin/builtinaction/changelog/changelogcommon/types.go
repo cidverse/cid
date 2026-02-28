@@ -4,7 +4,7 @@ import (
 	"embed"
 	"time"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
 //go:embed templates/*
@@ -15,8 +15,8 @@ type TemplateData struct {
 	ProjectURL   string
 	Version      string
 	ReleaseDate  time.Time
-	Commits      []cidsdk.VCSCommit
-	CommitGroups map[string][]cidsdk.VCSCommit
+	Commits      []*actionsdk.VCSCommit
+	CommitGroups map[string][]*actionsdk.VCSCommit
 	NoteGroups   map[string][]string
 	Contributors map[string]ContributorData
 }

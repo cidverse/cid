@@ -2,10 +2,11 @@ package changelogcommon
 
 import (
 	"encoding/json"
-	cidsdk "github.com/cidverse/cid-sdk-go"
+
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
-func TestProjectData() *cidsdk.ProjectActionData {
+func TestProjectData() *actionsdk.ProjectExecutionContextV1Response {
 	cfg := Config{
 		Templates: []string{
 			"github.changelog",
@@ -42,9 +43,9 @@ func TestProjectData() *cidsdk.ProjectActionData {
 		panic(err)
 	}
 
-	return &cidsdk.ProjectActionData{
+	return &actionsdk.ProjectExecutionContextV1Response{
 		ProjectDir: "/my-project",
-		Config: cidsdk.CurrentConfig{
+		Config: &actionsdk.ConfigV1Response{
 			Log:         map[string]string{},
 			ProjectDir:  "/my-project",
 			ArtifactDir: "/my-project/.dist",

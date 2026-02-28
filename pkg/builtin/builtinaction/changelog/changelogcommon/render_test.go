@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
 func TestRenderTemplate(t *testing.T) {
@@ -14,8 +14,8 @@ func TestRenderTemplate(t *testing.T) {
 		ProjectURL:   "https://example.com",
 		Version:      "v1.0.0",
 		ReleaseDate:  time.Now(),
-		Commits:      []cidsdk.VCSCommit{},
-		CommitGroups: map[string][]cidsdk.VCSCommit{},
+		Commits:      []*actionsdk.VCSCommit{},
+		CommitGroups: map[string][]*actionsdk.VCSCommit{},
 		NoteGroups:   map[string][]string{},
 		Contributors: map[string]ContributorData{},
 	}

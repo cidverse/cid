@@ -3,34 +3,35 @@ package helmpublishnexus
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmcommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"testing"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHelmPublishNexus(t *testing.T) {
 	sdk := common.TestSetup(t)
-	sdk.On("ModuleActionDataV1").Return(helmcommon.GetHelmTestData(map[string]string{
+	sdk.On("ModuleExecutionContextV1").Return(helmcommon.GetHelmTestData(map[string]string{
 		"HELM_NEXUS_URL":        "https://localhost:9999",
 		"HELM_NEXUS_REPOSITORY": "dummy",
 		"HELM_NEXUS_USERNAME":   "admin",
 		"HELM_NEXUS_PASSWORD":   "admin",
 	}, false), nil)
-	sdk.On("ArtifactList", cidsdk.ArtifactListRequest{Query: `artifact_type == "helm-chart" && format == "tgz"`}).Return(&[]cidsdk.ActionArtifact{
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "helm-chart" && format == "tgz"`}).Return([]*actionsdk.Artifact{
 		{
-			ID:     "root/helm-chart/mychart.tgz",
-			Module: "root",
-			Type:   "helm-chart",
-			Name:   "mychart.tgz",
-			Format: "tgz",
+			ArtifactID: "root/helm-chart/mychart.tgz",
+			Module:     "root",
+			Type:       "helm-chart",
+			Name:       "mychart.tgz",
+			Format:     "tgz",
 		},
 	}, nil)
-	sdk.On("ArtifactDownload", cidsdk.ArtifactDownloadRequest{
+	sdk.On("ArtifactDownloadV1", actionsdk.ArtifactDownloadRequest{
 		ID:         "root/helm-chart/mychart.tgz",
 		TargetFile: ".tmp/mychart.tgz",
-	}).Return(nil)
+	}).Return(nil, nil)
 
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()

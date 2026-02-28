@@ -6,6 +6,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gocommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/sourcegraph/conc/pool"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -14,7 +15,7 @@ import (
 const URI = "builtin://actions/go-build"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -63,7 +64,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -75,7 +76,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -105,12 +106,12 @@ func (a Action) Execute() (err error) {
 
 	// don't build libraries
 	if gocommon.IsGoLibrary(d.Module) {
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "no go files in module root, not attempting to build library projects"})
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "no go files in module root, not attempting to build library projects"})
 		return nil
 	}
 
 	// pull dependencies
-	pullResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	pullResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `go get -v -t ./...`,
 		WorkDir: d.Module.ModuleDir,
 		Env: map[string]string{
@@ -128,7 +129,7 @@ func (a Action) Execute() (err error) {
 	for _, p := range cfg.Platform {
 		goos := p.Goos
 		goarch := p.Goarch
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "compile binary", Context: map[string]interface{}{"goos": goos, "goarch": goarch}})
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "compile binary", Context: map[string]interface{}{"goos": goos, "goarch": goarch}})
 
 		buildEnv := map[string]string{
 			"CGO_ENABLED": "false",
@@ -142,7 +143,7 @@ func (a Action) Execute() (err error) {
 			outputFile := cidsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("%s_%s", goos, goarch))
 
 			// build
-			buildResult, wgErr := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+			buildResult, wgErr := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 				Command: fmt.Sprintf(`go build -buildvcs=false -ldflags "-s -w -X main.version={NCI_COMMIT_REF_RELEASE} -X main.commit={NCI_COMMIT_HASH} -X main.date={TIMESTAMP_RFC3339} -X main.status={NCI_REPOSITORY_STATUS}" -o %s .`, outputFile),
 				WorkDir: d.Module.ModuleDir,
 				Env:     buildEnv,
@@ -154,7 +155,7 @@ func (a Action) Execute() (err error) {
 			}
 
 			// store result
-			wgErr = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+			_, _, wgErr = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 				File:   outputFile,
 				Module: d.Module.Slug,
 				Type:   "binary",

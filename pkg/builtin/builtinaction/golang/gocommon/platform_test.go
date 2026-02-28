@@ -1,7 +1,8 @@
 package gocommon
 
 import (
-	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"reflect"
 	"testing"
 )
@@ -54,11 +55,11 @@ func TestParsePlatforms(t *testing.T) {
 
 func TestIsGoLibrary(t *testing.T) {
 	tests := []struct {
-		module    cidsdk.ProjectModule
+		module    actionsdk.ProjectModule
 		isLibrary bool
 	}{
 		{
-			module: cidsdk.ProjectModule{
+			module: actionsdk.ProjectModule{
 				ModuleDir: "/path/to/module",
 				Files: []string{
 					"/path/to/module/main.go",
@@ -68,7 +69,7 @@ func TestIsGoLibrary(t *testing.T) {
 			isLibrary: false,
 		},
 		{
-			module: cidsdk.ProjectModule{
+			module: actionsdk.ProjectModule{
 				ModuleDir: "/path/to/module",
 				Files: []string{
 					"/path/to/module/subdir/subfile.go",
@@ -79,7 +80,7 @@ func TestIsGoLibrary(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		result := IsGoLibrary(test.module)
+		result := IsGoLibrary(&test.module)
 		if result != test.isLibrary {
 			t.Errorf("Test case %d failed: expected %t, got %t", i+1, test.isLibrary, result)
 		}

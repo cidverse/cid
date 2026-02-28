@@ -16,12 +16,12 @@ import (
 	"time"
 
 	"github.com/cidverse/cid/internal/state"
-
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/common/shellcommand"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/actionexecutor/api"
+	"github.com/cidverse/cid/pkg/core/actionexecutor/builtin"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
@@ -108,21 +108,23 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 
 	// listen
 	apiEngine := restapi.Setup(&restapi.APIConfig{
-		BuildID:              buildID,
-		JobID:                jobID,
-		ProjectDir:           ctx.ProjectDir,
-		Modules:              ctx.Modules,
-		Step:                 step,
-		CurrentModule:        ctx.CurrentModule,
-		CurrentAction:        catalogAction,
-		NCI:                  ctx.NCI,
-		Env:                  ctx.Env,
-		ActionEnv:            ctx.ActionEnv,
-		ActionConfig:         string(actionConfig),
-		State:                localState,
-		TempDir:              tempDir,
-		ArtifactDir:          artifactDir,
-		ExecutableCandidates: executableCandidates,
+		SDKClient: builtin.ActionSDK{
+			BuildID:              buildID,
+			JobID:                jobID,
+			ProjectDir:           ctx.ProjectDir,
+			Modules:              ctx.Modules,
+			Step:                 step,
+			CurrentModule:        ctx.CurrentModule,
+			CurrentAction:        catalogAction,
+			NCI:                  ctx.NCI,
+			Env:                  ctx.Env,
+			ActionEnv:            ctx.ActionEnv,
+			ActionConfig:         string(actionConfig),
+			State:                localState,
+			TempDir:              tempDir,
+			ArtifactDir:          artifactDir,
+			ExecutableCandidates: executableCandidates,
+		},
 	})
 	restapi.SecureWithAPIKey(apiEngine, secret)
 	go func() {

@@ -2,7 +2,10 @@ package trivyfsscan
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"strings"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -11,7 +14,7 @@ import (
 const URI = "builtin://actions/trivyfs-scan"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -54,7 +57,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ProjectExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -66,7 +69,7 @@ func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ProjectActionDataV1()
+	d, err := a.Sdk.ProjectExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -88,7 +91,7 @@ func (a Action) Execute() (err error) {
 		"--format", "sarif",
 		"--output", reportFile,
 	}
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: strings.Join(opts, " "),
 		WorkDir: d.ProjectDir,
 	})
@@ -99,7 +102,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// store report
-	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 		File:          reportFile,
 		Type:          "report",
 		Format:        "sarif",

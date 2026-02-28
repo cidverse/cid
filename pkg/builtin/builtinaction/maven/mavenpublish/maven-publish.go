@@ -2,9 +2,12 @@ package mavenpublish
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlecommon"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavencommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"strings"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -13,7 +16,7 @@ import (
 const URI = "builtin://actions/maven-publish"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -112,7 +115,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 	if cfg.MavenVersion == "" {
 		cfg.MavenVersion = gradlecommon.GetVersion(d.Env["NCI_COMMIT_REF_TYPE"], d.Env["NCI_COMMIT_REF_RELEASE"], d.Env["NCI_COMMIT_HASH_SHORT"])
@@ -127,7 +130,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -150,10 +153,10 @@ func (a Action) Execute() (err error) {
 
 	// wrapper
 	mavenWrapper := cidsdk.JoinPath(d.Module.ModuleDir, "mvnw")
-	isUsingWrapper := a.Sdk.FileExists(mavenWrapper)
+	isUsingWrapper := a.Sdk.FileExistsV1(mavenWrapper)
 
 	// version
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, fmt.Sprintf("versions:set -DnewVersion=%q", cfg.MavenVersion)),
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -164,7 +167,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// publish
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, `deploy --batch-mode`),
 		WorkDir: d.Module.ModuleDir,
 		Env: map[string]string{

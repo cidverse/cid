@@ -1,29 +1,29 @@
 package uvcommon
 
 import (
-	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
-func TestModuleData() *cidsdk.ModuleActionData {
-	return &cidsdk.ModuleActionData{
-		Module: cidsdk.ProjectModule{
+func TestModuleData() *actionsdk.ModuleExecutionContextV1Response {
+	return &actionsdk.ModuleExecutionContextV1Response{
+		Module: &actionsdk.ProjectModule{
 			ProjectDir:        "/my-project",
 			ModuleDir:         "/my-project",
-			Discovery:         []cidsdk.ProjectModuleDiscovery{{File: "/my-project/package.json"}},
+			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/package.json"}},
 			Name:              "my-package",
 			Slug:              "my-package",
 			BuildSystem:       "python-uv",
 			BuildSystemSyntax: "default",
-			Language:          &map[string]string{},
+			Language:          map[string]string{},
 			Submodules:        nil,
-			Dependencies: &[]cidsdk.ProjectDependency{
+			Dependencies: []*actionsdk.ProjectDependency{
 				{
 					Type: "pypi",
 					Id:   "pytest",
 				},
 			},
 		},
-		Config: cidsdk.CurrentConfig{
+		Config: &actionsdk.ConfigV1Response{
 			Debug:       false,
 			Log:         map[string]string{},
 			ArtifactDir: ".dist",

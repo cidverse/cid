@@ -2,11 +2,13 @@ package helmdeploy
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmcommon"
-	"github.com/cidverse/cid/pkg/util"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmcommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+	"github.com/cidverse/cid/pkg/util"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/go-playground/validator/v10"
@@ -16,7 +18,7 @@ import (
 const URI = "builtin://actions/helm-deploy"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -125,7 +127,7 @@ func (a Action) GetConfig(env map[string]string) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -138,7 +140,7 @@ func (a Action) Execute() (err error) {
 
 	// prepare kubeconfig
 	kubeConfigFile := cidsdk.JoinPath(d.Config.TempDir, "kube", "kubeconfig")
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "Starting Helm deployment...", Context: map[string]interface{}{"KUBECONFIG": kubeConfigFile}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Starting Helm deployment...", Context: map[string]interface{}{"KUBECONFIG": kubeConfigFile}})
 	err = helmcommon.PrepareKubeConfig(kubeConfigFile, d.Deployment.DeploymentEnvironment, d.Env)
 	if err != nil {
 		return err
@@ -149,11 +151,11 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "Target cluster", Context: map[string]interface{}{"name": targetCluster.Name, "api": targetCluster.Cluster.Server}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Target cluster", Context: map[string]interface{}{"name": targetCluster.Name, "api": targetCluster.Cluster.Server}})
 
 	// query chart information
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "Querying Helm chart information", Context: map[string]interface{}{"chart": cfg.DeploymentChart, "chart-version": cfg.DeploymentChartVersion}})
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Querying Helm chart information", Context: map[string]interface{}{"chart": cfg.DeploymentChart, "chart-version": cfg.DeploymentChartVersion}})
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command:       fmt.Sprintf(`helm show chart --version %q %q`, cfg.DeploymentChartVersion, cfg.DeploymentChart),
 		WorkDir:       d.Module.ModuleDir,
 		CaptureOutput: true,
@@ -168,7 +170,7 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "Found Helm chart", Context: map[string]interface{}{"chart-version": chart.Version, "app-version": chart.AppVersion}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Found Helm chart", Context: map[string]interface{}{"chart-version": chart.Version, "app-version": chart.AppVersion}})
 
 	// properties
 	chartsDir := cidsdk.JoinPath(d.Config.TempDir, "helm-charts")
@@ -179,8 +181,8 @@ func (a Action) Execute() (err error) {
 	// local dir branch, copy dir and maybe pull requirements, if missing
 	if chartSource == helmcommon.ChartSourceOCI || chartSource == helmcommon.ChartSourceRepository {
 		// download chart
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "Downloading Helm chart", Context: map[string]interface{}{"chart": cfg.DeploymentChart, "chart-version": cfg.DeploymentChartVersion}})
-		cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Downloading Helm chart", Context: map[string]interface{}{"chart": cfg.DeploymentChart, "chart-version": cfg.DeploymentChartVersion}})
+		cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 			Command: fmt.Sprintf(`helm pull --untar --destination %q --version %q %q`, chartsDir, cfg.DeploymentChartVersion, cfg.DeploymentChart),
 			WorkDir: d.Module.ModuleDir,
 		})
@@ -195,7 +197,7 @@ func (a Action) Execute() (err error) {
 		if err != nil {
 			return fmt.Errorf("failed to resolve chart path: %w", err)
 		}
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "Copying Helm chart", Context: map[string]interface{}{"chart-dir": chartSourceDir}})
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Copying Helm chart", Context: map[string]interface{}{"chart-dir": chartSourceDir}})
 		if chartSourceDir == "" {
 			return fmt.Errorf("chart not found: %s", cfg.DeploymentChart)
 		}
@@ -209,8 +211,8 @@ func (a Action) Execute() (err error) {
 	}
 
 	// deploy
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "installing helm chart onto cluster", Context: map[string]interface{}{"chart": cfg.DeploymentChart, "chart-version": cfg.DeploymentChartVersion, "namespace": cfg.DeploymentNamespace, "release": cfg.DeploymentID}})
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "installing helm chart onto cluster", Context: map[string]interface{}{"chart": cfg.DeploymentChart, "chart-version": cfg.DeploymentChartVersion, "namespace": cfg.DeploymentNamespace, "release": cfg.DeploymentID}})
+	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: fmt.Sprintf(`helm upgrade --namespace %q --install --disable-openapi-validation %s %q %q`, cfg.DeploymentNamespace, cfg.HelmArgs, cfg.DeploymentID, chartDir),
 		WorkDir: d.Module.ModuleDir,
 		Env: map[string]string{

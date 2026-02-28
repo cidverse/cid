@@ -1,27 +1,29 @@
 package sonarqubecommon
 
-import cidsdk "github.com/cidverse/cid-sdk-go"
+import (
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+)
 
-func TestModuleData() *cidsdk.ProjectActionData {
-	return &cidsdk.ProjectActionData{
+func TestModuleData() *actionsdk.ProjectExecutionContextV1Response {
+	return &actionsdk.ProjectExecutionContextV1Response{
 		ProjectDir: "/my-project",
-		Config: cidsdk.CurrentConfig{
+		Config: &actionsdk.ConfigV1Response{
 			Debug:       false,
 			Log:         map[string]string{},
 			ProjectDir:  "/my-project",
 			ArtifactDir: "/my-project/.dist",
 			TempDir:     "/my-project/.tmp",
 		},
-		Modules: []cidsdk.ProjectModule{
+		Modules: []*actionsdk.ProjectModule{
 			{
 				ProjectDir:        "/my-project",
 				ModuleDir:         "/my-project",
-				Discovery:         []cidsdk.ProjectModuleDiscovery{{File: "/my-project/go.mod"}},
+				Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/go.mod"}},
 				Name:              "github.com/cidverse/my-project",
 				Slug:              "github-com-cidverse-my-project",
 				BuildSystem:       "gomod",
 				BuildSystemSyntax: "default",
-				Language:          &map[string]string{},
+				Language:          map[string]string{},
 				Submodules:        nil,
 			},
 		},

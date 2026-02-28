@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -18,29 +18,29 @@ var config = Config{
 	NoteKeywords:  []NoteKeyword{{"NOTE", "Notes"}, {"BREAKING CHANGE", "Breaking Changes"}},
 }
 
-var commits = []cidsdk.VCSCommit{
+var commits = []*actionsdk.VCSCommit{
 	{
 		Hash:        "",
 		Message:     "feat: adds new feature",
 		Description: "NOTE: this feature is pretty useful",
-		Author:      cidsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
-		Committer:   cidsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
+		Author:      actionsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
+		Committer:   actionsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
 		Tags:        nil,
 	},
 	{
 		Hash:        "",
 		Message:     "fix(core): resolves a issue",
 		Description: "",
-		Author:      cidsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
-		Committer:   cidsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
+		Author:      actionsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
+		Committer:   actionsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
 		Tags:        nil,
 	},
 	{
 		Hash:        "",
 		Message:     "fix(core): resolves a different issue",
 		Description: "",
-		Author:      cidsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
-		Committer:   cidsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
+		Author:      actionsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
+		Committer:   actionsdk.VCSAuthor{Name: "Philipp Heuer", Email: "contact@example.com"},
 		Tags:        nil,
 	},
 }

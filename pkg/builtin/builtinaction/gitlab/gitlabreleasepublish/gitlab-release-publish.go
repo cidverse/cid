@@ -3,7 +3,10 @@ package gitlabreleasepublish
 import (
 	"bytes"
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"net/http"
 	"os"
 	"strconv"
@@ -16,7 +19,7 @@ import (
 const URI = "builtin://actions/gitlab-release-publish"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -70,7 +73,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ProjectExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -82,7 +85,7 @@ func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ProjectActionDataV1()
+	d, err := a.Sdk.ProjectExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -96,14 +99,14 @@ func (a Action) Execute() (err error) {
 	// release notes / changelog
 	var releaseNotes bytes.Buffer
 	changelogFile := cidsdk.JoinPath(d.Config.TempDir, "gitlab.changelog")
-	changelogErr := a.Sdk.ArtifactDownload(cidsdk.ArtifactDownloadRequest{
+	_, changelogErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 		ID:         "root|changelog|gitlab.changelog",
 		TargetFile: changelogFile,
 	})
 	if changelogErr != nil {
 		releaseNotes.WriteString(fmt.Sprintf("No changelog available.\n"))
 	} else {
-		content, err := a.Sdk.FileRead(changelogFile)
+		content, err := a.Sdk.FileReadV1(changelogFile)
 		if err != nil {
 			releaseNotes.WriteString(fmt.Sprintf("No changelog available.\n"))
 		} else {
@@ -135,25 +138,25 @@ func (a Action) Execute() (err error) {
 
 	// release artifacts
 	var releaseAssets []*gitlab.ReleaseAssetLinkOptions
-	artifacts, err := a.Sdk.ArtifactList(cidsdk.ArtifactListRequest{Query: `artifact_type == "binary"`})
+	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`})
 	if err != nil {
 		return err
 	}
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "searching for artifacts to include in the release", Context: map[string]interface{}{"artifact_count": len(*artifacts)}})
-	for _, artifact := range *artifacts {
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "searching for artifacts to include in the release", Context: map[string]interface{}{"artifact_count": len(artifacts)}})
+	for _, artifact := range artifacts {
 		targetFile := cidsdk.JoinPath(d.Config.TempDir, artifact.Name)
-		var dlErr = a.Sdk.ArtifactDownload(cidsdk.ArtifactDownloadRequest{
-			ID:         artifact.ID,
+		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
+			ID:         artifact.ArtifactID,
 			TargetFile: targetFile,
 		})
 		if dlErr != nil {
-			_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "error", Message: "failed to retrieve release artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
+			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "error", Message: "failed to retrieve release artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
 			return fmt.Errorf("failed to retrieve release artifact: %w", dlErr)
 		}
 
 		reader, err := os.Open(targetFile)
 		if err != nil {
-			_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "warn", Message: "failed to open release artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
+			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "warn", Message: "failed to open release artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
 			continue
 		}
 		defer reader.Close()
@@ -171,11 +174,11 @@ func (a Action) Execute() (err error) {
 			URL:      gitlab.Ptr(assetUrl),
 			LinkType: gitlab.Ptr(gitlab.OtherLinkType),
 		})
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "added artifact to release", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name), "url": assetUrl}})
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "added artifact to release", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name), "url": assetUrl}})
 	}
 
 	// create release
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "creating release", Context: map[string]interface{}{"gl_project_id": projectId, "gl_host": host}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "creating release", Context: map[string]interface{}{"gl_project_id": projectId, "gl_host": host}})
 	_, _, err = glab.Releases.CreateRelease(projectId, &gitlab.CreateReleaseOptions{
 		Name:        gitlab.Ptr(releaseVersion),               // release name
 		TagName:     gitlab.Ptr(d.Env["NCI_COMMIT_REF_NAME"]), // tag name

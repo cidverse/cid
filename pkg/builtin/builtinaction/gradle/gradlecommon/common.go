@@ -2,25 +2,26 @@ package gradlecommon
 
 import (
 	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
-func GradleTestData(env map[string]string, debug bool) *cidsdk.ModuleActionData {
+func GradleTestData(env map[string]string, debug bool) *actionsdk.ModuleExecutionContextV1Response {
 	env["NCI_COMMIT_REF_TYPE"] = "tag"
 	env["NCI_COMMIT_REF_RELEASE"] = "1.0.0"
-	return &cidsdk.ModuleActionData{
+	return &actionsdk.ModuleExecutionContextV1Response{
 		ProjectDir: "/my-project",
-		Module: cidsdk.ProjectModule{
+		Module: &actionsdk.ProjectModule{
 			ProjectDir:        "/my-project",
 			ModuleDir:         "/my-project",
-			Discovery:         []cidsdk.ProjectModuleDiscovery{{File: "/my-project/build.gradle.kts"}},
+			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/build.gradle.kts"}},
 			Name:              "my-module",
 			Slug:              "my-module",
 			BuildSystem:       string(cidsdk.BuildSystemGradle),
 			BuildSystemSyntax: string(cidsdk.BuildSystemSyntaxGradleKotlinDSL),
-			Language:          &map[string]string{},
+			Language:          map[string]string{},
 			Submodules:        nil,
 		},
-		Config: cidsdk.CurrentConfig{
+		Config: &actionsdk.ConfigV1Response{
 			Debug:       debug,
 			Log:         map[string]string{},
 			ArtifactDir: "/my-project/.dist",

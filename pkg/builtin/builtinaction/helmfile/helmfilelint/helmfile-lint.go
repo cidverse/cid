@@ -2,7 +2,9 @@ package helmfilelint
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helmfile/helmfilecommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
@@ -10,7 +12,7 @@ import (
 const URI = "builtin://actions/helmfile-lint"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -42,7 +44,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -52,7 +54,7 @@ func (a Action) Execute() (err error) {
 	cidsdk.PopulateFromEnv(&cfg, d.Env)
 
 	// lint
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `helmfile lint`,
 		WorkDir: d.Module.ModuleDir,
 	})

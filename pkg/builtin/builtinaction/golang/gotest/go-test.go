@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
@@ -14,7 +15,7 @@ import (
 const URI = "builtin://actions/go-test"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -77,7 +78,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -89,7 +90,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -108,7 +109,7 @@ func (a Action) Execute() (err error) {
 	coberturaReport := filepath.Join(d.Config.TempDir, "cobertura.xml")
 
 	// pull dependencies
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `go get -v -t ./...`,
 		WorkDir: d.Module.ModuleDir,
 		Env: map[string]string{
@@ -132,8 +133,8 @@ func (a Action) Execute() (err error) {
 		"-count=1",    // disable rest result caching
 		"-shuffle=on", // randomize test order to catch inter-test dependencies
 	}
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "running tests"})
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "running tests"})
+	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: fmt.Sprintf("go test %s ./...", strings.Join(testArgs, " ")),
 		Env: map[string]string{
 			"GOTOOLCHAIN": "local",
@@ -146,7 +147,7 @@ func (a Action) Execute() (err error) {
 		return fmt.Errorf("go test report generation failed, exit code %d", cmdResult.Code)
 	}
 
-	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 		Module:        d.Module.Slug,
 		File:          coverageOut,
 		Type:          "report",
@@ -158,8 +159,8 @@ func (a Action) Execute() (err error) {
 	}
 
 	// json report
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "generating json coverage report"})
-	coverageJSONResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "generating json coverage report"})
+	coverageJSONResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: fmt.Sprintf("go test -coverprofile %q -json -covermode=count -parallel=4 -timeout 10s ./...", coverageOut),
 		WorkDir: d.Module.ModuleDir,
 		Env: map[string]string{
@@ -173,12 +174,12 @@ func (a Action) Execute() (err error) {
 		return fmt.Errorf("go test report generation failed, exit code %d", coverageJSONResult.Code)
 	}
 
-	err = a.Sdk.FileWrite(coverageJSON, []byte(coverageJSONResult.Stdout))
+	err = a.Sdk.FileWriteV1(coverageJSON, []byte(coverageJSONResult.Stdout))
 	if err != nil {
 		return errors.New("failed to store json test coverage report on filesystem: " + err.Error())
 	}
 
-	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 		Module:        d.Module.Slug,
 		File:          coverageJSON,
 		Type:          "report",
@@ -190,8 +191,8 @@ func (a Action) Execute() (err error) {
 	}
 
 	// html report
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "generating html coverage report"})
-	_, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "generating html coverage report"})
+	_, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: fmt.Sprintf("go tool cover -html %q -o %q", coverageOut, coverageHTML),
 		Env: map[string]string{
 			"GOTOOLCHAIN": "local",
@@ -202,7 +203,7 @@ func (a Action) Execute() (err error) {
 		return errors.New("failed to generate html test coverage report: " + err.Error())
 	}
 
-	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 		Module:        d.Module.Slug,
 		File:          coverageHTML,
 		Type:          "report",
@@ -214,7 +215,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// gojson to junit conversion
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: fmt.Sprintf("go-junit-report -in %q -parser gojson -out %q", coverageJSON, junitReport),
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -224,7 +225,7 @@ func (a Action) Execute() (err error) {
 		return fmt.Errorf("go test json to junit conversion failed, exit code %d", cmdResult.Code)
 	}
 
-	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 		Module: d.Module.Slug,
 		File:   junitReport,
 		Type:   "report",
@@ -235,7 +236,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// gocover-cobertura to convert go coverage into the cobertura format
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: fmt.Sprintf("gocover-cobertura %q %q", coverageOut, coberturaReport),
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -245,7 +246,7 @@ func (a Action) Execute() (err error) {
 		return fmt.Errorf("go test json to junit conversion failed, exit code %d", cmdResult.Code)
 	}
 
-	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 		Module: d.Module.Slug,
 		File:   coberturaReport,
 		Type:   "report",

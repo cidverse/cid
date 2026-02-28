@@ -4,19 +4,21 @@ import (
 	"testing"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
-	"github.com/cidverse/cid-sdk-go/mocks"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+	"github.com/stretchr/testify/mock"
 )
 
-func TestSetup(t *testing.T) *mocks.SDKClient {
+func TestSetup(t *testing.T) *actionsdk.MockSDKClient {
 	cidsdk.JoinSeparator = "/"
-	sdk := mocks.NewSDKClient(t)
+	sdk := actionsdk.NewMockSDKClient(t)
+	sdk.On("LogV1", mock.Anything).Return(nil).Maybe()
 	return sdk
 }
 
-func TestProjectData() *cidsdk.ProjectActionData {
-	return &cidsdk.ProjectActionData{
+func TestProjectData() *actionsdk.ProjectExecutionContextV1Response {
+	return &actionsdk.ProjectExecutionContextV1Response{
 		ProjectDir: "/my-project",
-		Config: cidsdk.CurrentConfig{
+		Config: &actionsdk.ConfigV1Response{
 			Log:         map[string]string{},
 			ProjectDir:  "/my-project",
 			ArtifactDir: "/my-project/.dist",

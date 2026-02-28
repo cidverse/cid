@@ -41,16 +41,11 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvtest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/zizmor/zizmorscan"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
-// GetActionsMetadata returns a map of all actions with their metadata
-func GetActionsMetadata() map[string]cidsdk.Action {
-	sdk, _ := cidsdk.NewSDK()
-	return GetActions(sdk)
-}
-
 // GetActions returns a map of all actions initialized with the given SDK
-func GetActions(sdk *cidsdk.SDK) map[string]cidsdk.Action {
+func GetActions(sdk actionsdk.SDKClient) map[string]cidsdk.Action {
 	// actions
 	actions := []cidsdk.Action{
 		// dotnet

@@ -2,7 +2,10 @@ package githubreleasepublish
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"strings"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -12,7 +15,7 @@ import (
 const URI = "builtin://actions/github-release-publish"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -54,7 +57,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ProjectExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -66,7 +69,7 @@ func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ProjectActionDataV1()
+	d, err := a.Sdk.ProjectExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -79,7 +82,7 @@ func (a Action) Execute() (err error) {
 
 	// changelog
 	changelogFile := cidsdk.JoinPath(d.Config.TempDir, "github.changelog")
-	changelogErr := a.Sdk.ArtifactDownload(cidsdk.ArtifactDownloadRequest{
+	_, changelogErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 		ID:         "root|changelog|github.changelog",
 		TargetFile: changelogFile,
 	})
@@ -98,19 +101,19 @@ func (a Action) Execute() (err error) {
 	}
 
 	// release artifacts
-	artifacts, err := a.Sdk.ArtifactList(cidsdk.ArtifactListRequest{Query: `artifact_type == "binary"`})
+	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`})
 	if err != nil {
 		return err
 	}
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "searching for artifacts to include in the release", Context: map[string]interface{}{"artifact_count": len(*artifacts)}})
-	for _, artifact := range *artifacts {
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "searching for artifacts to include in the release", Context: map[string]interface{}{"artifact_count": len(artifacts)}})
+	for _, artifact := range artifacts {
 		targetFile := cidsdk.JoinPath(d.Config.TempDir, artifact.Name)
-		var dlErr = a.Sdk.ArtifactDownload(cidsdk.ArtifactDownloadRequest{
-			ID:         artifact.ID,
+		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
+			ID:         artifact.ArtifactID,
 			TargetFile: targetFile,
 		})
 		if dlErr != nil {
-			_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "warn", Message: "failed to retrieve release artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
+			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "warn", Message: "failed to retrieve release artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
 			continue
 		}
 
@@ -118,7 +121,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// create release
-	releaseResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	releaseResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: fmt.Sprintf(`gh release create %q %s`, d.Env["NCI_COMMIT_REF_NAME"], strings.Join(releaseOpts, " ")),
 		WorkDir: d.ProjectDir,
 		Env: map[string]string{

@@ -2,11 +2,13 @@ package sonarqubescan
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/sonarqube/sonarqubecommon"
-	"github.com/cidverse/cid/pkg/util"
 	"os"
 	"strings"
+
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/sonarqube/sonarqubecommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+	"github.com/cidverse/cid/pkg/util"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/gosimple/slug"
@@ -15,7 +17,7 @@ import (
 const URI = "builtin://actions/sonarqube-scan"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -111,7 +113,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ProjectExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 	if cfg.SonarHostURL == "" {
 		cfg.SonarHostURL = "https://sonarcloud.io"
@@ -132,7 +134,7 @@ func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ProjectActionDataV1()
+	d, err := a.Sdk.ProjectExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -144,7 +146,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// ensure that the default branch is configured correctly
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "creating project and setting default branch if missing", Context: map[string]interface{}{"default-branch": cfg.SonarDefaultBranch, "host": cfg.SonarHostURL, "project-key": cfg.SonarProjectKey, "organization": cfg.SonarOrganization}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "creating project and setting default branch if missing", Context: map[string]interface{}{"default-branch": cfg.SonarDefaultBranch, "host": cfg.SonarHostURL, "project-key": cfg.SonarProjectKey, "organization": cfg.SonarOrganization}})
 	err = sonarqubecommon.PrepareProject(cfg.SonarHostURL, cfg.SonarToken, cfg.SonarOrganization, cfg.SonarProjectKey, d.Env["NCI_PROJECT_NAME"], d.Env["NCI_PROJECT_DESCRIPTION"], cfg.SonarDefaultBranch)
 	if err != nil {
 		return fmt.Errorf("failed to prepare sonarqube project: %w", err)
@@ -167,21 +169,21 @@ func (a Action) Execute() (err error) {
 	}
 
 	// publish sarif reports to sonarqube
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "debug", Message: fmt.Sprintf("query artifacts with %s", "type == \"report\"")})
-	artifacts, err := a.Sdk.ArtifactList(cidsdk.ArtifactListRequest{Query: `artifact_type == "report"`})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "debug", Message: fmt.Sprintf("query artifacts with %s", "type == \"report\"")})
+	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "report"`})
 	if err != nil {
 		return fmt.Errorf("failed to list report artifacts: %w", err)
 	}
 	files := make(map[string][]string)
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: fmt.Sprintf("found %d reports with type == report", len(*artifacts))})
-	for _, artifact := range *artifacts {
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: fmt.Sprintf("found %d reports with type == report", len(artifacts))})
+	for _, artifact := range artifacts {
 		targetFile := cidsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("%s-%s", artifact.Module, artifact.Name))
-		var dlErr = a.Sdk.ArtifactDownload(cidsdk.ArtifactDownloadRequest{
-			ID:         artifact.ID,
+		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
+			ID:         artifact.ArtifactID,
 			TargetFile: targetFile,
 		})
 		if dlErr != nil {
-			_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "warn", Message: "failed to retrieve report", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
+			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "warn", Message: "failed to retrieve report", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
 			continue
 		}
 
@@ -285,8 +287,8 @@ func (a Action) Execute() (err error) {
 	}
 
 	// execute
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "running sonar scan", Context: map[string]interface{}{"sonar_host": cfg.SonarHostURL, "sonar_organization": cfg.SonarOrganization, "sonar_project_key": cfg.SonarProjectKey}})
-	scanResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "running sonar scan", Context: map[string]interface{}{"sonar_host": cfg.SonarHostURL, "sonar_organization": cfg.SonarOrganization, "sonar_project_key": cfg.SonarProjectKey}})
+	scanResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `sonar-scanner -X ` + strings.Join(scanArgs, " "),
 		WorkDir: d.ProjectDir,
 		Env: map[string]string{
@@ -295,9 +297,9 @@ func (a Action) Execute() (err error) {
 		},
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to execute sonar-scanner: %w", err)
 	} else if scanResult.Code != 0 {
-		return fmt.Errorf("sonar scan failed, exit code %d: %s", scanResult.Code, scanResult.Stderr)
+		return fmt.Errorf("failed to execute sonar-scanner - code %d: %s", scanResult.Code, scanResult.Stderr)
 	}
 
 	return nil

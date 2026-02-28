@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmcommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
@@ -11,7 +12,7 @@ import (
 const URI = "builtin://actions/helm-build"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type BuildConfig struct {
@@ -54,7 +55,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -64,7 +65,7 @@ func (a Action) Execute() (err error) {
 	cidsdk.PopulateFromEnv(&cfg, d.Env)
 
 	// restore the charts/ directory based on the Chart.lock file
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `helm dependency build .`,
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -76,7 +77,7 @@ func (a Action) Execute() (err error) {
 
 	// parse chart
 	chartFile := cidsdk.JoinPath(d.Module.ModuleDir, "Chart.yaml")
-	chartFileContent, err := a.Sdk.FileRead(chartFile)
+	chartFileContent, err := a.Sdk.FileReadV1(chartFile)
 	if err != nil {
 		return fmt.Errorf("failed to read chart file: %s", err.Error())
 	}
@@ -84,7 +85,7 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "building chart", Context: map[string]interface{}{"chart-name": chart.Name, "chart-version": chart.Version}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "building chart", Context: map[string]interface{}{"chart-name": chart.Name, "chart-version": chart.Version}})
 
 	// version
 	chartVersion := chart.Version
@@ -94,7 +95,7 @@ func (a Action) Execute() (err error) {
 
 	// pull dependencies, if any are defined in Chart.yaml
 	if len(chart.Dependencies) > 0 {
-		cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+		cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 			Command: `helm dependency build .`,
 			WorkDir: d.Module.ModuleDir,
 		})
@@ -106,7 +107,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// package
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `helm package . --version ` + chartVersion + ` --destination ` + d.Config.TempDir,
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -117,7 +118,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// upload charts
-	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 		File:   cidsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("%s-%s.tgz", chart.Name, chartVersion)),
 		Module: d.Module.Slug,
 		Type:   "helm-chart",

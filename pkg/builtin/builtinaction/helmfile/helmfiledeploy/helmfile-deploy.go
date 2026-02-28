@@ -2,8 +2,10 @@ package helmfiledeploy
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmcommon"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helmfile/helmfilecommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/go-playground/validator/v10"
@@ -12,7 +14,7 @@ import (
 const URI = "builtin://actions/helmfile-deploy"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -63,7 +65,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 	cidsdk.PopulateFromEnv(&cfg, d.Env)
 
@@ -87,7 +89,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -100,7 +102,7 @@ func (a Action) Execute() (err error) {
 
 	// prepare kubeconfig
 	kubeConfigFile := cidsdk.JoinPath(d.Config.TempDir, "kube", "kubeconfig")
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "Starting Helmfile deployment...", Context: map[string]interface{}{"KUBECONFIG": kubeConfigFile}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Starting Helmfile deployment...", Context: map[string]interface{}{"KUBECONFIG": kubeConfigFile}})
 	err = helmcommon.PrepareKubeConfig(kubeConfigFile, d.Deployment.DeploymentEnvironment, d.Env)
 	if err != nil {
 		return err
@@ -111,10 +113,10 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "Target cluster", Context: map[string]interface{}{"name": targetCluster.Name, "api": targetCluster.Cluster.Server, "namespace": cfg.DeploymentNamespace}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Target cluster", Context: map[string]interface{}{"name": targetCluster.Name, "api": targetCluster.Cluster.Server, "namespace": cfg.DeploymentNamespace}})
 
 	// init
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `helmfile init --force`,
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -125,8 +127,8 @@ func (a Action) Execute() (err error) {
 	}
 
 	// deployment
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "Deploying to cluster...", Context: map[string]interface{}{"cluster": targetCluster.Name, "namespace": cfg.DeploymentNamespace, "environment": cfg.DeploymentEnvironment}})
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Deploying to cluster...", Context: map[string]interface{}{"cluster": targetCluster.Name, "namespace": cfg.DeploymentNamespace, "environment": cfg.DeploymentEnvironment}})
+	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: fmt.Sprintf(`helmfile apply -f %q --namespace=%q --environment=%q --suppress-diff %s`, d.Deployment.DeploymentFile, cfg.DeploymentNamespace, d.Deployment.DeploymentEnvironment, cfg.HelmfileArgs),
 		WorkDir: d.Module.ModuleDir,
 		Env: map[string]string{

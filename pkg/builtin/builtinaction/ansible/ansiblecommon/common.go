@@ -1,13 +1,15 @@
 package ansiblecommon
 
-import cidsdk "github.com/cidverse/cid-sdk-go"
+import (
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+)
 
-func ModuleTestData() *cidsdk.ModuleActionData {
-	return &cidsdk.ModuleActionData{
-		Module: cidsdk.ProjectModule{
+func ModuleTestData() *actionsdk.ModuleExecutionContextV1Response {
+	return &actionsdk.ModuleExecutionContextV1Response{
+		Module: &actionsdk.ProjectModule{
 			ProjectDir:        "/my-project",
 			ModuleDir:         "/my-project/playbook-a",
-			Discovery:         []cidsdk.ProjectModuleDiscovery{{File: "/my-project/playbook-a/playbook.yml"}},
+			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/playbook-a/playbook.yml"}},
 			Name:              "playbook-a",
 			Slug:              "playbook-a",
 			BuildSystem:       "ansible",
@@ -15,7 +17,7 @@ func ModuleTestData() *cidsdk.ModuleActionData {
 			Language:          nil,
 			Submodules:        nil,
 		},
-		Config: cidsdk.CurrentConfig{
+		Config: &actionsdk.ConfigV1Response{
 			Debug:       false,
 			Log:         map[string]string{},
 			ProjectDir:  "/my-project",

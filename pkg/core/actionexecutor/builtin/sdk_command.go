@@ -1,80 +1,32 @@
-package restapi
+package builtin
 
 import (
 	"errors"
 	"fmt"
-	"github.com/cidverse/cid/internal/state"
 	"log/slog"
-	"net/http"
 	"os/exec"
 	"slices"
 	"strings"
 	"time"
 
+	"github.com/cidverse/cid/internal/state"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/common/executable"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/redact"
-	"github.com/labstack/echo/v5"
 	"github.com/rs/zerolog/log"
 )
 
-type executeRequest struct {
-	WorkDir            string            `json:"work_dir"`
-	Command            string            `json:"command"`
-	CaptureOutput      bool              `json:"capture_output"`
-	HideStandardOutput bool              `json:"hide_stdout"`
-	HideStandardError  bool              `json:"hide_stderr"`
-	Env                map[string]string `json:"env"`
-	Ports              []int             `json:"ports"`
-	Constraint         string            `json:"constraint"`
-}
-
-type executeResponse struct {
-	Dir     string `json:"dir"`
-	Command string `json:"command"`
-	Code    int    `json:"code"`
-	Stdout  string `json:"stdout"`
-	Stderr  string `json:"stderr"`
-	Error   string `json:"error"`
-}
-
-// commandExecute runs a command in the project directory (blocking until the command exits, returns the response code)
-func (hc *APIConfig) commandExecute(c *echo.Context) error {
-	var req executeRequest
-	err := c.Bind(&req)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, apiError{
-			Status:  400,
-			Title:   "bad request",
-			Details: "bad request, " + err.Error(),
-		})
-	}
-
-	resp, err := hc.executeCommand(req)
-	if err != nil {
-		slog.With("err", err.Error()).Warn("[API] execute command request failed")
-		return c.JSON(http.StatusBadRequest, apiError{
-			Status:  500,
-			Title:   "command execution failed",
-			Details: err.Error(),
-		})
-	}
-	if resp.Error != "" {
-		slog.With("error", resp.Error).Warn("[API] execute command request returned error")
-	}
-
-	return c.JSON(http.StatusOK, resp)
-}
-
-func (hc *APIConfig) executeCommand(req executeRequest) (executeResponse, error) {
-	execDir := util.GetStringOrDefault(req.WorkDir, hc.ProjectDir)
+// ExecuteCommand command
+func (sdk ActionSDK) ExecuteCommandV1(req actionsdk.ExecuteCommandV1Request) (*actionsdk.ExecuteCommandV1Response, error) {
+	execDir := util.GetStringOrDefault(req.WorkDir, sdk.ProjectDir)
 	log.Debug().Str("work_dir", execDir).Str("constraint", req.Constraint).Str("command", req.Command).Interface("env", req.Env).Msg("[API] execute command")
 
 	// command env
 	var commandEnv = make(map[string]string)
-	for k, v := range hc.ActionEnv {
+	for k, v := range sdk.ActionEnv {
 		commandEnv[k] = v
 	}
 	if req.Env != nil {
@@ -87,7 +39,7 @@ func (hc *APIConfig) executeCommand(req executeRequest) (executeResponse, error)
 	cmdBinary := strings.Split(req.Command, " ")[0]
 	var allowedExecutables []string
 	constraints := make(map[string]string)
-	for _, e := range hc.Step.Access.Executables {
+	for _, e := range sdk.Step.Access.Executables {
 		allowedExecutables = append(allowedExecutables, e.Name)
 		if e.Constraint != "" {
 			constraints[e.Name] = e.Constraint
@@ -97,21 +49,21 @@ func (hc *APIConfig) executeCommand(req executeRequest) (executeResponse, error)
 	}
 
 	if !slices.Contains(allowedExecutables, cmdBinary) {
-		slog.With("command", cmdBinary).With("allowed_commands", allowedExecutables).With("step", hc.Step.Slug).Error("[API] command not allowed by step")
-		return executeResponse{}, fmt.Errorf("command [%s] by [%s] not allowed", cmdBinary, hc.Step.Slug)
+		slog.With("command", cmdBinary).With("allowed_commands", allowedExecutables).With("step", sdk.Step.Slug).Error("[API] command not allowed by step")
+		return nil, fmt.Errorf("command [%s] by [%s] not allowed", cmdBinary, sdk.Step.Slug)
 	}
 
 	// execute
 	exitCode := 0
 	var errorMessage = ""
 	stdout, stderr, selectedCandidate, cmdErr := command.Execute(command.Opts{
-		Candidates:             hc.ExecutableCandidates,
+		Candidates:             sdk.ExecutableCandidates,
 		CandidateTypes:         executable.ToCandidateTypes(config.Current.CommandExecutionTypes),
-		Command:                replaceCommandPlaceholders(req.Command, hc.Env),
+		Command:                replaceCommandPlaceholders(req.Command, sdk.ActionEnv),
 		Env:                    commandEnv,
-		ProjectDir:             hc.ProjectDir,
+		ProjectDir:             sdk.ProjectDir,
 		WorkDir:                execDir,
-		TempDir:                hc.TempDir,
+		TempDir:                sdk.TempDir,
 		CaptureOutput:          req.CaptureOutput,
 		HideStandardOutput:     req.HideStandardOutput,
 		HideStandardError:      req.HideStandardError,
@@ -123,14 +75,14 @@ func (hc *APIConfig) executeCommand(req executeRequest) (executeResponse, error)
 	var exitErr *exec.ExitError
 	isExitError := errors.As(cmdErr, &exitErr)
 	if selectedCandidate != nil {
-		hc.State.AuditLog = append(hc.State.AuditLog, state.AuditEvents{
+		sdk.State.AuditLog = append(sdk.State.AuditLog, state.AuditEvents{
 			Timestamp: time.Now().UTC(),
 			Type:      "command",
 			Payload: map[string]string{
 				"binary":  selectedCandidate.GetName(),
 				"version": selectedCandidate.GetVersion(),
 				"uri":     selectedCandidate.GetUri(),
-				"command": redact.Redact(replaceCommandPlaceholders(req.Command, hc.ActionEnv)),
+				"command": redact.Redact(replaceCommandPlaceholders(req.Command, sdk.ActionEnv)),
 			},
 		})
 	}
@@ -143,7 +95,7 @@ func (hc *APIConfig) executeCommand(req executeRequest) (executeResponse, error)
 		errorMessage = cmdErr.Error()
 	}
 
-	return executeResponse{
+	return &actionsdk.ExecuteCommandV1Response{
 		Dir:     execDir,
 		Command: req.Command,
 		Code:    exitCode,

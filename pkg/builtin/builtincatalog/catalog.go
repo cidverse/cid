@@ -19,7 +19,7 @@ var indexJSON []byte
 // InternalCatalog returns a virtual catalog with all built-in actions and workflows
 func InternalCatalog() catalog.Config {
 	var actions []catalog.Action
-	for _, action := range builtinaction.GetActionsMetadata() {
+	for _, action := range builtinaction.GetActions(nil) { // TODO: dummy sdk client for metadata collection
 		am := action.Metadata()
 		catalogActionMetadata := convertActionMetadata(am)
 

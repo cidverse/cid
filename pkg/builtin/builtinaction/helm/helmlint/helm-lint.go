@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmcommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
@@ -11,7 +12,7 @@ import (
 const URI = "builtin://actions/helm-lint"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type LintConfig struct {
@@ -46,7 +47,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -57,7 +58,7 @@ func (a Action) Execute() (err error) {
 
 	// parse chart
 	chartFile := cidsdk.JoinPath(d.Module.ModuleDir, "Chart.yaml")
-	chartFileContent, err := a.Sdk.FileRead(chartFile)
+	chartFileContent, err := a.Sdk.FileReadV1(chartFile)
 	if err != nil {
 		return fmt.Errorf("failed to read chart file: %s", err.Error())
 	}
@@ -65,11 +66,11 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "linting chart", Context: map[string]interface{}{"chart-name": chart.Name, "chart-version": chart.Version}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "linting chart", Context: map[string]interface{}{"chart-name": chart.Name, "chart-version": chart.Version}})
 
 	// pull dependencies, if any are defined in Chart.yaml
 	if len(chart.Dependencies) > 0 {
-		cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+		cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 			Command: `helm dependency build .`,
 			WorkDir: d.Module.ModuleDir,
 		})
@@ -81,7 +82,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// lint
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `helm lint . --strict`,
 		WorkDir: d.Module.ModuleDir,
 	})

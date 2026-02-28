@@ -2,14 +2,16 @@ package uvtest
 
 import (
 	"fmt"
+
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
 const URI = "builtin://actions/uv-test"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -53,7 +55,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -65,7 +67,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -82,7 +84,7 @@ func (a Action) Execute() (err error) {
 
 	if d.Module.HasDependencyByTypeAndId("pypi", "pytest") {
 		if d.Module.HasDependencyByTypeAndId("pypi", "pytest-cov") {
-			cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+			cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 				Command: fmt.Sprintf(`uv run pytest -v --cov --cov-report term --cov-report xml:%q --junit-xml=%q`, coverageFile, reportFile),
 				WorkDir: d.Module.ModuleDir,
 			})
@@ -92,7 +94,7 @@ func (a Action) Execute() (err error) {
 				return fmt.Errorf("command failed, exit code %d", cmdResult.Code)
 			}
 
-			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 				File:   coverageFile,
 				Module: d.Module.Slug,
 				Type:   "report",
@@ -102,7 +104,7 @@ func (a Action) Execute() (err error) {
 				return err
 			}
 		} else {
-			cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+			cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 				Command: fmt.Sprintf(`uv run pytest -v --junit-xml=%q`, reportFile),
 				WorkDir: d.Module.ModuleDir,
 			})
@@ -113,7 +115,7 @@ func (a Action) Execute() (err error) {
 			}
 		}
 
-		err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+		_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 			File:   reportFile,
 			Module: d.Module.Slug,
 			Type:   "report",

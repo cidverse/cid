@@ -9,6 +9,7 @@ import (
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
 const URI = "builtin://actions/golangci-lint"
@@ -17,7 +18,7 @@ const URI = "builtin://actions/golangci-lint"
 var defaultConfig []byte
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -65,7 +66,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -77,7 +78,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -93,7 +94,7 @@ func (a Action) Execute() (err error) {
 	reportFile := cidsdk.JoinPath(d.Config.TempDir, "golangci-lint.sarif.json")
 
 	// if no config is present, create a default config
-	if !a.Sdk.FileExists(path.Join(d.Module.ModuleDir, ".golangci.yml")) && !a.Sdk.FileExists(path.Join(d.Module.ModuleDir, ".golangci.yaml")) && !a.Sdk.FileExists(path.Join(d.Module.ModuleDir, ".golangci.toml")) && !a.Sdk.FileExists(path.Join(d.Module.ModuleDir, ".golangci.json")) {
+	if !a.Sdk.FileExistsV1(path.Join(d.Module.ModuleDir, ".golangci.yml")) && !a.Sdk.FileExistsV1(path.Join(d.Module.ModuleDir, ".golangci.yaml")) && !a.Sdk.FileExistsV1(path.Join(d.Module.ModuleDir, ".golangci.toml")) && !a.Sdk.FileExistsV1(path.Join(d.Module.ModuleDir, ".golangci.json")) {
 		configFile = cidsdk.JoinPath(d.Config.TempDir, ".golangci.yml")
 
 		err = os.WriteFile(configFile, defaultConfig, 0644)
@@ -112,7 +113,7 @@ func (a Action) Execute() (err error) {
 	if configFile != "" {
 		cmdArgs = append(cmdArgs, "--config", configFile)
 	}
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `golangci-lint ` + strings.Join(cmdArgs, " "),
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -123,7 +124,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// store report
-	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 		File:          reportFile,
 		Type:          "report",
 		Format:        "sarif",

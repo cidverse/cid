@@ -2,15 +2,17 @@ package npmlint
 
 import (
 	"fmt"
+
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/npm/npmcommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
 const URI = "builtin://actions/npm-lint"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -55,7 +57,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -67,7 +69,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -79,7 +81,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// package.json
-	content, err := a.Sdk.FileRead(cidsdk.JoinPath(d.Module.ModuleDir, "package.json"))
+	content, err := a.Sdk.FileReadV1(cidsdk.JoinPath(d.Module.ModuleDir, "package.json"))
 	if err != nil {
 		return err
 	}
@@ -91,12 +93,12 @@ func (a Action) Execute() (err error) {
 	// check if script is present
 	_, scriptFound := pkg.Scripts[`lint`]
 	if !scriptFound {
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "warn", Message: "No lint script found in package.json"})
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "warn", Message: "No lint script found in package.json"})
 		return nil
 	}
 
 	// install
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `npm install`,
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -107,7 +109,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// lint
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `npm run lint`,
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -118,12 +120,12 @@ func (a Action) Execute() (err error) {
 	}
 
 	// collect and store jacoco test reports
-	testReports, err := a.Sdk.FileList(cidsdk.FileRequest{
+	testReports, err := a.Sdk.FileListV1(actionsdk.FileV1Request{
 		Directory:  d.Module.ModuleDir,
 		Extensions: []string{".sarif"},
 	})
 	for _, report := range testReports {
-		err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+		_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 			File:          report.Path,
 			Module:        d.Module.Slug,
 			Type:          "report",

@@ -2,9 +2,12 @@ package maventest
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlecommon"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavencommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"regexp"
 	"strings"
 
@@ -17,7 +20,7 @@ var junitRegex = regexp.MustCompile(`target/surefire-reports/TEST-.*\.xml$`)
 var junitFailSafeRegex = regexp.MustCompile(`target/failsafe-reports/TEST-.*\.xml$`)
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -64,7 +67,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 	if cfg.MavenVersion == "" {
 		cfg.MavenVersion = gradlecommon.GetVersion(d.Env["NCI_COMMIT_REF_TYPE"], d.Env["NCI_COMMIT_REF_RELEASE"], d.Env["NCI_COMMIT_HASH_SHORT"])
@@ -79,7 +82,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -92,10 +95,10 @@ func (a Action) Execute() (err error) {
 
 	// wrapper
 	mavenWrapper := cidsdk.JoinPath(d.Module.ModuleDir, "mvnw")
-	isUsingWrapper := a.Sdk.FileExists(mavenWrapper)
+	isUsingWrapper := a.Sdk.FileExistsV1(mavenWrapper)
 
 	// version
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, fmt.Sprintf("versions:set -DnewVersion=%q", cfg.MavenVersion)),
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -106,7 +109,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// test
-	cmdResult, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, `test --batch-mode`),
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -117,7 +120,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// collect and store test reports for Gradle and Maven
-	testReports, err := a.Sdk.FileList(cidsdk.FileRequest{Directory: d.Module.ModuleDir, Extensions: []string{".xml", ".sarif"}})
+	testReports, err := a.Sdk.FileListV1(actionsdk.FileV1Request{Directory: d.Module.ModuleDir, Extensions: []string{".xml", ".sarif"}})
 	if err != nil {
 		return err
 	}
@@ -125,7 +128,7 @@ func (a Action) Execute() (err error) {
 		path := report.Path
 
 		if strings.HasSuffix(path, cidsdk.JoinPath("target", "site", "jacoco", "jacoco.xml")) {
-			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 				File:   path,
 				Module: d.Module.Slug,
 				Type:   "report",
@@ -135,7 +138,7 @@ func (a Action) Execute() (err error) {
 				return err
 			}
 		} else if junitRegex.MatchString(path) || junitFailSafeRegex.MatchString(path) {
-			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 				File:   path,
 				Module: d.Module.Slug,
 				Type:   "report",

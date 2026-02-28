@@ -4,27 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
-	"runtime"
-	"strconv"
-	"time"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/internal/state"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction"
-	"github.com/cidverse/cid/pkg/util"
-
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/command"
 	"github.com/cidverse/cid/pkg/core/actionexecutor/api"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
-	"github.com/cidverse/cid/pkg/core/restapi"
-	"github.com/cidverse/cidverseutils/hash"
-	"github.com/cidverse/cidverseutils/network"
-	"github.com/google/uuid"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/rs/zerolog/log"
 )
 
@@ -43,13 +33,6 @@ func (e Executor) GetType() string {
 }
 
 func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *state.ActionStateContext, catalogAction *catalog.Action, step plangenerate.Step) error {
-	// api (port or socket)
-	freePort, err := network.FreePort()
-	if err != nil {
-		return fmt.Errorf("could not get free port: %w", err)
-	}
-	apiPort := strconv.Itoa(freePort)
-
 	// temp dir
 	tempBaseDir, err := util.CITempDir(ctx.NCI.ServiceSlug)
 	if err != nil {
@@ -57,7 +40,6 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 	}
 
 	// properties
-	secret := api.GenerateSecret(32)
 	buildID := api.GenerateSnowflakeId()
 	jobID := api.GenerateSnowflakeId()
 	artifactDir := filepath.Join(ctx.ProjectDir, ".dist")
@@ -82,9 +64,6 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		_ = os.RemoveAll(tempDir)
 	}()
 
-	// create socket file
-	socketFile := path.Join(tempDir, hash.UUIDNoDash(uuid.New().String())+".socket")
-
 	// executables
 	executableCandidates, err := command.CandidatesFromConfig(config.Current)
 	if err != nil {
@@ -97,8 +76,8 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		log.Fatal().Err(err).Msg("failed to marshal action config")
 	}
 
-	// listen
-	apiEngine := restapi.Setup(&restapi.APIConfig{
+	// sdk client
+	sdkClient := ActionSDK{
 		BuildID:              buildID,
 		JobID:                jobID,
 		ProjectDir:           ctx.ProjectDir,
@@ -114,34 +93,10 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 		TempDir:              tempDir,
 		ArtifactDir:          artifactDir,
 		ExecutableCandidates: executableCandidates,
-	})
-	restapi.SecureWithAPIKey(apiEngine, secret)
-	go func() {
-		if runtime.GOOS == "windows" {
-			restapi.ListenOnAddr(apiEngine, ":"+apiPort)
-		} else {
-			restapi.ListenOnSocket(apiEngine, socketFile)
-		}
-	}()
-
-	// wait a short moment for the unix socket to be created / the api endpoint to be ready
-	time.Sleep(100 * time.Millisecond) // TODO: find a better way to wait for the api to be ready
-
-	// run action
-	sdkConfig := cidsdk.SDKConfig{}
-	if runtime.GOOS == "windows" {
-		sdkConfig.APIAddr = "http://host.docker.internal:" + apiPort
-	} else {
-		sdkConfig.APISocket = socketFile
-	}
-	sdkConfig.APISecret = secret
-	sdk, err := cidsdk.NewSDKWithConfig(sdkConfig)
-	if err != nil {
-		return fmt.Errorf("failed to create sdk: %w", err)
 	}
 
 	// lookup in action by name map - TODO: make function in actions for lookup
-	actionLookup := builtinaction.GetActions(sdk)
+	actionLookup := builtinaction.GetActions(sdkClient)
 	action, ok := actionLookup[catalogAction.Metadata.Name]
 	if !ok {
 		return fmt.Errorf("action %s not found", catalogAction.Metadata.Name)

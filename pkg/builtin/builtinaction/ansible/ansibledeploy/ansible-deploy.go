@@ -2,7 +2,10 @@ package ansibledeploy
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"path"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -11,7 +14,7 @@ import (
 const URI = "builtin://actions/ansible-deploy"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -55,7 +58,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{
 		PlaybookFile:   path.Join(d.Module.ModuleDir, "playbook.yml"),
 		InventoryFile:  path.Join(d.Module.ModuleDir, "inventory"),
@@ -71,7 +74,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -83,8 +86,8 @@ func (a Action) Execute() (err error) {
 	}
 
 	// role requirements
-	if a.Sdk.FileExists(path.Join(d.Module.ModuleDir, cfg.GalaxyRolesDir, "requirements.yml")) {
-		_, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	if a.Sdk.FileExistsV1(path.Join(d.Module.ModuleDir, cfg.GalaxyRolesDir, "requirements.yml")) {
+		_, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 			Command: fmt.Sprintf(`ansible-galaxy install -g -f -r %s/requirements.yml -p %s`, cfg.GalaxyRolesDir, cfg.GalaxyRolesDir),
 			WorkDir: d.Module.ModuleDir,
 		})
@@ -94,7 +97,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// deploy
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: fmt.Sprintf(`ansible-playbook %q -i %q`, cfg.PlaybookFile, cfg.InventoryFile),
 		WorkDir: d.Module.ModuleDir,
 	})

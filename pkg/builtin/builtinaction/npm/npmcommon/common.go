@@ -1,21 +1,23 @@
 package npmcommon
 
-import cidsdk "github.com/cidverse/cid-sdk-go"
+import (
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+)
 
-func TestModuleData() *cidsdk.ModuleActionData {
-	return &cidsdk.ModuleActionData{
-		Module: cidsdk.ProjectModule{
+func TestModuleData() *actionsdk.ModuleExecutionContextV1Response {
+	return &actionsdk.ModuleExecutionContextV1Response{
+		Module: &actionsdk.ProjectModule{
 			ProjectDir:        "/my-project",
 			ModuleDir:         "/my-project",
-			Discovery:         []cidsdk.ProjectModuleDiscovery{{File: "/my-project/package.json"}},
+			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/package.json"}},
 			Name:              "my-package",
 			Slug:              "my-package",
 			BuildSystem:       "npm",
 			BuildSystemSyntax: "default",
-			Language:          &map[string]string{},
+			Language:          map[string]string{},
 			Submodules:        nil,
 		},
-		Config: cidsdk.CurrentConfig{
+		Config: &actionsdk.ConfigV1Response{
 			Log:         map[string]string{},
 			ArtifactDir: ".dist",
 			TempDir:     ".tmp",

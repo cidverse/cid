@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
@@ -12,7 +13,7 @@ import (
 const URI = "builtin://actions/zizmor-scan"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -76,7 +77,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ProjectExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 	if cfg.GHHost == "" {
 		cfg.GHHost = "github.com"
@@ -95,7 +96,7 @@ func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ProjectActionDataV1()
+	d, err := a.Sdk.ProjectExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -117,7 +118,7 @@ func (a Action) Execute() (err error) {
 		"--persona", "pedantic",
 		"--no-exit-codes", // don't fail, always report issues
 	}
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: strings.Join(opts, " "),
 		WorkDir: d.ProjectDir,
 		Env: map[string]string{
@@ -134,13 +135,13 @@ func (a Action) Execute() (err error) {
 
 	// write and parse report
 	sarifContent := []byte(cmdResult.Stdout)
-	err = a.Sdk.FileWrite(reportFile, sarifContent)
+	err = a.Sdk.FileWriteV1(reportFile, sarifContent)
 	if err != nil {
 		return fmt.Errorf("failed to write report content to file %s: %s", reportFile, err.Error())
 	}
 
 	// store report
-	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 		File:          reportFile,
 		Type:          "report",
 		Format:        "sarif",

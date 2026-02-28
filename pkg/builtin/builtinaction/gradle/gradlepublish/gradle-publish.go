@@ -6,6 +6,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlecommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
@@ -13,7 +14,7 @@ import (
 const URI = "builtin://actions/gradle-publish"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -115,7 +116,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 
 	// version
@@ -142,7 +143,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -162,12 +163,12 @@ func (a Action) Execute() (err error) {
 	}
 
 	gradleWrapper := cidsdk.JoinPath(d.Module.ModuleDir, "gradlew")
-	if !a.Sdk.FileExists(gradleWrapper) {
+	if !a.Sdk.FileExistsV1(gradleWrapper) {
 		return fmt.Errorf("gradle wrapper not found at %s", gradleWrapper)
 	}
 
 	gradleWrapperJar := cidsdk.JoinPath(d.Module.ModuleDir, "gradle", "wrapper", "gradle-wrapper.jar")
-	if !a.Sdk.FileExists(gradleWrapperJar) {
+	if !a.Sdk.FileExistsV1(gradleWrapperJar) {
 		return fmt.Errorf("gradle wrapper jar not found at %s", gradleWrapperJar)
 	}
 
@@ -197,7 +198,7 @@ func (a Action) Execute() (err error) {
 		`--console=plain`,
 		`--stacktrace`,
 	}
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: gradlecommon.GradleWrapperCommand(strings.Join(publishArgs, " "), gradleWrapperJar),
 		WorkDir: d.Module.ModuleDir,
 		Env:     publishEnv,

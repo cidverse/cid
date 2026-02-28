@@ -7,6 +7,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlecommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 )
@@ -16,7 +17,7 @@ const URI = "builtin://actions/gradle-test"
 var junitRegex = regexp.MustCompile(`build/test-results/test(?:/[^/]+)*/TEST-.*\.xml$`)
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -65,7 +66,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 	if cfg.MavenVersion == "" {
 		cfg.MavenVersion = gradlecommon.GetVersion(d.Env["NCI_COMMIT_REF_TYPE"], d.Env["NCI_COMMIT_REF_RELEASE"], d.Env["NCI_COMMIT_HASH_SHORT"])
@@ -80,7 +81,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -100,12 +101,12 @@ func (a Action) Execute() (err error) {
 	}
 
 	gradleWrapper := cidsdk.JoinPath(d.Module.ModuleDir, "gradlew")
-	if !a.Sdk.FileExists(gradleWrapper) {
+	if !a.Sdk.FileExistsV1(gradleWrapper) {
 		return fmt.Errorf("gradle wrapper not found at %s", gradleWrapper)
 	}
 
 	gradleWrapperJar := cidsdk.JoinPath(d.Module.ModuleDir, "gradle", "wrapper", "gradle-wrapper.jar")
-	if !a.Sdk.FileExists(gradleWrapperJar) {
+	if !a.Sdk.FileExistsV1(gradleWrapperJar) {
 		return fmt.Errorf("gradle wrapper jar not found at %s", gradleWrapperJar)
 	}
 
@@ -117,7 +118,7 @@ func (a Action) Execute() (err error) {
 		`--console=plain`,
 		`--stacktrace`,
 	}
-	testResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	testResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: gradlecommon.GradleWrapperCommand(strings.Join(testArgs, " "), gradleWrapperJar),
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -128,13 +129,13 @@ func (a Action) Execute() (err error) {
 	}
 
 	// collect and store jacoco test reports
-	testReports, err := a.Sdk.FileList(cidsdk.FileRequest{
+	testReports, err := a.Sdk.FileListV1(actionsdk.FileV1Request{
 		Directory:  d.Module.ModuleDir,
 		Extensions: []string{"jacocoTestReport.xml", ".sarif", ".xml"},
 	})
 	for _, report := range testReports {
 		if strings.HasSuffix(report.Path, cidsdk.JoinPath("build", "reports", "jacoco", "test", "jacocoTestReport.xml")) {
-			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 				File:   report.Path,
 				Module: d.Module.Slug,
 				Type:   "report",
@@ -144,7 +145,7 @@ func (a Action) Execute() (err error) {
 				return err
 			}
 		} else if strings.HasSuffix(report.Path, cidsdk.JoinPath("build", "reports", "checkstyle", "main.sarif")) {
-			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 				File:   report.Path,
 				Module: d.Module.Slug,
 				Type:   "report",
@@ -154,7 +155,7 @@ func (a Action) Execute() (err error) {
 				return err
 			}
 		} else if junitRegex.MatchString(report.Path) {
-			err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 				File:   report.Path,
 				Module: d.Module.Slug,
 				Type:   "report",

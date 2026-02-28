@@ -3,24 +3,26 @@ package gitlabreleasepublish
 import (
 	_ "embed"
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitlab/gitlabcommon"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"testing"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGitLabReleasePublishWithChangelog(t *testing.T) {
 	sdk := common.TestSetup(t)
-	sdk.On("ProjectActionDataV1").Return(gitlabcommon.GitLabTestData(), nil)
-	sdk.On("ArtifactDownload", cidsdk.ArtifactDownloadRequest{
+	sdk.On("ProjectExecutionContextV1").Return(gitlabcommon.GitLabTestData(), nil)
+	sdk.On("ArtifactDownloadV1", actionsdk.ArtifactDownloadRequest{
 		ID:         "root|changelog|gitlab.changelog",
 		TargetFile: "/my-project/.tmp/gitlab.changelog",
-	}).Return(nil)
-	sdk.On("FileRead", "/my-project/.tmp/gitlab.changelog").Return(`changes ...`, nil)
-	sdk.On("ArtifactList", cidsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return(&[]cidsdk.ActionArtifact{}, nil)
+	}).Return(nil, nil)
+	sdk.On("FileReadV1", "/my-project/.tmp/gitlab.changelog").Return(`changes ...`, nil)
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return([]*actionsdk.Artifact{}, nil)
 
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
@@ -39,12 +41,12 @@ func TestGitLabReleasePublishWithChangelog(t *testing.T) {
 
 func TestGitLabReleasePublishAutoChangelog(t *testing.T) {
 	sdk := common.TestSetup(t)
-	sdk.On("ProjectActionDataV1").Return(gitlabcommon.GitLabTestData(), nil)
-	sdk.On("ArtifactDownload", cidsdk.ArtifactDownloadRequest{
+	sdk.On("ProjectExecutionContextV1").Return(gitlabcommon.GitLabTestData(), nil)
+	sdk.On("ArtifactDownloadV1", actionsdk.ArtifactDownloadRequest{
 		ID:         "root|changelog|gitlab.changelog",
 		TargetFile: "/my-project/.tmp/gitlab.changelog",
-	}).Return(fmt.Errorf("a error of some kind"))
-	sdk.On("ArtifactList", cidsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return(&[]cidsdk.ActionArtifact{}, nil)
+	}).Return(nil, fmt.Errorf("a error of some kind"))
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return([]*actionsdk.Artifact{}, nil)
 
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
@@ -63,13 +65,13 @@ func TestGitLabReleasePublishAutoChangelog(t *testing.T) {
 
 func TestGitLabReleasePublishSelfHosted(t *testing.T) {
 	sdk := common.TestSetup(t)
-	sdk.On("ProjectActionDataV1").Return(gitlabcommon.GitLabSelfHostedTestData(), nil)
-	sdk.On("ArtifactDownload", cidsdk.ArtifactDownloadRequest{
+	sdk.On("ProjectExecutionContextV1").Return(gitlabcommon.GitLabSelfHostedTestData(), nil)
+	sdk.On("ArtifactDownloadV1", actionsdk.ArtifactDownloadRequest{
 		ID:         "root|changelog|gitlab.changelog",
 		TargetFile: "/my-project/.tmp/gitlab.changelog",
-	}).Return(nil)
-	sdk.On("FileRead", "/my-project/.tmp/gitlab.changelog").Return(`changes ...`, nil)
-	sdk.On("ArtifactList", cidsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return(&[]cidsdk.ActionArtifact{}, nil)
+	}).Return(nil, nil)
+	sdk.On("FileReadV1", "/my-project/.tmp/gitlab.changelog").Return(`changes ...`, nil)
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return([]*actionsdk.Artifact{}, nil)
 
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()

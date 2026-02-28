@@ -2,16 +2,18 @@ package cargobuild
 
 import (
 	"fmt"
+
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargocommon"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/lib/formats/cargotoml"
 )
 
 const URI = "builtin://actions/cargo-build"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -48,7 +50,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 	if cfg.CargoVersion == "" {
 		cfg.CargoVersion = cargocommon.GetVersion(d.Env["NCI_COMMIT_REF_TYPE"], d.Env["NCI_COMMIT_REF_RELEASE"], d.Env["NCI_COMMIT_HASH_SHORT"])
@@ -63,7 +65,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -76,21 +78,21 @@ func (a Action) Execute() (err error) {
 
 	// read cargo package
 	cargoTomlFile := cidsdk.JoinPath(d.Module.ModuleDir, "Cargo.toml")
-	cargoBytes, err := a.Sdk.FileRead(cargoTomlFile)
+	cargoBytes, err := a.Sdk.FileReadV1(cargoTomlFile)
 	if err != nil {
 		return fmt.Errorf("error reading cargo.toml: %v", err)
 	}
 
-	mainExists := a.Sdk.FileExists("src/main.rs")
-	libExists := a.Sdk.FileExists("src/lib.rs")
+	mainExists := a.Sdk.FileExistsV1("src/main.rs")
+	libExists := a.Sdk.FileExistsV1("src/lib.rs")
 
 	// TD-003: patch version in Cargo.toml due to cargo limitations
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "patching cargo.toml version", Context: map[string]interface{}{"version": cfg.CargoVersion}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "patching cargo.toml version", Context: map[string]interface{}{"version": cfg.CargoVersion}})
 	patchedCargoBytes, err := cargotoml.PatchVersion([]byte(cargoBytes), cfg.CargoVersion)
 	if err != nil {
 		return err
 	}
-	err = a.Sdk.FileWrite(cargoTomlFile, patchedCargoBytes)
+	err = a.Sdk.FileWriteV1(cargoTomlFile, patchedCargoBytes)
 	if err != nil {
 		return fmt.Errorf("error writing patched cargo.toml: %v", err)
 	}
@@ -103,9 +105,9 @@ func (a Action) Execute() (err error) {
 
 	// build (executable)
 	if mainExists {
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "main.rs found, building executable"})
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "main.rs found, building executable"})
 
-		cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+		cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 			Command: `cargo build --release -vv`,
 			WorkDir: d.Module.ModuleDir,
 		})
@@ -115,7 +117,7 @@ func (a Action) Execute() (err error) {
 			return fmt.Errorf("cargo build failed, exit code %d", cmdResult.Code)
 		}
 
-		err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+		_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 			File:   fmt.Sprintf("target/release/%s", packageConfig.Package.Name),
 			Module: d.Module.Slug,
 			Type:   "binary",
@@ -127,9 +129,9 @@ func (a Action) Execute() (err error) {
 
 	// build (crate)
 	if libExists {
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "lib.rs found, building crate"})
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "lib.rs found, building crate"})
 
-		cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+		cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 			Command: `cargo package --allow-dirty -vv`,
 			WorkDir: d.Module.ModuleDir,
 		})
@@ -139,7 +141,7 @@ func (a Action) Execute() (err error) {
 			return fmt.Errorf("cargo build failed, exit code %d", cmdResult.Code)
 		}
 
-		err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+		_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 			File:   fmt.Sprintf("target/package/%s-%s.crate", packageConfig.Package.Name, packageConfig.Package.Version),
 			Module: d.Module.Slug,
 			Type:   "crate",

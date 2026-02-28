@@ -2,8 +2,12 @@ package changeloggenerate
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/changelog/changelogcommon"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+	"github.com/cidverse/go-vcs/vcsapi"
+
 	"time"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -13,7 +17,7 @@ import (
 const URI = "builtin://actions/changelog-generate"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -45,7 +49,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ProjectExecutionContextV1Response) (Config, error) {
 	cfg := Config{
 		Templates: []string{
 			"github.changelog",
@@ -88,7 +92,7 @@ func (a Action) GetConfig(d *cidsdk.ProjectActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ProjectActionDataV1()
+	d, err := a.Sdk.ProjectExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -101,7 +105,7 @@ func (a Action) Execute() (err error) {
 
 	// find last release to generate the changelog diff
 	currentRelease := d.Env["NCI_COMMIT_REF_NAME"]
-	releases, err := a.Sdk.VCSReleases(cidsdk.VCSReleasesRequest{})
+	releases, err := a.Sdk.VCSReleasesV1(actionsdk.VCSReleasesRequest{})
 	if err != nil {
 		return err
 	}
@@ -110,7 +114,7 @@ func (a Action) Execute() (err error) {
 	if previousRelease.Ref.Value == "" {
 		previousReleaseVCSRef = ""
 	}
-	c, err := a.Sdk.VCSCommits(cidsdk.VCSCommitsRequest{
+	c, err := a.Sdk.VCSCommitsV1(actionsdk.VCSCommitsRequest{
 		FromHash: fmt.Sprintf("hash/%s", d.Env["NCI_COMMIT_HASH"]),
 		ToHash:   previousReleaseVCSRef,
 		Limit:    1000,
@@ -118,7 +122,7 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
-	_ = a.Sdk.Log(cidsdk.LogMessageRequest{
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{
 		Level:   "debug",
 		Message: "fetch commits",
 		Context: map[string]interface{}{
@@ -126,12 +130,12 @@ func (a Action) Execute() (err error) {
 			"release_previous": previousRelease.Version,
 			"from":             d.Env["NCI_COMMIT_HASH"],
 			"to":               previousReleaseVCSRef,
-			"count":            len(*c),
+			"count":            len(c),
 		},
 	})
 
 	// preprocess
-	commits := changelogcommon.PreprocessCommits(cfg.CommitPattern, *c)
+	commits := changelogcommon.PreprocessCommits(cfg.CommitPattern, c)
 
 	// analyze / grouping
 	templateData := changelogcommon.ProcessCommits(changelogcommon.Config{TitleMaps: cfg.TitleMaps, NoteKeywords: cfg.NoteKeywords}, commits)
@@ -154,7 +158,7 @@ func (a Action) Execute() (err error) {
 		}
 
 		// store
-		err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+		_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 			File:    templateFile,
 			Content: output,
 			Type:    "changelog",
@@ -163,24 +167,24 @@ func (a Action) Execute() (err error) {
 			return err
 		}
 
-		_ = a.Sdk.Log(cidsdk.LogMessageRequest{Level: "info", Message: "rendered changelog template successfully", Context: map[string]interface{}{"template": templateFile}})
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "rendered changelog template successfully", Context: map[string]interface{}{"template": templateFile}})
 	}
 
 	return nil
 }
 
-func latestReleaseOfSameType(releases *[]cidsdk.VCSRelease, currentRelease string) cidsdk.VCSRelease {
+func latestReleaseOfSameType(releases []actionsdk.VCSRelease, currentRelease string) actionsdk.VCSRelease {
 	currentReleaseStable := version.IsStable(currentRelease)
 
-	for _, release := range *releases {
+	for _, release := range releases {
 		compare, _ := version.Compare(currentRelease, release.Version)
 		if compare > 0 && version.IsStable(release.Version) == currentReleaseStable {
 			return release
 		}
 	}
 
-	return cidsdk.VCSRelease{
+	return actionsdk.VCSRelease{
 		Version: "0.0.0",
-		Ref:     cidsdk.VCSTag{},
+		Ref:     vcsapi.VCSRef{},
 	}
 }

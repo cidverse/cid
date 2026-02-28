@@ -1,9 +1,11 @@
 package cmd
 
 import (
-	"github.com/cidverse/cid/internal/state"
 	"os"
 	"path/filepath"
+
+	"github.com/cidverse/cid/internal/state"
+	"github.com/cidverse/cid/pkg/core/actionexecutor/builtin"
 
 	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/context"
@@ -63,18 +65,20 @@ cid api --type http --listen localhost:7400`,
 
 			// start api
 			apiEngine := restapi.Setup(&restapi.APIConfig{
-				BuildID:              "0",
-				JobID:                "0",
-				ProjectDir:           cid.ProjectDir,
-				Modules:              modules,
-				CurrentModule:        currentModule,
-				Env:                  cid.Env,
-				ActionEnv:            cid.Env,
-				ActionConfig:         ``,
-				State:                &localState,
-				TempDir:              filepath.Join(cid.ProjectDir, ".tmp"),
-				ArtifactDir:          filepath.Join(cid.ProjectDir, ".dist"),
-				ExecutableCandidates: executableCandidates,
+				SDKClient: builtin.ActionSDK{
+					BuildID:              "0",
+					JobID:                "0",
+					ProjectDir:           cid.ProjectDir,
+					Modules:              modules,
+					CurrentModule:        currentModule,
+					Env:                  cid.Env,
+					ActionEnv:            cid.Env,
+					ActionConfig:         ``,
+					State:                &localState,
+					TempDir:              filepath.Join(cid.ProjectDir, ".tmp"),
+					ArtifactDir:          filepath.Join(cid.ProjectDir, ".dist"),
+					ExecutableCandidates: executableCandidates,
+				},
 			})
 			if len(secret) > 0 {
 				restapi.SecureWithAPIKey(apiEngine, secret)

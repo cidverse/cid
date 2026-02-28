@@ -1,13 +1,13 @@
 package gitlabcommon
 
 import (
-	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
-func GitLabTestData() *cidsdk.ProjectActionData {
-	return &cidsdk.ProjectActionData{
+func GitLabTestData() *actionsdk.ProjectExecutionContextV1Response {
+	return &actionsdk.ProjectExecutionContextV1Response{
 		ProjectDir: "/my-project",
-		Config: cidsdk.CurrentConfig{
+		Config: &actionsdk.ConfigV1Response{
 			Debug:       false,
 			Log:         map[string]string{},
 			ProjectDir:  "/my-project",
@@ -28,10 +28,10 @@ func GitLabTestData() *cidsdk.ProjectActionData {
 	}
 }
 
-func GitLabSelfHostedTestData() *cidsdk.ProjectActionData {
-	return &cidsdk.ProjectActionData{
+func GitLabSelfHostedTestData() *actionsdk.ProjectExecutionContextV1Response {
+	return &actionsdk.ProjectExecutionContextV1Response{
 		ProjectDir: "/my-project",
-		Config: cidsdk.CurrentConfig{
+		Config: &actionsdk.ConfigV1Response{
 			Debug:       false,
 			Log:         map[string]string{},
 			ProjectDir:  "/my-project",

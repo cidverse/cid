@@ -1,27 +1,27 @@
 package dotnetcommon
 
 import (
-	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
-func ModuleTestData() *cidsdk.ModuleActionData {
-	return &cidsdk.ModuleActionData{
+func ModuleTestData() *actionsdk.ModuleExecutionContextV1Response {
+	return &actionsdk.ModuleExecutionContextV1Response{
 		ProjectDir: "/my-project",
-		Module: cidsdk.ProjectModule{
+		Module: &actionsdk.ProjectModule{
 			ProjectDir:        "/my-project",
 			ModuleDir:         "/my-project",
-			Discovery:         []cidsdk.ProjectModuleDiscovery{{File: "/my-project/project.csproj"}},
+			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/project.csproj"}},
 			Name:              "my-module",
 			Slug:              "my-module",
 			BuildSystem:       "dotnet",
 			BuildSystemSyntax: "default",
-			Language:          &map[string]string{},
+			Language:          map[string]string{},
 			Submodules:        nil,
 			Files: []string{
 				"/my-project/app.go",
 			},
 		},
-		Config: cidsdk.CurrentConfig{
+		Config: &actionsdk.ConfigV1Response{
 			Log:         map[string]string{},
 			ProjectDir:  "/my-project",
 			ArtifactDir: "/my-project/.dist",

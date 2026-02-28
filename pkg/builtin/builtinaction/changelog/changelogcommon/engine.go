@@ -7,12 +7,12 @@ import (
 	"strconv"
 	"strings"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/oriser/regroup"
 )
 
-func PreprocessCommits(commitPattern []string, commits []cidsdk.VCSCommit) []cidsdk.VCSCommit {
-	var response []cidsdk.VCSCommit
+func PreprocessCommits(commitPattern []string, commits []*actionsdk.VCSCommit) []*actionsdk.VCSCommit {
+	var response []*actionsdk.VCSCommit
 
 	var commitExpr []*regexp.Regexp
 	var commitGroupExpr []*regroup.ReGroup
@@ -63,9 +63,9 @@ func PreprocessCommits(commitPattern []string, commits []cidsdk.VCSCommit) []cid
 	return response
 }
 
-func ProcessCommits(config Config, commits []cidsdk.VCSCommit) TemplateData {
+func ProcessCommits(config Config, commits []*actionsdk.VCSCommit) TemplateData {
 	// init
-	commitGroups := make(map[string][]cidsdk.VCSCommit)
+	commitGroups := make(map[string][]*actionsdk.VCSCommit)
 	noteGroups := make(map[string][]string)
 	contributors := make(map[string]ContributorData)
 

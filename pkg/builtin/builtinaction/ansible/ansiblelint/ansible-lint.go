@@ -2,7 +2,10 @@ package ansiblelint
 
 import (
 	"fmt"
+
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
 	"path"
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
@@ -12,7 +15,7 @@ import (
 const URI = "builtin://actions/ansible-lint"
 
 type Action struct {
-	Sdk cidsdk.SDKClient
+	Sdk actionsdk.SDKClient
 }
 
 type Config struct {
@@ -53,7 +56,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 	}
 }
 
-func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
+func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{
 		LintProfile:    "production",
 		GalaxyRolesDir: "roles",
@@ -68,7 +71,7 @@ func (a Action) GetConfig(d *cidsdk.ModuleActionData) (Config, error) {
 
 func (a Action) Execute() (err error) {
 	// query action data
-	d, err := a.Sdk.ModuleActionDataV1()
+	d, err := a.Sdk.ModuleExecutionContextV1()
 	if err != nil {
 		return err
 	}
@@ -83,8 +86,8 @@ func (a Action) Execute() (err error) {
 	reportFile := cidsdk.JoinPath(d.Config.TempDir, "ansiblelint.sarif.json")
 
 	// role requirements
-	if a.Sdk.FileExists(path.Join(d.Module.ModuleDir, cfg.GalaxyRolesDir, "requirements.yml")) {
-		_, err = a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	if a.Sdk.FileExistsV1(path.Join(d.Module.ModuleDir, cfg.GalaxyRolesDir, "requirements.yml")) {
+		_, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 			Command: fmt.Sprintf(`ansible-galaxy install -g -f -r %s/requirements.yml -p %s`, cfg.GalaxyRolesDir, cfg.GalaxyRolesDir),
 			WorkDir: d.Module.ModuleDir,
 		})
@@ -95,7 +98,7 @@ func (a Action) Execute() (err error) {
 
 	// lint
 	// config lookup: https://ansible.readthedocs.io/projects/lint/configuring/#using-local-configuration-files
-	cmdResult, err := a.Sdk.ExecuteCommand(cidsdk.ExecuteCommandRequest{
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: fmt.Sprintf(`ansible-lint --project . --profile %q --sarif-file %q`, cfg.LintProfile, reportFile),
 		WorkDir: d.Module.ModuleDir,
 	})
@@ -106,7 +109,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// parse report
-	reportContent, err := a.Sdk.FileRead(reportFile)
+	reportContent, err := a.Sdk.FileReadV1(reportFile)
 	if err != nil {
 		return fmt.Errorf("failed to read report content from file %s: %s", reportFile, err.Error())
 	}
@@ -116,7 +119,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// store report
-	err = a.Sdk.ArtifactUpload(cidsdk.ArtifactUploadRequest{
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 		File:          reportFile,
 		Type:          "report",
 		Format:        "sarif",

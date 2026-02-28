@@ -3,6 +3,7 @@ package restapi
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -15,19 +16,22 @@ func Setup(handlers *APIConfig) *echo.Echo {
 	e := echo.New()
 
 	// middlewares
+	//e.Use(middleware.RequestID())
 	e.Use(middleware.Recover())
+	e.Use(middleware.Gzip())
 	//e.Use(middleware.RequestLogger())
 
-	// observability
-	e.GET("/v1/health", handlers.healthCheck)
-	e.POST("/v1/log", handlers.logMessage)
+	// misc
+	e.GET("/v1/health", handlers.healthV1)
+	e.POST("/v1/log", handlers.logV1)
+	e.GET("/v4/uuid", handlers.uuidV4)
 
 	// vcs
-	e.GET("/v1/vcs/commit", handlers.vcsCommits)
-	e.GET("/v1/vcs/commit/:hash", handlers.vcsCommitByHash)
-	e.GET("/v1/vcs/tag", handlers.vcsTags)
-	e.GET("/v1/vcs/release", handlers.vcsReleases)
-	e.GET("/v1/vcs/diff", handlers.vcsDiff)
+	e.GET("/v1/vcs/commit", handlers.vcsCommitsV1)
+	e.GET("/v1/vcs/commit/:hash", handlers.vcsCommitByHashV1)
+	e.GET("/v1/vcs/tag", handlers.vcsTagsV1)
+	e.GET("/v1/vcs/release", handlers.vcsReleasesV1)
+	e.GET("/v1/vcs/diff", handlers.vcsDiffV1)
 
 	// current job
 	e.GET("/v1/job/module-action-data", handlers.jobModuleDataV1)
@@ -55,7 +59,7 @@ func Setup(handlers *APIConfig) *echo.Echo {
 	// TODO: (advanced) exec command as async task (+ get command status / log output / send stdin input)
 
 	// provenance
-	e.GET("/v1/provenance", handlers.provenance)
+	//e.GET("/v1/provenance", handlers.provenance)
 
 	return e
 }
@@ -70,7 +74,7 @@ func SecureWithAPIKey(e *echo.Echo, secret string) {
 	}))
 }
 
-func ListenOnSocket(e *echo.Echo, file string) {
+func ListenOnSocket(e *echo.Echo, file string) error {
 	// start server
 	sc := echo.StartConfig{
 		HideBanner:      true,
@@ -83,15 +87,17 @@ func ListenOnSocket(e *echo.Echo, file string) {
 	}
 	if err := sc.Start(context.Background(), e); err != nil {
 		if errors.Is(err, http.ErrServerClosed) {
-			return
+			slog.With("socket", file).Warn("Server closed") // TODO: debug
+			return nil
 		}
 
-		slog.Error("failed to start server", "err", err)
-		os.Exit(1)
+		return fmt.Errorf("failed to start server: %w", err)
 	}
+
+	return nil
 }
 
-func ListenOnAddr(e *echo.Echo, listen string) {
+func ListenOnAddr(e *echo.Echo, listen string) error {
 	sc := echo.StartConfig{
 		HideBanner: true,
 		HidePort:   true,
@@ -99,10 +105,12 @@ func ListenOnAddr(e *echo.Echo, listen string) {
 	}
 	if err := sc.Start(context.Background(), e); err != nil {
 		if errors.Is(err, http.ErrServerClosed) {
-			return
+			slog.With("listen", listen).Warn("Server closed") // TODO: debug
+			return nil
 		}
 
-		slog.Error("failed to start server", "err", err)
-		os.Exit(1)
+		return fmt.Errorf("failed to start server: %w", err)
 	}
+
+	return nil
 }

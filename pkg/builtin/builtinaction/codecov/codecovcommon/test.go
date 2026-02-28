@@ -1,11 +1,13 @@
 package codecovcommon
 
-import cidsdk "github.com/cidverse/cid-sdk-go"
+import (
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+)
 
-func ProjectTestData() *cidsdk.ProjectActionData {
-	return &cidsdk.ProjectActionData{
+func ProjectTestData() *actionsdk.ProjectExecutionContextV1Response {
+	return &actionsdk.ProjectExecutionContextV1Response{
 		ProjectDir: "/my-project",
-		Config: cidsdk.CurrentConfig{
+		Config: &actionsdk.ConfigV1Response{
 			Debug:       false,
 			Log:         map[string]string{},
 			ProjectDir:  "/my-project",
