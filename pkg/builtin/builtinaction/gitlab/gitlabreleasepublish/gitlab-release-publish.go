@@ -13,7 +13,7 @@ import (
 
 	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cidverseutils/core/ci"
-	gitlab "gitlab.com/gitlab-org/api/client-go"
+	gitlab "gitlab.com/gitlab-org/api/client-go/v2"
 )
 
 const URI = "builtin://actions/gitlab-release-publish"
