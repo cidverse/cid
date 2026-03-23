@@ -31,6 +31,12 @@ func TitleAndDescription(currentVersion string, currentState appconfig.WorkflowS
 		changesByGroup[change.Workflow] = append(changesByGroup[change.Workflow], change)
 	}
 
+	// use specific title, if the main pkg changed
+	mainPkgChange := appconfig.FindChangeEntryByPackageUrl(changeEntries, "pkg:github/cidverse/cid")
+	if mainPkgChange != nil && mainPkgChange.OldVersion != "" {
+		title = fmt.Sprintf("ci: update cid from %s to %s", mainPkgChange.OldVersion, mainPkgChange.NewVersion)
+	}
+
 	// version and changelog
 	template, err := vcsapp.Render(string(descriptionTemplate), WorkflowDescriptionData{
 		Version:        currentVersion,

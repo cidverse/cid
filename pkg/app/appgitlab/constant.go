@@ -32,15 +32,15 @@ var gitlabWorkflowDependencyList = []dependency.Dependency{
 	{
 		Id:         "podman/stable",
 		Type:       "docker",
-		Version:    "v5.7.0-immutable",
-		Hash:       "e373092f93d45249cb4409d4bff2d71f26d808a1dae18ed78d3f7c18f82c5fea",
+		Version:    "v5.8.1-immutable",
+		Hash:       "42d8b3d789333f07e631305325a02b4ab33c3f107413e04b612973a72f1d7deb",
 		Repository: "quay.io",
 	},
 	{
 		Id:         "docker",
 		Type:       "docker",
-		Version:    "28.3.3-dind",
-		Hash:       "acf2e2d09cedf21fa8f27bb0962674e33e159c744c152b248f1f7f43623ccd82",
+		Version:    "29.3.0-dind",
+		Hash:       "1ba18449911d01f477a3fc104123c85d677addc60701b14b3fcb5381f9c4a537",
 		Repository: "docker.io",
 	},
 	{

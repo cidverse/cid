@@ -16,9 +16,21 @@ type WorkflowState struct {
 }
 
 type ChangeEntry struct {
-	Workflow string
-	Scope    string
-	Message  string
+	Workflow   string
+	Scope      string
+	Message    string
+	PackageUrl string // optional: package url
+	OldVersion string
+	NewVersion string
+}
+
+func FindChangeEntryByPackageUrl(entries []ChangeEntry, url string) *ChangeEntry {
+	for i := range entries {
+		if entries[i].PackageUrl == url {
+			return &entries[i]
+		}
+	}
+	return nil
 }
 
 func (w *WorkflowState) Hash() (string, error) {
@@ -78,23 +90,31 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 			oldDep, exists := oldWf.ReferencedWorkflowDependency[depKey]
 			if !exists {
 				changes = append(changes, ChangeEntry{
-					Workflow: key,
-					Scope:    "dependency",
-					Message:  fmt.Sprintf("added [%s] version [%s]", newDep.AsPackageUrlNoVersion(), newDep.Version),
+					Workflow:   key,
+					Scope:      "dependency",
+					Message:    fmt.Sprintf("added [%s] version [%s]", newDep.AsPackageUrlNoVersion(), newDep.Version),
+					PackageUrl: newDep.AsPackageUrlNoVersion(),
+					NewVersion: newDep.Version,
 				})
 				continue
 			}
 			if oldDep.Version != newDep.Version && oldDep.Hash != newDep.Hash {
 				changes = append(changes, ChangeEntry{
-					Workflow: key,
-					Scope:    "dependency",
-					Message:  fmt.Sprintf("[%s] version and hash changed (%s → %s, %s → %s)", newDep.AsPackageUrlNoVersion(), oldDep.Version, newDep.Version, oldDep.Hash, newDep.Hash),
+					Workflow:   key,
+					Scope:      "dependency",
+					Message:    fmt.Sprintf("[%s] version and hash changed (%s → %s, %s → %s)", newDep.AsPackageUrlNoVersion(), oldDep.Version, newDep.Version, oldDep.Hash, newDep.Hash),
+					PackageUrl: newDep.AsPackageUrlNoVersion(),
+					OldVersion: oldDep.Version,
+					NewVersion: newDep.Version,
 				})
 			} else if oldDep.Version != newDep.Version {
 				changes = append(changes, ChangeEntry{
-					Workflow: key,
-					Scope:    "dependency",
-					Message:  fmt.Sprintf("[%s] version changed (%s → %s)", newDep.AsPackageUrlNoVersion(), oldDep.Version, newDep.Version),
+					Workflow:   key,
+					Scope:      "dependency",
+					Message:    fmt.Sprintf("[%s] version changed (%s → %s)", newDep.AsPackageUrlNoVersion(), oldDep.Version, newDep.Version),
+					PackageUrl: newDep.AsPackageUrlNoVersion(),
+					OldVersion: oldDep.Version,
+					NewVersion: newDep.Version,
 				})
 			} else if oldDep.Hash != newDep.Hash {
 				changes = append(changes, ChangeEntry{
