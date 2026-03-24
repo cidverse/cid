@@ -36,6 +36,14 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Name: "poetry",
 				},
 			},
+			Network: []cidsdk.ActionAccessNetwork{
+				{
+					Host: "files.pythonhosted.org:443",
+				},
+				{
+					Host: "pypi.org:443",
+				},
+			},
 		},
 	}
 }

@@ -26,7 +26,7 @@ require (
 	github.com/cidverse/go-vcs v0.0.0-20260225231920-72e2575db148
 	github.com/cidverse/go-vcsapp v0.0.0-20260317150524-c44a1a5b1e91
 	github.com/cidverse/normalizeci v1.1.1-0.20260221203634-9f1800da627a
-	github.com/cidverse/repoanalyzer v0.1.1-0.20260212194710-062438e11d73
+	github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/google/go-github/v84 v84.0.0
