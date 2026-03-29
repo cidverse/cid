@@ -3,13 +3,15 @@
 set -euo pipefail
 
 # parameters
-CID_VERSION="${1:-latest}"
-CID_SHA256="${2:-}"
+CID_VERSION="${1:?Error: CID_VERSION must be provided}"
+CID_SHA256="${2:?Error: CID_SHA256 must be provided for integrity check}"
 
 # variables
+TMP_DIR="$(mktemp -d)"
 BIN_DIR="/usr/local/bin"
-DOWNLOAD_URL="https://github.com/cidverse/cid/releases/download/v${CID_VERSION}/linux_amd64"
-[[ "$CID_VERSION" == "latest" ]] && DOWNLOAD_URL="https://github.com/cidverse/cid/releases/latest/download/linux_amd64"
+BASE_URL="${CID_MIRROR_URL:-https://github.com/cidverse/cid/releases/download}"
+BINARY_URL="${BASE_URL}/v${CID_VERSION}/linux_amd64"
+SIG_URL="${BINARY_URL}.asc"
 
 # github actions
 if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
@@ -19,21 +21,20 @@ if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
     BIN_DIR="${TOOL_DIR}/bin"
 fi
 
-# prepare bin dir
-mkdir -p "$BIN_DIR"
-
 # download
-echo "Downloading CID $CID_VERSION ..."
-curl -sSL -o "${BIN_DIR}/cid" "$DOWNLOAD_URL"
+echo "Fetching binary and signature [$CID_VERSION]..."
+curl -sSL -o "$TMP_DIR/cid" "$BINARY_URL"
+curl -sSL -o "$TMP_DIR/cid.asc" "$SIG_URL"
 
-# optional hash verification
+# sha256 integrity
 if [[ -n "${CID_SHA256}" ]]; then
-    echo "Verifying SHA256..."
-    echo "${CID_SHA256}  ${BIN_DIR}/cid" | sha256sum -c -
+    echo "Checking checksum..."
+    echo "${CID_SHA256}  $TMP_DIR/cid" | sha256sum -c -
 fi
 
-# make executable, after verification
-chmod +x "${BIN_DIR}/cid"
+# install binary
+mkdir -p "$BIN_DIR"
+install -m 755 "$TMP_DIR/cid" "$BIN_DIR/cid"
 
 # github actions
 if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then

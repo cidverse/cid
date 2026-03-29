@@ -27,6 +27,7 @@ var gitlabWorkflowDependencyList = []dependency.Dependency{
 		Id:      "cidverse/cid",
 		Type:    "github",
 		Version: constants.Version,
+		Hash:    constants.BinaryHash,
 	},
 	// oci-containers
 	{
