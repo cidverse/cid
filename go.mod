@@ -14,7 +14,7 @@ require (
 	github.com/cidverse/cidverseutils/ci v0.1.0
 	github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842
 	github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4
-	github.com/cidverse/cidverseutils/core v0.0.0-20260225205012-7328c766ce81
+	github.com/cidverse/cidverseutils/core v0.0.0-20260328224537-443c76f16414
 	github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20260120202941-ba7eef6381fa
 	github.com/cidverse/cidverseutils/hash v0.1.0
 	github.com/cidverse/cidverseutils/network v0.1.0
@@ -23,8 +23,8 @@ require (
 	github.com/cidverse/cidverseutils/zerologconfig v0.1.2-0.20250329161944-cee6e2f5f53c
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812
-	github.com/cidverse/go-vcs v0.0.0-20260225231920-72e2575db148
-	github.com/cidverse/go-vcsapp v0.0.0-20260317150524-c44a1a5b1e91
+	github.com/cidverse/go-vcs v0.0.0-20260328094225-55d358c2b47d
+	github.com/cidverse/go-vcsapp v0.0.0-20260328224511-4fcb6afb1e47
 	github.com/cidverse/normalizeci v1.1.1-0.20260221203634-9f1800da627a
 	github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b
 	github.com/go-playground/validator/v10 v10.30.1
@@ -102,15 +102,15 @@ require (
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/otiai10/mint v1.6.3 // indirect
-	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
+	github.com/pelletier/go-toml/v2 v2.3.0 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/pjbgf/sha1cd v0.5.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 // indirect
 	github.com/samber/lo v1.53.0 // indirect
-	github.com/samber/slog-common v0.20.0 // indirect
-	github.com/samber/slog-zerolog/v2 v2.9.1 // indirect
+	github.com/samber/slog-common v0.21.0 // indirect
+	github.com/samber/slog-zerolog/v2 v2.9.2 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.10.0 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/shibumi/go-pathspec v1.3.0 // indirect
