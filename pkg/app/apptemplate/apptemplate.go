@@ -49,6 +49,6 @@ func RenderFile(templateFile string, data TemplateData, outputFile string) error
 func NewTemplateData(conf appconfig.Config) TemplateData {
 	return TemplateData{
 		Version:         conf.Version,
-		VersionFileHash: "",
+		VersionFileHash: conf.VersionHash,
 	}
 }

@@ -14,7 +14,8 @@ import (
 )
 
 type Config struct {
-	Version          string   `json:"version" env:"CLI_VERSION" validate:"required"`         // Version of this project
+	Version          string   `json:"version" env:"CLI_VERSION" validate:"required"` // Version of this project
+	VersionHash      string   `json:"version_hash" env:"CLI_VERSION_HASH" validate:"required"`
 	JobTimeout       int      `json:"job_timeout" env:"JOB_TIMEOUT" validate:"required"`     // Timeout for the job in minutes
 	JobRetries       int      `json:"job_retries" env:"JOB_RETRIES" validate:"required"`     // Number of retries for the job
 	RunnerTags       []string `json:"runner_tags" env:"RUNNER_TAGS" validate:"required"`     // Tags for the runner jobs (e.g. "docker", "podman", ...)

@@ -28,6 +28,7 @@ var githubWorkflowDependencyList = []dependency.Dependency{
 		Id:      "cidverse/cid",
 		Type:    "github",
 		Version: constants.Version,
+		Hash:    constants.BinaryHash,
 	},
 	// github-actions
 	{

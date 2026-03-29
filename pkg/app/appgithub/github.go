@@ -29,6 +29,7 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 	// read config
 	conf := appconfig.Config{
 		Version:          constants.Version,
+		VersionHash:      constants.BinaryHash,
 		JobTimeout:       10,
 		RunnerTags:       []string{},
 		EgressPolicy:     "block",
