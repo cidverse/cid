@@ -41,8 +41,12 @@ if [[ -n "${GPG_FINGERPRINT}" ]]; then
     fi
     echo "Verifying GPG signature..."
     gpg --keyserver hkps://keyserver.ubuntu.com --quiet --recv-keys "$GPG_FINGERPRINT"
-    gpg --verify "$TMP_DIR/cid.asc" "$TMP_DIR/cid"
-    echo "GPG verification successful."
+    if gpg --verify "$TMP_DIR/cid.asc" "$TMP_DIR/cid" 2>&1 | grep -q "Good signature"; then
+        echo "GPG verification successful using key with fingerprint ${GPG_FINGERPRINT}."
+    else
+        echo "Error: GPG verification failed!"
+        exit 1
+    fi
 fi
 
 # install binary
