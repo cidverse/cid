@@ -5,11 +5,12 @@ import (
 )
 
 type Dependency struct {
-	Id         string `json:"id"`
-	Type       string `json:"type"`
-	Version    string `json:"version,omitempty"`
-	Hash       string `json:"hash,omitempty"`
-	Repository string `json:"repository,omitempty"`
+	Id             string `json:"id"`
+	Type           string `json:"type"`
+	Version        string `json:"version,omitempty"`
+	Hash           string `json:"hash,omitempty"`
+	GPGFingerprint string `json:"gpg-fingerprint,omitempty"`
+	Repository     string `json:"repository,omitempty"`
 }
 
 func (wd Dependency) AsPackageUrl() string {

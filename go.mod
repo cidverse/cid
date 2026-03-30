@@ -14,7 +14,7 @@ require (
 	github.com/cidverse/cidverseutils/ci v0.1.0
 	github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842
 	github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4
-	github.com/cidverse/cidverseutils/core v0.0.0-20260328224537-443c76f16414
+	github.com/cidverse/cidverseutils/core v0.0.0-20260330161027-a14616fe0b8a
 	github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20260120202941-ba7eef6381fa
 	github.com/cidverse/cidverseutils/hash v0.1.0
 	github.com/cidverse/cidverseutils/network v0.1.0
@@ -23,8 +23,8 @@ require (
 	github.com/cidverse/cidverseutils/zerologconfig v0.1.2-0.20250329161944-cee6e2f5f53c
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812
-	github.com/cidverse/go-vcs v0.0.0-20260328094225-55d358c2b47d
-	github.com/cidverse/go-vcsapp v0.0.0-20260328224511-4fcb6afb1e47
+	github.com/cidverse/go-vcs v0.0.0-20260329221523-57dc362d9d4d
+	github.com/cidverse/go-vcsapp v0.0.0-20260330160848-69a0befaac6b
 	github.com/cidverse/normalizeci v1.1.1-0.20260221203634-9f1800da627a
 	github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b
 	github.com/go-playground/validator/v10 v10.30.1
@@ -75,7 +75,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.8.0 // indirect
-	github.com/go-git/go-git/v5 v5.17.0 // indirect
+	github.com/go-git/go-git/v5 v5.17.1 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
@@ -133,8 +133,8 @@ require (
 	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/text v0.35.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260319201613-d00831a3d3e7 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260319201613-d00831a3d3e7 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260330182312-d5a96adf58d8 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260330182312-d5a96adf58d8 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )

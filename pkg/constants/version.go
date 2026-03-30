@@ -7,7 +7,7 @@ var (
 	CommitHash       = "none"
 	BuildAt          = "unknown"
 	RepositoryStatus = "clean"
-	BinaryHash       = "unknown"
+	BinaryHash       = ""
 )
 
 func init() {

@@ -13,7 +13,7 @@
 default:
   image: {{ $defaultImage.AsDependencyReference }} # {{ $defaultImage.Version }}
   before_script:
-    - bash .cid/scripts/install.sh "{{ $cidRelease.Version }}" "{{ $cidRelease.Hash }}"
+    - bash .cid/scripts/install.sh "{{ $cidRelease.Version }}" "{{ $cidRelease.Hash }}" "{{ $cidRelease.GPGFingerprint }}"
 
 # variables
 variables:

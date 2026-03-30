@@ -24,10 +24,11 @@ var gitlabNetworkAllowList = []catalog.ActionAccessNetwork{
 var gitlabWorkflowDependencyList = []dependency.Dependency{
 	// tools
 	{
-		Id:      "cidverse/cid",
-		Type:    "github",
-		Version: constants.Version,
-		Hash:    constants.BinaryHash,
+		Id:             "cidverse/cid",
+		Type:           "github",
+		Version:        constants.Version,
+		Hash:           constants.BinaryHash,
+		GPGFingerprint: "76A4948E69C62589C7B0AB84E414434DF5371FB6",
 	},
 	// oci-containers
 	{

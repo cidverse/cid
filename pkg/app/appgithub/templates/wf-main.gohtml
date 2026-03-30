@@ -136,7 +136,7 @@ jobs:
           persist-credentials: false
       - name: Prepare Tooling
         shell: bash
-        run: bash .cid/scripts/install.sh "{{ $cidRelease.Version }}" "{{ $cidRelease.Hash }}"
+        run: bash .cid/scripts/install.sh "{{ $cidRelease.Version }}" "{{ $cidRelease.Hash }}" "{{ $cidRelease.GPGFingerprint }}"
       {{- if $step.UsesOutputOf }}
       {{- range $prevStepSlug := $step.UsesOutputOf }}
       - name: Download Inputs > {{ $prevStepSlug }}
