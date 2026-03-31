@@ -42,7 +42,11 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Required:    true,
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{},
+			Executables: []cidsdk.ActionAccessExecutable{
+				{
+					Name: "gh",
+				},
+			},
 		},
 		Input: cidsdk.ActionInput{
 			Artifacts: []cidsdk.ActionArtifactType{
@@ -101,7 +105,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// release artifacts
-	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`})
+	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `(artifact_type == "binary" || artifact_type == "signature")`})
 	if err != nil {
 		return err
 	}

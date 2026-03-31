@@ -19,7 +19,7 @@ func TestGithubReleasePublishWithChangelog(t *testing.T) {
 		ID:         "root|changelog|github.changelog",
 		TargetFile: "/my-project/.tmp/github.changelog",
 	}).Return(nil, nil)
-	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return([]*actionsdk.Artifact{
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `(artifact_type == "binary" || artifact_type == "signature")`}).Return([]*actionsdk.Artifact{
 		{
 			BuildID:    "0",
 			JobID:      "0",
@@ -53,7 +53,7 @@ func TestGithubReleasePublishAutoChangelog(t *testing.T) {
 		ID:         "root|changelog|github.changelog",
 		TargetFile: "/my-project/.tmp/github.changelog",
 	}).Return(nil, fmt.Errorf("a error of some kind"))
-	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return([]*actionsdk.Artifact{
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `(artifact_type == "binary" || artifact_type == "signature")`}).Return([]*actionsdk.Artifact{
 		{
 			BuildID:    "0",
 			JobID:      "0",

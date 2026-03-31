@@ -191,7 +191,7 @@ func (sdk ActionSDK) storeArtifact(request actionsdk.ArtifactUploadRequest) (fil
 		ArtifactID:    fmt.Sprintf("%s|%s|%s", moduleSlug, request.Type, request.File),
 		Module:        moduleSlug,
 		Type:          request.Type,
-		Name:          request.File,
+		Name:          fileName,
 		Path:          targetFile,
 		Format:        request.Format,
 		FormatVersion: request.FormatVersion,
@@ -229,7 +229,7 @@ func (sdk ActionSDK) ArtifactDownloadV1(request actionsdk.ArtifactDownloadReques
 	}
 
 	id := request.ID
-	slog.With("id", id).Info("[API] artifact download requested")
+	slog.With("id", id).With("target", request.TargetFile).Info("[API] artifact download requested")
 
 	// lookup
 	artifact, present := sdk.State.Artifacts[id]
