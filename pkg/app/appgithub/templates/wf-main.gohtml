@@ -67,18 +67,18 @@ on:
 
 # permissions, see https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions and https://docs.github.com/en/rest/overview/permissions-required-for-github-apps
 permissions:
-  actions: read # detection of GitHub Actions environment
-  checks: none
-  contents: read
-  deployments: none
-  id-token: none
-  issues: none
-  packages: none
-  pages: none
-  pull-requests: none
-  repository-projects: none
-  security-events: none
-  statuses: none
+  actions: read # required: detect GitHub Actions runtime environment
+  checks: none # not required
+  contents: read # required: read repository content
+  deployments: none # not required
+  id-token: none # not required
+  issues: none # not required
+  packages: none # not required
+  pages: none # not required
+  pull-requests: none # not required
+  repository-projects: none # not required
+  security-events: none # not required
+  statuses: none # not required
 
 # cancel in progress when a new run starts
 concurrency:
@@ -104,10 +104,10 @@ jobs:
     permissions:
       id-token: write # provenance signing
       {{- if and (eq $step.Stage "scan") (ne $.WorkflowConfig.Type "pull-request") }}
-      security-events: write # upload security events
+      security-events: write # required: upload security events
       {{- end }}
       {{- if and (eq $step.Stage "publish") (ne $.WorkflowConfig.Type "pull-request") }}
-      packages: write # upload packages
+      packages: write # required: publication
       {{- end }}
       {{- if eq $step.Name "github-pr-comment" }}
       pull-requests: write # post pr comment
