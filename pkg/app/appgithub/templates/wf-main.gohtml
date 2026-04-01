@@ -103,7 +103,7 @@ jobs:
     {{- end }}
     permissions:
       id-token: write # provenance signing
-      {{- if and (eq $step.Stage "scan") (ne $.WorkflowConfig.Type "pull-request") }}
+      {{- if and (contains $step.Access.Resources "security-events") (ne $.WorkflowConfig.Type "pull-request") }}
       security-events: write # required: upload security events
       {{- end }}
       {{- if and (contains $step.Access.Resources "releases") (ne $.WorkflowConfig.Type "pull-request") }}

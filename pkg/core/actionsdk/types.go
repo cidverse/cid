@@ -71,8 +71,9 @@ type ActionAccessNetwork struct {
 type ActionAccessResource string
 
 const (
-	ResourceReleases ActionAccessResource = "releases"
-	ResourcePackages ActionAccessResource = "packages"
+	ResourceReleases       ActionAccessResource = "releases"
+	ResourcePackages       ActionAccessResource = "packages"
+	ResourceSecurityEvents ActionAccessResource = "security-events"
 )
 
 type ActionInput struct {

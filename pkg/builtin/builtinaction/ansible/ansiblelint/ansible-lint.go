@@ -43,6 +43,9 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Name: "ansible-galaxy",
 				},
 			},
+			Resources: []actionsdk.ActionAccessResource{
+				actionsdk.ResourceSecurityEvents,
+			},
 		},
 		Output: actionsdk.ActionOutput{
 			Artifacts: []actionsdk.ActionArtifactType{

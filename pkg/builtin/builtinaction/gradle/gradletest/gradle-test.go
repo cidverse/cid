@@ -44,6 +44,9 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				},
 			},
 			Network: common.MergeActionAccessNetwork(gradlecommon.NetworkJvm, gradlecommon.NetworkGradle),
+			Resources: []actionsdk.ActionAccessResource{
+				actionsdk.ResourceSecurityEvents,
+			},
 		},
 		Output: actionsdk.ActionOutput{
 			Artifacts: []actionsdk.ActionArtifactType{

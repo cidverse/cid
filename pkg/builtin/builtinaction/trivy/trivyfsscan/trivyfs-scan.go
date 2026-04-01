@@ -43,6 +43,9 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Host: "mirror.gcr.io:443",
 				},
 			},
+			Resources: []actionsdk.ActionAccessResource{
+				actionsdk.ResourceSecurityEvents,
+			},
 		},
 		Output: actionsdk.ActionOutput{
 			Artifacts: []actionsdk.ActionArtifactType{

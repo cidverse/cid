@@ -39,6 +39,9 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Name: "gitleaks",
 				},
 			},
+			Resources: []actionsdk.ActionAccessResource{
+				actionsdk.ResourceSecurityEvents,
+			},
 		},
 		Output: actionsdk.ActionOutput{
 			Artifacts: []actionsdk.ActionArtifactType{

@@ -53,6 +53,9 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Host: "semgrep.dev:443",
 				},
 			},
+			Resources: []actionsdk.ActionAccessResource{
+				actionsdk.ResourceSecurityEvents,
+			},
 		},
 		Output: actionsdk.ActionOutput{
 			Artifacts: []actionsdk.ActionArtifactType{

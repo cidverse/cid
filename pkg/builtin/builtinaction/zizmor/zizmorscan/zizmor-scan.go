@@ -63,6 +63,9 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Constraint: "=> 1.4.1",
 				},
 			},
+			Resources: []actionsdk.ActionAccessResource{
+				actionsdk.ResourceSecurityEvents,
+			},
 		},
 		Output: actionsdk.ActionOutput{
 			Artifacts: []actionsdk.ActionArtifactType{
