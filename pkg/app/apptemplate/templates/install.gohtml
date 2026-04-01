@@ -29,22 +29,45 @@ curl -sSL -o "$TMP_DIR/cid.asc" "$SIG_URL"
 
 # sha256 integrity
 if [[ -n "${CID_SHA256}" ]]; then
-    echo "Checking checksum..."
-    echo "${CID_SHA256}  $TMP_DIR/cid" | sha256sum -c --status -
+    ACTUAL_SHA256=$(sha256sum "$TMP_DIR/cid" | awk '{print $1}')
+
+    if [[ "${ACTUAL_SHA256}" == "${CID_SHA256}" ]]; then
+        echo "✅ CID Checksum verification passed. checksum=${ACTUAL_SHA256}"
+    else
+        echo "❌ CHECKSUM VERIFICATION FAILED!"
+        echo "Expected: ${CID_SHA256}"
+        echo "Actual:   ${ACTUAL_SHA256}"
+        exit 1
+    fi
 fi
 
 # gpg verification
 if [[ -n "${GPG_FINGERPRINT}" ]]; then
-    if [[ -n "${GPG_FINGERPRINT}" && ${#GPG_FINGERPRINT} -lt 40 ]]; then
-        echo "Error: GPG_FINGERPRINT looks to short. Use the full 40-character fingerprint for better security."
+    if [[ ${#GPG_FINGERPRINT} -lt 40 ]]; then
+        echo "❌ Error: GPG_FINGERPRINT is too short (${#GPG_FINGERPRINT}/40 chars)."
+        echo "Please provide the full 40-character hex fingerprint."
         exit 1
     fi
-    echo "Verifying GPG signature..."
-    gpg --keyserver hkps://keyserver.ubuntu.com --quiet --recv-keys "$GPG_FINGERPRINT"
-    if gpg --verify "$TMP_DIR/cid.asc" "$TMP_DIR/cid" 2>&1 | grep -q "Good signature"; then
-        echo "GPG verification successful using key with fingerprint ${GPG_FINGERPRINT}."
+
+    echo "Fetching GPG key ${GPG_FINGERPRINT}..."
+    if ! gpg --keyserver hkps://keyserver.ubuntu.com --quiet --recv-keys "$GPG_FINGERPRINT" 2>/dev/null; then
+        echo "❌ Error: Could not retrieve key ${GPG_FINGERPRINT} from keyserver."
+        exit 1
+    fi
+
+    GPG_OUTPUT=$(gpg --verify "$TMP_DIR/cid.asc" "$TMP_DIR/cid" 2>&1)
+    GPG_STATUS=$?
+    if [ $GPG_STATUS -eq 0 ]; then
+        echo "✅ GPG verification successful!"
+        echo "Key Fingerprint: ${GPG_FINGERPRINT}"
+        echo "$(echo "$GPG_OUTPUT" | grep "Good signature from")"
     else
-        echo "Error: GPG verification failed!"
+        echo "❌ GPG VERIFICATION FAILED!"
+        echo "---------------------------------------------------"
+        echo "$GPG_OUTPUT"
+        echo "---------------------------------------------------"
+        echo "Possible issues: The file was tampered with, or the signature"
+        echo "was not created by the key ${GPG_FINGERPRINT}."
         exit 1
     fi
 fi

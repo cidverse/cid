@@ -107,6 +107,9 @@ jobs:
       security-events: write # required: upload security events
       {{- end }}
       {{- if and (eq $step.Stage "publish") (ne $.WorkflowConfig.Type "pull-request") }}
+      contents: write # required: create release
+      {{- end }}
+      {{- if and (eq $step.Stage "publish") (ne $.WorkflowConfig.Type "pull-request") }}
       packages: write # required: publication
       {{- end }}
       {{- if eq $step.Name "github-pr-comment" }}
