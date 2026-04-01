@@ -5,7 +5,7 @@ import (
 	"github.com/cidverse/cid/pkg/common/dependency"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/context"
-	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"github.com/cidverse/go-vcsapp/pkg/task/taskcommon"
@@ -49,7 +49,7 @@ type RenderWorkflowResult struct {
 }
 
 // GenerateWorkflowData generates the workflow template data
-func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon.TaskContext, conf Config, wfName string, wfConfig WorkflowConfig, vars []api.CIVariable, environments map[string]appcommon.VCSEnvironment, wfDependencies map[string]dependency.Dependency, networkAllowGlobal []catalog.ActionAccessNetwork) (WorkflowData, error) {
+func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon.TaskContext, conf Config, wfName string, wfConfig WorkflowConfig, vars []api.CIVariable, environments map[string]appcommon.VCSEnvironment, wfDependencies map[string]dependency.Dependency, networkAllowGlobal []actionsdk.ActionAccessNetwork) (WorkflowData, error) {
 	wfConfig = PreProcessWorkflowConfig(wfConfig, taskContext.Repository)
 
 	// generate plan

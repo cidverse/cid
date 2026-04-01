@@ -106,10 +106,10 @@ jobs:
       {{- if and (eq $step.Stage "scan") (ne $.WorkflowConfig.Type "pull-request") }}
       security-events: write # required: upload security events
       {{- end }}
-      {{- if and (eq $step.Stage "publish") (ne $.WorkflowConfig.Type "pull-request") }}
+      {{- if and (contains $step.Access.Resources "releases") (ne $.WorkflowConfig.Type "pull-request") }}
       contents: write # required: create release
       {{- end }}
-      {{- if and (eq $step.Stage "publish") (ne $.WorkflowConfig.Type "pull-request") }}
+      {{- if and (contains $step.Access.Resources "packages") (ne $.WorkflowConfig.Type "pull-request") }}
       packages: write # required: publication
       {{- end }}
       {{- if eq $step.Name "github-pr-comment" }}

@@ -1,7 +1,7 @@
 package catalog
 
 import (
-	"strings"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
 type Action struct {
@@ -14,85 +14,17 @@ type Action struct {
 }
 
 type ActionMetadata struct {
-	Name          string            `json:"name"`
-	Description   string            `json:"description"`
-	Documentation string            `json:"documentation,omitempty"`
-	Category      string            `json:"category"`
-	Scope         ActionScope       `json:"scope"`
-	Links         map[string]string `json:"links,omitempty"`
-	Rules         []WorkflowRule    `json:"rules,omitempty"`        // Rules define conditions that must be met for the action to be executed
-	RunIfChanged  []string          `json:"runIfChanged,omitempty"` // RunIfChanged defines files that must be changed for the action to be executed
-	Access        ActionAccess      `json:"access,omitempty"`       // Access defines resources that the action may access
-	Input         ActionInput       `json:"input,omitempty"`        // Input defines the inputs that the action may consume
-	Output        ActionOutput      `json:"output,omitempty"`       // Output defines the outputs that the action may produce
-}
-
-type ActionScope string
-
-const (
-	ActionScopeProject ActionScope = "project"
-	ActionScopeModule  ActionScope = "module"
-)
-
-type ActionAccess struct {
-	Environment []ActionAccessEnv        `json:"env,omitempty"`         // Environment variables that the action may access during execution
-	Executables []ActionAccessExecutable `json:"executables,omitempty"` // Executables that the action may invoke during execution
-	Network     []ActionAccessNetwork    `json:"network,omitempty"`     // Network access that the action may use during execution
-}
-
-type ActionAccessEnv struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Pattern     bool   `json:"pattern,omitempty"`
-	Required    bool   `json:"required,omitempty"`
-	Secret      bool   `json:"secret,omitempty"` // Secret indicates that the environment variable holds a secret and should be redacted
-}
-
-type ActionAccessExecutable struct {
-	Name       string `json:"name"`
-	Constraint string `json:"constraint,omitempty"`
-}
-
-type ActionAccessNetwork struct {
-	Host string `json:"host"`
-}
-
-type ActionInput struct {
-	Artifacts []ActionArtifactType `json:"artifacts,omitempty"`
-}
-
-type ActionOutput struct {
-	Artifacts []ActionArtifactType `json:"artifacts,omitempty"`
-}
-
-func (a ActionOutput) ContainsArtifactWithTypeAndFormat(artifactType string, artifactFormat string) bool {
-	for _, artifact := range a.Artifacts {
-		if artifact.Type == artifactType && artifact.Format == artifactFormat {
-			return true
-		}
-	}
-	return false
-}
-
-type ActionArtifactType struct {
-	Type          string `json:"type"`             // Type, e.g. "report", "binary"
-	Format        string `json:"format,omitempty"` // Format, e.g. "sarif"
-	FormatVersion string `json:"format_version,omitempty"`
-}
-
-func (a ActionArtifactType) Key() string {
-	var parts []string
-	if a.Type != "" {
-		parts = append(parts, a.Type)
-	}
-	if a.Format != "" {
-		parts = append(parts, a.Format)
-	}
-	if a.FormatVersion != "" {
-		parts = append(parts, a.FormatVersion)
-	}
-
-	return strings.Join(parts, ":")
+	Name          string                 `json:"name"`
+	Description   string                 `json:"description"`
+	Documentation string                 `json:"documentation,omitempty"`
+	Category      string                 `json:"category"`
+	Scope         actionsdk.ActionScope  `json:"scope"`
+	Links         map[string]string      `json:"links,omitempty"`
+	Rules         []WorkflowRule         `json:"rules,omitempty"`        // Rules define conditions that must be met for the action to be executed
+	RunIfChanged  []string               `json:"runIfChanged,omitempty"` // RunIfChanged defines files that must be changed for the action to be executed
+	Access        actionsdk.ActionAccess `json:"access,omitempty"`       // Access defines resources that the action may access
+	Input         actionsdk.ActionInput  `json:"input,omitempty"`        // Input defines the inputs that the action may consume
+	Output        actionsdk.ActionOutput `json:"output,omitempty"`       // Output defines the outputs that the action may produce
 }
 
 type ActionType string

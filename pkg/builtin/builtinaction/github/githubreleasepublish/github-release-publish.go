@@ -43,7 +43,9 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Required:    true,
 				},
 			},
-			Executables: []actionsdk.ActionAccessExecutable{},
+			Resources: []actionsdk.ActionAccessResource{
+				actionsdk.ResourceReleases,
+			},
 		},
 		Input: actionsdk.ActionInput{
 			Artifacts: []actionsdk.ActionArtifactType{

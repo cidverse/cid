@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
@@ -33,25 +34,25 @@ type Stage struct {
 }
 
 type Step struct {
-	ID                 string               `json:"id"`
-	Name               string               `json:"name"`
-	Slug               string               `json:"slug"`
-	Stage              string               `json:"stage"`
-	Scope              catalog.ActionScope  `json:"scope"`
-	Action             string               `json:"action"`
-	Module             string               `json:"module,omitempty"`
-	ModuleDir          string               `json:"module-dir,omitempty"`             // Directory of the module, if applicable
-	RunAfter           []string             `json:"run-after,omitempty"`              // List of steps that need to be completed before this step starts (by slug)
-	RunAfterByName     []string             `json:"run-after-by-name,omitempty"`      // List of steps that need to be completed before this step starts (by name)
-	RunIfChanged       []string             `json:"run-if-changed,omitempty"`         // List of files that trigger this step if changed
-	UsesOutputOf       []string             `json:"uses-output-of,omitempty"`         // List of steps whose outputs need to be downloaded (by slug)
-	UsesOutputOfByName []string             `json:"uses-output-of-by-name,omitempty"` // List of steps whose outputs need to be downloaded (by name)
-	Environment        string               `json:"environment,omitempty"`
-	Access             catalog.ActionAccess `json:"access,omitempty"`
-	Inputs             catalog.ActionInput  `json:"inputs,omitempty"`
-	Outputs            catalog.ActionOutput `json:"outputs,omitempty"`
-	Order              int                  `json:"order"` // Topological order
-	Config             interface{}          `json:"config,omitempty"`
+	ID                 string                 `json:"id"`
+	Name               string                 `json:"name"`
+	Slug               string                 `json:"slug"`
+	Stage              string                 `json:"stage"`
+	Scope              actionsdk.ActionScope  `json:"scope"`
+	Action             string                 `json:"action"`
+	Module             string                 `json:"module,omitempty"`
+	ModuleDir          string                 `json:"module-dir,omitempty"`             // Directory of the module, if applicable
+	RunAfter           []string               `json:"run-after,omitempty"`              // List of steps that need to be completed before this step starts (by slug)
+	RunAfterByName     []string               `json:"run-after-by-name,omitempty"`      // List of steps that need to be completed before this step starts (by name)
+	RunIfChanged       []string               `json:"run-if-changed,omitempty"`         // List of files that trigger this step if changed
+	UsesOutputOf       []string               `json:"uses-output-of,omitempty"`         // List of steps whose outputs need to be downloaded (by slug)
+	UsesOutputOfByName []string               `json:"uses-output-of-by-name,omitempty"` // List of steps whose outputs need to be downloaded (by name)
+	Environment        string                 `json:"environment,omitempty"`
+	Access             actionsdk.ActionAccess `json:"access,omitempty"`
+	Inputs             actionsdk.ActionInput  `json:"inputs,omitempty"`
+	Outputs            actionsdk.ActionOutput `json:"outputs,omitempty"`
+	Order              int                    `json:"order"` // Topological order
+	Config             interface{}            `json:"config,omitempty"`
 }
 
 func (s *Step) HasOutputWithTypeAndFormat(artifactType string, artifactFormat string) bool {
@@ -64,7 +65,7 @@ func (s *Step) HasOutputWithTypeAndFormat(artifactType string, artifactFormat st
 	return false
 }
 
-func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id int, name string, moduleRef *analyzerapi.ProjectModule, environment string, executableConstraints []catalog.ActionAccessExecutable) Step {
+func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id int, name string, moduleRef *analyzerapi.ProjectModule, environment string, executableConstraints []actionsdk.ActionAccessExecutable) Step {
 	moduleName := ""
 	moduleDir := ""
 	if moduleRef != nil {
@@ -95,10 +96,11 @@ func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id i
 		RunAfter:     []string{},
 		RunIfChanged: catalogAction.Metadata.RunIfChanged,
 		Environment:  environment,
-		Access: catalog.ActionAccess{
+		Access: actionsdk.ActionAccess{
 			Environment: catalogAction.Metadata.Access.Environment,
 			Executables: executableConstraints,
 			Network:     catalogAction.Metadata.Access.Network,
+			Resources:   catalogAction.Metadata.Access.Resources,
 		},
 		Inputs:  catalogAction.Metadata.Input,
 		Outputs: catalogAction.Metadata.Output,

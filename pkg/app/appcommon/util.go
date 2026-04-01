@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
-func RemoveEnvByName(env []catalog.ActionAccessEnv, namesToRemove []string) []catalog.ActionAccessEnv {
+func RemoveEnvByName(env []actionsdk.ActionAccessEnv, namesToRemove []string) []actionsdk.ActionAccessEnv {
 	nameSet := make(map[string]struct{}, len(namesToRemove))
 	for _, name := range namesToRemove {
 		nameSet[name] = struct{}{}
 	}
 
-	var filtered []catalog.ActionAccessEnv
+	var filtered []actionsdk.ActionAccessEnv
 	for _, e := range env {
 		if _, shouldRemove := nameSet[e.Name]; !shouldRemove {
 			filtered = append(filtered, e)

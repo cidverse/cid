@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/cidverse/cid/internal/state"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	"github.com/cidverse/cid/pkg/core/actionexecutor"
 	"github.com/cidverse/cid/pkg/core/catalog"
@@ -40,7 +41,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 	ctx.Config = string(configAsJSON)
 
 	// project-scoped actions
-	if catalogAction.Metadata.Scope == catalog.ActionScopeProject {
+	if catalogAction.Metadata.Scope == actionsdk.ActionScopeProject {
 		ruleContext := rules.GetProjectRuleContext(ctx.Env, ctx.Modules)
 		ruleMatch := rules.AnyRuleMatches(append(action.Rules, catalogAction.Metadata.Rules...), ruleContext)
 		log.Debug().Str("Trace", action.ID).Bool("rules_match", ruleMatch).Msg("check action rules")
@@ -50,7 +51,7 @@ func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, en
 	}
 
 	// module-scoped actions
-	if catalogAction.Metadata.Scope == catalog.ActionScopeModule {
+	if catalogAction.Metadata.Scope == actionsdk.ActionScopeModule {
 		// for each module
 		for _, m := range ctx.Modules {
 			moduleRef := *m

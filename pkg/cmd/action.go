@@ -9,6 +9,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/common/workflowrun"
 	"github.com/cidverse/cid/pkg/context"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/cidverse/cidverseutils/core/clioutputwriter"
@@ -57,7 +58,7 @@ func actionListCmd() *cobra.Command {
 			}
 			for _, action := range cid.Config.Registry.Actions {
 				ruleEvaluation := "?/" + strconv.Itoa(len(action.Metadata.Rules))
-				if action.Metadata.Scope == catalog.ActionScopeProject {
+				if action.Metadata.Scope == actionsdk.ActionScopeProject {
 					ruleEvaluation = rules.EvaluateRulesAsText(action.Metadata.Rules, rules.GetRuleContext(cid.Env))
 				}
 

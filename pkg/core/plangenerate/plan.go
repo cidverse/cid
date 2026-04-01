@@ -7,6 +7,7 @@ import (
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	actionApi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/common/executable"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/cidverse/cid/pkg/util"
@@ -161,7 +162,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 		ctx := actionApi.GetActionContext(context.Modules, context.ProjectDir, context.Environment, catalogAction.Metadata.Access)
 
 		// pin executable constraints
-		var executableConstraints []catalog.ActionAccessExecutable
+		var executableConstraints []actionsdk.ActionAccessExecutable
 		for _, ex := range catalogAction.Metadata.Access.Executables {
 			versionConstraint := ex.Constraint
 			if versionConstraint == "" {
@@ -181,14 +182,14 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 				}
 			}
 
-			executableConstraints = append(executableConstraints, catalog.ActionAccessExecutable{
+			executableConstraints = append(executableConstraints, actionsdk.ActionAccessExecutable{
 				Name:       ex.Name,
 				Constraint: versionConstraint,
 			})
 		}
 
 		// create steps without stage grouping, but store the stage name
-		if catalogAction.Metadata.Scope == catalog.ActionScopeProject {
+		if catalogAction.Metadata.Scope == actionsdk.ActionScopeProject {
 			ruleContext := rules.GetProjectRuleContext(projectEnv(ctx.Env, context.VCSVariables), ctx.Modules)
 			ruleContext["CID_WORKFLOW_TYPE"] = workflowType
 
@@ -206,7 +207,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 					}
 				}
 			}
-		} else if catalogAction.Metadata.Scope == catalog.ActionScopeModule {
+		} else if catalogAction.Metadata.Scope == actionsdk.ActionScopeModule {
 			for _, m := range ctx.Modules {
 				moduleRef := ptr.Value(m)
 				ruleContext := rules.GetModuleRuleContext(projectEnv(ctx.Env, context.VCSVariables), &moduleRef)

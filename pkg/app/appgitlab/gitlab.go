@@ -8,7 +8,7 @@ import (
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/app/apptask"
 	"github.com/cidverse/cid/pkg/constants"
-	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/go-vcsapp/pkg/task/taskcommon"
 )
 
@@ -48,8 +48,8 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool) (apptas
 
 				for i := range wtd.Plan.Steps { // TD-001: add gitlab-sarif-converter to steps that produce SARIF reports, due to automatic report conversion for GitLab
 					if wtd.Plan.Steps[i].Outputs.ContainsArtifactWithTypeAndFormat("report", "sarif") {
-						wtd.Plan.Steps[i].Access.Executables = append(wtd.Plan.Steps[i].Access.Executables, catalog.ActionAccessExecutable{Name: "gitlab-sarif-converter"})
-						wtd.Plan.Steps[i].Outputs.Artifacts = append(wtd.Plan.Steps[i].Outputs.Artifacts, catalog.ActionArtifactType{Type: "report", Format: "gl-codequality"})
+						wtd.Plan.Steps[i].Access.Executables = append(wtd.Plan.Steps[i].Access.Executables, actionsdk.ActionAccessExecutable{Name: "gitlab-sarif-converter"})
+						wtd.Plan.Steps[i].Outputs.Artifacts = append(wtd.Plan.Steps[i].Outputs.Artifacts, actionsdk.ActionArtifactType{Type: "report", Format: "gl-codequality"})
 					}
 				}
 

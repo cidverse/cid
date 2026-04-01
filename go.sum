@@ -60,8 +60,8 @@ github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812 h1:3N+3h/KNdG7wz
 github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812/go.mod h1:idKxSNVgvigegPgr+XgOeH+l42h20r/0k4kIQXASfq0=
 github.com/cidverse/go-vcs v0.0.0-20260331215627-210979a80271 h1:jHNMcKxR/iwXk0fosF6saJMDJjFidcus2/XuxDAase8=
 github.com/cidverse/go-vcs v0.0.0-20260331215627-210979a80271/go.mod h1:h/JKCjNbfHwuJDnu4Mg2yTgs2Z6Pnr1MG0h4n07RT/I=
-github.com/cidverse/go-vcsapp v0.0.0-20260330160848-69a0befaac6b h1:nk+wWqeUx+pPqQQo7N5YO14DPrziLs5kDXZMrMeSsYE=
-github.com/cidverse/go-vcsapp v0.0.0-20260330160848-69a0befaac6b/go.mod h1:Q5GBXQV+gjipX6v5OkgKYP59txgfsO5KEifzcA1MUbU=
+github.com/cidverse/go-vcsapp v0.0.0-20260401215045-cdbcccbe27af h1:fk6P5FUWuTAI2fkVLPhc/9uHQ+xekl9tA8WGEwzz5Co=
+github.com/cidverse/go-vcsapp v0.0.0-20260401215045-cdbcccbe27af/go.mod h1:Ks28EBo4T3yYXV85yqJlv3+BKjgw3pSg6D1rTLOLyWw=
 github.com/cidverse/normalizeci v1.1.1-0.20260401172553-b50f0eb85257 h1:WbjZPC//UNO80shseZrsnIWoZ52ozNS601o23RXJ9Ls=
 github.com/cidverse/normalizeci v1.1.1-0.20260401172553-b50f0eb85257/go.mod h1:3ZrrPlPmNVjQSSmc5QBputj/DutZ2OT1/PBkHqV2Z9w=
 github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b h1:k9ZCfVn6TlxhdjYzj6qQnsaP6eUI1Yd5jLMlYakkcpo=
@@ -267,8 +267,8 @@ github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 h1:EzJWgHo
 github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415/go.mod h1:GwrjFmJcFw6At/Gs6z4yjiIwzuJ1/+UwLxMQDVQXShQ=
 github.com/xeipuuv/gojsonschema v1.2.0 h1:LhYJRs+L4fBtjZUfuSZIKGeVu0QRy8e5Xi7D17UxZ74=
 github.com/xeipuuv/gojsonschema v1.2.0/go.mod h1:anYRn/JVcOK2ZgGU+IjEV4nwlhoK5sQluxsYJ78Id3Y=
-gitlab.com/gitlab-org/api/client-go/v2 v2.12.0 h1:qtp1p1NO3V60qq3GUCt/U/YmlYeb1HrhIc+zLQdbxB0=
-gitlab.com/gitlab-org/api/client-go/v2 v2.12.0/go.mod h1:nwCC627kJqfhrjsK9+yM2hRGmXFbtR5hrIhsav0+EGk=
+gitlab.com/gitlab-org/api/client-go/v2 v2.13.0 h1:+zKLmZ7ZK5vG/JGK0mCnYnpZSRQ5zpBQD3CZTOo/UeA=
+gitlab.com/gitlab-org/api/client-go/v2 v2.13.0/go.mod h1:nwCC627kJqfhrjsK9+yM2hRGmXFbtR5hrIhsav0+EGk=
 go.uber.org/multierr v1.11.0 h1:blXXJkSxSSfBVBlC76pxqeO+LN3aDfLQo+309xJstO0=
 go.uber.org/multierr v1.11.0/go.mod h1:20+QtiLqy0Nd6FdQB9TLXag12DsQkrbs3htMFfDN80Y=
 go.yaml.in/yaml/v3 v3.0.4 h1:tfq32ie2Jv2UxXFdLJdh3jXuOzWiL1fo0bu/FbuKpbc=

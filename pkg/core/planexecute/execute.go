@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/cidverse/cid/internal/state"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	"github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/actionexecutor"
@@ -83,7 +84,7 @@ func RunPlanStep(plan plangenerate.Plan, planContext ExecuteContext, step plange
 	actionContext.Config = &step.Config
 
 	// set CurrentModule ref for module-scoped actions
-	if step.Scope == catalog.ActionScopeModule {
+	if step.Scope == actionsdk.ActionScopeModule {
 		var moduleRef analyzerapi.ProjectModule
 		for _, m := range planContext.Modules {
 			if m.ID == step.Module {

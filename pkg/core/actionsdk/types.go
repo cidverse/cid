@@ -1,5 +1,7 @@
 package actionsdk
 
+import "strings"
+
 // Action is the common interface for all actions
 type Action interface {
 	Metadata() ActionMetadata
@@ -46,7 +48,7 @@ type ActionAccess struct {
 	Environment []ActionAccessEnv        `json:"env,omitempty"`         // Environment variables that the action may access during execution
 	Executables []ActionAccessExecutable `json:"executables,omitempty"` // Executables that the action may invoke during execution
 	Network     []ActionAccessNetwork    `json:"network,omitempty"`     // Network access that the action may use during execution
-	Resource    []ActionAccessResource   `json:"resource,omitempty"`    // Resource the action may access (e.g. releases, tags, ...)
+	Resources   []ActionAccessResource   `json:"resources,omitempty"`   // Resources the action may access (e.g. releases, packages, ...)
 }
 
 type ActionAccessEnv struct {
@@ -66,8 +68,12 @@ type ActionAccessNetwork struct {
 	Host string `json:"host"`
 }
 
-type ActionAccessResource struct {
-}
+type ActionAccessResource string
+
+const (
+	ResourceReleases ActionAccessResource = "releases"
+	ResourcePackages ActionAccessResource = "packages"
+)
 
 type ActionInput struct {
 	Artifacts []ActionArtifactType `json:"artifacts,omitempty"`
@@ -77,8 +83,32 @@ type ActionOutput struct {
 	Artifacts []ActionArtifactType `json:"artifacts,omitempty"`
 }
 
+func (a ActionOutput) ContainsArtifactWithTypeAndFormat(artifactType string, artifactFormat string) bool {
+	for _, artifact := range a.Artifacts {
+		if artifact.Type == artifactType && artifact.Format == artifactFormat {
+			return true
+		}
+	}
+	return false
+}
+
 type ActionArtifactType struct {
 	Type          string `json:"type"`             // Type, e.g. "report", "binary"
 	Format        string `json:"format,omitempty"` // Format, e.g. "sarif"
 	FormatVersion string `json:"format_version,omitempty"`
+}
+
+func (a ActionArtifactType) Key() string {
+	var parts []string
+	if a.Type != "" {
+		parts = append(parts, a.Type)
+	}
+	if a.Format != "" {
+		parts = append(parts, a.Format)
+	}
+	if a.FormatVersion != "" {
+		parts = append(parts, a.FormatVersion)
+	}
+
+	return strings.Join(parts, ":")
 }

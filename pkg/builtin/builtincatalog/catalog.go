@@ -58,66 +58,17 @@ func convertActionMetadata(actionMetadata actionsdk.ActionMetadata) catalog.Acti
 		})
 	}
 
-	var accessEnvironment []catalog.ActionAccessEnv
-	for _, env := range actionMetadata.Access.Environment {
-		accessEnvironment = append(accessEnvironment, catalog.ActionAccessEnv{
-			Name:        env.Name,
-			Description: env.Description,
-			Required:    env.Required,
-			Secret:      env.Secret,
-		})
-	}
-
-	var accessExecutable []catalog.ActionAccessExecutable
-	for _, exec := range actionMetadata.Access.Executables {
-		accessExecutable = append(accessExecutable, catalog.ActionAccessExecutable{
-			Name:       exec.Name,
-			Constraint: exec.Constraint,
-		})
-	}
-
-	var accessNetwork []catalog.ActionAccessNetwork
-	for _, net := range actionMetadata.Access.Network {
-		accessNetwork = append(accessNetwork, catalog.ActionAccessNetwork{
-			Host: net.Host,
-		})
-	}
-
-	var inputArtifacts []catalog.ActionArtifactType
-	for _, artifact := range actionMetadata.Input.Artifacts {
-		inputArtifacts = append(inputArtifacts, catalog.ActionArtifactType{
-			Type:   artifact.Type,
-			Format: artifact.Format,
-		})
-	}
-
-	var outputArtifacts []catalog.ActionArtifactType
-	for _, artifact := range actionMetadata.Output.Artifacts {
-		outputArtifacts = append(outputArtifacts, catalog.ActionArtifactType{
-			Type:   artifact.Type,
-			Format: artifact.Format,
-		})
-	}
-
 	return catalog.ActionMetadata{
 		Name:          actionMetadata.Name,
 		Description:   actionMetadata.Description,
 		Documentation: actionMetadata.Documentation,
 		Category:      actionMetadata.Category,
-		Scope:         catalog.ActionScope(actionMetadata.Scope),
+		Scope:         actionMetadata.Scope,
 		Links:         actionMetadata.Links,
 		Rules:         workflowRules,
 		RunIfChanged:  actionMetadata.RunIfChanged,
-		Access: catalog.ActionAccess{
-			Environment: accessEnvironment,
-			Executables: accessExecutable,
-			Network:     accessNetwork,
-		},
-		Input: catalog.ActionInput{
-			Artifacts: inputArtifacts,
-		},
-		Output: catalog.ActionOutput{
-			Artifacts: outputArtifacts,
-		},
+		Access:        actionMetadata.Access,
+		Input:         actionMetadata.Input,
+		Output:        actionMetadata.Output,
 	}
 }
