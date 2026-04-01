@@ -8,8 +8,6 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlecommon"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/gradle-test"
@@ -25,21 +23,21 @@ type Config struct {
 	WrapperVerification bool   `json:"wrapper_verification" env:"WRAPPER_VERIFICATION"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "gradle-test",
 		Description: `Tests the java module using the configured build system.`,
 		Category:    "test",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "gradle"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name:       "java",
 					Constraint: ">= 21.0.0-0",
@@ -47,8 +45,8 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 			},
 			Network: common.MergeActionAccessNetwork(gradlecommon.NetworkJvm, gradlecommon.NetworkGradle),
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "sarif",
@@ -100,12 +98,12 @@ func (a Action) Execute() (err error) {
 		}
 	}
 
-	gradleWrapper := cidsdk.JoinPath(d.Module.ModuleDir, "gradlew")
+	gradleWrapper := actionsdk.JoinPath(d.Module.ModuleDir, "gradlew")
 	if !a.Sdk.FileExistsV1(gradleWrapper) {
 		return fmt.Errorf("gradle wrapper not found at %s", gradleWrapper)
 	}
 
-	gradleWrapperJar := cidsdk.JoinPath(d.Module.ModuleDir, "gradle", "wrapper", "gradle-wrapper.jar")
+	gradleWrapperJar := actionsdk.JoinPath(d.Module.ModuleDir, "gradle", "wrapper", "gradle-wrapper.jar")
 	if !a.Sdk.FileExistsV1(gradleWrapperJar) {
 		return fmt.Errorf("gradle wrapper jar not found at %s", gradleWrapperJar)
 	}
@@ -134,7 +132,7 @@ func (a Action) Execute() (err error) {
 		Extensions: []string{"jacocoTestReport.xml", ".sarif", ".xml"},
 	})
 	for _, report := range testReports {
-		if strings.HasSuffix(report.Path, cidsdk.JoinPath("build", "reports", "jacoco", "test", "jacocoTestReport.xml")) {
+		if strings.HasSuffix(report.Path, actionsdk.JoinPath("build", "reports", "jacoco", "test", "jacocoTestReport.xml")) {
 			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 				File:   report.Path,
 				Module: d.Module.Slug,
@@ -144,7 +142,7 @@ func (a Action) Execute() (err error) {
 			if err != nil {
 				return err
 			}
-		} else if strings.HasSuffix(report.Path, cidsdk.JoinPath("build", "reports", "checkstyle", "main.sarif")) {
+		} else if strings.HasSuffix(report.Path, actionsdk.JoinPath("build", "reports", "checkstyle", "main.sarif")) {
 			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 				File:   report.Path,
 				Module: d.Module.Slug,

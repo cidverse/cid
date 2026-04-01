@@ -3,7 +3,6 @@ package renovatelint
 import (
 	"fmt"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
@@ -17,21 +16,21 @@ type Action struct {
 type Config struct {
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "renovate-lint",
 		Description: "Lint the Renovate configuration file.",
 		Category:    "sast",
-		Scope:       cidsdk.ActionScopeProject,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeProject,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `contains(PROJECT_CONFIG_TYPES, "renovate")`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "renovate-config-validator",
 				},

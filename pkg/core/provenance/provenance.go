@@ -2,8 +2,9 @@ package provenance
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/internal/state"
 	"time"
+
+	"github.com/cidverse/cid/internal/state"
 
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/normalizeci/pkg/envstruct"

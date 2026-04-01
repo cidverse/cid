@@ -5,8 +5,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmcommon"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/helm-publish-nexus"
@@ -22,20 +20,20 @@ type PublishNexusConfig struct {
 	NexusPassword   string `json:"nexus_password" env:"HELM_NEXUS_PASSWORD"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "helm-publish-nexus",
 		Description: "Publishes the helm chart into a nexus repository server.",
 		Category:    "publish",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "helm" && ENV["HELM_NEXUS_URL"] != ""`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "HELM_NEXUS_URL",
 					Description: "The url of the nexus server.",
@@ -58,15 +56,15 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Secret:      true,
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name:       "helm",
 					Constraint: helmcommon.HelmVersionConstraint,
 				},
 			},
 		},
-		Input: cidsdk.ActionInput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Input: actionsdk.ActionInput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "helm-chart",
 					Format: "tgz",
@@ -85,7 +83,7 @@ func (a Action) Execute() (err error) {
 
 	// parse config
 	cfg := PublishNexusConfig{}
-	cidsdk.PopulateFromEnv(&cfg, d.Env)
+	actionsdk.PopulateFromEnv(&cfg, d.Env)
 
 	// find charts
 	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "helm-chart" && format == "tgz"`})
@@ -99,7 +97,7 @@ func (a Action) Execute() (err error) {
 		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "uploading chart", Context: map[string]interface{}{"chart": artifact.Name}})
 
 		// download
-		chartArchive := cidsdk.JoinPath(d.Config.TempDir, artifact.Name)
+		chartArchive := actionsdk.JoinPath(d.Config.TempDir, artifact.Name)
 		_, err = a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 			ID:         artifact.ArtifactID,
 			TargetFile: chartArchive,

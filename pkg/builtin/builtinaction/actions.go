@@ -1,7 +1,6 @@
 package builtinaction
 
 import (
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/ansible/ansibledeploy"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/ansible/ansiblelint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
@@ -45,9 +44,9 @@ import (
 )
 
 // GetActions returns a map of all actions initialized with the given SDK
-func GetActions(sdk actionsdk.SDKClient) map[string]cidsdk.Action {
+func GetActions(sdk actionsdk.SDKClient) map[string]actionsdk.Action {
 	// actions
-	actions := []cidsdk.Action{
+	actions := []actionsdk.Action{
 		// dotnet
 		dotnetbuild.Action{Sdk: sdk},
 		dotnettest.Action{Sdk: sdk},
@@ -111,7 +110,7 @@ func GetActions(sdk actionsdk.SDKClient) map[string]cidsdk.Action {
 	}
 
 	// as map
-	actionMap := make(map[string]cidsdk.Action, len(actions))
+	actionMap := make(map[string]actionsdk.Action, len(actions))
 	for _, action := range actions {
 		actionMap[action.Metadata().Name] = action
 	}

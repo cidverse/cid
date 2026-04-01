@@ -6,8 +6,6 @@ import (
 	"os"
 	"path"
 	"strings"
-
-	"gopkg.in/yaml.v3"
 )
 
 func PrepareKubeConfig(kubeConfigFile string, environmentName string, env map[string]string) error {

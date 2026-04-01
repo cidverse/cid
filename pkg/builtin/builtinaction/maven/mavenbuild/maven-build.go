@@ -7,8 +7,6 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlecommon"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/maven/mavencommon"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/maven-build"
@@ -22,21 +20,21 @@ type Config struct {
 	WrapperVerification bool   `json:"wrapper_verification" env:"WRAPPER_VERIFICATION"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "maven-build",
 		Description: `Builds the java module using the configured build system.`,
 		Category:    "build",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "maven"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "java",
 				},
@@ -76,7 +74,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// wrapper
-	mavenWrapper := cidsdk.JoinPath(d.Module.ModuleDir, "mvnw")
+	mavenWrapper := actionsdk.JoinPath(d.Module.ModuleDir, "mvnw")
 	isUsingWrapper := a.Sdk.FileExistsV1(mavenWrapper)
 
 	// version

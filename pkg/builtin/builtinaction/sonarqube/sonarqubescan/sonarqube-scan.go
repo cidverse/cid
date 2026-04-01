@@ -10,7 +10,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/util"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/gosimple/slug"
 )
 
@@ -28,24 +27,24 @@ type Config struct {
 	SonarToken         string `json:"sonar_token"  env:"SONAR_TOKEN"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "sonarqube-scan",
 		Description: "Scans the repository for security issues using SonarQube.",
 		Category:    "sast",
-		Scope:       cidsdk.ActionScopeProject,
+		Scope:       actionsdk.ActionScopeProject,
 		Links: map[string]string{
 			"Test Coverage Parameters":  "https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/test-coverage/overview/",
 			"Test Execution Parameters": "https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/test-coverage/test-execution-parameters/",
 		},
-		Rules: []cidsdk.ActionRule{
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `NCI_COMMIT_REF_TYPE == "branch" && getMapValue(ENV, "SONAR_TOKEN") != ""`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "SONAR_HOST_URL",
 					Description: `The SonarQube host URL.`,
@@ -73,12 +72,12 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Secret:      true,
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "sonar-scanner",
 				},
 			},
-			Network: []cidsdk.ActionAccessNetwork{
+			Network: []actionsdk.ActionAccessNetwork{
 				{
 					Host: "sonarcloud.io:443",
 				},
@@ -90,8 +89,8 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				},
 			},
 		},
-		Input: cidsdk.ActionInput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Input: actionsdk.ActionInput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "junit",
@@ -177,7 +176,7 @@ func (a Action) Execute() (err error) {
 	files := make(map[string][]string)
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: fmt.Sprintf("found %d reports with type == report", len(artifacts))})
 	for _, artifact := range artifacts {
-		targetFile := cidsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("%s-%s", artifact.Module, artifact.Name))
+		targetFile := actionsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("%s-%s", artifact.Module, artifact.Name))
 		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 			ID:         artifact.ArtifactID,
 			TargetFile: targetFile,
@@ -231,7 +230,7 @@ func (a Action) Execute() (err error) {
 	var testInclusion []string
 	var testExclusions []string
 	for _, module := range d.Modules {
-		if module.BuildSystem == string(cidsdk.BuildSystemGradle) || module.BuildSystem == string(cidsdk.BuildSystemMaven) {
+		if module.BuildSystem == string(actionsdk.BuildSystemGradle) || module.BuildSystem == string(actionsdk.BuildSystemMaven) {
 			sourceInclusion = append(sourceInclusion, "**/src/main/java/**", "**/src/main/kotlin/**")
 			testInclusion = append(testInclusion, "**/src/test/java/**", "**/src/test/kotlin/**")
 			scanArgs = append(scanArgs, `-D sonar.java.binaries=.`)
@@ -243,13 +242,13 @@ func (a Action) Execute() (err error) {
 
 			/*
 				if module.BuildSystem == analyzerapi.BuildSystemGradle {
-					scanArgs = append(scanArgs, `-D sonar.java.binaries=`+cidsdk.JoinPath(ctx.Paths.Artifact, "**", "classes", "java", "main"))
-					scanArgs = append(scanArgs, `-D sonar.java.test.binaries=`+cidsdk.JoinPath(ctx.Paths.Artifact, "**", "classes", "java", "test"))
+					scanArgs = append(scanArgs, `-D sonar.java.binaries=`+actionsdk.JoinPath(ctx.Paths.Artifact, "**", "classes", "java", "main"))
+					scanArgs = append(scanArgs, `-D sonar.java.test.binaries=`+actionsdk.JoinPath(ctx.Paths.Artifact, "**", "classes", "java", "test"))
 
 					// TODO: figure sth. out for sonar.java.libraries and sonar.java.test.libraries
 				}
 			*/
-		} else if module.BuildSystem == string(cidsdk.BuildSystemGoMod) {
+		} else if module.BuildSystem == string(actionsdk.BuildSystemGoMod) {
 			sourceExclusions = append(sourceExclusions, "**/*_test.go", "**/vendor/**", "**/mocks/**", "**/testdata/*")
 			testInclusion = append(testInclusion, "**/*_test.go")
 			testExclusions = append(testExclusions, "**/vendor/**")

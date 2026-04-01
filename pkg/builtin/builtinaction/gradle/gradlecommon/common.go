@@ -1,7 +1,6 @@
 package gradlecommon
 
 import (
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
@@ -16,8 +15,8 @@ func GradleTestData(env map[string]string, debug bool) *actionsdk.ModuleExecutio
 			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/build.gradle.kts"}},
 			Name:              "my-module",
 			Slug:              "my-module",
-			BuildSystem:       string(cidsdk.BuildSystemGradle),
-			BuildSystemSyntax: string(cidsdk.BuildSystemSyntaxGradleKotlinDSL),
+			BuildSystem:       string(actionsdk.BuildSystemGradle),
+			BuildSystemSyntax: string(actionsdk.BuildSystemSyntaxGradleKotlinDSL),
 			Language:          map[string]string{},
 			Submodules:        nil,
 		},

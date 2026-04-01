@@ -11,7 +11,6 @@ import (
 	"os"
 	"strconv"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cidverseutils/core/ci"
 	gitlab "gitlab.com/gitlab-org/api/client-go/v2"
 )
@@ -27,20 +26,20 @@ type Config struct {
 	GitLabToken string `json:"gitlab_token"  env:"GITLAB_TOKEN"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "gitlab-release-publish",
 		Description: "Publishes a new release on GitLab, including the release notes and artifacts.",
 		Category:    "publish",
-		Scope:       cidsdk.ActionScopeProject,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeProject,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `hasPrefix(ENV["NCI_REPOSITORY_REMOTE"], "https://gitlab.com/")`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "CI_JOB_TOKEN",
 					Description: "The GitLab job token to use for authentication. Preferred over personal access tokens.",
@@ -58,10 +57,10 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Required:    false,
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{},
+			Executables: []actionsdk.ActionAccessExecutable{},
 		},
-		Input: cidsdk.ActionInput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Input: actionsdk.ActionInput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type: "changelog",
 				},
@@ -98,7 +97,7 @@ func (a Action) Execute() (err error) {
 
 	// release notes / changelog
 	var releaseNotes bytes.Buffer
-	changelogFile := cidsdk.JoinPath(d.Config.TempDir, "gitlab.changelog")
+	changelogFile := actionsdk.JoinPath(d.Config.TempDir, "gitlab.changelog")
 	_, changelogErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 		ID:         "root|changelog|gitlab.changelog",
 		TargetFile: changelogFile,
@@ -144,7 +143,7 @@ func (a Action) Execute() (err error) {
 	}
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "searching for artifacts to include in the release", Context: map[string]interface{}{"artifact_count": len(artifacts)}})
 	for _, artifact := range artifacts {
-		targetFile := cidsdk.JoinPath(d.Config.TempDir, artifact.Name)
+		targetFile := actionsdk.JoinPath(d.Config.TempDir, artifact.Name)
 		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 			ID:         artifact.ArtifactID,
 			TargetFile: targetFile,

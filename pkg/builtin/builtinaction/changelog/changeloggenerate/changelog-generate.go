@@ -10,7 +10,6 @@ import (
 
 	"time"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cidverseutils/version"
 )
 
@@ -28,19 +27,19 @@ type Config struct {
 	IssuePrefix   string                        `yaml:"issue_prefix"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "changelog-generate",
 		Description: `Generates a changelog based on the commit history. The default regex expression supports parsing semantic commit messages.`,
 		Category:    "build",
-		Scope:       cidsdk.ActionScopeProject,
-		Rules:       []cidsdk.ActionRule{},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{},
+		Scope:       actionsdk.ActionScopeProject,
+		Rules:       []actionsdk.ActionRule{},
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type: "changelog",
 				},

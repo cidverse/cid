@@ -3,7 +3,6 @@ package npmbuild
 import (
 	"fmt"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/npm/npmcommon"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
@@ -18,26 +17,26 @@ type Action struct {
 type Config struct {
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "npm-build",
 		Description: "Builds a npm.js project",
 		Category:    "build",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "npm"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "npm",
 				},
 			},
-			Network: []cidsdk.ActionAccessNetwork{
+			Network: []actionsdk.ActionAccessNetwork{
 				{
 					Host: "registry.npmjs.org:443",
 				},
@@ -73,7 +72,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// package.json
-	content, err := a.Sdk.FileReadV1(cidsdk.JoinPath(d.Module.ModuleDir, "package.json"))
+	content, err := a.Sdk.FileReadV1(actionsdk.JoinPath(d.Module.ModuleDir, "package.json"))
 	if err != nil {
 		return err
 	}

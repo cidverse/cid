@@ -3,7 +3,6 @@ package cargobuild
 import (
 	"fmt"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargocommon"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
@@ -20,28 +19,28 @@ type Config struct {
 	CargoVersion string `json:"cargo_version"        env:"CARGO_VERSION"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "cargo-build",
 		Description: "Builds a Rust project using cargo.",
 		Category:    "build",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "cargo"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "cargo",
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type: "binary",
 				},
@@ -77,7 +76,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// read cargo package
-	cargoTomlFile := cidsdk.JoinPath(d.Module.ModuleDir, "Cargo.toml")
+	cargoTomlFile := actionsdk.JoinPath(d.Module.ModuleDir, "Cargo.toml")
 	cargoBytes, err := a.Sdk.FileReadV1(cargoTomlFile)
 	if err != nil {
 		return fmt.Errorf("error reading cargo.toml: %v", err)

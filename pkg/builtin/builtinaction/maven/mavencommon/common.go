@@ -1,7 +1,6 @@
 package mavencommon
 
 import (
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
@@ -16,8 +15,8 @@ func MavenTestData(env map[string]string, debug bool) *actionsdk.ModuleExecution
 			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/pom.xml"}},
 			Name:              "my-module",
 			Slug:              "my-module",
-			BuildSystem:       string(cidsdk.BuildSystemMaven),
-			BuildSystemSyntax: string(cidsdk.BuildSystemSyntaxDefault),
+			BuildSystem:       string(actionsdk.BuildSystemMaven),
+			BuildSystemSyntax: string(actionsdk.BuildSystemSyntaxDefault),
 			Language:          map[string]string{},
 			Submodules:        nil,
 		},

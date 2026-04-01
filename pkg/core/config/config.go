@@ -2,6 +2,7 @@ package config
 
 import (
 	"embed"
+
 	"github.com/cidverse/cid/pkg/builtin/builtincatalog"
 
 	"github.com/cidverse/cid/pkg/core/catalog"

@@ -9,8 +9,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	"strings"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/maven-publish"
@@ -30,8 +28,8 @@ type Config struct {
 	GPGSignKeyId            string `json:"gpg_sign_key_id"      env:"MAVEN_GPG_SIGN_KEYID"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name: "maven-publish",
 		Description: `This action publishes maven artifacts.
 
@@ -54,15 +52,15 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
         // Now store the secret key in the MAVEN_GPG_SIGN_PRIVATEKEY
         `,
 		Category: "publish",
-		Scope:    cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:    actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "maven" && getMapValue(ENV, "MAVEN_REPO_URL") != ""`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "MAVEN_VERSION",
 					Description: "Overwrites the version of the maven artifact to publish, defaults to the git tag or branch name.",
@@ -102,7 +100,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Secret:      true,
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "java",
 				},
@@ -152,7 +150,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// wrapper
-	mavenWrapper := cidsdk.JoinPath(d.Module.ModuleDir, "mvnw")
+	mavenWrapper := actionsdk.JoinPath(d.Module.ModuleDir, "mvnw")
 	isUsingWrapper := a.Sdk.FileExistsV1(mavenWrapper)
 
 	// version

@@ -8,8 +8,6 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gocommon"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/sourcegraph/conc/pool"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/go-build"
@@ -22,27 +20,27 @@ type Config struct {
 	Platform []gocommon.Platform `json:"platform"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "go-build",
 		Description: "Builds the go project using go mod, generated binaries are stored for later publication.",
 		Category:    "build",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "gomod"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name:       "go",
 					Constraint: "=> 1.16.0",
 				},
 			},
-			Network: []cidsdk.ActionAccessNetwork{
+			Network: []actionsdk.ActionAccessNetwork{
 				{
 					Host: "proxy.golang.org:443",
 				},
@@ -54,8 +52,8 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type: "binary",
 				},
@@ -140,7 +138,7 @@ func (a Action) Execute() (err error) {
 		}
 
 		wg.Go(func() error {
-			outputFile := cidsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("%s_%s", goos, goarch))
+			outputFile := actionsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("%s_%s", goos, goarch))
 
 			// build
 			buildResult, wgErr := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{

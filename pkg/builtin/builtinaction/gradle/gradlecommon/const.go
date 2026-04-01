@@ -1,17 +1,13 @@
 package gradlecommon
 
-import (
-	cidsdk "github.com/cidverse/cid-sdk-go"
-)
-
 var (
-	NetworkJvm = []cidsdk.ActionAccessNetwork{
+	NetworkJvm = []actionsdk.ActionAccessNetwork{
 		{Host: "repo.maven.apache.org:443"},
 		{Host: "repo1.maven.org:443"},
 		{Host: "kotlinlang.org:443"},
 	}
 
-	NetworkGradle = []cidsdk.ActionAccessNetwork{
+	NetworkGradle = []actionsdk.ActionAccessNetwork{
 		{Host: "plugins.gradle.org:443"},
 		{Host: "plugins-artifacts.gradle.org:443"},
 		{Host: "services.gradle.org:443"}, // gradle wrapper checksum verification
@@ -19,7 +15,7 @@ var (
 		{Host: "jcenter.bintray.com:443"},
 	}
 
-	NetworkPublish = []cidsdk.ActionAccessNetwork{
+	NetworkPublish = []actionsdk.ActionAccessNetwork{
 		{Host: "central.sonatype.com:443"}, // mavenCentral
 		{Host: "maven.pkg.github.com:443"},
 	}

@@ -8,7 +8,6 @@ import (
 
 	"path"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/owenrumney/go-sarif/v3/pkg/report/v210/sarif"
 )
 
@@ -23,20 +22,20 @@ type Config struct {
 	GalaxyRolesDir string `json:"ansible_galaxy_roles_dir"  env:"ANSIBLE_GALAXY_ROLES_DIR"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "ansible-lint",
 		Description: "Lint the ansible playbooks using ansible-lint.",
 		Category:    "sast",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "ansible"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "ansible-lint",
 				},
@@ -45,8 +44,8 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "sarif",
@@ -83,7 +82,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// files
-	reportFile := cidsdk.JoinPath(d.Config.TempDir, "ansiblelint.sarif.json")
+	reportFile := actionsdk.JoinPath(d.Config.TempDir, "ansiblelint.sarif.json")
 
 	// role requirements
 	if a.Sdk.FileExistsV1(path.Join(d.Module.ModuleDir, cfg.GalaxyRolesDir, "requirements.yml")) {

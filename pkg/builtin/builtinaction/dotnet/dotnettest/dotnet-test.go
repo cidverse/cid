@@ -3,7 +3,6 @@ package dotnettest
 import (
 	"fmt"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 
@@ -19,33 +18,33 @@ type Action struct {
 type Config struct {
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "dotnet-test",
 		Description: `Runs the dotnet test command`,
 		Category:    "test",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "dotnet"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "dotnet",
 				},
 			},
-			Network: []cidsdk.ActionAccessNetwork{
+			Network: []actionsdk.ActionAccessNetwork{
 				{
 					Host: "api.nuget.org:443",
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "junit",
@@ -83,8 +82,8 @@ func (a Action) Execute() (err error) {
 	}
 
 	// files
-	junitReport := cidsdk.JoinPath(d.Config.TempDir, "junit.xml")
-	trxReport := cidsdk.JoinPath(d.Config.TempDir, "vstest.trx")
+	junitReport := actionsdk.JoinPath(d.Config.TempDir, "junit.xml")
+	trxReport := actionsdk.JoinPath(d.Config.TempDir, "vstest.trx")
 
 	// restore
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{

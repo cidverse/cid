@@ -5,8 +5,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helm/helmcommon"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/helm-build"
@@ -18,13 +16,13 @@ type Action struct {
 type BuildConfig struct {
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "helm-build",
 		Description: "Builds the helm chart using helm cli.",
 		Category:    "build",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "helm"`,
@@ -33,17 +31,17 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 		RunIfChanged: []string{
 			"**/*",
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name:       "helm",
 					Constraint: helmcommon.HelmVersionConstraint,
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "helm-chart",
 					Format: "tgz",
@@ -62,7 +60,7 @@ func (a Action) Execute() (err error) {
 
 	// parse config
 	cfg := BuildConfig{}
-	cidsdk.PopulateFromEnv(&cfg, d.Env)
+	actionsdk.PopulateFromEnv(&cfg, d.Env)
 
 	// restore the charts/ directory based on the Chart.lock file
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
@@ -76,7 +74,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// parse chart
-	chartFile := cidsdk.JoinPath(d.Module.ModuleDir, "Chart.yaml")
+	chartFile := actionsdk.JoinPath(d.Module.ModuleDir, "Chart.yaml")
 	chartFileContent, err := a.Sdk.FileReadV1(chartFile)
 	if err != nil {
 		return fmt.Errorf("failed to read chart file: %s", err.Error())
@@ -119,7 +117,7 @@ func (a Action) Execute() (err error) {
 
 	// upload charts
 	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
-		File:   cidsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("%s-%s.tgz", chart.Name, chartVersion)),
+		File:   actionsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("%s-%s.tgz", chart.Name, chartVersion)),
 		Module: d.Module.Slug,
 		Type:   "helm-chart",
 		Format: "tgz",

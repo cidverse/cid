@@ -3,13 +3,14 @@ package workflowrun
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cidverse/cid/internal/state"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/cidverse/cid/internal/state"
 
 	"github.com/cidverse/cid/pkg/core/actionexecutor"
 	"github.com/cidverse/cid/pkg/core/catalog"

@@ -1,7 +1,6 @@
 package helmcommon
 
 import (
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
@@ -16,7 +15,7 @@ func GetHelmTestData(env map[string]string, debug bool) *actionsdk.ModuleExecuti
 			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/charts/mychart/Chart.yaml"}},
 			Name:              "my-package",
 			Slug:              "my-package",
-			BuildSystem:       string(cidsdk.BuildSystemHelm),
+			BuildSystem:       string(actionsdk.BuildSystemHelm),
 			BuildSystemSyntax: "default",
 			Language:          map[string]string{},
 			Submodules:        nil,
@@ -47,7 +46,7 @@ func GetHelmfileTestData(env map[string]string, debug bool) *actionsdk.ModuleExe
 			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/Helmfile.yaml"}},
 			Name:              "my-package",
 			Slug:              "my-package",
-			BuildSystem:       string(cidsdk.BuildSystemHelmfile),
+			BuildSystem:       string(actionsdk.BuildSystemHelmfile),
 			BuildSystemSyntax: "default",
 			Language:          map[string]string{},
 			Submodules:        nil,

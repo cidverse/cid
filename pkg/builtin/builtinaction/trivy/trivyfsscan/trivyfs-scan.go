@@ -7,8 +7,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	"strings"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/trivyfs-scan"
@@ -20,34 +18,34 @@ type Action struct {
 type Config struct {
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "trivyfs-scan",
 		Description: "The all-in-one open source security scanner",
 		Category:    "sast",
-		Scope:       cidsdk.ActionScopeProject,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeProject,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `NCI_COMMIT_REF_TYPE == "branch" && size(PROJECT_BUILD_SYSTEMS) > 0`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name:       "trivy",
 					Constraint: "=> 0.61.0",
 				},
 			},
-			Network: []cidsdk.ActionAccessNetwork{
+			Network: []actionsdk.ActionAccessNetwork{
 				{
 					Host: "mirror.gcr.io:443",
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "sarif",
@@ -81,7 +79,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// files
-	reportFile := cidsdk.JoinPath(d.Config.TempDir, "trivyfs.sarif.json")
+	reportFile := actionsdk.JoinPath(d.Config.TempDir, "trivyfs.sarif.json")
 
 	// scan
 	var opts = []string{

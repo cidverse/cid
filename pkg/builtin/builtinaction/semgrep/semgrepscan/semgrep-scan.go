@@ -7,8 +7,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/semgrep-scan"
@@ -21,20 +19,20 @@ type Config struct {
 	RuleSets []string
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "semgrep-scan",
 		Description: "Scans the repository for security issues using semgrep.",
 		Category:    "sast",
-		Scope:       cidsdk.ActionScopeProject,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeProject,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `NCI_COMMIT_REF_TYPE == "branch" && size(PROJECT_BUILD_SYSTEMS) > 0`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "SEMGREP_RULES",
 					Description: "See option --config.",
@@ -45,19 +43,19 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Secret:      true,
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "semgrep",
 				},
 			},
-			Network: []cidsdk.ActionAccessNetwork{
+			Network: []actionsdk.ActionAccessNetwork{
 				{
 					Host: "semgrep.dev:443",
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "sarif",
@@ -89,7 +87,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// files
-	reportFile := cidsdk.JoinPath(d.Config.TempDir, "semgrep.sarif.json")
+	reportFile := actionsdk.JoinPath(d.Config.TempDir, "semgrep.sarif.json")
 
 	// defaults
 	if len(cfg.RuleSets) == 0 {

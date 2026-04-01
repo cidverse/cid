@@ -2,6 +2,7 @@ package cargotoml
 
 import (
 	"fmt"
+
 	"github.com/BurntSushi/toml"
 )
 

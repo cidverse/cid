@@ -10,7 +10,6 @@ import (
 	"github.com/google/go-github/v84/github"
 	"golang.org/x/oauth2"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cidverseutils/version"
 )
 
@@ -24,30 +23,30 @@ type Config struct {
 	GitHubToken string `json:"github_token"  env:"GITHUB_TOKEN"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "github-release-publish",
 		Description: "Publishes a new release on GitHub, including the release notes and artifacts.",
 		Category:    "publish",
-		Scope:       cidsdk.ActionScopeProject,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeProject,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `hasPrefix(ENV["NCI_REPOSITORY_REMOTE"], "https://github.com/")`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "GITHUB_TOKEN",
 					Description: "The GitHub token to use for creating the release.",
 					Required:    true,
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{},
+			Executables: []actionsdk.ActionAccessExecutable{},
 		},
-		Input: cidsdk.ActionInput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Input: actionsdk.ActionInput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type: "changelog",
 				},
@@ -99,7 +98,7 @@ func (a Action) Execute() (err error) {
 	}
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "searching for artifacts to include in the release", Context: map[string]interface{}{"artifact_count": len(artifacts)}})
 	for _, artifact := range artifacts {
-		targetFile := cidsdk.JoinPath(d.Config.TempDir, artifact.Name)
+		targetFile := actionsdk.JoinPath(d.Config.TempDir, artifact.Name)
 		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 			ID:         artifact.ArtifactID,
 			TargetFile: targetFile,
@@ -139,7 +138,7 @@ func (a Action) Execute() (err error) {
 	// release artifacts
 	for _, artifact := range artifacts {
 		err = func() error {
-			targetFile := cidsdk.JoinPath(d.Config.TempDir, artifact.Name)
+			targetFile := actionsdk.JoinPath(d.Config.TempDir, artifact.Name)
 
 			file, err := os.Open(targetFile)
 			if err != nil {

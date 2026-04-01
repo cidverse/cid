@@ -7,8 +7,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	"strings"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/codecov-upload"
@@ -22,20 +20,20 @@ type Config struct {
 	CodecovToken string `json:"codecov_token"  env:"CODECOV_TOKEN"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "codecov-upload",
 		Description: "Uploads the code coverage report to Codecov. Codecov does not automatically post the PR comment as of now, even though we call send-notifications.",
 		Category:    "sast",
-		Scope:       cidsdk.ActionScopeProject,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeProject,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `getMapValue(ENV, "CODECOV_TOKEN") != ""`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "CODECOV_TOKEN",
 					Description: "The Codecov token to use for uploading the report.",
@@ -43,12 +41,12 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Secret:      true,
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "codecov",
 				},
 			},
-			Network: []cidsdk.ActionAccessNetwork{
+			Network: []actionsdk.ActionAccessNetwork{
 				{
 					Host: "ingest.codecov.io:443", // used to prepare report upload
 				},
@@ -60,8 +58,8 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				},
 			},
 		},
-		Input: cidsdk.ActionInput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Input: actionsdk.ActionInput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "junit",
@@ -111,7 +109,7 @@ func (a Action) Execute() (err error) {
 		return err
 	}
 	for _, artifact := range artifacts {
-		targetFile := cidsdk.JoinPath(d.Config.TempDir, artifact.Name)
+		targetFile := actionsdk.JoinPath(d.Config.TempDir, artifact.Name)
 		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 			ID:         artifact.ArtifactID,
 			TargetFile: targetFile,

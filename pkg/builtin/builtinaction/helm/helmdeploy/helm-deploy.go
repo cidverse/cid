@@ -10,7 +10,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/util"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/go-playground/validator/v10"
 	cp "github.com/otiai10/copy"
 )
@@ -31,8 +30,8 @@ type Config struct {
 	HelmArgs                 string `json:"helm_args"                   env:"HELM_ARGS"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "helm-deploy",
 		Description: "The Helm Deploy action is used to deploy a Helm chart to a Kubernetes cluster.",
 		Documentation: util.TrimLeftEachLine(`
@@ -42,15 +41,15 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 			...
 		`),
 		Category: "deploy",
-		Scope:    cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:    actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_DEPLOYMENT_TYPE == "helm"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "DEPLOYMENT_CHART",
 					Description: "The Helm chart to deploy",
@@ -90,7 +89,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Description: "Additional arguments to pass to the helm command",
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name:       "helm",
 					Constraint: helmcommon.HelmVersionConstraint,
@@ -102,7 +101,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 
 func (a Action) GetConfig(env map[string]string) (Config, error) {
 	cfg := Config{}
-	cidsdk.PopulateFromEnv(&cfg, env)
+	actionsdk.PopulateFromEnv(&cfg, env)
 
 	// defaults
 	if cfg.DeploymentNamespace == "" {
@@ -139,7 +138,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// prepare kubeconfig
-	kubeConfigFile := cidsdk.JoinPath(d.Config.TempDir, "kube", "kubeconfig")
+	kubeConfigFile := actionsdk.JoinPath(d.Config.TempDir, "kube", "kubeconfig")
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Starting Helm deployment...", Context: map[string]interface{}{"KUBECONFIG": kubeConfigFile}})
 	err = helmcommon.PrepareKubeConfig(kubeConfigFile, d.Deployment.DeploymentEnvironment, d.Env)
 	if err != nil {
@@ -173,7 +172,7 @@ func (a Action) Execute() (err error) {
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Found Helm chart", Context: map[string]interface{}{"chart-version": chart.Version, "app-version": chart.AppVersion}})
 
 	// properties
-	chartsDir := cidsdk.JoinPath(d.Config.TempDir, "helm-charts")
+	chartsDir := actionsdk.JoinPath(d.Config.TempDir, "helm-charts")
 	chartDir := path.Join(chartsDir, chart.Name)
 	_ = os.MkdirAll(chartsDir, 0755)
 	chartSource := helmcommon.GetChartSource(cfg.DeploymentChart)

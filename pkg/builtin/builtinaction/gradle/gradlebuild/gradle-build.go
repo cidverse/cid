@@ -7,8 +7,6 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gradle/gradlecommon"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/gradle-build"
@@ -22,26 +20,26 @@ type Config struct {
 	MavenVersion        string `json:"maven_version"        env:"MAVEN_VERSION"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "gradle-build",
 		Description: `Builds the java module using the configured build system.`,
 		Category:    "build",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "gradle"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "WRAPPER_VERIFICATION",
 					Description: "Enable verification of the gradle wrapper",
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name:       "java",
 					Constraint: ">= 21.0.0-0",
@@ -86,12 +84,12 @@ func (a Action) Execute() (err error) {
 		}
 	}
 
-	gradleWrapper := cidsdk.JoinPath(d.Module.ModuleDir, "gradlew")
+	gradleWrapper := actionsdk.JoinPath(d.Module.ModuleDir, "gradlew")
 	if !a.Sdk.FileExistsV1(gradleWrapper) {
 		return fmt.Errorf("gradle wrapper not found at %s", gradleWrapper)
 	}
 
-	gradleWrapperJar := cidsdk.JoinPath(d.Module.ModuleDir, "gradle", "wrapper", "gradle-wrapper.jar")
+	gradleWrapperJar := actionsdk.JoinPath(d.Module.ModuleDir, "gradle", "wrapper", "gradle-wrapper.jar")
 	if !a.Sdk.FileExistsV1(gradleWrapperJar) {
 		return fmt.Errorf("gradle wrapper jar not found at %s", gradleWrapperJar)
 	}

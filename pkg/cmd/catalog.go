@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/cidverse/cid/pkg/lib/files"
 	"os"
 	"strings"
 	"sync"
+
+	"github.com/cidverse/cid/pkg/lib/files"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cidverseutils/core/clioutputwriter"

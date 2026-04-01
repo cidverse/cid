@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"fmt"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 
@@ -23,33 +22,33 @@ type Action struct {
 type Config struct {
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "cargo-test",
 		Description: "Tests a Rust project",
 		Category:    "test",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "cargo"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "cargo",
 				},
 			},
-			Network: []cidsdk.ActionAccessNetwork{
+			Network: []actionsdk.ActionAccessNetwork{
 				{
 					Host: "crates.io:443",
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "junit",
@@ -83,7 +82,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// create ci config
-	configFile := cidsdk.JoinPath(d.Config.TempDir, "nextest.toml")
+	configFile := actionsdk.JoinPath(d.Config.TempDir, "nextest.toml")
 	err = a.Sdk.FileWriteV1(configFile, nextestBytes)
 	if err != nil {
 		return fmt.Errorf("error writing nextest config %s: %w", configFile, err)

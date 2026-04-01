@@ -1,8 +1,9 @@
 package api
 
 import (
-	"github.com/cidverse/cid/internal/state"
 	"testing"
+
+	"github.com/cidverse/cid/internal/state"
 
 	commonapi "github.com/cidverse/cid/pkg/common/api"
 	"github.com/cidverse/cid/pkg/core/catalog"

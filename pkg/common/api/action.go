@@ -1,15 +1,16 @@
 package api
 
 import (
-	"github.com/cidverse/cid/internal/state"
-	"github.com/cidverse/cid/pkg/util"
-	"github.com/cidverse/normalizeci/pkg/envstruct"
-	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
 	"log/slog"
 	"os/user"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/cidverse/cid/internal/state"
+	"github.com/cidverse/cid/pkg/util"
+	"github.com/cidverse/normalizeci/pkg/envstruct"
+	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/config"

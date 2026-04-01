@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"os"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction"
 	"github.com/cidverse/cid/pkg/builtin/builtinworkflow"
 	"github.com/cidverse/cid/pkg/constants"
@@ -49,7 +48,7 @@ func InternalCatalog() catalog.Config {
 	}
 }
 
-func convertActionMetadata(actionMetadata cidsdk.ActionMetadata) catalog.ActionMetadata {
+func convertActionMetadata(actionMetadata actionsdk.ActionMetadata) catalog.ActionMetadata {
 	var workflowRules []catalog.WorkflowRule
 	for _, rule := range actionMetadata.Rules {
 		workflowRules = append(workflowRules, catalog.WorkflowRule{

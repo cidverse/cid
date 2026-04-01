@@ -3,7 +3,6 @@ package uvtest
 import (
 	"fmt"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
@@ -17,29 +16,29 @@ type Action struct {
 type Config struct {
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "uv-test",
 		Description: "Runs tests using UV.",
 		Category:    "test",
-		Scope:       cidsdk.ActionScopeModule,
+		Scope:       actionsdk.ActionScopeModule,
 		Links: map[string]string{
 			"project": "https://github.com/astral-sh/uv",
 		},
-		Rules: []cidsdk.ActionRule{
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "pyproject-uv"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "uv",
 				},
 			},
-			Network: []cidsdk.ActionAccessNetwork{
+			Network: []actionsdk.ActionAccessNetwork{
 				{
 					Host: "files.pythonhosted.org:443",
 				},
@@ -48,8 +47,8 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "junit",
@@ -87,8 +86,8 @@ func (a Action) Execute() (err error) {
 	}
 
 	// files
-	reportFile := cidsdk.JoinPath(d.Config.TempDir, "pytest.junit.xml")
-	coverageFile := cidsdk.JoinPath(d.Config.TempDir, "pytest.coverage.xml")
+	reportFile := actionsdk.JoinPath(d.Config.TempDir, "pytest.junit.xml")
+	coverageFile := actionsdk.JoinPath(d.Config.TempDir, "pytest.coverage.xml")
 
 	if d.Module.HasDependencyByTypeAndId("pypi", "pytest") {
 		if d.Module.HasDependencyByTypeAndId("pypi", "pytest-cov") {

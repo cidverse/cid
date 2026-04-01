@@ -8,7 +8,6 @@ import (
 
 	"strings"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/owenrumney/go-sarif/v3/pkg/report/v210/sarif"
 )
 
@@ -21,28 +20,28 @@ type Action struct {
 type Config struct {
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "gitleaks-scan",
 		Description: "Scans the repository for secrets using Gitleaks.",
 		Category:    "sast",
-		Scope:       cidsdk.ActionScopeProject,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeProject,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `NCI_COMMIT_REF_TYPE == "branch" && size(PROJECT_BUILD_SYSTEMS) > 0`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "gitleaks",
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "sarif",
@@ -76,7 +75,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// files
-	reportFile := cidsdk.JoinPath(d.Config.TempDir, "gitleaks.sarif.json")
+	reportFile := actionsdk.JoinPath(d.Config.TempDir, "gitleaks.sarif.json")
 
 	// opts
 	var opts = []string{

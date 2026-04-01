@@ -7,7 +7,6 @@ import (
 	"path"
 	"strings"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
@@ -24,26 +23,26 @@ type Action struct {
 type Config struct {
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "golangci-lint",
 		Description: "Runs golangci-lint to check the code quality of your go project.",
 		Category:    "sast",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "gomod"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "golangci-lint",
 				},
 			},
-			Network: []cidsdk.ActionAccessNetwork{
+			Network: []actionsdk.ActionAccessNetwork{
 				{
 					Host: "proxy.golang.org:443",
 				},
@@ -55,8 +54,8 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "sarif",
@@ -91,11 +90,11 @@ func (a Action) Execute() (err error) {
 
 	// files
 	configFile := ""
-	reportFile := cidsdk.JoinPath(d.Config.TempDir, "golangci-lint.sarif.json")
+	reportFile := actionsdk.JoinPath(d.Config.TempDir, "golangci-lint.sarif.json")
 
 	// if no config is present, create a default config
 	if !a.Sdk.FileExistsV1(path.Join(d.Module.ModuleDir, ".golangci.yml")) && !a.Sdk.FileExistsV1(path.Join(d.Module.ModuleDir, ".golangci.yaml")) && !a.Sdk.FileExistsV1(path.Join(d.Module.ModuleDir, ".golangci.toml")) && !a.Sdk.FileExistsV1(path.Join(d.Module.ModuleDir, ".golangci.json")) {
-		configFile = cidsdk.JoinPath(d.Config.TempDir, ".golangci.yml")
+		configFile = actionsdk.JoinPath(d.Config.TempDir, ".golangci.yml")
 
 		err = os.WriteFile(configFile, defaultConfig, 0644)
 		if err != nil {

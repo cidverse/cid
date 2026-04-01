@@ -1,11 +1,12 @@
 package plangenerate
 
 import (
+	"slices"
+	"strings"
+
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
-	"slices"
-	"strings"
 
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/rules"

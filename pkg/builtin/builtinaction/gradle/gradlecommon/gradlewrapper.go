@@ -9,15 +9,14 @@ import (
 
 	"github.com/cidverse/cid/pkg/lib/hash"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cidverseutils/filesystem"
 )
 
 func VerifyGradleWrapper(moduleDir string) error {
-	gradlewSh := cidsdk.JoinPath(moduleDir, "gradlew")
-	gradlewBat := cidsdk.JoinPath(moduleDir, "gradlew.bat")
-	wrapperJar := cidsdk.JoinPath(moduleDir, "gradle", "wrapper", "gradle-wrapper.jar")
-	wrapperProperties := cidsdk.JoinPath(moduleDir, "gradle", "wrapper", "gradle-wrapper.properties")
+	gradlewSh := actionsdk.JoinPath(moduleDir, "gradlew")
+	gradlewBat := actionsdk.JoinPath(moduleDir, "gradlew.bat")
+	wrapperJar := actionsdk.JoinPath(moduleDir, "gradle", "wrapper", "gradle-wrapper.jar")
+	wrapperProperties := actionsdk.JoinPath(moduleDir, "gradle", "wrapper", "gradle-wrapper.properties")
 
 	// check for presence of gradle wrapper files
 	if !filesystem.FileExists(wrapperProperties) && !filesystem.FileExists(wrapperJar) && !filesystem.FileExists(gradlewSh) && !filesystem.FileExists(gradlewBat) {

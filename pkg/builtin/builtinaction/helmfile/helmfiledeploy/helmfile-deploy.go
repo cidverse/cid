@@ -7,7 +7,6 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/helmfile/helmfilecommon"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -23,20 +22,20 @@ type Config struct {
 	HelmfileArgs          string `json:"helmfile_args"          env:"HELMFILE_ARGS"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "helmfile-deploy",
 		Description: "Deploy a module using helmfile.",
 		Category:    "deploy",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_DEPLOYMENT_TYPE == "helmfile"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "DEPLOYMENT_NAMESPACE",
 					Description: "The namespace the deployment should be created in",
@@ -55,7 +54,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Description: "Additional arguments to pass to the helmfile command",
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name:       "helmfile",
 					Constraint: helmfilecommon.HelmfileVersionConstraint,
@@ -67,7 +66,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 
 func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
-	cidsdk.PopulateFromEnv(&cfg, d.Env)
+	actionsdk.PopulateFromEnv(&cfg, d.Env)
 
 	// defaults
 	if cfg.DeploymentNamespace == "" {
@@ -101,7 +100,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// prepare kubeconfig
-	kubeConfigFile := cidsdk.JoinPath(d.Config.TempDir, "kube", "kubeconfig")
+	kubeConfigFile := actionsdk.JoinPath(d.Config.TempDir, "kube", "kubeconfig")
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Starting Helmfile deployment...", Context: map[string]interface{}{"KUBECONFIG": kubeConfigFile}})
 	err = helmcommon.PrepareKubeConfig(kubeConfigFile, d.Deployment.DeploymentEnvironment, d.Env)
 	if err != nil {

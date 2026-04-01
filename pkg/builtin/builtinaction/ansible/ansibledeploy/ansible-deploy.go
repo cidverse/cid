@@ -7,8 +7,6 @@ import (
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	"path"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/ansible-deploy"
@@ -23,20 +21,20 @@ type Config struct {
 	GalaxyRolesDir string `json:"ansible_galaxy_roles_dir"  env:"ANSIBLE_GALAXY_ROLES_DIR"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "ansible-deploy",
 		Description: "Deploys the ansible playbook using ansible-playbook.",
 		Category:    "deployment",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "ansible"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "ANSIBLE_PLAYBOOK",
 					Description: "The ansible playbook to deploy.",
@@ -46,7 +44,7 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					Description: "The ansible inventory to use. Defaults to 'inventory'.",
 				},
 			},
-			Executables: []cidsdk.ActionAccessExecutable{
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "ansible-playbook",
 				},

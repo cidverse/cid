@@ -6,8 +6,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/zizmor-scan"
@@ -22,24 +20,24 @@ type Config struct {
 	GitHubToken string `json:"github_token"  env:"GITHUB_TOKEN"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "zizmor-scan",
 		Description: "A static analysis tool for GitHub Actions",
 		Category:    "sast",
-		Scope:       cidsdk.ActionScopeProject,
+		Scope:       actionsdk.ActionScopeProject,
 		Links: map[string]string{
 			"repo": "https://github.com/woodruffw/zizmor",
 			"docs": "https://woodruffw.github.io/zizmor/",
 		},
-		Rules: []cidsdk.ActionRule{
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `contains(PROJECT_CONFIG_TYPES, "github-workflow") && NCI_REPOSITORY_HOST_TYPE == "github"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "GH_HOSTNAME",
 					Description: "GH_HOSTNAME is required for some online audits",
@@ -59,15 +57,15 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 					},
 				*/
 			},
-			Executables: []cidsdk.ActionAccessExecutable{
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name:       "zizmor",
 					Constraint: "=> 1.4.1",
 				},
 			},
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "sarif",
@@ -108,7 +106,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// files
-	reportFile := cidsdk.JoinPath(d.Config.TempDir, "zizmor.sarif.json")
+	reportFile := actionsdk.JoinPath(d.Config.TempDir, "zizmor.sarif.json")
 
 	// scan
 	var opts = []string{

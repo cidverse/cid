@@ -3,7 +3,7 @@ package common
 import (
 	"encoding/json"
 	"fmt"
-	cidsdk "github.com/cidverse/cid-sdk-go"
+
 	"github.com/go-playground/validator/v10"
 )
 
@@ -17,7 +17,7 @@ func ParseAndValidateConfig(rawConfig string, env map[string]string, out any) er
 	}
 
 	// Populate from env
-	cidsdk.PopulateFromEnv(out, env)
+	actionsdk.PopulateFromEnv(out, env)
 
 	// Validate the struct
 	validate := validator.New(validator.WithRequiredStructEnabled())
@@ -28,8 +28,8 @@ func ParseAndValidateConfig(rawConfig string, env map[string]string, out any) er
 	return nil
 }
 
-func MergeActionAccessNetwork(groups ...[]cidsdk.ActionAccessNetwork) []cidsdk.ActionAccessNetwork {
-	var merged []cidsdk.ActionAccessNetwork
+func MergeActionAccessNetwork(groups ...[]actionsdk.ActionAccessNetwork) []actionsdk.ActionAccessNetwork {
+	var merged []actionsdk.ActionAccessNetwork
 	for _, group := range groups {
 		merged = append(merged, group...)
 	}

@@ -10,8 +10,6 @@ import (
 
 	"regexp"
 	"strings"
-
-	cidsdk "github.com/cidverse/cid-sdk-go"
 )
 
 const URI = "builtin://actions/maven-test"
@@ -28,21 +26,21 @@ type Config struct {
 	WrapperVerification bool   `json:"wrapper_verification" env:"WRAPPER_VERIFICATION"`
 }
 
-func (a Action) Metadata() cidsdk.ActionMetadata {
-	return cidsdk.ActionMetadata{
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
 		Name:        "maven-test",
 		Description: `Tests the java module using the configured build system.`,
 		Category:    "test",
-		Scope:       cidsdk.ActionScopeModule,
-		Rules: []cidsdk.ActionRule{
+		Scope:       actionsdk.ActionScopeModule,
+		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
 				Expression: `MODULE_BUILD_SYSTEM == "maven"`,
 			},
 		},
-		Access: cidsdk.ActionAccess{
-			Environment: []cidsdk.ActionAccessEnv{},
-			Executables: []cidsdk.ActionAccessExecutable{
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name: "java",
 				},
@@ -52,8 +50,8 @@ func (a Action) Metadata() cidsdk.ActionMetadata {
 			},
 			Network: common.MergeActionAccessNetwork(gradlecommon.NetworkJvm, gradlecommon.NetworkGradle),
 		},
-		Output: cidsdk.ActionOutput{
-			Artifacts: []cidsdk.ActionArtifactType{
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type:   "report",
 					Format: "jacoco",
@@ -94,7 +92,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// wrapper
-	mavenWrapper := cidsdk.JoinPath(d.Module.ModuleDir, "mvnw")
+	mavenWrapper := actionsdk.JoinPath(d.Module.ModuleDir, "mvnw")
 	isUsingWrapper := a.Sdk.FileExistsV1(mavenWrapper)
 
 	// version
@@ -127,7 +125,7 @@ func (a Action) Execute() (err error) {
 	for _, report := range testReports {
 		path := report.Path
 
-		if strings.HasSuffix(path, cidsdk.JoinPath("target", "site", "jacoco", "jacoco.xml")) {
+		if strings.HasSuffix(path, actionsdk.JoinPath("target", "site", "jacoco", "jacoco.xml")) {
 			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 				File:   path,
 				Module: d.Module.Slug,

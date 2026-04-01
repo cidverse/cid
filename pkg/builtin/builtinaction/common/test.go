@@ -3,13 +3,12 @@ package common
 import (
 	"testing"
 
-	cidsdk "github.com/cidverse/cid-sdk-go"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestSetup(t *testing.T) *actionsdk.MockSDKClient {
-	cidsdk.JoinSeparator = "/"
+	actionsdk.JoinSeparator = "/"
 	sdk := actionsdk.NewMockSDKClient(t)
 	sdk.On("LogV1", mock.Anything).Return(nil).Maybe()
 	return sdk
