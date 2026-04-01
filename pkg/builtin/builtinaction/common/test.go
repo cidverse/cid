@@ -34,6 +34,12 @@ func TestProjectData() *actionsdk.ProjectExecutionContextV1Response {
 			"NCI_COMMIT_HASH":            "abcdef123456",
 			"NCI_COMMIT_REF_VCS":         "refs/tags/v1.2.0",
 			"NCI_PROJECT_ID":             "123456",
+			"NCI_PROJECT_NAME":           "cidverse-name",
+			"NCI_PROJECT_NAME_SLUG":      "cidverse-name",
+			"NCI_PROJECT_NAMESPACE":      "cidverse-owner",
+			"NCI_PROJECT_NAMESPACE_SLUG": "cidverse-owner",
+			"NCI_PROJECT_PATH":           "cidverse-owner/cidverse-name",
+			"NCI_PROJECT_PATH_SLUG":      "cidverse-owner-cidverse-name",
 			"NCI_PROJECT_URL":            "https://github.com/cidverse/normalizeci",
 		},
 	}
