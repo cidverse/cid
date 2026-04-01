@@ -74,3 +74,39 @@ func DecryptOpenPGP(privateKey string, privateKeyPassword string, encString stri
 
 	return string(decrypted.Bytes()), nil
 }
+
+// SignOpenPGP signs a message using a private key and returns a detached armored signature
+func SignOpenPGP(privateKey string, privateKeyPassword string, message []byte) (string, error) {
+	// support for base64 encoded private key
+	if !strings.HasPrefix(privateKey, "-----BEGIN PGP PRIVATE KEY BLOCK-----") {
+		decoded, err := DecodeBase64(privateKey)
+		if err != nil {
+			return "", err
+		}
+		privateKey = decoded
+	}
+
+	// decrypt armored private key
+	privKey, err := crypto.NewPrivateKeyFromArmored(privateKey, []byte(privateKeyPassword))
+	if err != nil {
+		return "", err
+	}
+	defer privKey.ClearPrivateParams()
+
+	// sign bytes
+	pgp := crypto.PGPWithProfile(profile.RFC9580())
+	signHandle, err := pgp.Sign().
+		SigningKey(privKey).
+		Detached().
+		New()
+	if err != nil {
+		return "", err
+	}
+
+	signatureBytes, err := signHandle.Sign(message, crypto.Armor)
+	if err != nil {
+		return "", err
+	}
+
+	return string(signatureBytes), nil
+}
