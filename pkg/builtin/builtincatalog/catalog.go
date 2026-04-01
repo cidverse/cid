@@ -8,6 +8,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction"
 	"github.com/cidverse/cid/pkg/builtin/builtinworkflow"
 	"github.com/cidverse/cid/pkg/constants"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/lib/files"
 )

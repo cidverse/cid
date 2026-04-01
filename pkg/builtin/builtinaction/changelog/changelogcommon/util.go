@@ -4,6 +4,7 @@ import (
 	"embed"
 	"errors"
 
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cidverseutils/filesystem"
 )
 

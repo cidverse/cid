@@ -9,6 +9,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/sonarqube/sonarqubecommon"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/util"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 
 	"github.com/gosimple/slug"
 )
@@ -230,7 +231,7 @@ func (a Action) Execute() (err error) {
 	var testInclusion []string
 	var testExclusions []string
 	for _, module := range d.Modules {
-		if module.BuildSystem == string(actionsdk.BuildSystemGradle) || module.BuildSystem == string(actionsdk.BuildSystemMaven) {
+		if module.BuildSystem == string(analyzerapi.BuildSystemGradle) || module.BuildSystem == string(analyzerapi.BuildSystemMaven) {
 			sourceInclusion = append(sourceInclusion, "**/src/main/java/**", "**/src/main/kotlin/**")
 			testInclusion = append(testInclusion, "**/src/test/java/**", "**/src/test/kotlin/**")
 			scanArgs = append(scanArgs, `-D sonar.java.binaries=.`)
@@ -248,7 +249,7 @@ func (a Action) Execute() (err error) {
 					// TODO: figure sth. out for sonar.java.libraries and sonar.java.test.libraries
 				}
 			*/
-		} else if module.BuildSystem == string(actionsdk.BuildSystemGoMod) {
+		} else if module.BuildSystem == string(analyzerapi.BuildSystemGoMod) {
 			sourceExclusions = append(sourceExclusions, "**/*_test.go", "**/vendor/**", "**/mocks/**", "**/testdata/*")
 			testInclusion = append(testInclusion, "**/*_test.go")
 			testExclusions = append(testExclusions, "**/vendor/**")

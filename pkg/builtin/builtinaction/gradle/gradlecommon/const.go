@@ -1,5 +1,7 @@
 package gradlecommon
 
+import "github.com/cidverse/cid/pkg/core/actionsdk"
+
 var (
 	NetworkJvm = []actionsdk.ActionAccessNetwork{
 		{Host: "repo.maven.apache.org:443"},

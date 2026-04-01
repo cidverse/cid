@@ -2,6 +2,7 @@ package gradlecommon
 
 import (
 	"github.com/cidverse/cid/pkg/core/actionsdk"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
 func GradleTestData(env map[string]string, debug bool) *actionsdk.ModuleExecutionContextV1Response {
@@ -15,8 +16,8 @@ func GradleTestData(env map[string]string, debug bool) *actionsdk.ModuleExecutio
 			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/build.gradle.kts"}},
 			Name:              "my-module",
 			Slug:              "my-module",
-			BuildSystem:       string(actionsdk.BuildSystemGradle),
-			BuildSystemSyntax: string(actionsdk.BuildSystemSyntaxGradleKotlinDSL),
+			BuildSystem:       string(analyzerapi.BuildSystemGradle),
+			BuildSystemSyntax: string(analyzerapi.BuildSystemSyntaxGradleKotlinDSL),
 			Language:          map[string]string{},
 			Submodules:        nil,
 		},

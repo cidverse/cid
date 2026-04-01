@@ -2,6 +2,7 @@ package mavencommon
 
 import (
 	"github.com/cidverse/cid/pkg/core/actionsdk"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
 func MavenTestData(env map[string]string, debug bool) *actionsdk.ModuleExecutionContextV1Response {
@@ -15,8 +16,8 @@ func MavenTestData(env map[string]string, debug bool) *actionsdk.ModuleExecution
 			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/pom.xml"}},
 			Name:              "my-module",
 			Slug:              "my-module",
-			BuildSystem:       string(actionsdk.BuildSystemMaven),
-			BuildSystemSyntax: string(actionsdk.BuildSystemSyntaxDefault),
+			BuildSystem:       string(analyzerapi.BuildSystemMaven),
+			BuildSystemSyntax: string(analyzerapi.BuildSystemSyntaxDefault),
 			Language:          map[string]string{},
 			Submodules:        nil,
 		},

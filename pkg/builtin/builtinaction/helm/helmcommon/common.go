@@ -2,6 +2,7 @@ package helmcommon
 
 import (
 	"github.com/cidverse/cid/pkg/core/actionsdk"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
 const HelmVersionConstraint = ">=3.16.0"
@@ -15,7 +16,7 @@ func GetHelmTestData(env map[string]string, debug bool) *actionsdk.ModuleExecuti
 			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/charts/mychart/Chart.yaml"}},
 			Name:              "my-package",
 			Slug:              "my-package",
-			BuildSystem:       string(actionsdk.BuildSystemHelm),
+			BuildSystem:       string(analyzerapi.BuildSystemHelm),
 			BuildSystemSyntax: "default",
 			Language:          map[string]string{},
 			Submodules:        nil,
@@ -46,7 +47,7 @@ func GetHelmfileTestData(env map[string]string, debug bool) *actionsdk.ModuleExe
 			Discovery:         []actionsdk.ProjectModuleDiscovery{{File: "/my-project/Helmfile.yaml"}},
 			Name:              "my-package",
 			Slug:              "my-package",
-			BuildSystem:       string(actionsdk.BuildSystemHelmfile),
+			BuildSystem:       string(analyzerapi.BuildSystemHelmfile),
 			BuildSystemSyntax: "default",
 			Language:          map[string]string{},
 			Submodules:        nil,
