@@ -106,6 +106,7 @@ func (a Action) Execute() (err error) {
 		"--disable-version-check",
 		"--exclude=.dist",
 		"--exclude=.tmp",
+		"--error=false",
 	}
 
 	// ruleSets
