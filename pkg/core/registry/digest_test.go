@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetArtifactDigest(t *testing.T) {
-	digest, err := GetArtifactDigest("quay.io/cidverse/base-ubi:9.1.0-17")
+	digest, err := GetArtifactDigest("ghcr.io/cidverse/build-go:1.25.0")
 	assert.NoError(t, err)
-	assert.Equal(t, "sha256:ef454485d07da2e28caaaf019b033d57a2ded2433b6483367b8335541f74a59c", digest)
+	assert.Equal(t, "sha256:1b991e97bc1aed083633a1060ce7341be4094413c83778b390fecb2db2a8f7c5", digest)
 }
