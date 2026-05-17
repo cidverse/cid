@@ -98,21 +98,17 @@ func (a Action) Execute() (err error) {
 	}
 
 	// scan
-	var opts = []string{
-		"semgrep", "ci",
-		"--text", // output plain text format in stdout
-		"--sarif-output=" + strconv.Quote(reportFile), // output sarif format to file
+	var opts = []string{"semgrep", "ci"}
+	for _, config := range cfg.RuleSets {
+		opts = append(opts, "--config", strconv.Quote(config))
+	}
+	opts = append(opts, "--text", // output plain text format in stdout
+		"--sarif-output="+strconv.Quote(reportFile), // output sarif format to file
 		"--metrics=off",
 		"--disable-version-check",
 		"--exclude=.dist",
 		"--exclude=.tmp",
-		"--error=false",
-	}
-
-	// ruleSets
-	for _, config := range cfg.RuleSets {
-		opts = append(opts, "--config", strconv.Quote(config))
-	}
+		"--suppress-errors")
 
 	// scan
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
@@ -125,6 +121,8 @@ func (a Action) Execute() (err error) {
 	})
 	if err != nil {
 		return err
+	} else if cmdResult.Code == 1 {
+		// we ignore "blocking findings" here and leave this up to whatever consumes the report. See https://semgrep.dev/docs/cli-reference#exit-codes
 	} else if cmdResult.Code != 0 {
 		return fmt.Errorf("failed, exit code %d. error: %s", cmdResult.Code, cmdResult.Stderr)
 	}

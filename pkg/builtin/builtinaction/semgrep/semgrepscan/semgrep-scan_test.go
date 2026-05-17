@@ -15,7 +15,7 @@ func TestSemgrepScan(t *testing.T) {
 	sdk := common.TestSetup(t)
 	sdk.On("ProjectExecutionContextV1").Return(common.TestProjectData(), nil)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: `semgrep ci --text --sarif-output="/my-project/.tmp/semgrep.sarif.json" --metrics=off --disable-version-check --exclude=.dist --exclude=.tmp --error=false --config "p/ci"`,
+		Command: `semgrep ci --config "p/ci" --text --sarif-output="/my-project/.tmp/semgrep.sarif.json" --metrics=off --disable-version-check --exclude=.dist --exclude=.tmp --suppress-errors`,
 		WorkDir: "/my-project",
 		Env: map[string]string{
 			"SEMGREP_APP_TOKEN": "",
