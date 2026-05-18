@@ -7,7 +7,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-	"github.com/google/go-github/v86/github"
+	"github.com/google/go-github/v87/github"
 	"golang.org/x/oauth2"
 
 	"github.com/cidverse/cidverseutils/version"
