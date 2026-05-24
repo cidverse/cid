@@ -10,7 +10,7 @@ import (
 
 	"github.com/cidverse/cidverseutils/compress"
 	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
-	"github.com/google/go-github/v86/github"
+	"github.com/google/go-github/v88/github"
 	"golang.org/x/oauth2"
 )
 
@@ -27,7 +27,10 @@ func GitHubCodeSecuritySarifUpload(githubToken string, sarifFile string, nci nci
 		&oauth2.Token{AccessToken: githubToken},
 	)
 	tc := oauth2.NewClient(context.Background(), ts)
-	client := github.NewClient(tc)
+	client, err := github.NewClient(github.WithHTTPClient(tc))
+	if err != nil {
+		return err
+	}
 
 	// read sarif file
 	reportName := path.Base(sarifFile)

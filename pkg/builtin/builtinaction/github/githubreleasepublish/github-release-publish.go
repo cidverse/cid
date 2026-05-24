@@ -7,7 +7,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-	"github.com/google/go-github/v86/github"
+	"github.com/google/go-github/v88/github"
 	"golang.org/x/oauth2"
 
 	"github.com/cidverse/cidverseutils/version"
@@ -128,7 +128,10 @@ func (a Action) Execute() (err error) {
 	// create client
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.GitHubToken})
 	tc := oauth2.NewClient(ctx, ts)
-	client := github.NewClient(tc)
+	client, err := github.NewClient(github.WithHTTPClient(tc))
+	if err != nil {
+		return err
+	}
 
 	// create release
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "creating github draft release"})
