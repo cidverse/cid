@@ -22,7 +22,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool) (apptas
 			return appconfig.Config{
 				Version:          constants.Version,
 				VersionHash:      constants.BinaryHash,
-				JobTimeout:       10,
+				JobTimeout:       20,
 				RunnerTags:       []string{"saas-linux-small-amd64"},
 				EgressPolicy:     "block",
 				ContainerRuntime: "podman",
