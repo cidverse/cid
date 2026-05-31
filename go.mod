@@ -13,7 +13,7 @@ require (
 	github.com/cidverse/cidverseutils/ci v0.1.0
 	github.com/cidverse/cidverseutils/compress v0.1.2-0.20250308170839-94a75eae5842
 	github.com/cidverse/cidverseutils/containerruntime v0.1.1-0.20250210224234-b2040fc3a6b4
-	github.com/cidverse/cidverseutils/core v0.0.0-20260501011017-285bf67ee5aa
+	github.com/cidverse/cidverseutils/core v0.0.0-20260531142101-3f00ac7f4f03
 	github.com/cidverse/cidverseutils/filesystem v0.1.2-0.20260120202941-ba7eef6381fa
 	github.com/cidverse/cidverseutils/hash v0.1.0
 	github.com/cidverse/cidverseutils/network v0.1.0
