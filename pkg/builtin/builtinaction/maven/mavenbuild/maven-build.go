@@ -42,7 +42,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Name: "mvn",
 				},
 			},
-			Network: common.MergeActionAccessNetwork(gradlecommon.NetworkJvm, gradlecommon.NetworkGradle),
+			Network: common.MergeActionAccessNetwork(gradlecommon.NetworkJvm, gradlecommon.NetworkGradle, gradlecommon.NetworkBuild),
 		},
 	}
 }

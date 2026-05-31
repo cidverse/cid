@@ -17,6 +17,11 @@ var (
 		{Host: "jcenter.bintray.com:443"},
 	}
 
+	NetworkBuild = []actionsdk.ActionAccessNetwork{
+		{Host: "javadoc.io:443"},       // javadocs
+		{Host: "www.javadocs.dev:443"}, // javadocs
+	}
+
 	NetworkPublish = []actionsdk.ActionAccessNetwork{
 		{Host: "central.sonatype.com:443"}, // mavenCentral
 		{Host: "maven.pkg.github.com:443"},

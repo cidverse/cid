@@ -45,7 +45,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Constraint: ">= 21.0.0-0",
 				},
 			},
-			Network: common.MergeActionAccessNetwork(gradlecommon.NetworkJvm, gradlecommon.NetworkGradle),
+			Network: common.MergeActionAccessNetwork(gradlecommon.NetworkJvm, gradlecommon.NetworkGradle, gradlecommon.NetworkBuild),
 		},
 	}
 }
