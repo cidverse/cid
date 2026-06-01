@@ -26,7 +26,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool) (apptas
 				RunnerTags:       []string{"saas-linux-small-amd64"},
 				EgressPolicy:     "block",
 				ContainerRuntime: "podman",
-				Workflows:        appconfig.DefaultWorkflowConfig(taskContext.Repository.DefaultBranch),
+				Workflows:        appconfig.DefaultWorkflowConfig(taskContext.Repository.DefaultBranch, taskContext.Repository.Branches),
 			}, nil
 		},
 		RenderWorkflow: func(workflowState *appconfig.WorkflowState, data apptask.PlatformWorkflowData, template string, targetPath string) (string, error) {

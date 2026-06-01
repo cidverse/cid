@@ -53,7 +53,9 @@ on:
   {{- if .WorkflowConfig.TriggerPullRequest }}
   pull_request:
     branches:
-      - '{{ .DefaultBranch }}'
+      {{- range $branch := .WorkflowConfig.TriggerPushBranches }}
+      - {{ $branch }}
+      {{- end }}
     paths-ignore:
       {{- range $f := .IgnoreFiles }}
       - '{{ $f }}'

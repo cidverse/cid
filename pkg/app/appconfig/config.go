@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
@@ -49,13 +50,18 @@ func PreProcessWorkflowConfig(wfConfig WorkflowConfig, repo api.Repository) Work
 	return wfConfig
 }
 
-func DefaultWorkflowConfig(defaultBranch string) *orderedmap.OrderedMap[string, WorkflowConfig] {
+func DefaultWorkflowConfig(defaultBranch string, branches []string) *orderedmap.OrderedMap[string, WorkflowConfig] {
+	triggerBranches := []string{defaultBranch}
+	if slices.Contains(branches, "develop") && !slices.Contains(triggerBranches, "develop") {
+		triggerBranches = append(triggerBranches, "develop")
+	}
+
 	workflowMap := orderedmap.New[string, WorkflowConfig]()
 	workflowMap.Set("Main", WorkflowConfig{
 		Type:                "main",
 		TriggerManual:       true,
 		TriggerPush:         true,
-		TriggerPushBranches: []string{defaultBranch},
+		TriggerPushBranches: triggerBranches,
 	})
 	workflowMap.Set("Release", WorkflowConfig{
 		Type:               "release",

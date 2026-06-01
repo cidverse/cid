@@ -34,7 +34,7 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext) error {
 		RunnerTags:       []string{},
 		EgressPolicy:     "block",
 		ContainerRuntime: "podman",
-		Workflows:        appconfig.DefaultWorkflowConfig(taskContext.Repository.DefaultBranch),
+		Workflows:        appconfig.DefaultWorkflowConfig(taskContext.Repository.DefaultBranch, taskContext.Repository.Branches),
 	}
 	content, err := taskContext.Platform.FileContent(taskContext.Repository, taskContext.Repository.DefaultBranch, appcommon.ConfigFileName)
 	if err == nil {
