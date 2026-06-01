@@ -53,7 +53,7 @@ on:
   {{- if .WorkflowConfig.TriggerPullRequest }}
   pull_request:
     branches:
-      {{- range $branch := .WorkflowConfig.TriggerPushBranches }}
+      {{- range $branch := .WorkflowConfig.TriggerPullRequestBranches }}
       - {{ $branch }}
       {{- end }}
     paths-ignore:

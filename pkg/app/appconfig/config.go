@@ -27,15 +27,16 @@ type Config struct {
 }
 
 type WorkflowConfig struct {
-	Type                string   `json:"type"` // e.g. "cron", "dispatch", "manual"
-	TriggerManual       bool     `json:"trigger_manual,omitempty"`
-	TriggerSchedule     bool     `json:"trigger_cron,omitempty"`
-	TriggerScheduleCron string   `json:"trigger_cron_schedule,omitempty"`
-	TriggerPush         bool     `json:"trigger_push,omitempty"`
-	TriggerPushBranches []string `json:"trigger_push_branches,omitempty"`
-	TriggerPushTags     []string `json:"trigger_push_tags,omitempty"`
-	TriggerPullRequest  bool     `json:"trigger_pull_request,omitempty"`
-	EnvironmentPattern  string   `json:"environment_pattern,omitempty"` // EnvironmentPattern can be a regex or glob pattern to match which environments should be deployed from this workflow
+	Type                       string   `json:"type"` // e.g. "cron", "dispatch", "manual"
+	TriggerManual              bool     `json:"trigger_manual,omitempty"`
+	TriggerSchedule            bool     `json:"trigger_cron,omitempty"`
+	TriggerScheduleCron        string   `json:"trigger_cron_schedule,omitempty"`
+	TriggerPush                bool     `json:"trigger_push,omitempty"`
+	TriggerPushBranches        []string `json:"trigger_push_branches,omitempty"`
+	TriggerPushTags            []string `json:"trigger_push_tags,omitempty"`
+	TriggerPullRequest         bool     `json:"trigger_pull_request,omitempty"`
+	TriggerPullRequestBranches []string `json:"trigger_pull_request_branches,omitempty"`
+	EnvironmentPattern         string   `json:"environment_pattern,omitempty"` // EnvironmentPattern can be a regex or glob pattern to match which environments should be deployed from this workflow
 }
 
 func PreProcessWorkflowConfig(wfConfig WorkflowConfig, repo api.Repository) WorkflowConfig {
@@ -71,9 +72,10 @@ func DefaultWorkflowConfig(defaultBranch string, branches []string) *orderedmap.
 		EnvironmentPattern: "release-.*",
 	})
 	workflowMap.Set("Pull Request", WorkflowConfig{
-		Type:               "pull-request",
-		TriggerPullRequest: true,
-		EnvironmentPattern: "pr-.*",
+		Type:                       "pull-request",
+		TriggerPullRequest:         true,
+		TriggerPullRequestBranches: triggerBranches,
+		EnvironmentPattern:         "pr-.*",
 	})
 	workflowMap.Set("Nightly", WorkflowConfig{
 		Type:                "nightly",
