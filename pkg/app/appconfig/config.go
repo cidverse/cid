@@ -31,6 +31,7 @@ type WorkflowConfig struct {
 	TriggerManual              bool     `json:"trigger_manual,omitempty"`
 	TriggerSchedule            bool     `json:"trigger_cron,omitempty"`
 	TriggerScheduleCron        string   `json:"trigger_cron_schedule,omitempty"`
+	TriggerScheduleBranches    []string `json:"trigger_schedule_branches,omitempty"`
 	TriggerPush                bool     `json:"trigger_push,omitempty"`
 	TriggerPushBranches        []string `json:"trigger_push_branches,omitempty"`
 	TriggerPushTags            []string `json:"trigger_push_tags,omitempty"`
@@ -78,11 +79,12 @@ func DefaultWorkflowConfig(defaultBranch string, branches []string) *orderedmap.
 		EnvironmentPattern:         "pr-.*",
 	})
 	workflowMap.Set("Nightly", WorkflowConfig{
-		Type:                "nightly",
-		TriggerManual:       true,
-		TriggerSchedule:     true,
-		TriggerScheduleCron: "@weekly",
-		EnvironmentPattern:  "nightly-.*",
+		Type:                    "nightly",
+		TriggerManual:           true,
+		TriggerSchedule:         true,
+		TriggerScheduleCron:     "@weekly",
+		TriggerScheduleBranches: triggerBranches,
+		EnvironmentPattern:      "nightly-.*",
 	})
 
 	return workflowMap
