@@ -34,7 +34,7 @@ require (
 	github.com/hashicorp/go-version v1.9.0
 	github.com/heimdalr/dag v1.5.1
 	github.com/in-toto/in-toto-golang v0.11.0
-	github.com/jarcoal/httpmock v1.4.1
+	github.com/jarcoal/httpmock v1.4.2
 	github.com/jinzhu/configor v1.2.2
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v5 v5.3.1
