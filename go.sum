@@ -64,6 +64,8 @@ github.com/cidverse/go-vcs v0.0.0-20260519220358-81ec25a7ed93 h1:owLLRLqD70c4vjx
 github.com/cidverse/go-vcs v0.0.0-20260519220358-81ec25a7ed93/go.mod h1:cWMiNdkv1eXL8zz55EYNcNONQAaZh4yAEgaL2g3lqZs=
 github.com/cidverse/go-vcsapp v0.0.0-20260724182826-83a403221bab h1:Y0Ku/8PP6x1Ur5YMEuByCC/tH4dnrcBPU9X9B0nKNgM=
 github.com/cidverse/go-vcsapp v0.0.0-20260724182826-83a403221bab/go.mod h1:t4SXQM0ewhfcN+rPTmqeeogH3Pcr6+CHWBrobbwLubk=
+github.com/cidverse/go-vcsapp v0.0.0-20260829113640-79154e4cc33d h1:x/8aZR/9zyHT1eISz8Clo63QOytq1iXsywUzF97J2qg=
+github.com/cidverse/go-vcsapp v0.0.0-20260829113640-79154e4cc33d/go.mod h1:2aC5q1MPr7+PzcoLuy2Ve1oueJ8wxAlra+aT39wULIE=
 github.com/cidverse/normalizeci v1.1.1-0.20260401172553-b50f0eb85257 h1:WbjZPC//UNO80shseZrsnIWoZ52ozNS601o23RXJ9Ls=
 github.com/cidverse/normalizeci v1.1.1-0.20260401172553-b50f0eb85257/go.mod h1:3ZrrPlPmNVjQSSmc5QBputj/DutZ2OT1/PBkHqV2Z9w=
 github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b h1:k9ZCfVn6TlxhdjYzj6qQnsaP6eUI1Yd5jLMlYakkcpo=
@@ -98,6 +100,8 @@ github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399 h1:eMj
 github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399/go.mod h1:1OCfN199q1Jm3HZlxleg+Dw/mwps2Wbk9frAWm+4FII=
 github.com/go-git/go-git/v5 v5.19.1 h1:nX27AnaU43/K5bKktKwgBmR9lawoYVe1Ckg0rgzzN00=
 github.com/go-git/go-git/v5 v5.19.1/go.mod h1:Pb1v0c7/g8aGQJwx9Us09W85yGoyvSwuhEGMH7zjDKQ=
+github.com/go-git/go-git/v5 v5.19.2 h1:wkfn7vOlUBu8ivAWKBWisTiwJK4jYHzTF8Ndv1LyGqY=
+github.com/go-git/go-git/v5 v5.19.2/go.mod h1:QqCBE1EFN5ddFmrliLQ3/ntRCUjZU3EJuwuB/jWEHjk=
 github.com/go-playground/assert/v2 v2.2.0 h1:JvknZsQTYeFEAhQwI4qEt9cyV5ONwRHC+lYKSsYSR8s=
 github.com/go-playground/assert/v2 v2.2.0/go.mod h1:VDjEfimB/XKnb+ZQfWdccd7VUvScMdVu0Titje2rxJ4=
 github.com/go-playground/locales v0.14.1 h1:EWaQ/wswjilfKLTECiXz7Rh+3BjFhfDFKv/oXslEjJA=

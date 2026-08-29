@@ -23,7 +23,7 @@ require (
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812
 	github.com/cidverse/go-vcs v0.0.0-20260519220358-81ec25a7ed93
-	github.com/cidverse/go-vcsapp v0.0.0-20260724182826-83a403221bab
+	github.com/cidverse/go-vcsapp v0.0.0-20260829113640-79154e4cc33d
 	github.com/cidverse/normalizeci v1.1.1-0.20260401172553-b50f0eb85257
 	github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b
 	github.com/go-playground/validator/v10 v10.30.3
@@ -75,7 +75,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.9.1 // indirect
-	github.com/go-git/go-git/v5 v5.19.1 // indirect
+	github.com/go-git/go-git/v5 v5.19.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
