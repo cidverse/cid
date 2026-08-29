@@ -3,7 +3,7 @@ package constants
 import "github.com/cidverse/cid/pkg/util"
 
 var (
-	Version          = "0.11.6"
+	Version          = "0.11.7"
 	CommitHash       = "none"
 	BuildAt          = "unknown"
 	RepositoryStatus = "clean"
