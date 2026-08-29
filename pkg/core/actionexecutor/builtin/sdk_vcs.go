@@ -12,10 +12,17 @@ import (
 )
 
 func (sdk ActionSDK) VCSCommitsV1(request actionsdk.VCSCommitsRequest) ([]*actionsdk.VCSCommit, error) {
+	if len(request.FromHash) == 0 {
+		return nil, fmt.Errorf("parameter has an invalid value: from must not be empty")
+	}
+
 	fromRef, err := vcsapi.NewVCSRefFromString(request.FromHash)
 	if err != nil {
 		return nil, fmt.Errorf("parameter has a invalid value: from: %w", err)
 	}
+
+	// an empty ToHash is a documented contract meaning "no boundary" (walk to
+	// repository root, bounded by limit); it must only be passed deliberately
 	toRef, err := vcsapi.NewVCSRefFromString(request.ToHash)
 	if err != nil {
 		return nil, fmt.Errorf("parameter has a invalid value: to: %w", err)

@@ -6,7 +6,6 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/changelog/changelogcommon"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-	"github.com/cidverse/go-vcs/vcsapi"
 
 	"time"
 
@@ -25,6 +24,7 @@ type Config struct {
 	TitleMaps     map[string]string             `yaml:"title_maps"`
 	NoteKeywords  []changelogcommon.NoteKeyword `yaml:"note_keywords"`
 	IssuePrefix   string                        `yaml:"issue_prefix"`
+	CommitLimit   int                           `yaml:"commit_limit"`
 }
 
 func (a Action) Metadata() actionsdk.ActionMetadata {
@@ -80,6 +80,7 @@ func (a Action) GetConfig(d *actionsdk.ProjectExecutionContextV1Response) (Confi
 				Title:   "Breaking Changes",
 			},
 		},
+		CommitLimit: 1000,
 	}
 
 	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
@@ -108,25 +109,65 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
-	previousRelease := latestReleaseOfSameType(releases, currentRelease)
-	previousReleaseVCSRef := "tag/" + previousRelease.Ref.Value
-	if previousRelease.Ref.Value == "" {
-		previousReleaseVCSRef = ""
+	previousRelease, hasPreviousRelease := resolvePreviousRelease(releases, currentRelease)
+
+	previousReleaseVCSRef := ""
+	previousReleaseVersion := ""
+	if hasPreviousRelease {
+		// the previous release tag must exist in the local repository, the commit
+		// range query would otherwise silently walk to the repository root
+		tags, tagsErr := a.Sdk.VCSTagsV1()
+		if tagsErr != nil {
+			return tagsErr
+		}
+		tagFound := false
+		for _, tag := range tags {
+			if tag.Value == previousRelease.Ref.Value {
+				tagFound = true
+				break
+			}
+		}
+		if !tagFound {
+			return fmt.Errorf("previous release tag %s not found in repository", previousRelease.Ref.Value)
+		}
+
+		previousReleaseVCSRef = "tag/" + previousRelease.Ref.Value
+		previousReleaseVersion = previousRelease.Version
+	} else {
+		// first release: full history is intentional, bounded by the commit limit
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{
+			Level:   "warn",
+			Message: "no previous release found, generating changelog from full history",
+			Context: map[string]interface{}{
+				"release_current": currentRelease,
+			},
+		})
 	}
+
 	c, err := a.Sdk.VCSCommitsV1(actionsdk.VCSCommitsRequest{
 		FromHash: fmt.Sprintf("hash/%s", d.Env["NCI_COMMIT_HASH"]),
 		ToHash:   previousReleaseVCSRef,
-		Limit:    1000,
+		Limit:    cfg.CommitLimit,
 	})
 	if err != nil {
 		return err
+	}
+	if cfg.CommitLimit > 0 && len(c) >= cfg.CommitLimit {
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{
+			Level:   "warn",
+			Message: "commit limit reached, changelog may be truncated",
+			Context: map[string]interface{}{
+				"limit": cfg.CommitLimit,
+				"count": len(c),
+			},
+		})
 	}
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{
 		Level:   "debug",
 		Message: "fetch commits",
 		Context: map[string]interface{}{
 			"release_current":  currentRelease,
-			"release_previous": previousRelease.Version,
+			"release_previous": previousReleaseVersion,
 			"from":             d.Env["NCI_COMMIT_HASH"],
 			"to":               previousReleaseVCSRef,
 			"count":            len(c),
@@ -172,18 +213,63 @@ func (a Action) Execute() (err error) {
 	return nil
 }
 
-func latestReleaseOfSameType(releases []actionsdk.VCSRelease, currentRelease string) actionsdk.VCSRelease {
-	currentReleaseStable := version.IsStable(currentRelease)
+func resolvePreviousRelease(releases []actionsdk.VCSRelease, currentRef string) (actionsdk.VCSRelease, bool) {
+	if version.IsValidSemver(currentRef) {
+		currentRefStable := version.IsStable(currentRef)
+
+		var sameType, anyType actionsdk.VCSRelease
+		foundSameType, foundAnyType := false, false
+
+		for _, release := range releases {
+			compare, compareErr := version.Compare(currentRef, release.Version)
+			if compareErr != nil {
+				continue
+			}
+			if compare <= 0 {
+				continue
+			}
+
+			if !foundAnyType || releaseNewer(release, anyType) {
+				anyType, foundAnyType = release, true
+			}
+			if version.IsStable(release.Version) == currentRefStable && (!foundSameType || releaseNewer(release, sameType)) {
+				sameType, foundSameType = release, true
+			}
+		}
+
+		if foundSameType {
+			return sameType, true
+		}
+		if foundAnyType {
+			return anyType, true
+		}
+
+		return actionsdk.VCSRelease{}, false
+	}
+
+	var stable, anyType actionsdk.VCSRelease
+	foundStable, foundAnyType := false, false
 
 	for _, release := range releases {
-		compare, _ := version.Compare(currentRelease, release.Version)
-		if compare > 0 && version.IsStable(release.Version) == currentReleaseStable {
-			return release
+		if !foundAnyType || releaseNewer(release, anyType) {
+			anyType, foundAnyType = release, true
+		}
+		if version.IsStable(release.Version) && (!foundStable || releaseNewer(release, stable)) {
+			stable, foundStable = release, true
 		}
 	}
 
-	return actionsdk.VCSRelease{
-		Version: "0.0.0",
-		Ref:     vcsapi.VCSRef{},
+	if foundStable {
+		return stable, true
 	}
+	if foundAnyType {
+		return anyType, true
+	}
+
+	return actionsdk.VCSRelease{}, false
+}
+
+func releaseNewer(candidate, current actionsdk.VCSRelease) bool {
+	compare, compareErr := version.Compare(candidate.Version, current.Version)
+	return compareErr == nil && compare > 0
 }
