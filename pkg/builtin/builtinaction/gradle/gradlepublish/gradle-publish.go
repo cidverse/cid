@@ -16,16 +16,26 @@ type Action struct {
 }
 
 type Config struct {
-	WrapperVerification        bool   `json:"wrapper_verification"   env:"WRAPPER_VERIFICATION"`
-	MavenVersion               string `json:"maven_version"           env:"MAVEN_VERSION"`
-	MavenRepositoryUrl         string `json:"maven_repo_url"          env:"MAVEN_REPO_URL"`
-	MavenRepositoryUsername    string `json:"maven_repo_username"     env:"MAVEN_REPO_USERNAME"`
-	MavenRepositoryPassword    string `json:"maven_repo_password"     env:"MAVEN_REPO_PASSWORD"`
-	MavenRepositoryHeaderName  string `json:"maven_repo_header_name"  env:"MAVEN_REPO_HEADER_NAME"`
-	MavenRepositoryHeaderValue string `json:"maven_repo_header_value" env:"MAVEN_REPO_HEADER_VALUE"`
-	GPGSignPrivateKey          string `json:"gpg_sign_private_key"   env:"MAVEN_GPG_SIGN_PRIVATEKEY"`
-	GPGSignPassword            string `json:"gpg_sign_password"       env:"MAVEN_GPG_SIGN_PASSWORD"`
-	GPGSignKeyId               string `json:"gpg_sign_key_id"         env:"MAVEN_GPG_SIGN_KEYID"`
+	WrapperVerification                bool   `json:"wrapper_verification"             env:"WRAPPER_VERIFICATION"`
+	MavenVersion                       string `json:"maven_version"                    env:"MAVEN_VERSION"`
+	MavenRepositoryUrl                 string `json:"maven_repo_url"                   env:"MAVEN_REPO_URL"`
+	MavenRepositoryUsername            string `json:"maven_repo_username"              env:"MAVEN_REPO_USERNAME"`
+	MavenRepositoryPassword            string `json:"maven_repo_password"              env:"MAVEN_REPO_PASSWORD"`
+	MavenRepositoryHeaderName          string `json:"maven_repo_header_name"           env:"MAVEN_REPO_HEADER_NAME"`
+	MavenRepositoryHeaderValue         string `json:"maven_repo_header_value"          env:"MAVEN_REPO_HEADER_VALUE"`
+	MavenRepositoryReleaseUrl          string `json:"maven_repo_release_url"           env:"MAVEN_REPO_RELEASE_URL"`
+	MavenRepositoryReleaseUsername     string `json:"maven_repo_release_username"      env:"MAVEN_REPO_RELEASE_USERNAME"`
+	MavenRepositoryReleasePassword     string `json:"maven_repo_release_password"      env:"MAVEN_REPO_RELEASE_PASSWORD"`
+	MavenRepositoryReleaseHeaderName   string `json:"maven_repo_release_header_name"   env:"MAVEN_REPO_RELEASE_HEADER_NAME"`
+	MavenRepositoryReleaseHeaderValue  string `json:"maven_repo_release_header_value"  env:"MAVEN_REPO_RELEASE_HEADER_VALUE"`
+	MavenRepositorySnapshotUrl         string `json:"maven_repo_snapshot_url"          env:"MAVEN_REPO_SNAPSHOT_URL"`
+	MavenRepositorySnapshotUsername    string `json:"maven_repo_snapshot_username"     env:"MAVEN_REPO_SNAPSHOT_USERNAME"`
+	MavenRepositorySnapshotPassword    string `json:"maven_repo_snapshot_password"     env:"MAVEN_REPO_SNAPSHOT_PASSWORD"`
+	MavenRepositorySnapshotHeaderName  string `json:"maven_repo_snapshot_header_name"  env:"MAVEN_REPO_SNAPSHOT_HEADER_NAME"`
+	MavenRepositorySnapshotHeaderValue string `json:"maven_repo_snapshot_header_value" env:"MAVEN_REPO_SNAPSHOT_HEADER_VALUE"`
+	GPGSignPrivateKey                  string `json:"gpg_sign_private_key"             env:"MAVEN_GPG_SIGN_PRIVATEKEY"`
+	GPGSignPassword                    string `json:"gpg_sign_password"                env:"MAVEN_GPG_SIGN_PASSWORD"`
+	GPGSignKeyId                       string `json:"gpg_sign_key_id"                  env:"MAVEN_GPG_SIGN_KEYID"`
 }
 
 func (a Action) Metadata() actionsdk.ActionMetadata {
@@ -38,6 +48,12 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
         Username and password are not required when publishing to GitHub Packages. (https://maven.pkg.github.com/<your_username>/<your_repository>)
 
         Repositories that authenticate via HTTP header instead of username/password (e.g. a GitLab package registry) can be configured using MAVEN_REPO_HEADER_NAME and MAVEN_REPO_HEADER_VALUE instead of MAVEN_REPO_USERNAME and MAVEN_REPO_PASSWORD.
+
+        **Release and snapshot repositories**
+
+        Artifacts from git tags are published as releases, artifacts from branches are published as snapshots (version suffix -SNAPSHOT).
+        To publish releases and snapshots to different maven repositories, set the MAVEN_REPO_RELEASE_* and MAVEN_REPO_SNAPSHOT_* variables.
+        For their artifact type, the MAVEN_REPO_RELEASE_* and MAVEN_REPO_SNAPSHOT_* variables take precedence over the generic MAVEN_REPO_* variables, unset variables fall back to the generic MAVEN_REPO_* variables.
 
         **Signing**
 
@@ -58,7 +74,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 		Rules: []actionsdk.ActionRule{
 			{
 				Type:       "cel",
-				Expression: `MODULE_BUILD_SYSTEM == "gradle" && getMapValue(ENV, "MAVEN_REPO_URL") != ""`,
+				Expression: `MODULE_BUILD_SYSTEM == "gradle" && (getMapValue(ENV, "MAVEN_REPO_URL") != "" || getMapValue(ENV, "MAVEN_REPO_RELEASE_URL") != "" || getMapValue(ENV, "MAVEN_REPO_SNAPSHOT_URL") != "")`,
 			},
 		},
 		Access: actionsdk.ActionAccess{
@@ -69,8 +85,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				},
 				{
 					Name:        "MAVEN_REPO_URL",
-					Description: "The URL of the maven repository to publish to.",
-					Required:    true,
+					Description: "The URL of the maven repository to publish to, used for releases and snapshots unless MAVEN_REPO_RELEASE_URL or MAVEN_REPO_SNAPSHOT_URL are set.",
 				},
 				{
 					Name:        "MAVEN_REPO_USERNAME",
@@ -89,6 +104,52 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				{
 					Name:        "MAVEN_REPO_HEADER_VALUE",
 					Description: "The value of the HTTP header to use for authentication with the maven repository.",
+					Secret:      true,
+				},
+				{
+					Name:        "MAVEN_REPO_RELEASE_URL",
+					Description: "The URL of the maven repository to publish release artifacts to, takes precedence over MAVEN_REPO_URL for releases.",
+				},
+				{
+					Name:        "MAVEN_REPO_RELEASE_USERNAME",
+					Description: "The username to use for authentication with the maven repository for releases, takes precedence over MAVEN_REPO_USERNAME.",
+					Secret:      true,
+				},
+				{
+					Name:        "MAVEN_REPO_RELEASE_PASSWORD",
+					Description: "The password to use for authentication with the maven repository for releases, takes precedence over MAVEN_REPO_PASSWORD.",
+					Secret:      true,
+				},
+				{
+					Name:        "MAVEN_REPO_RELEASE_HEADER_NAME",
+					Description: "The name of the HTTP header to use for authentication with the maven repository for releases, takes precedence over MAVEN_REPO_HEADER_NAME.",
+				},
+				{
+					Name:        "MAVEN_REPO_RELEASE_HEADER_VALUE",
+					Description: "The value of the HTTP header to use for authentication with the maven repository for releases, takes precedence over MAVEN_REPO_HEADER_VALUE.",
+					Secret:      true,
+				},
+				{
+					Name:        "MAVEN_REPO_SNAPSHOT_URL",
+					Description: "The URL of the maven repository to publish snapshot artifacts to, takes precedence over MAVEN_REPO_URL for snapshots.",
+				},
+				{
+					Name:        "MAVEN_REPO_SNAPSHOT_USERNAME",
+					Description: "The username to use for authentication with the maven repository for snapshots, takes precedence over MAVEN_REPO_USERNAME.",
+					Secret:      true,
+				},
+				{
+					Name:        "MAVEN_REPO_SNAPSHOT_PASSWORD",
+					Description: "The password to use for authentication with the maven repository for snapshots, takes precedence over MAVEN_REPO_PASSWORD.",
+					Secret:      true,
+				},
+				{
+					Name:        "MAVEN_REPO_SNAPSHOT_HEADER_NAME",
+					Description: "The name of the HTTP header to use for authentication with the maven repository for snapshots, takes precedence over MAVEN_REPO_HEADER_NAME.",
+				},
+				{
+					Name:        "MAVEN_REPO_SNAPSHOT_HEADER_VALUE",
+					Description: "The value of the HTTP header to use for authentication with the maven repository for snapshots, takes precedence over MAVEN_REPO_HEADER_VALUE.",
 					Secret:      true,
 				},
 				{
@@ -130,6 +191,11 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config, error) {
 	cfg := Config{}
 
+	// parse config
+	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
+		return cfg, err
+	}
+
 	// version
 	if cfg.MavenVersion == "" {
 		cfg.MavenVersion = gradlecommon.GetVersion(d.Env["NCI_COMMIT_REF_TYPE"], d.Env["NCI_COMMIT_REF_RELEASE"], d.Env["NCI_COMMIT_HASH_SHORT"])
@@ -143,10 +209,6 @@ func (a Action) GetConfig(d *actionsdk.ModuleExecutionContextV1Response) (Config
 		if cfg.MavenRepositoryPassword == "" {
 			cfg.MavenRepositoryPassword = d.Env["GITHUB_TOKEN"]
 		}
-	}
-
-	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
-		return cfg, err
 	}
 
 	return cfg, nil
@@ -196,14 +258,31 @@ func (a Action) Execute() (err error) {
 	}
 
 	// maven repository (project needs to support this)
-	publishEnv["MAVEN_REPO_URL"] = cfg.MavenRepositoryUrl
-	publishEnv["MAVEN_REPO_USERNAME"] = cfg.MavenRepositoryUsername
-	publishEnv["MAVEN_REPO_PASSWORD"] = cfg.MavenRepositoryPassword
-	if cfg.MavenRepositoryHeaderName != "" {
-		publishEnv["MAVEN_REPO_HEADER_NAME"] = cfg.MavenRepositoryHeaderName
+	// release/snapshot specific settings take precedence over the generic ones, unset values fall back to the generic ones
+	repoUrl, repoUsername, repoPassword := cfg.MavenRepositoryUrl, cfg.MavenRepositoryUsername, cfg.MavenRepositoryPassword
+	repoHeaderName, repoHeaderValue := cfg.MavenRepositoryHeaderName, cfg.MavenRepositoryHeaderValue
+	if strings.HasSuffix(cfg.MavenVersion, "-SNAPSHOT") && cfg.MavenRepositorySnapshotUrl != "" {
+		repoUrl = cfg.MavenRepositorySnapshotUrl
+		repoUsername = firstNonEmpty(cfg.MavenRepositorySnapshotUsername, repoUsername)
+		repoPassword = firstNonEmpty(cfg.MavenRepositorySnapshotPassword, repoPassword)
+		repoHeaderName = firstNonEmpty(cfg.MavenRepositorySnapshotHeaderName, repoHeaderName)
+		repoHeaderValue = firstNonEmpty(cfg.MavenRepositorySnapshotHeaderValue, repoHeaderValue)
+	} else if !strings.HasSuffix(cfg.MavenVersion, "-SNAPSHOT") && cfg.MavenRepositoryReleaseUrl != "" {
+		repoUrl = cfg.MavenRepositoryReleaseUrl
+		repoUsername = firstNonEmpty(cfg.MavenRepositoryReleaseUsername, repoUsername)
+		repoPassword = firstNonEmpty(cfg.MavenRepositoryReleasePassword, repoPassword)
+		repoHeaderName = firstNonEmpty(cfg.MavenRepositoryReleaseHeaderName, repoHeaderName)
+		repoHeaderValue = firstNonEmpty(cfg.MavenRepositoryReleaseHeaderValue, repoHeaderValue)
 	}
-	if cfg.MavenRepositoryHeaderValue != "" {
-		publishEnv["MAVEN_REPO_HEADER_VALUE"] = cfg.MavenRepositoryHeaderValue
+
+	publishEnv["MAVEN_REPO_URL"] = repoUrl
+	publishEnv["MAVEN_REPO_USERNAME"] = repoUsername
+	publishEnv["MAVEN_REPO_PASSWORD"] = repoPassword
+	if repoHeaderName != "" {
+		publishEnv["MAVEN_REPO_HEADER_NAME"] = repoHeaderName
+	}
+	if repoHeaderValue != "" {
+		publishEnv["MAVEN_REPO_HEADER_VALUE"] = repoHeaderValue
 	}
 
 	// args
@@ -227,4 +306,14 @@ func (a Action) Execute() (err error) {
 	}
 
 	return nil
+}
+
+func firstNonEmpty(values ...string) string {
+	for _, v := range values {
+		if v != "" {
+			return v
+		}
+	}
+
+	return ""
 }

@@ -62,10 +62,10 @@ github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812 h1:3N+3h/KNdG7wz
 github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812/go.mod h1:idKxSNVgvigegPgr+XgOeH+l42h20r/0k4kIQXASfq0=
 github.com/cidverse/go-vcs v0.0.0-20260519220358-81ec25a7ed93 h1:owLLRLqD70c4vjxBAUT1oGLMEWK1HRsxNG5EXLYiBZI=
 github.com/cidverse/go-vcs v0.0.0-20260519220358-81ec25a7ed93/go.mod h1:cWMiNdkv1eXL8zz55EYNcNONQAaZh4yAEgaL2g3lqZs=
-github.com/cidverse/go-vcsapp v0.0.0-20260724182826-83a403221bab h1:Y0Ku/8PP6x1Ur5YMEuByCC/tH4dnrcBPU9X9B0nKNgM=
-github.com/cidverse/go-vcsapp v0.0.0-20260724182826-83a403221bab/go.mod h1:t4SXQM0ewhfcN+rPTmqeeogH3Pcr6+CHWBrobbwLubk=
 github.com/cidverse/go-vcsapp v0.0.0-20260829113640-79154e4cc33d h1:x/8aZR/9zyHT1eISz8Clo63QOytq1iXsywUzF97J2qg=
 github.com/cidverse/go-vcsapp v0.0.0-20260829113640-79154e4cc33d/go.mod h1:2aC5q1MPr7+PzcoLuy2Ve1oueJ8wxAlra+aT39wULIE=
+github.com/cidverse/go-vcsapp v0.0.0-20260829124324-b6e22ac1ddf7 h1:UjC3KPfBebYtLB/8mPsDsFNo7aLR3/g1y01NaBKDyoU=
+github.com/cidverse/go-vcsapp v0.0.0-20260829124324-b6e22ac1ddf7/go.mod h1:2aC5q1MPr7+PzcoLuy2Ve1oueJ8wxAlra+aT39wULIE=
 github.com/cidverse/normalizeci v1.1.1-0.20260401172553-b50f0eb85257 h1:WbjZPC//UNO80shseZrsnIWoZ52ozNS601o23RXJ9Ls=
 github.com/cidverse/normalizeci v1.1.1-0.20260401172553-b50f0eb85257/go.mod h1:3ZrrPlPmNVjQSSmc5QBputj/DutZ2OT1/PBkHqV2Z9w=
 github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b h1:k9ZCfVn6TlxhdjYzj6qQnsaP6eUI1Yd5jLMlYakkcpo=
@@ -98,8 +98,6 @@ github.com/go-git/go-billy/v5 v5.9.1 h1:8U73XiOTfINdItHVa6z4Gv7ToObcZ6grkqQbLryL
 github.com/go-git/go-billy/v5 v5.9.1/go.mod h1:ExsU+jcGwXTBOnyilvAnEM1wug1IxHr4yP2ZXsNRtV0=
 github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399 h1:eMje31YglSBqCdIqdhKBW8lokaMrL3uTkpGYlE2OOT4=
 github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399/go.mod h1:1OCfN199q1Jm3HZlxleg+Dw/mwps2Wbk9frAWm+4FII=
-github.com/go-git/go-git/v5 v5.19.1 h1:nX27AnaU43/K5bKktKwgBmR9lawoYVe1Ckg0rgzzN00=
-github.com/go-git/go-git/v5 v5.19.1/go.mod h1:Pb1v0c7/g8aGQJwx9Us09W85yGoyvSwuhEGMH7zjDKQ=
 github.com/go-git/go-git/v5 v5.19.2 h1:wkfn7vOlUBu8ivAWKBWisTiwJK4jYHzTF8Ndv1LyGqY=
 github.com/go-git/go-git/v5 v5.19.2/go.mod h1:QqCBE1EFN5ddFmrliLQ3/ntRCUjZU3EJuwuB/jWEHjk=
 github.com/go-playground/assert/v2 v2.2.0 h1:JvknZsQTYeFEAhQwI4qEt9cyV5ONwRHC+lYKSsYSR8s=
@@ -129,6 +127,8 @@ github.com/google/go-github/v88 v88.0.0 h1:dZA9IKkPK1eXZj4ypngnpRj5FwdpTv4whix2P
 github.com/google/go-github/v88 v88.0.0/go.mod h1:rufTDgn2N45wjhukLTyxmvc9nilSp3mr3Rgtt6b1MPw=
 github.com/google/go-github/v89 v89.0.0 h1:35bEK5XoEcF3PZrlVbl9XN63f5BcJRA/UGkxeC9xPg0=
 github.com/google/go-github/v89 v89.0.0/go.mod h1:QLcbU0ipeAqQuR5KSg8c2lql4Qk1EwJ2dWz/0rP4Nho=
+github.com/google/go-github/v90 v90.0.0 h1:EnX9HvTfqvuJbUSWu1/jLrYH6JJLMz0w0qfQVbTxPzE=
+github.com/google/go-github/v90 v90.0.0/go.mod h1:pLzt1FZURZyoTHT5/Z1UQY3b9fYyrbXH6aj7X+qgID4=
 github.com/google/go-querystring v1.2.0 h1:yhqkPbu2/OH+V9BfpCVPZkNmUXhb2gBxJArfhIxNtP0=
 github.com/google/go-querystring v1.2.0/go.mod h1:8IFJqpSRITyJ8QhQ13bmbeMBDfmeEJZD5A0egEOmkqU=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
