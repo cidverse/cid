@@ -16,14 +16,16 @@ type Action struct {
 }
 
 type Config struct {
-	WrapperVerification     bool   `json:"wrapper_verification" env:"WRAPPER_VERIFICATION"`
-	MavenVersion            string `json:"maven_version"        env:"MAVEN_VERSION"`
-	MavenRepositoryUrl      string `json:"maven_repo_url"       env:"MAVEN_REPO_URL"`
-	MavenRepositoryUsername string `json:"maven_repo_username"  env:"MAVEN_REPO_USERNAME"`
-	MavenRepositoryPassword string `json:"maven_repo_password"  env:"MAVEN_REPO_PASSWORD"`
-	GPGSignPrivateKey       string `json:"gpg_sign_private_key" env:"MAVEN_GPG_SIGN_PRIVATEKEY"`
-	GPGSignPassword         string `json:"gpg_sign_password"    env:"MAVEN_GPG_SIGN_PASSWORD"`
-	GPGSignKeyId            string `json:"gpg_sign_key_id"      env:"MAVEN_GPG_SIGN_KEYID"`
+	WrapperVerification        bool   `json:"wrapper_verification"   env:"WRAPPER_VERIFICATION"`
+	MavenVersion               string `json:"maven_version"           env:"MAVEN_VERSION"`
+	MavenRepositoryUrl         string `json:"maven_repo_url"          env:"MAVEN_REPO_URL"`
+	MavenRepositoryUsername    string `json:"maven_repo_username"     env:"MAVEN_REPO_USERNAME"`
+	MavenRepositoryPassword    string `json:"maven_repo_password"     env:"MAVEN_REPO_PASSWORD"`
+	MavenRepositoryHeaderName  string `json:"maven_repo_header_name"  env:"MAVEN_REPO_HEADER_NAME"`
+	MavenRepositoryHeaderValue string `json:"maven_repo_header_value" env:"MAVEN_REPO_HEADER_VALUE"`
+	GPGSignPrivateKey          string `json:"gpg_sign_private_key"   env:"MAVEN_GPG_SIGN_PRIVATEKEY"`
+	GPGSignPassword            string `json:"gpg_sign_password"       env:"MAVEN_GPG_SIGN_PASSWORD"`
+	GPGSignKeyId               string `json:"gpg_sign_key_id"         env:"MAVEN_GPG_SIGN_KEYID"`
 }
 
 func (a Action) Metadata() actionsdk.ActionMetadata {
@@ -34,6 +36,8 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
         **Publication**
 
         Username and password are not required when publishing to GitHub Packages. (https://maven.pkg.github.com/<your_username>/<your_repository>)
+
+        Repositories that authenticate via HTTP header instead of username/password (e.g. a GitLab package registry) can be configured using MAVEN_REPO_HEADER_NAME and MAVEN_REPO_HEADER_VALUE instead of MAVEN_REPO_USERNAME and MAVEN_REPO_PASSWORD.
 
         **Signing**
 
@@ -76,6 +80,15 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				{
 					Name:        "MAVEN_REPO_PASSWORD",
 					Description: "The password to use for authentication with the maven repository.",
+					Secret:      true,
+				},
+				{
+					Name:        "MAVEN_REPO_HEADER_NAME",
+					Description: "The name of the HTTP header to use for authentication with the maven repository (e.g. Deploy-Token for a GitLab package registry), use this instead of MAVEN_REPO_USERNAME and MAVEN_REPO_PASSWORD.",
+				},
+				{
+					Name:        "MAVEN_REPO_HEADER_VALUE",
+					Description: "The value of the HTTP header to use for authentication with the maven repository.",
 					Secret:      true,
 				},
 				{
@@ -186,6 +199,12 @@ func (a Action) Execute() (err error) {
 	publishEnv["MAVEN_REPO_URL"] = cfg.MavenRepositoryUrl
 	publishEnv["MAVEN_REPO_USERNAME"] = cfg.MavenRepositoryUsername
 	publishEnv["MAVEN_REPO_PASSWORD"] = cfg.MavenRepositoryPassword
+	if cfg.MavenRepositoryHeaderName != "" {
+		publishEnv["MAVEN_REPO_HEADER_NAME"] = cfg.MavenRepositoryHeaderName
+	}
+	if cfg.MavenRepositoryHeaderValue != "" {
+		publishEnv["MAVEN_REPO_HEADER_VALUE"] = cfg.MavenRepositoryHeaderValue
+	}
 
 	// args
 	publishArgs := []string{

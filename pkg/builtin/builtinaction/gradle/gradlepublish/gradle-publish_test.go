@@ -34,3 +34,30 @@ func TestGradlePublish(t *testing.T) {
 	err := action.Execute()
 	assert.NoError(t, err)
 }
+
+func TestGradlePublishWithHeaderAuth(t *testing.T) {
+	sdk := common.TestSetup(t)
+	sdk.On("ModuleExecutionContextV1").Return(gradlecommon.GradleTestData(map[string]string{
+		"WRAPPER_VERIFICATION":    "false",
+		"MAVEN_REPO_URL":          "https://gitlab.com/api/v4/groups/primelib/-/packages/maven",
+		"MAVEN_REPO_HEADER_NAME":  "Deploy-Token",
+		"MAVEN_REPO_HEADER_VALUE": "deploy-token-value",
+	}, false), nil)
+	sdk.On("FileExistsV1", "/my-project/gradlew").Return(true)
+	sdk.On("FileExistsV1", "/my-project/gradle/wrapper/gradle-wrapper.jar").Return(true)
+	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
+		Command: `java -Dorg.gradle.appname="gradlew" -classpath "/my-project/gradle/wrapper/gradle-wrapper.jar" org.gradle.wrapper.GradleWrapperMain -Pversion="1.0.0" publish --no-daemon --warning-mode=all --console=plain --stacktrace`,
+		WorkDir: "/my-project",
+		Env: map[string]string{
+			"MAVEN_REPO_URL":          "https://gitlab.com/api/v4/groups/primelib/-/packages/maven",
+			"MAVEN_REPO_USERNAME":     "",
+			"MAVEN_REPO_PASSWORD":     "",
+			"MAVEN_REPO_HEADER_NAME":  "Deploy-Token",
+			"MAVEN_REPO_HEADER_VALUE": "deploy-token-value",
+		},
+	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
+
+	action := Action{Sdk: sdk}
+	err := action.Execute()
+	assert.NoError(t, err)
+}
