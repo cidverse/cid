@@ -275,6 +275,12 @@ func (a Action) Execute() (err error) {
 		repoHeaderValue = firstNonEmpty(cfg.MavenRepositoryReleaseHeaderValue, repoHeaderValue)
 	}
 
+	// no repository configured for this artifact type (e.g. only a release repository is set but a snapshot is built), skip the publish
+	if repoUrl == "" {
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "no maven target repo configured, skipping publish"})
+		return nil
+	}
+
 	publishEnv["MAVEN_REPO_URL"] = repoUrl
 	publishEnv["MAVEN_REPO_USERNAME"] = repoUsername
 	publishEnv["MAVEN_REPO_PASSWORD"] = repoPassword

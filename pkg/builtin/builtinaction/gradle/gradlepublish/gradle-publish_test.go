@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestGradlePublish(t *testing.T) {
@@ -92,6 +93,22 @@ func TestGradlePublishSnapshotRepository(t *testing.T) {
 	action := Action{Sdk: sdk}
 	err := action.Execute()
 	assert.NoError(t, err)
+}
+
+func TestGradlePublishNoRepoConfigured(t *testing.T) {
+	sdk := common.TestSetup(t)
+	sdk.On("ModuleExecutionContextV1").Return(gradlecommon.GradleTestData(map[string]string{
+		"WRAPPER_VERIFICATION":   "false",
+		"MAVEN_VERSION":          "2.0.0-SNAPSHOT",
+		"MAVEN_REPO_RELEASE_URL": "http://localhost:9101/releases",
+	}, false), nil)
+	sdk.On("FileExistsV1", "/my-project/gradlew").Return(true)
+	sdk.On("FileExistsV1", "/my-project/gradle/wrapper/gradle-wrapper.jar").Return(true)
+
+	action := Action{Sdk: sdk}
+	err := action.Execute()
+	assert.NoError(t, err)
+	sdk.AssertNotCalled(t, "ExecuteCommandV1", mock.Anything)
 }
 
 func TestGradlePublishWithHeaderAuth(t *testing.T) {
