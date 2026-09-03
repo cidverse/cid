@@ -62,8 +62,6 @@ github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812 h1:3N+3h/KNdG7wz
 github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812/go.mod h1:idKxSNVgvigegPgr+XgOeH+l42h20r/0k4kIQXASfq0=
 github.com/cidverse/go-vcs v0.0.0-20260519220358-81ec25a7ed93 h1:owLLRLqD70c4vjxBAUT1oGLMEWK1HRsxNG5EXLYiBZI=
 github.com/cidverse/go-vcs v0.0.0-20260519220358-81ec25a7ed93/go.mod h1:cWMiNdkv1eXL8zz55EYNcNONQAaZh4yAEgaL2g3lqZs=
-github.com/cidverse/go-vcsapp v0.0.0-20260829113640-79154e4cc33d h1:x/8aZR/9zyHT1eISz8Clo63QOytq1iXsywUzF97J2qg=
-github.com/cidverse/go-vcsapp v0.0.0-20260829113640-79154e4cc33d/go.mod h1:2aC5q1MPr7+PzcoLuy2Ve1oueJ8wxAlra+aT39wULIE=
 github.com/cidverse/go-vcsapp v0.0.0-20260829124324-b6e22ac1ddf7 h1:UjC3KPfBebYtLB/8mPsDsFNo7aLR3/g1y01NaBKDyoU=
 github.com/cidverse/go-vcsapp v0.0.0-20260829124324-b6e22ac1ddf7/go.mod h1:2aC5q1MPr7+PzcoLuy2Ve1oueJ8wxAlra+aT39wULIE=
 github.com/cidverse/normalizeci v1.1.1-0.20260401172553-b50f0eb85257 h1:WbjZPC//UNO80shseZrsnIWoZ52ozNS601o23RXJ9Ls=
@@ -106,8 +104,8 @@ github.com/go-playground/locales v0.14.1 h1:EWaQ/wswjilfKLTECiXz7Rh+3BjFhfDFKv/o
 github.com/go-playground/locales v0.14.1/go.mod h1:hxrqLVvrK65+Rwrd5Fc6F2O76J/NuW9t0sjnWqG1slY=
 github.com/go-playground/universal-translator v0.18.1 h1:Bcnm0ZwsGyWbCzImXv+pAJnYK9S473LQFuzCbDbfSFY=
 github.com/go-playground/universal-translator v0.18.1/go.mod h1:xekY+UJKNuX9WP91TpwSH2VMlDf28Uj24BCp08ZFTUY=
-github.com/go-playground/validator/v10 v10.30.3 h1:4MU6YkEwx7GbcPJOZxrtbu+QfF3pJLJuaYTeAH0DYy8=
-github.com/go-playground/validator/v10 v10.30.3/go.mod h1:4Axh7oCNGcoGkqLoE4YWt6n20mcEIsPRlB7vPk3lpyc=
+github.com/go-playground/validator/v10 v10.30.4 h1:9Rcod2ZPO6mOEG6b4GqyoHE/H6//Ze0RuhOo1hT1x0w=
+github.com/go-playground/validator/v10 v10.30.4/go.mod h1:numpT+RPLE91R9oYWMY/R9zRgJBewr3IXHko4OISPpk=
 github.com/go-resty/resty/v2 v2.17.2 h1:FQW5oHYcIlkCNrMD2lloGScxcHJ0gkjshV3qcQAyHQk=
 github.com/go-resty/resty/v2 v2.17.2/go.mod h1:kCKZ3wWmwJaNc7S29BRtUhJwy7iqmn+2mLtQrOyQlVA=
 github.com/go-test/deep v1.1.0 h1:WOcxcdHcvdgThNXjw0t76K42FXTU7HpNQWHpA2HHNlg=
