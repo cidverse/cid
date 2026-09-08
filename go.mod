@@ -3,7 +3,7 @@ module github.com/cidverse/cid
 //go:platform linux/amd64
 //go:platform darwin/amd64
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/BurntSushi/toml v1.6.0
@@ -50,7 +50,7 @@ require (
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	gitlab.com/gitlab-org/api/client-go/v2 v2.63.0
 	go.yaml.in/yaml/v3 v3.0.5
-	golang.org/x/oauth2 v0.36.0
+	golang.org/x/oauth2 v0.37.0
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.6.2
 )
