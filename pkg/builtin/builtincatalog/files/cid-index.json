@@ -3474,6 +3474,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "go",
+        "Version": "1.27.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/build-go:1.27.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "golangci-lint",
         "Version": "2.1.2",
         "Type": "container",
