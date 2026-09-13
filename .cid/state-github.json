@@ -1,10 +1,10 @@
 {
   "workflows": {
     "Nightly": {
-      "version": "0.11.0",
+      "version": "0.11.9",
       "name": "Nightly",
       "name_slug": "nightly",
-      "job_timeout": 10,
+      "job_timeout": 20,
       "default_branch": "main",
       "container_runtime": "podman",
       "workflow_key": "nightly",
@@ -13,6 +13,9 @@
         "trigger_manual": true,
         "trigger_cron": true,
         "trigger_cron_schedule": "26 0 * * 6",
+        "trigger_schedule_branches": [
+          "main"
+        ],
         "environment_pattern": "nightly-.*"
       },
       "plan": {
@@ -649,13 +652,13 @@
         "pkg:github-action-runner-image/ubuntu": {
           "id": "ubuntu",
           "type": "github-action-runner-image",
-          "version": "24.04"
+          "version": "26.04"
         },
         "pkg:github-action/actions/checkout": {
           "id": "actions/checkout",
           "type": "github-action",
-          "version": "v6.0.2",
-          "hash": "de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+          "version": "v7.0.1",
+          "hash": "3d3c42e5aac5ba805825da76410c181273ba90b1"
         },
         "pkg:github-action/actions/download-artifact": {
           "id": "actions/download-artifact",
@@ -672,14 +675,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.19.3",
-          "hash": "ab7a9404c0f3da075243ca237b5fac12c98deaa5"
+          "version": "v2.21.1",
+          "hash": "e14015d583714f6e62063499dc959a02595150a1"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.0",
-          "hash": "54a17e1d59e924e4e612efc33fc33a855806e3aaf120dec88fca94101e452beb",
+          "version": "0.11.9",
+          "hash": "af1f9497a8f84f7c8fa85f700b4645b14faa7e5dce4568d924fda0d7a1ace579",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
@@ -695,16 +698,19 @@
       ]
     },
     "Pull Request": {
-      "version": "0.11.0",
+      "version": "0.11.9",
       "name": "Pull Request",
       "name_slug": "pull-request",
-      "job_timeout": 10,
+      "job_timeout": 20,
       "default_branch": "main",
       "container_runtime": "podman",
       "workflow_key": "pull-request",
       "workflow_config": {
         "type": "pull-request",
         "trigger_pull_request": true,
+        "trigger_pull_request_branches": [
+          "main"
+        ],
         "environment_pattern": "pr-.*"
       },
       "plan": {
@@ -1341,13 +1347,13 @@
         "pkg:github-action-runner-image/ubuntu": {
           "id": "ubuntu",
           "type": "github-action-runner-image",
-          "version": "24.04"
+          "version": "26.04"
         },
         "pkg:github-action/actions/checkout": {
           "id": "actions/checkout",
           "type": "github-action",
-          "version": "v6.0.2",
-          "hash": "de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+          "version": "v7.0.1",
+          "hash": "3d3c42e5aac5ba805825da76410c181273ba90b1"
         },
         "pkg:github-action/actions/download-artifact": {
           "id": "actions/download-artifact",
@@ -1364,14 +1370,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.19.3",
-          "hash": "ab7a9404c0f3da075243ca237b5fac12c98deaa5"
+          "version": "v2.21.1",
+          "hash": "e14015d583714f6e62063499dc959a02595150a1"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.0",
-          "hash": "54a17e1d59e924e4e612efc33fc33a855806e3aaf120dec88fca94101e452beb",
+          "version": "0.11.9",
+          "hash": "af1f9497a8f84f7c8fa85f700b4645b14faa7e5dce4568d924fda0d7a1ace579",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
@@ -1387,10 +1393,10 @@
       ]
     },
     "Release": {
-      "version": "0.11.0",
+      "version": "0.11.9",
       "name": "Release",
       "name_slug": "release",
-      "job_timeout": 10,
+      "job_timeout": 20,
       "default_branch": "main",
       "container_runtime": "podman",
       "workflow_key": "release",
@@ -2126,13 +2132,13 @@
         "pkg:github-action-runner-image/ubuntu": {
           "id": "ubuntu",
           "type": "github-action-runner-image",
-          "version": "24.04"
+          "version": "26.04"
         },
         "pkg:github-action/actions/checkout": {
           "id": "actions/checkout",
           "type": "github-action",
-          "version": "v6.0.2",
-          "hash": "de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+          "version": "v7.0.1",
+          "hash": "3d3c42e5aac5ba805825da76410c181273ba90b1"
         },
         "pkg:github-action/actions/download-artifact": {
           "id": "actions/download-artifact",
@@ -2149,14 +2155,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.19.3",
-          "hash": "ab7a9404c0f3da075243ca237b5fac12c98deaa5"
+          "version": "v2.21.1",
+          "hash": "e14015d583714f6e62063499dc959a02595150a1"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.0",
-          "hash": "54a17e1d59e924e4e612efc33fc33a855806e3aaf120dec88fca94101e452beb",
+          "version": "0.11.9",
+          "hash": "af1f9497a8f84f7c8fa85f700b4645b14faa7e5dce4568d924fda0d7a1ace579",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
@@ -2172,10 +2178,10 @@
       ]
     },
     "Main": {
-      "version": "0.11.0",
+      "version": "0.11.9",
       "name": "Main",
       "name_slug": "main",
-      "job_timeout": 10,
+      "job_timeout": 20,
       "default_branch": "main",
       "container_runtime": "podman",
       "workflow_key": "main",
@@ -2821,13 +2827,13 @@
         "pkg:github-action-runner-image/ubuntu": {
           "id": "ubuntu",
           "type": "github-action-runner-image",
-          "version": "24.04"
+          "version": "26.04"
         },
         "pkg:github-action/actions/checkout": {
           "id": "actions/checkout",
           "type": "github-action",
-          "version": "v6.0.2",
-          "hash": "de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+          "version": "v7.0.1",
+          "hash": "3d3c42e5aac5ba805825da76410c181273ba90b1"
         },
         "pkg:github-action/actions/download-artifact": {
           "id": "actions/download-artifact",
@@ -2844,14 +2850,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.19.3",
-          "hash": "ab7a9404c0f3da075243ca237b5fac12c98deaa5"
+          "version": "v2.21.1",
+          "hash": "e14015d583714f6e62063499dc959a02595150a1"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.0",
-          "hash": "54a17e1d59e924e4e612efc33fc33a855806e3aaf120dec88fca94101e452beb",
+          "version": "0.11.9",
+          "hash": "af1f9497a8f84f7c8fa85f700b4645b14faa7e5dce4568d924fda0d7a1ace579",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
