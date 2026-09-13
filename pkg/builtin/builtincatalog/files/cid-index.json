@@ -292,6 +292,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "syft",
+        "Version": "1.51.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/syft:1.51.1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "trivy",
         "Version": "0.61.0",
         "Type": "container",
@@ -381,6 +398,23 @@
         "Version": "4.90.0",
         "Type": "container",
         "Image": "ghcr.io/cidverse/wrangler:4.90.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "wrangler",
+        "Version": "4.129.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/wrangler:4.129.0",
         "ImageCache": [],
         "Mounts": [],
         "Security": {
@@ -1230,6 +1264,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "upx",
+        "Version": "5.2.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/upx:5.2.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "gh",
         "Version": "2.64.0",
         "Type": "container",
@@ -1723,6 +1774,23 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "semgrep",
+        "Version": "1.172.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/semgrep:1.172.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "scorecard",
         "Version": "5.0.0",
         "Type": "container",
@@ -1931,6 +1999,23 @@
         "Version": "0.112.0",
         "Type": "container",
         "Image": "ghcr.io/cidverse/grype:0.112.0",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "grype",
+        "Version": "0.118.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/grype:0.118.0",
         "ImageCache": [],
         "Mounts": [],
         "Security": {
@@ -3359,6 +3444,23 @@
         "Version": "1.26.3",
         "Type": "container",
         "Image": "ghcr.io/cidverse/build-go:1.26.3",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "go",
+        "Version": "1.26.7",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/build-go:1.26.7",
         "ImageCache": [],
         "Mounts": [],
         "Security": {
