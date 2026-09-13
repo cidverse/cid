@@ -9,8 +9,9 @@ import (
 	"strings"
 
 	"github.com/cidverse/cidverseutils/compress"
+	"github.com/cidverse/go-ptr"
 	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
-	"github.com/google/go-github/v89/github"
+	"github.com/google/go-github/v91/github"
 	"golang.org/x/oauth2"
 )
 
@@ -53,7 +54,7 @@ func GitHubCodeSecuritySarifUpload(githubToken string, sarifFile string, nci nci
 
 	// upload
 	slog.With("report", reportName).With("ref", ref).With("commit_hash", nci.Commit.Hash).Info("uploading sarif report to github code scanning api")
-	sarifAnalysis := &github.SarifAnalysis{CommitSHA: github.Ptr(nci.Commit.Hash), Ref: github.Ptr(ref), Sarif: github.Ptr(sarifEncoded), CheckoutURI: github.Ptr(nci.Project.Dir)}
+	sarifAnalysis := github.SarifAnalysis{CommitSHA: nci.Commit.Hash, Ref: ref, Sarif: sarifEncoded, CheckoutURI: ptr.Ptr(nci.Project.Dir)}
 	sarifId, _, reportErr := client.CodeScanning.UploadSarif(context.Background(), organization, repository, sarifAnalysis)
 
 	if reportErr != nil {
