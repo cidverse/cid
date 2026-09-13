@@ -23,7 +23,7 @@ require (
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812
 	github.com/cidverse/go-vcs v0.0.0-20260913152445-78e7307450c8
-	github.com/cidverse/go-vcsapp v0.0.0-20260913152550-88d3027d9486
+	github.com/cidverse/go-vcsapp v0.0.0-20260913165910-fe985ca68524
 	github.com/cidverse/normalizeci v1.1.1-0.20260913153231-1b57bf517dda
 	github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b
 	github.com/go-playground/validator/v10 v10.30.4
