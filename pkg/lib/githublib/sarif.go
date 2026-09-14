@@ -11,7 +11,7 @@ import (
 	"github.com/cidverse/cidverseutils/compress"
 	"github.com/cidverse/go-ptr"
 	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
-	"github.com/google/go-github/v91/github"
+	"github.com/google/go-github/v92/github"
 	"golang.org/x/oauth2"
 )
 
