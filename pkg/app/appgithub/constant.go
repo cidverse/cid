@@ -49,8 +49,8 @@ var githubWorkflowDependencyList = []dependency.Dependency{
 	{
 		Id:      "actions/upload-artifact",
 		Type:    "github-action",
-		Version: "v7.0.1",
-		Hash:    "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+		Version: "v7.0.2",
+		Hash:    "cf430e030ddbb5b0abf93d22962f4752f3646cd9",
 	},
 	{
 		Id:      "step-security/harden-runner",
