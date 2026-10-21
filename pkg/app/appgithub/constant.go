@@ -55,8 +55,8 @@ var githubWorkflowDependencyList = []dependency.Dependency{
 	{
 		Id:      "step-security/harden-runner",
 		Type:    "github-action",
-		Version: "v2.21.1",
-		Hash:    "e14015d583714f6e62063499dc959a02595150a1",
+		Version: "v2.22.2",
+		Hash:    "dc2769abcc0fcfbadfc1df54081c1608579ef6b2",
 	},
 	// see https://github.com/actions/runner-images
 	{
