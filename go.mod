@@ -3,7 +3,7 @@ module github.com/cidverse/cid
 //go:platform linux/amd64
 //go:platform darwin/amd64
 
-go 1.26.0
+go 1.26.10
 
 require (
 	github.com/BurntSushi/toml v1.6.0
@@ -42,7 +42,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/oriser/regroup v0.0.0-20240925165441-f6bb0e08289e
 	github.com/otiai10/copy v1.14.1
-	github.com/owenrumney/go-sarif/v3 v3.3.1
+	github.com/owenrumney/go-sarif/v3 v3.3.2
 	github.com/rs/zerolog v1.35.1
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cobra v1.10.2
