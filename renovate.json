@@ -4,5 +4,20 @@
     "github>cidverse/renovate-config:default",
     "github>cidverse/renovate-config:assignee"
   ],
-  "baseBranches": ["main"]
+  "baseBranches": ["main"],
+  "ignorePaths": [
+    ".github/workflows/**"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update GitHub Actions in the constant.go",
+      "managerFilePatterns": [
+        "/^pkg/app/appgithub/constant\\.go$/"
+      ],
+      "matchStrings": [
+        "// renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+Id:\\s+\"[^\"]+\",\\s+Type:\\s+\"[^\"]+\",\\s+Version:\\s+\"(?<currentValue>[^\"]+)\",\\s+Hash:\\s+\"(?<currentDigest>[0-9a-f]{40})\""
+      ]
+    }
+  ]
 }

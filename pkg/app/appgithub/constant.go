@@ -24,6 +24,7 @@ var githubNetworkAllowList = []actionsdk.ActionAccessNetwork{
 	{Host: "pkg-containers.githubusercontent.com:443"},
 }
 
+// githubWorkflowDependencyList contains the tools and GitHub Actions used by the generated GitHub workflows.
 var githubWorkflowDependencyList = []dependency.Dependency{
 	// tools
 	{
@@ -35,24 +36,28 @@ var githubWorkflowDependencyList = []dependency.Dependency{
 	},
 	// github-actions
 	{
+		// renovate: datasource=github-tags depName=actions/checkout
 		Id:      "actions/checkout",
 		Type:    "github-action",
 		Version: "v7.0.1",
 		Hash:    "3d3c42e5aac5ba805825da76410c181273ba90b1",
 	},
 	{
+		// renovate: datasource=github-tags depName=actions/download-artifact
 		Id:      "actions/download-artifact",
 		Type:    "github-action",
 		Version: "v8.0.2",
 		Hash:    "9000827ccba6bdab643e8b6fd33ac0654aef8333",
 	},
 	{
+		// renovate: datasource=github-tags depName=actions/upload-artifact
 		Id:      "actions/upload-artifact",
 		Type:    "github-action",
 		Version: "v7.0.2",
 		Hash:    "cf430e030ddbb5b0abf93d22962f4752f3646cd9",
 	},
 	{
+		// renovate: datasource=github-tags depName=step-security/harden-runner
 		Id:      "step-security/harden-runner",
 		Type:    "github-action",
 		Version: "v2.22.3",
