@@ -49,7 +49,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	gitlab.com/gitlab-org/api/client-go/v3 v3.40.0
-	go.yaml.in/yaml/v3 v3.0.5
+	go.yaml.in/yaml/v3 v3.0.6
 	golang.org/x/oauth2 v0.37.0
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.7.0
