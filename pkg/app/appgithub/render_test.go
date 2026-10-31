@@ -5,6 +5,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/common/dependency"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 
 	"github.com/stretchr/testify/assert"
@@ -54,16 +55,75 @@ func TestRenderWorkflowJobPermissionsIncludeBaselineScopes(t *testing.T) {
 	result, err := renderWorkflow(testWorkflowData(), "wf-main.gohtml", "")
 	assert.NoError(t, err)
 
+	permissions := renderedJobPermissions(t, result.WorkflowContent, "changelog-generate")
+	assert.Equal(t, "read", permissions["actions"])
+	assert.Equal(t, "read", permissions["contents"])
+	assert.Equal(t, "write", permissions["id-token"])
+}
+
+func TestRenderWorkflowJobPermissionsOverrideBaseline(t *testing.T) {
+	data := testWorkflowData()
+	data.Plan.Steps = []plangenerate.Step{
+		{Name: "github-release-publish", Slug: "github-release-publish", Access: actionsdk.ActionAccess{Resources: []actionsdk.ActionAccessResource{actionsdk.ResourceReleases}}},
+		{Name: "container-publish", Slug: "container-publish", Access: actionsdk.ActionAccess{Resources: []actionsdk.ActionAccessResource{actionsdk.ResourcePackages}}},
+		{Name: "zizmor-scan", Slug: "zizmor-scan", Access: actionsdk.ActionAccess{Resources: []actionsdk.ActionAccessResource{actionsdk.ResourceSecurityEvents}}},
+		{Name: "github-pr-comment", Slug: "github-pr-comment"},
+	}
+
+	result, err := renderWorkflow(data, "wf-main.gohtml", "")
+	assert.NoError(t, err)
+
+	releasePermissions := renderedJobPermissions(t, result.WorkflowContent, "github-release-publish")
+	assert.Equal(t, "write", releasePermissions["contents"])
+	assert.Equal(t, "write", releasePermissions["id-token"])
+	assert.NotContains(t, result.WorkflowContent, "contents: read # required: checkout / repository metadata\n      contents: write")
+
+	packagePermissions := renderedJobPermissions(t, result.WorkflowContent, "container-publish")
+	assert.Equal(t, "write", packagePermissions["packages"])
+
+	scanPermissions := renderedJobPermissions(t, result.WorkflowContent, "zizmor-scan")
+	assert.Equal(t, "write", scanPermissions["security-events"])
+
+	commentPermissions := renderedJobPermissions(t, result.WorkflowContent, "github-pr-comment")
+	assert.Equal(t, "write", commentPermissions["pull-requests"])
+}
+
+func TestRenderWorkflowJobPermissionsPullRequestDoesNotEscalate(t *testing.T) {
+	data := testWorkflowData()
+	data.WorkflowConfig.Type = "pull-request"
+	data.Plan.Steps = []plangenerate.Step{
+		{
+			Name: "github-release-publish",
+			Slug: "github-release-publish",
+			Access: actionsdk.ActionAccess{Resources: []actionsdk.ActionAccessResource{
+				actionsdk.ResourceReleases,
+				actionsdk.ResourcePackages,
+				actionsdk.ResourceSecurityEvents,
+			}},
+		},
+	}
+
+	result, err := renderWorkflow(data, "wf-main.gohtml", "")
+	assert.NoError(t, err)
+
+	permissions := renderedJobPermissions(t, result.WorkflowContent, "github-release-publish")
+	assert.Equal(t, "read", permissions["contents"])
+	assert.NotContains(t, permissions, "packages")
+	assert.NotContains(t, permissions, "security-events")
+	assert.NotContains(t, permissions, "id-token", "pull requests must not be able to mint an OIDC token")
+}
+
+func renderedJobPermissions(t *testing.T, content string, jobSlug string) map[string]string {
+	t.Helper()
+
 	var doc struct {
 		Jobs map[string]struct {
 			Permissions map[string]string `yaml:"permissions"`
 		} `yaml:"jobs"`
 	}
-	assert.NoError(t, yaml.Unmarshal([]byte(result.WorkflowContent), &doc))
+	assert.NoError(t, yaml.Unmarshal([]byte(content), &doc))
 
-	job, ok := doc.Jobs["changelog-generate"]
-	assert.True(t, ok, "expected job changelog-generate to be rendered")
-	assert.Equal(t, "read", job.Permissions["actions"])
-	assert.Equal(t, "read", job.Permissions["contents"])
-	assert.Equal(t, "write", job.Permissions["id-token"])
+	job, ok := doc.Jobs[jobSlug]
+	assert.True(t, ok, "expected job %s to be rendered", jobSlug)
+	return job.Permissions
 }

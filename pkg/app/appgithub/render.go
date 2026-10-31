@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"text/template"
 
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
@@ -26,7 +27,9 @@ func renderWorkflow(data *appconfig.WorkflowData, templateFile string, outputFil
 	if err != nil {
 		return RenderWorkflowResult{}, fmt.Errorf("failed to read workflow template %s: %w", templateFile, err)
 	}
-	template, err := vcsapp.Render(string(content), data)
+	rendered, err := vcsapp.RenderCustom(string(content), "{{", "}}", data, template.FuncMap{
+		"jobPermissions": jobPermissions,
+	})
 	if err != nil {
 		return RenderWorkflowResult{}, fmt.Errorf("failed to render template %s: %w", templateFile, err)
 	}
@@ -38,11 +41,11 @@ func renderWorkflow(data *appconfig.WorkflowData, templateFile string, outputFil
 		if err != nil {
 			return RenderWorkflowResult{}, fmt.Errorf("failed to create workflow file parent directory: %w", err)
 		}
-		err = os.WriteFile(outputFile, template, 0644)
+		err = os.WriteFile(outputFile, rendered, 0644)
 		if err != nil {
 			return RenderWorkflowResult{}, fmt.Errorf("failed to create workflow file: %w", err)
 		}
 	}
 
-	return RenderWorkflowResult{Plan: data.Plan, WorkflowContent: string(template)}, nil
+	return RenderWorkflowResult{Plan: data.Plan, WorkflowContent: string(rendered)}, nil
 }

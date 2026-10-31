@@ -104,20 +104,8 @@ jobs:
     needs: [{{ join $step.RunAfter ", " }}]
     {{- end }}
     permissions:
-      actions: read # required: query workflow run metadata
-      contents: read # required: checkout / repository metadata
-      id-token: write # required: provenance signing
-      {{- if and (contains $step.Access.Resources "security-events") (ne $.WorkflowConfig.Type "pull-request") }}
-      security-events: write # required: upload security events
-      {{- end }}
-      {{- if and (contains $step.Access.Resources "releases") (ne $.WorkflowConfig.Type "pull-request") }}
-      contents: write # required: create release
-      {{- end }}
-      {{- if and (contains $step.Access.Resources "packages") (ne $.WorkflowConfig.Type "pull-request") }}
-      packages: write # required: publication
-      {{- end }}
-      {{- if eq $step.Name "github-pr-comment" }}
-      pull-requests: write # post pr comment
+      {{- range $permission := jobPermissions $step $.WorkflowConfig.Type }}
+      {{ $permission.Name }}: {{ $permission.Level }} # {{ $permission.Reason }}
       {{- end }}
     timeout-minutes: {{ $.JobTimeout }}
     {{- if $step.Environment }}
