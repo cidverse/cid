@@ -8,10 +8,11 @@ import (
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v3"
 )
 
-func TestRenderWorkflowCheckoutFetchesTags(t *testing.T) {
-	data := &appconfig.WorkflowData{
+func testWorkflowData() *appconfig.WorkflowData {
+	return &appconfig.WorkflowData{
 		Version:     "0.11.0",
 		Name:        "release",
 		JobTimeout:  10,
@@ -40,9 +41,29 @@ func TestRenderWorkflowCheckoutFetchesTags(t *testing.T) {
 		ReferencedWorkflowDependency: make(map[string]dependency.Dependency),
 		IgnoreFiles:                  []string{"README.md"},
 	}
+}
 
-	result, err := renderWorkflow(data, "wf-main.gohtml", "")
+func TestRenderWorkflowCheckoutFetchesTags(t *testing.T) {
+	result, err := renderWorkflow(testWorkflowData(), "wf-main.gohtml", "")
 	assert.NoError(t, err)
 	assert.Contains(t, result.WorkflowContent, "fetch-depth: 0")
 	assert.Contains(t, result.WorkflowContent, "fetch-tags: true")
+}
+
+func TestRenderWorkflowJobPermissionsIncludeBaselineScopes(t *testing.T) {
+	result, err := renderWorkflow(testWorkflowData(), "wf-main.gohtml", "")
+	assert.NoError(t, err)
+
+	var doc struct {
+		Jobs map[string]struct {
+			Permissions map[string]string `yaml:"permissions"`
+		} `yaml:"jobs"`
+	}
+	assert.NoError(t, yaml.Unmarshal([]byte(result.WorkflowContent), &doc))
+
+	job, ok := doc.Jobs["changelog-generate"]
+	assert.True(t, ok, "expected job changelog-generate to be rendered")
+	assert.Equal(t, "read", job.Permissions["actions"])
+	assert.Equal(t, "read", job.Permissions["contents"])
+	assert.Equal(t, "write", job.Permissions["id-token"])
 }
