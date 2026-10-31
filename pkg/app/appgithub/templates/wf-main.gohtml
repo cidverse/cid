@@ -104,7 +104,9 @@ jobs:
     needs: [{{ join $step.RunAfter ", " }}]
     {{- end }}
     permissions:
-      id-token: write # provenance signing
+      actions: read # required: query workflow run metadata
+      contents: read # required: checkout / repository metadata
+      id-token: write # required: provenance signing
       {{- if and (contains $step.Access.Resources "security-events") (ne $.WorkflowConfig.Type "pull-request") }}
       security-events: write # required: upload security events
       {{- end }}
