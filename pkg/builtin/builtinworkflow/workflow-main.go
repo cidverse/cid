@@ -33,6 +33,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrybuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/poetry/poetrytest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/sign/signartifacts"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/sonarqube/sonarqubescan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/trivy/trivyfsscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
@@ -227,6 +228,16 @@ func GetWorkflows() []catalog.Workflow {
 					},
 					{
 						ID: helmpublishregistry.URI,
+					},
+					// sign
+					{
+						ID: signartifacts.URI,
+						Rules: []catalog.WorkflowRule{
+							{
+								Type:       "cel",
+								Expression: `CID_WORKFLOW_TYPE == "release"`,
+							},
+						},
 					},
 					// changelog
 					{

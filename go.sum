@@ -68,6 +68,10 @@ github.com/cidverse/normalizeci v1.1.1-0.20261021160637-7dfca485a24e h1:IKj4TqTv
 github.com/cidverse/normalizeci v1.1.1-0.20261021160637-7dfca485a24e/go.mod h1:LZa1Ps6cmpw3NOMih0Xo0MR1MgJm51YtIe2PgzSLorA=
 github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b h1:k9ZCfVn6TlxhdjYzj6qQnsaP6eUI1Yd5jLMlYakkcpo=
 github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b/go.mod h1:HWj5MZYWNNyx32Cyi9DkxvddvthJxcVgkiCcKMlz/ew=
+github.com/cidverse/repoanalyzer v0.1.1-0.20261031202156-0907f6e507c6 h1:5LfAQ108hf4+HHy8MopiL/eJ4QDIkTFo6+9oaXFqHrs=
+github.com/cidverse/repoanalyzer v0.1.1-0.20261031202156-0907f6e507c6/go.mod h1:Cq5rykisp7QDnRghV1YlRjX0rDh3m5lq+ffRv9YJ7uw=
+github.com/cidverse/repoanalyzer v0.1.1-0.20261031202958-6d181aee92ae h1:4lSHgXIBk2C/CTOarGCkssx7pwYSH5Z3IHqpOAYVo/c=
+github.com/cidverse/repoanalyzer v0.1.1-0.20261031202958-6d181aee92ae/go.mod h1:Cq5rykisp7QDnRghV1YlRjX0rDh3m5lq+ffRv9YJ7uw=
 github.com/cloudflare/circl v1.6.5 h1:O64F26HEqNhznd/hrC5KZXVKYuKM2rx4deZDTc4ihQA=
 github.com/cloudflare/circl v1.6.5/go.mod h1:h5LNyxAc5nTue9DS5jT+48en2PSDYt3zdGnz5OstK6c=
 github.com/codahale/rfc6979 v0.0.0-20141003034818-6a90f24967eb h1:EDmT6Q9Zs+SbUoc7Ik9EfrFqcylYqgPZ9ANSbTAntnE=
@@ -284,6 +288,8 @@ go.uber.org/multierr v1.11.0/go.mod h1:20+QtiLqy0Nd6FdQB9TLXag12DsQkrbs3htMFfDN8
 go.yaml.in/yaml/v3 v3.0.4/go.mod h1:DhzuOOF2ATzADvBadXxruRBLzYTpT36CKvDb3+aBEFg=
 go.yaml.in/yaml/v3 v3.0.5 h1:N6y/pJk8buWs9NY5ERU2HSMfm+IuD/OtfdAnq6kESPw=
 go.yaml.in/yaml/v3 v3.0.5/go.mod h1:HVTZu1O7/Vkt2N+BFy8Zza+lnLsABggaTM2ZpNIGuKg=
+go.yaml.in/yaml/v3 v3.0.6 h1:zcDfvjXEqTQmpjniUBLc91xYJMB2c4QOFxEF/LCEckM=
+go.yaml.in/yaml/v3 v3.0.6/go.mod h1:HVTZu1O7/Vkt2N+BFy8Zza+lnLsABggaTM2ZpNIGuKg=
 golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
 golang.org/x/crypto v0.58.0 h1:COkYLr4k7nDI4r6QtMML2AfzeIswWHAJthLS6K/M/54=
 golang.org/x/crypto v0.58.0/go.mod h1:Xh+kl5A+M0gMiWDytH2Hhr5Z7WbNCpv/eB/EFgfSk+w=

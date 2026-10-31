@@ -67,6 +67,10 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				{
 					Type: "binary",
 				},
+				{
+					Type:   "signature",
+					Format: "pgp",
+				},
 			},
 		},
 	}
@@ -137,7 +141,7 @@ func (a Action) Execute() (err error) {
 
 	// release artifacts
 	var releaseAssets []*gitlab.ReleaseAssetLinkOptions
-	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`})
+	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `(artifact_type == "binary" || artifact_type == "signature")`})
 	if err != nil {
 		return err
 	}
@@ -158,11 +162,11 @@ func (a Action) Execute() (err error) {
 			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "warn", Message: "failed to open release artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
 			continue
 		}
-		defer reader.Close()
 		gpf, _, err := glab.GenericPackages.PublishPackageFile(projectId, artifact.Module, releaseVersion, artifact.Name, reader, &gitlab.PublishPackageFileOptions{
 			Status: gitlab.Ptr(gitlab.PackageDefault),
 			Select: gitlab.Ptr(gitlab.SelectPackageFile),
 		})
+		_ = reader.Close()
 		if err != nil {
 			return fmt.Errorf("failed to upload package: %w", err)
 		}

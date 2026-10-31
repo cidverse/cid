@@ -22,7 +22,7 @@ func TestGitLabReleasePublishWithChangelog(t *testing.T) {
 		TargetFile: "/my-project/.tmp/gitlab.changelog",
 	}).Return(nil, nil)
 	sdk.On("FileReadV1", "/my-project/.tmp/gitlab.changelog").Return(`changes ...`, nil)
-	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return([]*actionsdk.Artifact{}, nil)
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `(artifact_type == "binary" || artifact_type == "signature")`}).Return([]*actionsdk.Artifact{}, nil)
 
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
@@ -46,7 +46,7 @@ func TestGitLabReleasePublishAutoChangelog(t *testing.T) {
 		ID:         "root|changelog|gitlab.changelog",
 		TargetFile: "/my-project/.tmp/gitlab.changelog",
 	}).Return(nil, fmt.Errorf("a error of some kind"))
-	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return([]*actionsdk.Artifact{}, nil)
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `(artifact_type == "binary" || artifact_type == "signature")`}).Return([]*actionsdk.Artifact{}, nil)
 
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
@@ -71,7 +71,7 @@ func TestGitLabReleasePublishSelfHosted(t *testing.T) {
 		TargetFile: "/my-project/.tmp/gitlab.changelog",
 	}).Return(nil, nil)
 	sdk.On("FileReadV1", "/my-project/.tmp/gitlab.changelog").Return(`changes ...`, nil)
-	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return([]*actionsdk.Artifact{}, nil)
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `(artifact_type == "binary" || artifact_type == "signature")`}).Return([]*actionsdk.Artifact{}, nil)
 
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()

@@ -25,7 +25,7 @@ require (
 	github.com/cidverse/go-vcs v0.0.0-20261004225916-8349f25feaed
 	github.com/cidverse/go-vcsapp v0.0.0-20261021160248-8c50d47e0523
 	github.com/cidverse/normalizeci v1.1.1-0.20261021160637-7dfca485a24e
-	github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b
+	github.com/cidverse/repoanalyzer v0.1.1-0.20261031202958-6d181aee92ae
 	github.com/go-playground/validator/v10 v10.30.5
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/google/go-github/v93 v93.0.0
@@ -49,7 +49,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	gitlab.com/gitlab-org/api/client-go/v3 v3.40.0
-	go.yaml.in/yaml/v3 v3.0.5
+	go.yaml.in/yaml/v3 v3.0.6
 	golang.org/x/oauth2 v0.37.0
 	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.7.0

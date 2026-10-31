@@ -56,6 +56,10 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				{
 					Type: "binary",
 				},
+				{
+					Type:   "signature",
+					Format: "pgp",
+				},
 			},
 		},
 	}
@@ -100,6 +104,13 @@ func (a Action) Execute() (err error) {
 		return err
 	}
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "searching for artifacts to include in the release", Context: map[string]interface{}{"artifact_count": len(artifacts)}})
+
+	// download the artifacts we intend to publish
+	type releaseFile struct {
+		Name string
+		Path string
+	}
+	var releaseFiles []releaseFile
 	for _, artifact := range artifacts {
 		targetFile := actionsdk.JoinPath(d.Config.TempDir, artifact.Name)
 		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
@@ -110,6 +121,7 @@ func (a Action) Execute() (err error) {
 			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "warn", Message: "failed to retrieve release artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
 			continue
 		}
+		releaseFiles = append(releaseFiles, releaseFile{Name: artifact.Name, Path: targetFile})
 	}
 
 	// options
@@ -141,24 +153,22 @@ func (a Action) Execute() (err error) {
 	}
 
 	// release artifacts
-	for _, artifact := range artifacts {
+	for _, releaseAsset := range releaseFiles {
 		err = func() error {
-			targetFile := actionsdk.JoinPath(d.Config.TempDir, artifact.Name)
-
-			file, err := os.Open(targetFile)
+			file, err := os.Open(releaseAsset.Path)
 			if err != nil {
-				return fmt.Errorf("failed to open %s: %w", targetFile, err)
+				return fmt.Errorf("failed to open %s: %w", releaseAsset.Path, err)
 			}
 			defer file.Close()
 
-			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "uploading artifact", Context: map[string]interface{}{"name": artifact.Name}})
+			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "uploading artifact", Context: map[string]interface{}{"name": releaseAsset.Name}})
 
-			_, _, err = client.Repositories.UploadReleaseAsset(ctx, owner, repo, release.GetID(), &github.UploadOptions{Name: artifact.Name}, file)
+			_, _, err = client.Repositories.UploadReleaseAsset(ctx, owner, repo, release.GetID(), &github.UploadOptions{Name: releaseAsset.Name}, file)
 			return err
 		}()
 
 		if err != nil {
-			return fmt.Errorf("failed to upload asset %s: %w", artifact.Name, err)
+			return fmt.Errorf("failed to upload asset %s: %w", releaseAsset.Name, err)
 		}
 	}
 

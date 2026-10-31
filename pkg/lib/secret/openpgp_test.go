@@ -3,7 +3,10 @@ package secret
 import (
 	"testing"
 
+	"github.com/ProtonMail/gopenpgp/v3/crypto"
+	"github.com/ProtonMail/gopenpgp/v3/profile"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const PublicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -138,4 +141,24 @@ func TestGPGEncrypt(t *testing.T) {
 	dec, decErr := DecryptOpenPGP(PrivateKey, PrivateKeyPassword, enc)
 	assert.NoError(t, decErr)
 	assert.Equal(t, "my secret", dec)
+}
+
+func TestGPGSign(t *testing.T) {
+	message := []byte("binary content")
+
+	signature, sigErr := SignOpenPGP(PrivateKey, PrivateKeyPassword, message)
+	require.NoError(t, sigErr)
+	assert.Contains(t, signature, "-----BEGIN PGP SIGNATURE-----")
+
+	publicKey, keyErr := crypto.NewKeyFromArmored(PublicKey)
+	require.NoError(t, keyErr)
+
+	verifier, verifierErr := crypto.PGPWithProfile(profile.RFC9580()).Verify().
+		VerificationKey(publicKey).
+		New()
+	require.NoError(t, verifierErr)
+
+	result, verifyErr := verifier.VerifyDetached(message, []byte(signature), crypto.Armor)
+	require.NoError(t, verifyErr)
+	assert.NoError(t, result.SignatureError())
 }
