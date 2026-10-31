@@ -38,7 +38,6 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/trivy/trivyfsscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvtest"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/zizmor/zizmorscan"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/cid/pkg/core/catalog"
 )
@@ -185,9 +184,12 @@ func GetWorkflows() []catalog.Workflow {
 					{
 						ID: sonarqubescan.URI,
 					},
-					{
-						ID: zizmorscan.URI,
-					},
+					// zizmor
+					/*
+						{
+							ID: zizmorscan.URI,
+						},
+					*/
 					// reporting
 					/*
 						{
