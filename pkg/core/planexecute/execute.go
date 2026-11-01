@@ -1,7 +1,6 @@
 package planexecute
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
@@ -123,10 +122,7 @@ func RunAction(actionContext api.ActionExecutionContext, catalogAction *catalog.
 	localState.AuditLog = append(localState.AuditLog, state.AuditEvents{
 		Timestamp: time.Now(),
 		Type:      "action",
-		Payload: map[string]string{
-			"action": catalogAction.Repository + "/" + catalogAction.Metadata.Name + "@" + catalogAction.Version,
-			"uri":    fmt.Sprintf("oci://%s", catalogAction.Container.Image),
-		},
+		Payload:   catalogAction.AuditPayload(),
 	})
 
 	// serialize action config for pass-thru

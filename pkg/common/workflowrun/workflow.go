@@ -96,10 +96,7 @@ func runWorkflowAction(catalogAction *catalog.Action, action *catalog.WorkflowAc
 		localState.AuditLog = append(localState.AuditLog, state.AuditEvents{
 			Timestamp: time.Now(),
 			Type:      "action",
-			Payload: map[string]string{
-				"action": catalogAction.Repository + "/" + catalogAction.Metadata.Name + "@" + catalogAction.Version,
-				"uri":    fmt.Sprintf("oci://%s", catalogAction.Container.Image),
-			},
+			Payload:   catalogAction.AuditPayload(),
 		})
 
 		// serialize action config for pass-thru

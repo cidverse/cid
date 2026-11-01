@@ -140,7 +140,7 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 
 	// configure container
 	containerExec := containerruntime.Container{
-		Image:            catalogAction.Container.Image,
+		Image:            catalogAction.Container.Reference(),
 		WorkingDirectory: ci.ToUnixPath(ctx.ProjectDir),
 		Command:          api.InsertCommandVariables(catalogAction.Container.Command, *catalogAction),
 		User:             util.GetContainerUser(),

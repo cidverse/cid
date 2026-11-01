@@ -2,6 +2,7 @@ package provenance
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/cidverse/cid/internal/state"
@@ -40,25 +41,25 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 	})
 
 	for _, record := range state.AuditLog {
-		if record.Type == "action" {
-			resolvedDependencies = append(resolvedDependencies, v1.ResourceDescriptor{
-				URI: record.Payload["uri"],
-				Digest: map[string]string{
-					"sha1": record.Payload["digest"],
-				},
-				Name:      record.Payload["action"],
-				MediaType: "application/vnd.oci.image.index.v1+json",
-			})
-		} else if record.Type == "command" {
-			resolvedDependencies = append(resolvedDependencies, v1.ResourceDescriptor{
-				URI: record.Payload["uri"],
-				Digest: map[string]string{
-					"sha1": record.Payload["digest"],
-				},
-				Name:      record.Payload["binary"],
-				MediaType: "application/vnd.oci.image.index.v1+json",
-			})
+		var name string
+		switch record.Type {
+		case "action":
+			name = record.Payload["action"]
+		case "command":
+			name = record.Payload["binary"]
+		default:
+			continue
 		}
+
+		uri := record.Payload["uri"]
+		digest := digestFromReference(uri)
+		resolvedDependencies = append(resolvedDependencies, v1.ResourceDescriptor{
+			URI:         uri,
+			Digest:      digest,
+			Name:        name,
+			MediaType:   "application/vnd.oci.image.index.v1+json",
+			Annotations: referenceAnnotations(record.Payload["reference"], digest),
+		})
 	}
 
 	var systemParameters = map[string]string{
@@ -94,6 +95,41 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 	}
 
 	return prov
+}
+
+// referenceAnnotations records the human readable reference (e.g. the tag) of a resolved dependency for
+// informational purposes. The uri is the authoritative, digest-pinned identifier, so nothing is added when
+// the dependency is not pinned or has no reference.
+func referenceAnnotations(reference string, digest common.DigestSet) map[string]interface{} {
+	if reference == "" || len(digest) == 0 {
+		return nil
+	}
+
+	return map[string]interface{}{
+		"org.opencontainers.image.ref.name": reference,
+	}
+}
+
+// digestFromReference extracts the digest from a digest-pinned reference such as
+// "oci://ghcr.io/cidverse/actions/build-go@sha256:abc...". References without a digest yield an empty set.
+func digestFromReference(reference string) common.DigestSet {
+	index := strings.LastIndex(reference, "@")
+	if index == -1 || index == len(reference)-1 {
+		return common.DigestSet{}
+	}
+
+	return digestSet(reference[index+1:])
+}
+
+// digestSet converts a digest reference such as "sha256:abc..." into the algorithm to hex map used by
+// SLSA provenance. An empty or malformed digest yields an empty set rather than a bogus entry.
+func digestSet(digest string) common.DigestSet {
+	algorithm, value, ok := strings.Cut(digest, ":")
+	if !ok || algorithm == "" || value == "" {
+		return common.DigestSet{}
+	}
+
+	return common.DigestSet{algorithm: value}
 }
 
 // GenerateInTotoPredicate generates an in-toto statement with a SLSA-Predicate

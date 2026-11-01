@@ -11,13 +11,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cidverse/cid/pkg/common/executable"
 	"github.com/cidverse/cid/pkg/common/shellcommand"
+	cidregistry "github.com/cidverse/cid/pkg/core/registry"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/containerruntime"
 	"github.com/cidverse/cidverseutils/hash"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
+	orasregistry "oras.land/oras-go/v2/registry"
 )
 
 var repositoryConfigFile = filepath.Join(util.CIDConfigDir(), "repositories.json")
@@ -137,11 +140,21 @@ func UpdateCatalog(name string, source *Source) error {
 func updateCatalogOCI(file string, source *Source) error {
 	// get metadata from oci image
 	ociImage := strings.TrimPrefix(source.URI, "oci://")
-	ociImageTag := strings.Split(ociImage, ":") // TODO: create util function
 
-	// configure container
+	// parse the reference and resolve the tag to an immutable manifest digest, so the catalog records
+	// exactly what it was built from and execution can be pinned to that digest
+	ociRef, err := orasregistry.ParseReference(ociImage)
+	if err != nil {
+		return fmt.Errorf("invalid image reference %s: %w", source.URI, err)
+	}
+	digest, err := cidregistry.ResolveReferenceDigest(ociImage)
+	if err != nil {
+		return fmt.Errorf("failed to resolve image digest for %s: %w", source.URI, err)
+	}
+
+	// configure container, pinned to the digest the catalog is about to record
 	containerExec := containerruntime.Container{
-		Image:   ociImage,
+		Image:   executable.PinnedReference(ociImage, digest),
 		Command: "central cid-metadata",
 		User:    util.GetContainerUser(),
 	}
@@ -164,21 +177,29 @@ func updateCatalogOCI(file string, source *Source) error {
 	var actionMetadata []ActionMetadata
 	err = json.Unmarshal(outputBuffer.Bytes(), &actionMetadata)
 
+	// version is the tag the catalog was resolved from, a digest reference has no tag
+	version := ociRef.Reference
+	if _, digestErr := ociRef.Digest(); digestErr == nil {
+		version = ""
+	}
+
 	// preprocess data
 	data := Config{
 		Actions: make([]Action, 0),
 	}
 	for _, am := range actionMetadata {
+		// log.Info().Str("uri", fmt.Sprintf("%s://%s+%s", ActionTypeContainer, ociImage, am.Name)).Str("name", am.Name).Msg("adding action")
 		data.Actions = append(data.Actions, Action{
 			Repository: source.URI,
 			URI:        fmt.Sprintf("%s://%s+%s", ActionTypeContainer, ociImage, am.Name),
 			Type:       ActionTypeContainer,
 			Container: ContainerAction{
 				Image:   ociImage,
+				Digest:  digest,
 				Command: "central run " + am.Name,
 				Certs:   nil,
 			},
-			Version:  ociImageTag[1],
+			Version:  version,
 			Metadata: am,
 		})
 	}

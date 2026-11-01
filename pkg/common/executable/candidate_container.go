@@ -27,6 +27,7 @@ import (
 type ContainerCandidate struct {
 	BaseCandidate
 	Image      string `yaml:"package,omitempty"`
+	Digest     string `yaml:"digest,omitempty"` // Digest is the manifest digest the image tag was resolved to
 	ImageCache []ContainerCache
 	Mounts     []ContainerMount
 	Security   ContainerSecurity
@@ -34,12 +35,30 @@ type ContainerCandidate struct {
 	Certs      []ContainerCerts `yaml:"certs,omitempty"`
 }
 
+// Reference returns the digest-pinned image reference, falling back to the tag if no digest is known.
+func (c ContainerCandidate) Reference() string {
+	return PinnedReference(c.Image, c.Digest)
+}
+
+// NamedReference returns the human readable tag reference of the image, empty for digest-only images.
+func (c ContainerCandidate) NamedReference() string {
+	return NamedReference(c.Image)
+}
+
 func (c ContainerCandidate) GetUri() string {
-	return fmt.Sprintf("oci://%s", c.Image)
+	return fmt.Sprintf("oci://%s", c.Reference())
+}
+
+func (c ContainerCandidate) GetNamedReference() string {
+	return c.NamedReference()
 }
 
 func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
-	log.Debug().Msgf("Running ContainerCandidate %s with args %v", c.Image, opts.Args)
+	log.Debug().Msgf("Running ContainerCandidate %s with args %v", c.Reference(), opts.Args)
+
+	if c.Digest == "" {
+		log.Warn().Str("image", c.Image).Msg("running container image without a pinned digest, the tag may have been moved since discovery - run 'cid executables update' to refresh the candidate cache")
+	}
 
 	var stdoutBuffer, stderrBuffer bytes.Buffer
 	var stdoutWriter = io.MultiWriter(redact.NewProtectedWriter(nil, os.Stdout, &sync.Mutex{}, nil), &stdoutBuffer)
@@ -54,7 +73,7 @@ func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 	// overwrite binary for alias use-case
 	containerUser := util.GetContainerUser()
 	containerExec := containerruntime.Container{
-		Image:            c.Image,
+		Image:            c.Reference(),
 		WorkingDirectory: ci.ToUnixPath(opts.WorkDir),
 		Entrypoint:       c.Entrypoint,
 		Command:          ci.ToUnixPathArgs(strings.Join(opts.Args, " ")),

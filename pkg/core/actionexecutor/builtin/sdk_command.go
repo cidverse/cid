@@ -79,10 +79,11 @@ func (sdk ActionSDK) ExecuteCommandV1(req actionsdk.ExecuteCommandV1Request) (*a
 			Timestamp: time.Now().UTC(),
 			Type:      "command",
 			Payload: map[string]string{
-				"binary":  selectedCandidate.GetName(),
-				"version": selectedCandidate.GetVersion(),
-				"uri":     selectedCandidate.GetUri(),
-				"command": redact.Redact(replaceCommandPlaceholders(req.Command, sdk.ActionEnv)),
+				"binary":    selectedCandidate.GetName(),
+				"version":   selectedCandidate.GetVersion(),
+				"uri":       selectedCandidate.GetUri(),
+				"reference": selectedCandidate.GetNamedReference(),
+				"command":   redact.Redact(replaceCommandPlaceholders(req.Command, sdk.ActionEnv)),
 			},
 		})
 	}

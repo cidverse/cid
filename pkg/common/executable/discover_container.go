@@ -29,9 +29,10 @@ func DiscoverContainerCandidates(opts *DiscoverContainerOptions) []Executable {
 	}
 
 	for _, containerImage := range opts.Packages {
-		tags, err := registry.FindTags(containerImage.Image)
+		tags, err := registry.FindTagsWithDigest(containerImage.Image)
 		if err != nil {
 			log.Error().Err(err).Msgf("failed to find tags for image %s", containerImage.Image)
+			continue
 		}
 
 		cacheMounts := make([]ContainerCache, 0)
@@ -42,6 +43,11 @@ func DiscoverContainerCandidates(opts *DiscoverContainerOptions) []Executable {
 		log.Info().Msgf("Discovering container candidates for image %s", containerImage.Image)
 		for _, tag := range tags {
 			if strings.HasPrefix(tag.Tag, "sha256-") {
+				continue
+			}
+			// FindTagsWithDigest already drops tags without a resolvable digest, keep the guard so a
+			// regression there can never produce an unpinned candidate
+			if tag.Digest == "" {
 				continue
 			}
 
@@ -56,6 +62,7 @@ func DiscoverContainerCandidates(opts *DiscoverContainerOptions) []Executable {
 						Type:    ExecutionContainer,
 					},
 					Image:      fmt.Sprintf("%s:%s", containerImage.Image, tag.Tag),
+					Digest:     tag.Digest,
 					ImageCache: cacheMounts,
 					Mounts:     make([]ContainerMount, 0),
 					Security:   ContainerSecurity{},

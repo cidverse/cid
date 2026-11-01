@@ -38,7 +38,8 @@ type Executable interface {
 	GetName() string
 	GetVersion() string
 	GetType() CandidateType
-	GetUri() string // GetUri returns the URI of the candidate, for auditing purposes
+	GetUri() string            // GetUri returns the URI of the candidate, for auditing purposes
+	GetNamedReference() string // GetNamedReference returns the human readable reference of the candidate, empty if it has none
 	Run(opts RunParameters) (string, string, error)
 }
 
@@ -61,6 +62,10 @@ func (c BaseCandidate) GetType() CandidateType {
 }
 
 func (c BaseCandidate) GetUri() string {
+	return ""
+}
+
+func (c BaseCandidate) GetNamedReference() string {
 	return ""
 }
 
