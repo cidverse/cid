@@ -1,7 +1,7 @@
 {
   "workflows": {
     "Nightly": {
-      "version": "0.11.10",
+      "version": "0.11.13",
       "name": "Nightly",
       "name_slug": "nightly",
       "job_timeout": 20,
@@ -18,6 +18,18 @@
         ],
         "environment_pattern": "nightly-.*"
       },
+      "network_global": [
+        "keyserver.ubuntu.com:443",
+        "github.com:443",
+        "api.github.com:443",
+        "codeload.github.com:443",
+        "uploads.github.com:443",
+        "objects.githubusercontent.com:443",
+        "raw.githubusercontent.com:443",
+        "release-assets.githubusercontent.com:443",
+        "ghcr.io:443",
+        "pkg-containers.githubusercontent.com:443"
+      ],
       "plan": {
         "name": "main",
         "stages": [
@@ -44,45 +56,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "proxy.golang.org:443"
-                },
-                {
-                  "host": "storage.googleapis.com:443"
-                },
-                {
-                  "host": "sum.golang.org:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "proxy.golang.org:443",
+                "storage.googleapis.com:443",
+                "sum.golang.org:443"
               ]
             },
             "inputs": {},
@@ -120,45 +96,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "proxy.golang.org:443"
-                },
-                {
-                  "host": "storage.googleapis.com:443"
-                },
-                {
-                  "host": "sum.golang.org:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "proxy.golang.org:443",
+                "storage.googleapis.com:443",
+                "sum.golang.org:443"
               ]
             },
             "inputs": {},
@@ -197,45 +137,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "proxy.golang.org:443"
-                },
-                {
-                  "host": "storage.googleapis.com:443"
-                },
-                {
-                  "host": "sum.golang.org:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "proxy.golang.org:443",
+                "storage.googleapis.com:443",
+                "sum.golang.org:443"
               ],
               "resources": [
                 "security-events"
@@ -266,38 +170,6 @@
                   "constraint": "\u003e= 0.0.0-0"
                 }
               ],
-              "network": [
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ],
               "resources": [
                 "security-events"
               ]
@@ -323,12 +195,10 @@
             "access": {
               "env": [
                 {
-                  "name": "SEMGREP_RULES",
-                  "description": "See option --config."
+                  "name": "SEMGREP_RULES"
                 },
                 {
                   "name": "SEMGREP_APP_TOKEN",
-                  "description": "Semgrep AppSec Platform Token",
                   "secret": true
                 }
               ],
@@ -339,39 +209,7 @@
                 }
               ],
               "network": [
-                {
-                  "host": "semgrep.dev:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "semgrep.dev:443"
               ],
               "resources": [
                 "security-events"
@@ -403,39 +241,7 @@
                 }
               ],
               "network": [
-                {
-                  "host": "mirror.gcr.io:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "mirror.gcr.io:443"
               ],
               "resources": [
                 "security-events"
@@ -451,81 +257,6 @@
               ]
             },
             "order": 5
-          },
-          {
-            "id": "7",
-            "name": "zizmor-scan",
-            "slug": "zizmor-scan",
-            "stage": "scan",
-            "scope": "project",
-            "action": "builtin://actions/zizmor-scan",
-            "access": {
-              "env": [
-                {
-                  "name": "GH_HOSTNAME",
-                  "description": "GH_HOSTNAME is required for some online audits"
-                },
-                {
-                  "name": "GH_TOKEN",
-                  "description": "GH_TOKEN is required for some online audits. Takes precedence over GITHUB_TOKEN"
-                },
-                {
-                  "name": "GITHUB_TOKEN",
-                  "description": "GITHUB_TOKEN is set automatically by GitHub Actions"
-                }
-              ],
-              "executables": [
-                {
-                  "name": "zizmor",
-                  "constraint": "=\u003e 1.4.1"
-                }
-              ],
-              "network": [
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ],
-              "resources": [
-                "security-events"
-              ]
-            },
-            "inputs": {},
-            "outputs": {
-              "artifacts": [
-                {
-                  "type": "report",
-                  "format": "sarif"
-                }
-              ]
-            },
-            "order": 6
           },
           {
             "id": "6",
@@ -549,28 +280,22 @@
             "access": {
               "env": [
                 {
-                  "name": "SONAR_HOST_URL",
-                  "description": "The SonarQube host URL."
+                  "name": "SONAR_HOST_URL"
                 },
                 {
-                  "name": "SONAR_ORGANIZATION",
-                  "description": "The SonarQube organization."
+                  "name": "SONAR_ORGANIZATION"
                 },
                 {
-                  "name": "SONAR_PROJECTKEY",
-                  "description": "The SonarQube project key."
+                  "name": "SONAR_PROJECTKEY"
                 },
                 {
-                  "name": "SONAR_DEFAULT_BRANCH",
-                  "description": "The SonarQube default branch."
+                  "name": "SONAR_DEFAULT_BRANCH"
                 },
                 {
-                  "name": "SONAR_REGION",
-                  "description": "Can be used to switch to the US-based SonarCloud instance."
+                  "name": "SONAR_REGION"
                 },
                 {
                   "name": "SONAR_TOKEN",
-                  "description": "The SonarQube authentication token.",
                   "required": true,
                   "secret": true
                 }
@@ -582,45 +307,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "sonarcloud.io:443"
-                },
-                {
-                  "host": "api.sonarcloud.io:443"
-                },
-                {
-                  "host": "scanner.sonarcloud.io:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "sonarcloud.io:443",
+                "api.sonarcloud.io:443",
+                "scanner.sonarcloud.io:443"
               ]
             },
             "inputs": {
@@ -644,7 +333,7 @@
               ]
             },
             "outputs": {},
-            "order": 7
+            "order": 6
           }
         ]
       },
@@ -675,14 +364,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.22.2",
-          "hash": "dc2769abcc0fcfbadfc1df54081c1608579ef6b2"
+          "version": "v2.22.3",
+          "hash": "46b06cea07f9e64621fdf066ba77ac6915163d43"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.10",
-          "hash": "f137e1b1fce0d83821c2b96d8c65e5ea33270546ab0aac376a421c191a4864d0",
+          "version": "0.11.13",
+          "hash": "800d546523ee7c20a031a250bff0651e741c89211b6bec66bfaeeeb47664f5c9",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
@@ -698,7 +387,7 @@
       ]
     },
     "Pull Request": {
-      "version": "0.11.10",
+      "version": "0.11.13",
       "name": "Pull Request",
       "name_slug": "pull-request",
       "job_timeout": 20,
@@ -713,6 +402,18 @@
         ],
         "environment_pattern": "pr-.*"
       },
+      "network_global": [
+        "keyserver.ubuntu.com:443",
+        "github.com:443",
+        "api.github.com:443",
+        "codeload.github.com:443",
+        "uploads.github.com:443",
+        "objects.githubusercontent.com:443",
+        "raw.githubusercontent.com:443",
+        "release-assets.githubusercontent.com:443",
+        "ghcr.io:443",
+        "pkg-containers.githubusercontent.com:443"
+      ],
       "plan": {
         "name": "main",
         "stages": [
@@ -739,45 +440,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "proxy.golang.org:443"
-                },
-                {
-                  "host": "storage.googleapis.com:443"
-                },
-                {
-                  "host": "sum.golang.org:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "proxy.golang.org:443",
+                "storage.googleapis.com:443",
+                "sum.golang.org:443"
               ]
             },
             "inputs": {},
@@ -815,45 +480,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "proxy.golang.org:443"
-                },
-                {
-                  "host": "storage.googleapis.com:443"
-                },
-                {
-                  "host": "sum.golang.org:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "proxy.golang.org:443",
+                "storage.googleapis.com:443",
+                "sum.golang.org:443"
               ]
             },
             "inputs": {},
@@ -892,45 +521,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "proxy.golang.org:443"
-                },
-                {
-                  "host": "storage.googleapis.com:443"
-                },
-                {
-                  "host": "sum.golang.org:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "proxy.golang.org:443",
+                "storage.googleapis.com:443",
+                "sum.golang.org:443"
               ],
               "resources": [
                 "security-events"
@@ -961,38 +554,6 @@
                   "constraint": "\u003e= 0.0.0-0"
                 }
               ],
-              "network": [
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ],
               "resources": [
                 "security-events"
               ]
@@ -1018,12 +579,10 @@
             "access": {
               "env": [
                 {
-                  "name": "SEMGREP_RULES",
-                  "description": "See option --config."
+                  "name": "SEMGREP_RULES"
                 },
                 {
                   "name": "SEMGREP_APP_TOKEN",
-                  "description": "Semgrep AppSec Platform Token",
                   "secret": true
                 }
               ],
@@ -1034,39 +593,7 @@
                 }
               ],
               "network": [
-                {
-                  "host": "semgrep.dev:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "semgrep.dev:443"
               ],
               "resources": [
                 "security-events"
@@ -1098,39 +625,7 @@
                 }
               ],
               "network": [
-                {
-                  "host": "mirror.gcr.io:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "mirror.gcr.io:443"
               ],
               "resources": [
                 "security-events"
@@ -1146,81 +641,6 @@
               ]
             },
             "order": 5
-          },
-          {
-            "id": "7",
-            "name": "zizmor-scan",
-            "slug": "zizmor-scan",
-            "stage": "scan",
-            "scope": "project",
-            "action": "builtin://actions/zizmor-scan",
-            "access": {
-              "env": [
-                {
-                  "name": "GH_HOSTNAME",
-                  "description": "GH_HOSTNAME is required for some online audits"
-                },
-                {
-                  "name": "GH_TOKEN",
-                  "description": "GH_TOKEN is required for some online audits. Takes precedence over GITHUB_TOKEN"
-                },
-                {
-                  "name": "GITHUB_TOKEN",
-                  "description": "GITHUB_TOKEN is set automatically by GitHub Actions"
-                }
-              ],
-              "executables": [
-                {
-                  "name": "zizmor",
-                  "constraint": "=\u003e 1.4.1"
-                }
-              ],
-              "network": [
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ],
-              "resources": [
-                "security-events"
-              ]
-            },
-            "inputs": {},
-            "outputs": {
-              "artifacts": [
-                {
-                  "type": "report",
-                  "format": "sarif"
-                }
-              ]
-            },
-            "order": 6
           },
           {
             "id": "6",
@@ -1244,28 +664,22 @@
             "access": {
               "env": [
                 {
-                  "name": "SONAR_HOST_URL",
-                  "description": "The SonarQube host URL."
+                  "name": "SONAR_HOST_URL"
                 },
                 {
-                  "name": "SONAR_ORGANIZATION",
-                  "description": "The SonarQube organization."
+                  "name": "SONAR_ORGANIZATION"
                 },
                 {
-                  "name": "SONAR_PROJECTKEY",
-                  "description": "The SonarQube project key."
+                  "name": "SONAR_PROJECTKEY"
                 },
                 {
-                  "name": "SONAR_DEFAULT_BRANCH",
-                  "description": "The SonarQube default branch."
+                  "name": "SONAR_DEFAULT_BRANCH"
                 },
                 {
-                  "name": "SONAR_REGION",
-                  "description": "Can be used to switch to the US-based SonarCloud instance."
+                  "name": "SONAR_REGION"
                 },
                 {
                   "name": "SONAR_TOKEN",
-                  "description": "The SonarQube authentication token.",
                   "required": true,
                   "secret": true
                 }
@@ -1277,45 +691,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "sonarcloud.io:443"
-                },
-                {
-                  "host": "api.sonarcloud.io:443"
-                },
-                {
-                  "host": "scanner.sonarcloud.io:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "sonarcloud.io:443",
+                "api.sonarcloud.io:443",
+                "scanner.sonarcloud.io:443"
               ]
             },
             "inputs": {
@@ -1339,7 +717,7 @@
               ]
             },
             "outputs": {},
-            "order": 7
+            "order": 6
           }
         ]
       },
@@ -1370,14 +748,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.22.2",
-          "hash": "dc2769abcc0fcfbadfc1df54081c1608579ef6b2"
+          "version": "v2.22.3",
+          "hash": "46b06cea07f9e64621fdf066ba77ac6915163d43"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.10",
-          "hash": "f137e1b1fce0d83821c2b96d8c65e5ea33270546ab0aac376a421c191a4864d0",
+          "version": "0.11.13",
+          "hash": "800d546523ee7c20a031a250bff0651e741c89211b6bec66bfaeeeb47664f5c9",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
@@ -1393,7 +771,7 @@
       ]
     },
     "Release": {
-      "version": "0.11.10",
+      "version": "0.11.13",
       "name": "Release",
       "name_slug": "release",
       "job_timeout": 20,
@@ -1409,6 +787,18 @@
         ],
         "environment_pattern": "release-.*"
       },
+      "network_global": [
+        "keyserver.ubuntu.com:443",
+        "github.com:443",
+        "api.github.com:443",
+        "codeload.github.com:443",
+        "uploads.github.com:443",
+        "objects.githubusercontent.com:443",
+        "raw.githubusercontent.com:443",
+        "release-assets.githubusercontent.com:443",
+        "ghcr.io:443",
+        "pkg-containers.githubusercontent.com:443"
+      ],
       "plan": {
         "name": "main",
         "stages": [
@@ -1435,45 +825,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "proxy.golang.org:443"
-                },
-                {
-                  "host": "storage.googleapis.com:443"
-                },
-                {
-                  "host": "sum.golang.org:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "proxy.golang.org:443",
+                "storage.googleapis.com:443",
+                "sum.golang.org:443"
               ]
             },
             "inputs": {},
@@ -1511,45 +865,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "proxy.golang.org:443"
-                },
-                {
-                  "host": "storage.googleapis.com:443"
-                },
-                {
-                  "host": "sum.golang.org:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "proxy.golang.org:443",
+                "storage.googleapis.com:443",
+                "sum.golang.org:443"
               ]
             },
             "inputs": {},
@@ -1585,38 +903,6 @@
                   "constraint": "\u003e= 0.0.0-0"
                 }
               ],
-              "network": [
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ],
               "resources": [
                 "security-events"
               ]
@@ -1642,12 +928,10 @@
             "access": {
               "env": [
                 {
-                  "name": "SEMGREP_RULES",
-                  "description": "See option --config."
+                  "name": "SEMGREP_RULES"
                 },
                 {
                   "name": "SEMGREP_APP_TOKEN",
-                  "description": "Semgrep AppSec Platform Token",
                   "secret": true
                 }
               ],
@@ -1658,39 +942,7 @@
                 }
               ],
               "network": [
-                {
-                  "host": "semgrep.dev:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "semgrep.dev:443"
               ],
               "resources": [
                 "security-events"
@@ -1722,39 +974,7 @@
                 }
               ],
               "network": [
-                {
-                  "host": "mirror.gcr.io:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "mirror.gcr.io:443"
               ],
               "resources": [
                 "security-events"
@@ -1770,81 +990,6 @@
               ]
             },
             "order": 4
-          },
-          {
-            "id": "6",
-            "name": "zizmor-scan",
-            "slug": "zizmor-scan",
-            "stage": "scan",
-            "scope": "project",
-            "action": "builtin://actions/zizmor-scan",
-            "access": {
-              "env": [
-                {
-                  "name": "GH_HOSTNAME",
-                  "description": "GH_HOSTNAME is required for some online audits"
-                },
-                {
-                  "name": "GH_TOKEN",
-                  "description": "GH_TOKEN is required for some online audits. Takes precedence over GITHUB_TOKEN"
-                },
-                {
-                  "name": "GITHUB_TOKEN",
-                  "description": "GITHUB_TOKEN is set automatically by GitHub Actions"
-                }
-              ],
-              "executables": [
-                {
-                  "name": "zizmor",
-                  "constraint": "=\u003e 1.4.1"
-                }
-              ],
-              "network": [
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ],
-              "resources": [
-                "security-events"
-              ]
-            },
-            "inputs": {},
-            "outputs": {
-              "artifacts": [
-                {
-                  "type": "report",
-                  "format": "sarif"
-                }
-              ]
-            },
-            "order": 5
           },
           {
             "id": "5",
@@ -1868,28 +1013,22 @@
             "access": {
               "env": [
                 {
-                  "name": "SONAR_HOST_URL",
-                  "description": "The SonarQube host URL."
+                  "name": "SONAR_HOST_URL"
                 },
                 {
-                  "name": "SONAR_ORGANIZATION",
-                  "description": "The SonarQube organization."
+                  "name": "SONAR_ORGANIZATION"
                 },
                 {
-                  "name": "SONAR_PROJECTKEY",
-                  "description": "The SonarQube project key."
+                  "name": "SONAR_PROJECTKEY"
                 },
                 {
-                  "name": "SONAR_DEFAULT_BRANCH",
-                  "description": "The SonarQube default branch."
+                  "name": "SONAR_DEFAULT_BRANCH"
                 },
                 {
-                  "name": "SONAR_REGION",
-                  "description": "Can be used to switch to the US-based SonarCloud instance."
+                  "name": "SONAR_REGION"
                 },
                 {
                   "name": "SONAR_TOKEN",
-                  "description": "The SonarQube authentication token.",
                   "required": true,
                   "secret": true
                 }
@@ -1901,45 +1040,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "sonarcloud.io:443"
-                },
-                {
-                  "host": "api.sonarcloud.io:443"
-                },
-                {
-                  "host": "scanner.sonarcloud.io:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "sonarcloud.io:443",
+                "api.sonarcloud.io:443",
+                "scanner.sonarcloud.io:443"
               ]
             },
             "inputs": {
@@ -1963,6 +1066,64 @@
               ]
             },
             "outputs": {},
+            "order": 5
+          },
+          {
+            "id": "6",
+            "name": "sign-artifacts",
+            "slug": "sign-artifacts",
+            "stage": "publish",
+            "scope": "project",
+            "action": "builtin://actions/sign-artifacts",
+            "run-after": [
+              "gitleaks-scan",
+              "go-build-github-com-cidverse-cid",
+              "go-test-github-com-cidverse-cid",
+              "semgrep-scan",
+              "sonarqube-scan",
+              "trivyfs-scan"
+            ],
+            "run-after-by-name": [
+              "gitleaks-scan",
+              "go-build [github.com/cidverse/cid]",
+              "go-test [github.com/cidverse/cid]",
+              "semgrep-scan",
+              "sonarqube-scan",
+              "trivyfs-scan"
+            ],
+            "uses-output-of": [
+              "go-build-github-com-cidverse-cid"
+            ],
+            "uses-output-of-by-name": [
+              "go-build [github.com/cidverse/cid]"
+            ],
+            "access": {
+              "env": [
+                {
+                  "name": "GPG_PRIVATE_KEY",
+                  "secret": true
+                },
+                {
+                  "name": "GPG_PASSPHRASE",
+                  "secret": true
+                }
+              ]
+            },
+            "inputs": {
+              "artifacts": [
+                {
+                  "type": "binary"
+                }
+              ]
+            },
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "signature",
+                  "format": "pgp"
+                }
+              ]
+            },
             "order": 6
           },
           {
@@ -1978,8 +1139,7 @@
               "go-test-github-com-cidverse-cid",
               "semgrep-scan",
               "sonarqube-scan",
-              "trivyfs-scan",
-              "zizmor-scan"
+              "trivyfs-scan"
             ],
             "run-after-by-name": [
               "gitleaks-scan",
@@ -1987,43 +1147,9 @@
               "go-test [github.com/cidverse/cid]",
               "semgrep-scan",
               "sonarqube-scan",
-              "trivyfs-scan",
-              "zizmor-scan"
+              "trivyfs-scan"
             ],
-            "access": {
-              "network": [
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ]
-            },
+            "access": {},
             "inputs": {},
             "outputs": {
               "artifacts": [
@@ -2047,9 +1173,9 @@
               "go-build-github-com-cidverse-cid",
               "go-test-github-com-cidverse-cid",
               "semgrep-scan",
+              "sign-artifacts",
               "sonarqube-scan",
-              "trivyfs-scan",
-              "zizmor-scan"
+              "trivyfs-scan"
             ],
             "run-after-by-name": [
               "changelog-generate",
@@ -2057,56 +1183,25 @@
               "go-build [github.com/cidverse/cid]",
               "go-test [github.com/cidverse/cid]",
               "semgrep-scan",
+              "sign-artifacts",
               "sonarqube-scan",
-              "trivyfs-scan",
-              "zizmor-scan"
+              "trivyfs-scan"
             ],
             "uses-output-of": [
               "changelog-generate",
-              "go-build-github-com-cidverse-cid"
+              "go-build-github-com-cidverse-cid",
+              "sign-artifacts"
             ],
             "uses-output-of-by-name": [
               "changelog-generate",
-              "go-build [github.com/cidverse/cid]"
+              "go-build [github.com/cidverse/cid]",
+              "sign-artifacts"
             ],
             "access": {
               "env": [
                 {
                   "name": "GITHUB_TOKEN",
-                  "description": "The GitHub token to use for creating the release.",
                   "required": true
-                }
-              ],
-              "network": [
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
                 }
               ],
               "resources": [
@@ -2120,6 +1215,10 @@
                 },
                 {
                   "type": "binary"
+                },
+                {
+                  "type": "signature",
+                  "format": "pgp"
                 }
               ]
             },
@@ -2155,14 +1254,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.22.2",
-          "hash": "dc2769abcc0fcfbadfc1df54081c1608579ef6b2"
+          "version": "v2.22.3",
+          "hash": "46b06cea07f9e64621fdf066ba77ac6915163d43"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.10",
-          "hash": "f137e1b1fce0d83821c2b96d8c65e5ea33270546ab0aac376a421c191a4864d0",
+          "version": "0.11.13",
+          "hash": "800d546523ee7c20a031a250bff0651e741c89211b6bec66bfaeeeb47664f5c9",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
@@ -2178,7 +1277,7 @@
       ]
     },
     "Main": {
-      "version": "0.11.10",
+      "version": "0.11.13",
       "name": "Main",
       "name_slug": "main",
       "job_timeout": 20,
@@ -2193,6 +1292,18 @@
           "main"
         ]
       },
+      "network_global": [
+        "keyserver.ubuntu.com:443",
+        "github.com:443",
+        "api.github.com:443",
+        "codeload.github.com:443",
+        "uploads.github.com:443",
+        "objects.githubusercontent.com:443",
+        "raw.githubusercontent.com:443",
+        "release-assets.githubusercontent.com:443",
+        "ghcr.io:443",
+        "pkg-containers.githubusercontent.com:443"
+      ],
       "plan": {
         "name": "main",
         "stages": [
@@ -2219,45 +1330,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "proxy.golang.org:443"
-                },
-                {
-                  "host": "storage.googleapis.com:443"
-                },
-                {
-                  "host": "sum.golang.org:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "proxy.golang.org:443",
+                "storage.googleapis.com:443",
+                "sum.golang.org:443"
               ]
             },
             "inputs": {},
@@ -2295,45 +1370,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "proxy.golang.org:443"
-                },
-                {
-                  "host": "storage.googleapis.com:443"
-                },
-                {
-                  "host": "sum.golang.org:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "proxy.golang.org:443",
+                "storage.googleapis.com:443",
+                "sum.golang.org:443"
               ]
             },
             "inputs": {},
@@ -2372,45 +1411,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "proxy.golang.org:443"
-                },
-                {
-                  "host": "storage.googleapis.com:443"
-                },
-                {
-                  "host": "sum.golang.org:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "proxy.golang.org:443",
+                "storage.googleapis.com:443",
+                "sum.golang.org:443"
               ],
               "resources": [
                 "security-events"
@@ -2441,38 +1444,6 @@
                   "constraint": "\u003e= 0.0.0-0"
                 }
               ],
-              "network": [
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ],
               "resources": [
                 "security-events"
               ]
@@ -2498,12 +1469,10 @@
             "access": {
               "env": [
                 {
-                  "name": "SEMGREP_RULES",
-                  "description": "See option --config."
+                  "name": "SEMGREP_RULES"
                 },
                 {
                   "name": "SEMGREP_APP_TOKEN",
-                  "description": "Semgrep AppSec Platform Token",
                   "secret": true
                 }
               ],
@@ -2514,39 +1483,7 @@
                 }
               ],
               "network": [
-                {
-                  "host": "semgrep.dev:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "semgrep.dev:443"
               ],
               "resources": [
                 "security-events"
@@ -2578,39 +1515,7 @@
                 }
               ],
               "network": [
-                {
-                  "host": "mirror.gcr.io:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "mirror.gcr.io:443"
               ],
               "resources": [
                 "security-events"
@@ -2626,81 +1531,6 @@
               ]
             },
             "order": 5
-          },
-          {
-            "id": "7",
-            "name": "zizmor-scan",
-            "slug": "zizmor-scan",
-            "stage": "scan",
-            "scope": "project",
-            "action": "builtin://actions/zizmor-scan",
-            "access": {
-              "env": [
-                {
-                  "name": "GH_HOSTNAME",
-                  "description": "GH_HOSTNAME is required for some online audits"
-                },
-                {
-                  "name": "GH_TOKEN",
-                  "description": "GH_TOKEN is required for some online audits. Takes precedence over GITHUB_TOKEN"
-                },
-                {
-                  "name": "GITHUB_TOKEN",
-                  "description": "GITHUB_TOKEN is set automatically by GitHub Actions"
-                }
-              ],
-              "executables": [
-                {
-                  "name": "zizmor",
-                  "constraint": "=\u003e 1.4.1"
-                }
-              ],
-              "network": [
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ],
-              "resources": [
-                "security-events"
-              ]
-            },
-            "inputs": {},
-            "outputs": {
-              "artifacts": [
-                {
-                  "type": "report",
-                  "format": "sarif"
-                }
-              ]
-            },
-            "order": 6
           },
           {
             "id": "6",
@@ -2724,28 +1554,22 @@
             "access": {
               "env": [
                 {
-                  "name": "SONAR_HOST_URL",
-                  "description": "The SonarQube host URL."
+                  "name": "SONAR_HOST_URL"
                 },
                 {
-                  "name": "SONAR_ORGANIZATION",
-                  "description": "The SonarQube organization."
+                  "name": "SONAR_ORGANIZATION"
                 },
                 {
-                  "name": "SONAR_PROJECTKEY",
-                  "description": "The SonarQube project key."
+                  "name": "SONAR_PROJECTKEY"
                 },
                 {
-                  "name": "SONAR_DEFAULT_BRANCH",
-                  "description": "The SonarQube default branch."
+                  "name": "SONAR_DEFAULT_BRANCH"
                 },
                 {
-                  "name": "SONAR_REGION",
-                  "description": "Can be used to switch to the US-based SonarCloud instance."
+                  "name": "SONAR_REGION"
                 },
                 {
                   "name": "SONAR_TOKEN",
-                  "description": "The SonarQube authentication token.",
                   "required": true,
                   "secret": true
                 }
@@ -2757,45 +1581,9 @@
                 }
               ],
               "network": [
-                {
-                  "host": "sonarcloud.io:443"
-                },
-                {
-                  "host": "api.sonarcloud.io:443"
-                },
-                {
-                  "host": "scanner.sonarcloud.io:443"
-                },
-                {
-                  "host": "keyserver.ubuntu.com:443"
-                },
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "release-assets.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
+                "sonarcloud.io:443",
+                "api.sonarcloud.io:443",
+                "scanner.sonarcloud.io:443"
               ]
             },
             "inputs": {
@@ -2819,7 +1607,7 @@
               ]
             },
             "outputs": {},
-            "order": 7
+            "order": 6
           }
         ]
       },
@@ -2850,14 +1638,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.22.2",
-          "hash": "dc2769abcc0fcfbadfc1df54081c1608579ef6b2"
+          "version": "v2.22.3",
+          "hash": "46b06cea07f9e64621fdf066ba77ac6915163d43"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.10",
-          "hash": "f137e1b1fce0d83821c2b96d8c65e5ea33270546ab0aac376a421c191a4864d0",
+          "version": "0.11.13",
+          "hash": "800d546523ee7c20a031a250bff0651e741c89211b6bec66bfaeeeb47664f5c9",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
