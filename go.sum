@@ -62,10 +62,14 @@ github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812 h1:3N+3h/KNdG7wz
 github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812/go.mod h1:idKxSNVgvigegPgr+XgOeH+l42h20r/0k4kIQXASfq0=
 github.com/cidverse/go-vcs v0.0.0-20261004225916-8349f25feaed h1:0Dyw7Fjs7sm4PYFdFnB/RU3Je1Y1SgX+xTVu9FYE2SY=
 github.com/cidverse/go-vcs v0.0.0-20261004225916-8349f25feaed/go.mod h1:o2+8U8p17nGkp48gNd4OU+L8RTPYhJaDhbDuGMKOg3w=
+github.com/cidverse/go-vcs v0.0.0-20261101140518-d14ae70807d4 h1:AOlT3T2Ul91IjsBrpAtX3MxtIjnpW0Nh6BxyUlRgxtU=
+github.com/cidverse/go-vcs v0.0.0-20261101140518-d14ae70807d4/go.mod h1:x2iHe8sn/hQxP0f0Njsr2oM82HI1C1EWcM/3roK0tkw=
 github.com/cidverse/go-vcsapp v0.0.0-20261021160248-8c50d47e0523 h1:BNrtKBJqz/pQTGY3P4IVvOLZR+N8NDB2NTfUWEykv/o=
 github.com/cidverse/go-vcsapp v0.0.0-20261021160248-8c50d47e0523/go.mod h1:xKt5wPeKTTDRoQoMlp0gPSbgtZmJS8Wlq/oyvSClOVM=
 github.com/cidverse/go-vcsapp v0.0.0-20261031164912-030087099712 h1:RoIXj/He0mKUXdiO7y3xFN2Sexc8Up6CT/Vd68KFKao=
 github.com/cidverse/go-vcsapp v0.0.0-20261031164912-030087099712/go.mod h1:3ifcy7ex/h1DAYBia5kdcH2GpdXTwRBd7SLZqHNhQQo=
+github.com/cidverse/go-vcsapp v0.0.0-20261101141231-aee04f73879a h1:SShhwPWOqSrUB99SMfy62sMDB0kNrM85ZY8CTJ4l7Cg=
+github.com/cidverse/go-vcsapp v0.0.0-20261101141231-aee04f73879a/go.mod h1:mpX0t7q6VbEsXaQaLjafJNCggJd0Ji8VGAsrI7rMhKE=
 github.com/cidverse/normalizeci v1.1.1-0.20261021160637-7dfca485a24e h1:IKj4TqTvrlPFKhLY0mzFlITacKXW1rE/UE7KRjMJVw0=
 github.com/cidverse/normalizeci v1.1.1-0.20261021160637-7dfca485a24e/go.mod h1:LZa1Ps6cmpw3NOMih0Xo0MR1MgJm51YtIe2PgzSLorA=
 github.com/cidverse/repoanalyzer v0.1.1-0.20260323224527-430bf6d5fa5b h1:k9ZCfVn6TlxhdjYzj6qQnsaP6eUI1Yd5jLMlYakkcpo=

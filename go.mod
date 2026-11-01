@@ -22,8 +22,8 @@ require (
 	github.com/cidverse/cidverseutils/zerologconfig v0.1.2-0.20250329161944-cee6e2f5f53c
 	github.com/cidverse/go-ptr v0.0.0-20240331160646-489e694bebbf
 	github.com/cidverse/go-rules v0.0.0-20250614224628-52704bb6b812
-	github.com/cidverse/go-vcs v0.0.0-20261004225916-8349f25feaed
-	github.com/cidverse/go-vcsapp v0.0.0-20261031164912-030087099712
+	github.com/cidverse/go-vcs v0.0.0-20261101140518-d14ae70807d4
+	github.com/cidverse/go-vcsapp v0.0.0-20261101141231-aee04f73879a
 	github.com/cidverse/normalizeci v1.1.1-0.20261021160637-7dfca485a24e
 	github.com/cidverse/repoanalyzer v0.1.1-0.20261101132110-946252f4aa3b
 	github.com/go-playground/validator/v10 v10.30.5
