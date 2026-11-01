@@ -9,15 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMergeNetworkAccess(t *testing.T) {
-	result := MergeNetworkAccess(
-		[]actionsdk.ActionAccessNetwork{{Host: "proxy.golang.org:443"}, {Host: ""}},
-		[]actionsdk.ActionAccessNetwork{{Host: "github.com:443"}, {Host: "proxy.golang.org:443"}},
-	)
-
-	assert.Equal(t, []actionsdk.ActionAccessNetwork{{Host: "proxy.golang.org:443"}, {Host: "github.com:443"}}, result)
-}
-
 func TestBuildStepIncludesModuleRepositories(t *testing.T) {
 	actionNetwork := []actionsdk.ActionAccessNetwork{{Host: "proxy.golang.org:443"}}
 	catalogAction := catalog.Action{URI: "builtin://actions/go-build"}
@@ -37,10 +28,6 @@ func TestBuildStepIncludesModuleRepositories(t *testing.T) {
 
 	step := buildStep(catalogAction, catalog.WorkflowAction{Stage: "build"}, 0, "go-build", module, "", nil)
 
-	assert.Equal(t, []actionsdk.ActionAccessNetwork{
-		{Host: "proxy.golang.org:443"},
-		{Host: "git.example.com:22"},
-		{Host: "repo.example.com:8443"},
-	}, step.Access.Network)
+	assert.Equal(t, StepAccessNetwork{"proxy.golang.org:443", "git.example.com:22", "repo.example.com:8443"}, step.Access.Network)
 	assert.Equal(t, []actionsdk.ActionAccessNetwork{{Host: "proxy.golang.org:443"}}, actionNetwork, "action metadata must not be modified")
 }

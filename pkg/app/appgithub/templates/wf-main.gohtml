@@ -118,10 +118,11 @@ jobs:
         with:
           disable-telemetry: true
           egress-policy: "{{ printf "%s" "${{ env.EGRESS_POLICY }}" }}"
-          {{- if $step.Access.Network }}
+          {{- $allowedEndpoints := $.AllowedEndpoints $step }}
+          {{- if $allowedEndpoints }}
           allowed-endpoints: >-
-            {{- range $n := $step.Access.Network }}
-            {{ $n.Host }}
+            {{- range $n := $allowedEndpoints }}
+            {{ $n }}
             {{- end }}
           {{- end }}
       - name: Checkout

@@ -3,27 +3,22 @@ package appconfig
 import (
 	"testing"
 
-	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/stretchr/testify/assert"
 )
 
-func stateWithStep(network ...string) *WorkflowState {
-	var access []actionsdk.ActionAccessNetwork
-	for _, host := range network {
-		access = append(access, actionsdk.ActionAccessNetwork{Host: host})
-	}
-
+func stateWithStep(global plangenerate.StepAccessNetwork, network ...string) *WorkflowState {
 	state := NewWorkflowState()
 	state.Workflows.Set("main", &WorkflowData{
-		Plan: plangenerate.Plan{Steps: []plangenerate.Step{{Name: "go-build [project]", Access: actionsdk.ActionAccess{Network: access}}}},
+		NetworkGlobal: global,
+		Plan:          plangenerate.Plan{Steps: []plangenerate.Step{{Name: "go-build [project]", Access: plangenerate.StepAccess{Network: network}}}},
 	})
 	return state
 }
 
 func TestCompareToNetworkChanges(t *testing.T) {
-	prev := stateWithStep("github.com:443", "proxy.golang.org:443")
-	next := stateWithStep("github.com:443", "git.example.com:22", "repo.example.com:443")
+	prev := stateWithStep(nil, "github.com:443", "proxy.golang.org:443")
+	next := stateWithStep(nil, "github.com:443", "git.example.com:22", "repo.example.com:443")
 
 	changes := prev.CompareTo(next)
 
@@ -35,8 +30,16 @@ func TestCompareToNetworkChanges(t *testing.T) {
 }
 
 func TestCompareToNetworkUnchanged(t *testing.T) {
-	prev := stateWithStep("github.com:443", "proxy.golang.org:443")
-	next := stateWithStep("proxy.golang.org:443", "github.com:443")
+	prev := stateWithStep(nil, "github.com:443", "proxy.golang.org:443")
+	next := stateWithStep(nil, "proxy.golang.org:443", "github.com:443")
+
+	assert.Empty(t, prev.CompareTo(next))
+}
+
+func TestCompareToNetworkGlobalHoisted(t *testing.T) {
+	// previous state stored the global allow list in every step, the new one stores it once per workflow
+	prev := stateWithStep(nil, "proxy.golang.org:443", "github.com:443")
+	next := stateWithStep(plangenerate.StepAccessNetwork{"github.com:443"}, "proxy.golang.org:443")
 
 	assert.Empty(t, prev.CompareTo(next))
 }

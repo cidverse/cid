@@ -64,9 +64,9 @@ func TestRenderWorkflowJobPermissionsIncludeBaselineScopes(t *testing.T) {
 func TestRenderWorkflowJobPermissionsOverrideBaseline(t *testing.T) {
 	data := testWorkflowData()
 	data.Plan.Steps = []plangenerate.Step{
-		{Name: "github-release-publish", Slug: "github-release-publish", Access: actionsdk.ActionAccess{Resources: []actionsdk.ActionAccessResource{actionsdk.ResourceReleases}}},
-		{Name: "container-publish", Slug: "container-publish", Access: actionsdk.ActionAccess{Resources: []actionsdk.ActionAccessResource{actionsdk.ResourcePackages}}},
-		{Name: "zizmor-scan", Slug: "zizmor-scan", Access: actionsdk.ActionAccess{Resources: []actionsdk.ActionAccessResource{actionsdk.ResourceSecurityEvents}}},
+		{Name: "github-release-publish", Slug: "github-release-publish", Access: plangenerate.StepAccess{Resources: []actionsdk.ActionAccessResource{actionsdk.ResourceReleases}}},
+		{Name: "container-publish", Slug: "container-publish", Access: plangenerate.StepAccess{Resources: []actionsdk.ActionAccessResource{actionsdk.ResourcePackages}}},
+		{Name: "zizmor-scan", Slug: "zizmor-scan", Access: plangenerate.StepAccess{Resources: []actionsdk.ActionAccessResource{actionsdk.ResourceSecurityEvents}}},
 		{Name: "github-pr-comment", Slug: "github-pr-comment"},
 	}
 
@@ -95,7 +95,7 @@ func TestRenderWorkflowJobPermissionsPullRequestDoesNotEscalate(t *testing.T) {
 		{
 			Name: "github-release-publish",
 			Slug: "github-release-publish",
-			Access: actionsdk.ActionAccess{Resources: []actionsdk.ActionAccessResource{
+			Access: plangenerate.StepAccess{Resources: []actionsdk.ActionAccessResource{
 				actionsdk.ResourceReleases,
 				actionsdk.ResourcePackages,
 				actionsdk.ResourceSecurityEvents,

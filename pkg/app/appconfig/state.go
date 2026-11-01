@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 
-	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/cidverseutils/hash"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
@@ -157,7 +155,7 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 			}
 
 			// network policy
-			added, removed := diffNetworkAccess(oldStep.Access.Network, s.Access.Network)
+			added, removed := diffNetworkHosts(oldWf.AllowedEndpoints(oldStep), newWf.AllowedEndpoints(s))
 			if len(added) > 0 || len(removed) > 0 {
 				var parts []string
 				if len(added) > 0 {
@@ -187,29 +185,9 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 	return changes
 }
 
-// diffNetworkAccess returns the hosts that are only present in next (added) and only present in prev (removed), preserving order
-func diffNetworkAccess(prev []actionsdk.ActionAccessNetwork, next []actionsdk.ActionAccessNetwork) (added []string, removed []string) {
-	prevHosts := make(map[string]struct{}, len(prev))
-	for _, n := range prev {
-		prevHosts[n.Host] = struct{}{}
-	}
-	nextHosts := make(map[string]struct{}, len(next))
-	for _, n := range next {
-		nextHosts[n.Host] = struct{}{}
-	}
-
-	for _, n := range next {
-		if _, exists := prevHosts[n.Host]; !exists && !slices.Contains(added, n.Host) {
-			added = append(added, n.Host)
-		}
-	}
-	for _, n := range prev {
-		if _, exists := nextHosts[n.Host]; !exists && !slices.Contains(removed, n.Host) {
-			removed = append(removed, n.Host)
-		}
-	}
-
-	return added, removed
+// diffNetworkHosts returns the endpoints that are only present in next (added) and only present in prev (removed), preserving order
+func diffNetworkHosts(prev plangenerate.StepAccessNetwork, next plangenerate.StepAccessNetwork) (added []string, removed []string) {
+	return plangenerate.RemoveNetworkHosts(next, prev), plangenerate.RemoveNetworkHosts(prev, next)
 }
 
 func formatHosts(hosts []string) string {

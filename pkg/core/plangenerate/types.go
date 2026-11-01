@@ -48,7 +48,7 @@ type Step struct {
 	UsesOutputOf       []string               `json:"uses-output-of,omitempty"`         // List of steps whose outputs need to be downloaded (by slug)
 	UsesOutputOfByName []string               `json:"uses-output-of-by-name,omitempty"` // List of steps whose outputs need to be downloaded (by name)
 	Environment        string                 `json:"environment,omitempty"`
-	Access             actionsdk.ActionAccess `json:"access,omitempty"`
+	Access             StepAccess             `json:"access,omitempty"`
 	Inputs             actionsdk.ActionInput  `json:"inputs,omitempty"`
 	Outputs            actionsdk.ActionOutput `json:"outputs,omitempty"`
 	Order              int                    `json:"order"` // Topological order
@@ -68,7 +68,8 @@ func (s *Step) HasOutputWithTypeAndFormat(artifactType string, artifactFormat st
 func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id int, name string, moduleRef *analyzerapi.ProjectModule, environment string, executableConstraints []actionsdk.ActionAccessExecutable) Step {
 	moduleName := ""
 	moduleDir := ""
-	network := MergeNetworkAccess(catalogAction.Metadata.Access.Network)
+	access := NewStepAccess(catalogAction.Metadata.Access)
+	access.Executables = executableConstraints
 	if moduleRef != nil {
 		moduleName = moduleRef.ID
 
@@ -80,7 +81,7 @@ func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id i
 		}
 
 		name = fmt.Sprintf("%s [%s]", name, moduleRef.Name)
-		network = MergeNetworkAccess(network, moduleRepositoryNetworkAccess(moduleRef))
+		access.Network = MergeNetworkHosts(access.Network, moduleRepositoryNetworkHosts(moduleRef))
 	}
 	if environment != "" {
 		name = fmt.Sprintf("%s (%s)", name, environment)
@@ -98,16 +99,11 @@ func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id i
 		RunAfter:     []string{},
 		RunIfChanged: catalogAction.Metadata.RunIfChanged,
 		Environment:  environment,
-		Access: actionsdk.ActionAccess{
-			Environment: catalogAction.Metadata.Access.Environment,
-			Executables: executableConstraints,
-			Network:     network,
-			Resources:   catalogAction.Metadata.Access.Resources,
-		},
-		Inputs:  catalogAction.Metadata.Input,
-		Outputs: catalogAction.Metadata.Output,
-		Order:   1,
-		Config:  action.Config,
+		Access:       access,
+		Inputs:       catalogAction.Metadata.Input,
+		Outputs:      catalogAction.Metadata.Output,
+		Order:        1,
+		Config:       action.Config,
 	}
 }
 

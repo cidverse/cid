@@ -21,6 +21,7 @@ type WorkflowData struct {
 	ContainerRuntime             string                           `json:"container_runtime"`
 	WorkflowKey                  string                           `json:"workflow_key"`
 	WorkflowConfig               WorkflowConfig                   `json:"workflow_config"`
+	NetworkGlobal                plangenerate.StepAccessNetwork   `json:"network_global,omitempty"` // NetworkGlobal is the network allow list shared by all steps of the workflow
 	Plan                         plangenerate.Plan                `json:"plan"`
 	WorkflowDependency           map[string]dependency.Dependency `json:"-"`
 	ReferencedWorkflowDependency map[string]dependency.Dependency `json:"workflow_dependency"`
@@ -41,6 +42,11 @@ func (t *WorkflowData) GetDependency(key string) dependency.Dependency {
 		return dep
 	}
 	return dependency.Dependency{}
+}
+
+// AllowedEndpoints returns all network endpoints a step may use, including the workflow-wide allow list
+func (t *WorkflowData) AllowedEndpoints(step plangenerate.Step) plangenerate.StepAccessNetwork {
+	return plangenerate.MergeNetworkHosts(step.Access.Network, t.NetworkGlobal)
 }
 
 type RenderWorkflowResult struct {
@@ -68,10 +74,10 @@ func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon
 		return WorkflowData{}, err
 	}
 
-	// pre-process access section for workflow rendering
+	// the global network allow list is stored once per workflow, steps only keep their own endpoints
+	networkGlobal := plangenerate.MergeNetworkHosts(plangenerate.NetworkHosts(networkAllowGlobal))
 	for i := range plan.Steps {
-		plan.Steps[i].Access.Network = plangenerate.MergeNetworkAccess(plan.Steps[i].Access.Network, networkAllowGlobal)
-		plan.Steps[i].Access.Environment = appcommon.RemoveEnvByName(plan.Steps[i].Access.Environment, []string{})
+		plan.Steps[i].Access.Network = plangenerate.RemoveNetworkHosts(plan.Steps[i].Access.Network, networkGlobal)
 	}
 
 	// render workflow template
@@ -85,6 +91,7 @@ func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon
 		WorkflowKey:                  slug.Make(wfName),
 		WorkflowConfig:               wfConfig,
 		Plan:                         plan,
+		NetworkGlobal:                networkGlobal,
 		WorkflowDependency:           wfDependencies,
 		ReferencedWorkflowDependency: make(map[string]dependency.Dependency),
 		IgnoreFiles: []string{
