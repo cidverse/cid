@@ -33,6 +33,7 @@ func RunCmd() *cobra.Command {
 			repos, err := platform.Repositories(api.RepositoryListOpts{
 				IncludeBranches:   true,
 				IncludeCommitHash: true,
+				IncludeArchived:   false,
 			})
 			if err != nil {
 				slog.Error("Failed to list repositories", "err", err)
@@ -41,6 +42,12 @@ func RunCmd() *cobra.Command {
 
 			// execute task for each repository
 			for _, repo := range repos {
+				// archived repositories are read-only, no PRs can be created
+				if repo.IsArchived {
+					slog.With("repository", fmt.Sprintf("%s/%s", repo.Namespace, repo.Name)).Debug("Skipping archived repository")
+					continue
+				}
+
 				if expr != "" {
 					e := regexp.MustCompile(expr)
 					if !e.Match([]byte(repo.Name)) {
