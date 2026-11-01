@@ -3,6 +3,7 @@ package builtinworkflow
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/ansible/ansibledeploy"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/ansible/ansiblelint"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/betterleaks/betterleaksscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargotest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/changelog/changeloggenerate"
@@ -10,7 +11,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnettest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/github/githubreleasepublish"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitlab/gitlabreleasepublish"
-	"github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan"
+	// "github.com/cidverse/cid/pkg/builtin/builtinaction/gitleaks/gitleaksscan" // replaced by betterleaks
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/golangcilint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gotest"
@@ -171,8 +172,11 @@ func GetWorkflows() []catalog.Workflow {
 				Name: "scan",
 				Actions: []catalog.WorkflowAction{
 					// secret scanning
+					// {
+					// 	ID: gitleaksscan.URI,
+					// },
 					{
-						ID: gitleaksscan.URI,
+						ID: betterleaksscan.URI,
 					},
 					{
 						ID: semgrepscan.URI,

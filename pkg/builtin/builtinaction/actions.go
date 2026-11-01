@@ -3,6 +3,7 @@ package builtinaction
 import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/ansible/ansibledeploy"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/ansible/ansiblelint"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/betterleaks/betterleaksscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargotest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/changelog/changeloggenerate"
@@ -51,6 +52,8 @@ func GetActions(sdk actionsdk.SDKClient) map[string]actionsdk.Action {
 		// dotnet
 		dotnetbuild.Action{Sdk: sdk},
 		dotnettest.Action{Sdk: sdk},
+		// betterleaks
+		betterleaksscan.Action{Sdk: sdk},
 		// gitleaks
 		gitleaksscan.Action{Sdk: sdk},
 		// github

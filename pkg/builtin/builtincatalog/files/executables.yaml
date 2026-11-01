@@ -45,6 +45,8 @@ executable-discovery:
         image: "ghcr.io/cidverse/upx"
       - binary: ["gh"]
         image: "ghcr.io/cidverse/gh"
+      - binary: ["betterleaks"]
+        image: "ghcr.io/cidverse/betterleaks"
       - binary: ["gitleaks"]
         image: "ghcr.io/cidverse/gitleaks"
       - binary: ["glab"]

@@ -1684,6 +1684,24 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "betterleaks",
+        "Version": "1.9.0",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/betterleaks:1.9.0",
+        "Digest": "sha256:62ac3252bc70c611958600cd5b3f604d8d3efb477a2f71e266dfd140e227c4d1",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "gitleaks",
         "Version": "8.22.1",
         "Type": "container",

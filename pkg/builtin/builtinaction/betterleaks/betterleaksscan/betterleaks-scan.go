@@ -1,0 +1,127 @@
+package betterleaksscan
+
+import (
+	"fmt"
+
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+
+	"strings"
+
+	"github.com/owenrumney/go-sarif/v3/pkg/report/v210/sarif"
+)
+
+const URI = "builtin://actions/betterleaks-scan"
+
+type Action struct {
+	Sdk actionsdk.SDKClient
+}
+
+type Config struct {
+}
+
+func (a Action) Metadata() actionsdk.ActionMetadata {
+	return actionsdk.ActionMetadata{
+		Name:        "betterleaks-scan",
+		Description: "Scans the repository for secrets using Betterleaks.",
+		Category:    "sast",
+		Scope:       actionsdk.ActionScopeProject,
+		Rules: []actionsdk.ActionRule{
+			{
+				Type:       "cel",
+				Expression: `NCI_COMMIT_REF_TYPE == "branch" && size(PROJECT_BUILD_SYSTEMS) > 0`,
+			},
+		},
+		Access: actionsdk.ActionAccess{
+			Environment: []actionsdk.ActionAccessEnv{},
+			Executables: []actionsdk.ActionAccessExecutable{
+				{
+					Name: "betterleaks",
+				},
+			},
+			Resources: []actionsdk.ActionAccessResource{
+				actionsdk.ResourceSecurityEvents,
+			},
+		},
+		Output: actionsdk.ActionOutput{
+			Artifacts: []actionsdk.ActionArtifactType{
+				{
+					Type:   "report",
+					Format: "sarif",
+				},
+			},
+		},
+	}
+}
+
+func (a Action) GetConfig(d *actionsdk.ProjectExecutionContextV1Response) (Config, error) {
+	cfg := Config{}
+
+	if err := common.ParseAndValidateConfig(d.Config.Config, d.Env, &cfg); err != nil {
+		return cfg, err
+	}
+
+	return cfg, nil
+}
+
+func (a Action) Execute() (err error) {
+	// query action data
+	d, err := a.Sdk.ProjectExecutionContextV1()
+	if err != nil {
+		return err
+	}
+
+	// parse config
+	_, err = a.GetConfig(d)
+	if err != nil {
+		return err
+	}
+
+	// files
+	reportFile := actionsdk.JoinPath(d.Config.TempDir, "betterleaks.sarif.json")
+
+	// opts
+	var opts = []string{
+		"betterleaks", "dir", ".",
+		"--verbose",
+		"--report-format=sarif",
+		fmt.Sprintf("--report-path=%q", reportFile),
+		"--no-banner",
+		"--redact=85", // redact 85% of the secret
+		"--exit-code=0",
+	}
+
+	// scan
+	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
+		Command: strings.Join(opts, " "),
+		WorkDir: d.ProjectDir,
+	})
+	if err != nil {
+		return err
+	} else if cmdResult.Code != 0 {
+		return fmt.Errorf("betterleaks scan failed, exit code %d", cmdResult.Code)
+	}
+
+	// parse report
+	reportContent, err := a.Sdk.FileReadV1(reportFile)
+	if err != nil {
+		return fmt.Errorf("failed to read report content from file %s: %s", reportFile, err.Error())
+	}
+	report, err := sarif.FromBytes([]byte(reportContent))
+	if err != nil {
+		return err
+	}
+
+	// store report
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
+		File:          reportFile,
+		Type:          "report",
+		Format:        "sarif",
+		FormatVersion: report.Version,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
