@@ -68,6 +68,7 @@ func (s *Step) HasOutputWithTypeAndFormat(artifactType string, artifactFormat st
 func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id int, name string, moduleRef *analyzerapi.ProjectModule, environment string, executableConstraints []actionsdk.ActionAccessExecutable) Step {
 	moduleName := ""
 	moduleDir := ""
+	network := MergeNetworkAccess(catalogAction.Metadata.Access.Network)
 	if moduleRef != nil {
 		moduleName = moduleRef.ID
 
@@ -79,6 +80,7 @@ func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id i
 		}
 
 		name = fmt.Sprintf("%s [%s]", name, moduleRef.Name)
+		network = MergeNetworkAccess(network, moduleRepositoryNetworkAccess(moduleRef))
 	}
 	if environment != "" {
 		name = fmt.Sprintf("%s (%s)", name, environment)
@@ -99,7 +101,7 @@ func buildStep(catalogAction catalog.Action, action catalog.WorkflowAction, id i
 		Access: actionsdk.ActionAccess{
 			Environment: catalogAction.Metadata.Access.Environment,
 			Executables: executableConstraints,
-			Network:     catalogAction.Metadata.Access.Network,
+			Network:     network,
 			Resources:   catalogAction.Metadata.Access.Resources,
 		},
 		Inputs:  catalogAction.Metadata.Input,

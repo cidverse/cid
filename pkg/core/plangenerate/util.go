@@ -8,8 +8,10 @@ import (
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/core/catalog"
 	"github.com/cidverse/cid/pkg/core/rules"
+	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
 // selectWorkflow returns the best matching workflow based on the rules
@@ -95,5 +97,35 @@ func projectEnvironmentEnv(env map[string]string, vars []api.CIVariable, environ
 		}
 	}
 
+	return result
+}
+
+// moduleRepositoryNetworkAccess returns the network endpoints of the external repositories a module pulls artifacts from
+func moduleRepositoryNetworkAccess(module *analyzerapi.ProjectModule) []actionsdk.ActionAccessNetwork {
+	var result []actionsdk.ActionAccessNetwork
+	for _, repository := range module.Repositories {
+		if endpoint := repository.HostAndPort(); endpoint != "" {
+			result = append(result, actionsdk.ActionAccessNetwork{Host: endpoint})
+		}
+	}
+	return result
+}
+
+// MergeNetworkAccess concatenates network access lists into a new slice, deduplicating by host and preserving order
+func MergeNetworkAccess(groups ...[]actionsdk.ActionAccessNetwork) []actionsdk.ActionAccessNetwork {
+	var result []actionsdk.ActionAccessNetwork
+	seen := make(map[string]struct{})
+	for _, group := range groups {
+		for _, network := range group {
+			if network.Host == "" {
+				continue
+			}
+			if _, exists := seen[network.Host]; exists {
+				continue
+			}
+			seen[network.Host] = struct{}{}
+			result = append(result, network)
+		}
+	}
 	return result
 }

@@ -74,6 +74,8 @@ github.com/cidverse/repoanalyzer v0.1.1-0.20261031202156-0907f6e507c6 h1:5LfAQ10
 github.com/cidverse/repoanalyzer v0.1.1-0.20261031202156-0907f6e507c6/go.mod h1:Cq5rykisp7QDnRghV1YlRjX0rDh3m5lq+ffRv9YJ7uw=
 github.com/cidverse/repoanalyzer v0.1.1-0.20261031202958-6d181aee92ae h1:4lSHgXIBk2C/CTOarGCkssx7pwYSH5Z3IHqpOAYVo/c=
 github.com/cidverse/repoanalyzer v0.1.1-0.20261031202958-6d181aee92ae/go.mod h1:Cq5rykisp7QDnRghV1YlRjX0rDh3m5lq+ffRv9YJ7uw=
+github.com/cidverse/repoanalyzer v0.1.1-0.20261101132110-946252f4aa3b h1:fXsQqgydOQpea2B/dqX6cZKZm5Y515ebpB6orCr96hA=
+github.com/cidverse/repoanalyzer v0.1.1-0.20261101132110-946252f4aa3b/go.mod h1:Cq5rykisp7QDnRghV1YlRjX0rDh3m5lq+ffRv9YJ7uw=
 github.com/cloudflare/circl v1.6.5 h1:O64F26HEqNhznd/hrC5KZXVKYuKM2rx4deZDTc4ihQA=
 github.com/cloudflare/circl v1.6.5/go.mod h1:h5LNyxAc5nTue9DS5jT+48en2PSDYt3zdGnz5OstK6c=
 github.com/codahale/rfc6979 v0.0.0-20141003034818-6a90f24967eb h1:EDmT6Q9Zs+SbUoc7Ik9EfrFqcylYqgPZ9ANSbTAntnE=

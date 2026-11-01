@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 
+	"github.com/cidverse/cid/pkg/core/actionsdk"
+	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/cidverseutils/hash"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 )
@@ -135,18 +139,37 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 		}
 
 		// Compare Steps by Name
-		oldSteps := make(map[string]struct{})
+		oldSteps := make(map[string]plangenerate.Step)
 		for _, s := range oldWf.Plan.Steps {
-			oldSteps[s.Name] = struct{}{}
+			oldSteps[s.Name] = s
 		}
 		newSteps := make(map[string]struct{})
 		for _, s := range newWf.Plan.Steps {
 			newSteps[s.Name] = struct{}{}
-			if _, exists := oldSteps[s.Name]; !exists {
+			oldStep, exists := oldSteps[s.Name]
+			if !exists {
 				changes = append(changes, ChangeEntry{
 					Workflow: key,
 					Scope:    "step",
 					Message:  fmt.Sprintf("added step: [%s]", s.Name),
+				})
+				continue
+			}
+
+			// network policy
+			added, removed := diffNetworkAccess(oldStep.Access.Network, s.Access.Network)
+			if len(added) > 0 || len(removed) > 0 {
+				var parts []string
+				if len(added) > 0 {
+					parts = append(parts, fmt.Sprintf("allowed %s", formatHosts(added)))
+				}
+				if len(removed) > 0 {
+					parts = append(parts, fmt.Sprintf("revoked %s", formatHosts(removed)))
+				}
+				changes = append(changes, ChangeEntry{
+					Workflow: key,
+					Scope:    "network",
+					Message:  fmt.Sprintf("step [%s]: %s", s.Name, strings.Join(parts, ", ")),
 				})
 			}
 		}
@@ -162,6 +185,39 @@ func (w *WorkflowState) CompareTo(other *WorkflowState) []ChangeEntry {
 	}
 
 	return changes
+}
+
+// diffNetworkAccess returns the hosts that are only present in next (added) and only present in prev (removed), preserving order
+func diffNetworkAccess(prev []actionsdk.ActionAccessNetwork, next []actionsdk.ActionAccessNetwork) (added []string, removed []string) {
+	prevHosts := make(map[string]struct{}, len(prev))
+	for _, n := range prev {
+		prevHosts[n.Host] = struct{}{}
+	}
+	nextHosts := make(map[string]struct{}, len(next))
+	for _, n := range next {
+		nextHosts[n.Host] = struct{}{}
+	}
+
+	for _, n := range next {
+		if _, exists := prevHosts[n.Host]; !exists && !slices.Contains(added, n.Host) {
+			added = append(added, n.Host)
+		}
+	}
+	for _, n := range prev {
+		if _, exists := nextHosts[n.Host]; !exists && !slices.Contains(removed, n.Host) {
+			removed = append(removed, n.Host)
+		}
+	}
+
+	return added, removed
+}
+
+func formatHosts(hosts []string) string {
+	formatted := make([]string, len(hosts))
+	for i, h := range hosts {
+		formatted[i] = fmt.Sprintf("`%s`", h)
+	}
+	return strings.Join(formatted, ", ")
 }
 
 func NewWorkflowState() *WorkflowState {

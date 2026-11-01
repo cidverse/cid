@@ -70,7 +70,7 @@ func GenerateWorkflowData(cidContext *context.CIDContext, taskContext taskcommon
 
 	// pre-process access section for workflow rendering
 	for i := range plan.Steps {
-		plan.Steps[i].Access.Network = append(plan.Steps[i].Access.Network, networkAllowGlobal...)
+		plan.Steps[i].Access.Network = plangenerate.MergeNetworkAccess(plan.Steps[i].Access.Network, networkAllowGlobal)
 		plan.Steps[i].Access.Environment = appcommon.RemoveEnvByName(plan.Steps[i].Access.Environment, []string{})
 	}
 
