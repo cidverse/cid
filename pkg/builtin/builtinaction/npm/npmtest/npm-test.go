@@ -104,7 +104,7 @@ func (a Action) Execute() (err error) {
 
 	// install
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: `npm install`,
+		Command: npmcommon.InstallCommand(a.Sdk, d.Module.ModuleDir),
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
@@ -124,12 +124,19 @@ func (a Action) Execute() (err error) {
 		return fmt.Errorf("npm test failed, exit code %d", cmdResult.Code)
 	}
 
-	// collect and store jacoco test reports
+	// collect and store reports
 	testReports, err := a.Sdk.FileListV1(actionsdk.FileV1Request{
 		Directory:  d.Module.ModuleDir,
 		Extensions: []string{".xml"},
 	})
+	if err != nil {
+		return err
+	}
 	for _, report := range testReports {
+		if npmcommon.IsDependencyPath(report.Path) {
+			continue
+		}
+
 		if strings.HasSuffix(report.Path, "cobertura-coverage.xml") {
 			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 				File:   report.Path,

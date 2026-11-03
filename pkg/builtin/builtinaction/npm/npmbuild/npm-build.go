@@ -90,7 +90,7 @@ func (a Action) Execute() (err error) {
 
 	// install
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: `npm install`,
+		Command: npmcommon.InstallCommand(a.Sdk, d.Module.ModuleDir),
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
@@ -101,7 +101,7 @@ func (a Action) Execute() (err error) {
 
 	// build
 	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: `npm build`,
+		Command: `npm run build`,
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
