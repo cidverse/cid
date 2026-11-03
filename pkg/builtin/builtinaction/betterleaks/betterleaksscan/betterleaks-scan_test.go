@@ -18,7 +18,7 @@ func TestBetterleaksScan(t *testing.T) {
 	sdk := common.TestSetup(t)
 	sdk.On("ProjectExecutionContextV1").Return(common.TestProjectData(), nil)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: `betterleaks dir . --verbose --report-format=sarif --report-path="/my-project/.tmp/betterleaks.sarif.json" --no-banner --redact=85 --exit-code=0`,
+		Command: `betterleaks git . --verbose --report-format=sarif --report-path="/my-project/.tmp/betterleaks.sarif.json" --no-banner --redact=85 --exit-code=0`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
 	sdk.On("FileReadV1", "/my-project/.tmp/betterleaks.sarif.json").Return(reportJson, nil)

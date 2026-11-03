@@ -23,7 +23,7 @@ type Config struct {
 func (a Action) Metadata() actionsdk.ActionMetadata {
 	return actionsdk.ActionMetadata{
 		Name:        "betterleaks-scan",
-		Description: "Scans the repository for secrets using Betterleaks.",
+		Description: "Scans the git history of the repository for secrets using Betterleaks.",
 		Category:    "sast",
 		Scope:       actionsdk.ActionScopeProject,
 		Rules: []actionsdk.ActionRule{
@@ -82,7 +82,7 @@ func (a Action) Execute() (err error) {
 
 	// opts
 	var opts = []string{
-		"betterleaks", "dir", ".",
+		"betterleaks", "git", ".", // scan the git history, not just the working tree
 		"--verbose",
 		"--report-format=sarif",
 		fmt.Sprintf("--report-path=%q", reportFile),
