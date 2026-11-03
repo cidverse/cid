@@ -13,8 +13,9 @@ import (
 func TestPythonUVPyTest(t *testing.T) {
 	sdk := common.TestSetup(t)
 	sdk.On("ModuleExecutionContextV1").Return(uvcommon.TestModuleData(), nil)
+	sdk.On("FileExistsV1", "/my-project/uv.lock").Return(true)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: `uv run pytest -v --junit-xml=".tmp/pytest.junit.xml"`,
+		Command: `uv run --locked pytest -v --junit-xml=".tmp/pytest.junit.xml"`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
 	sdk.On("ArtifactUploadV1", actionsdk.ArtifactUploadRequest{
@@ -38,6 +39,7 @@ func TestPythonUVPyTestCoverage(t *testing.T) {
 
 	sdk := common.TestSetup(t)
 	sdk.On("ModuleExecutionContextV1").Return(moduleData, nil)
+	sdk.On("FileExistsV1", "/my-project/uv.lock").Return(false)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
 		Command: `uv run pytest -v --cov --cov-report term --cov-report xml:".tmp/pytest.coverage.xml" --junit-xml=".tmp/pytest.junit.xml"`,
 		WorkDir: "/my-project",
