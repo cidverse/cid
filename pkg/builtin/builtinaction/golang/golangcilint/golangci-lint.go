@@ -128,6 +128,7 @@ func (a Action) Execute() (err error) {
 	// store report
 	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
 		File:          reportFile,
+		Module:        d.Module.Slug,
 		Type:          "report",
 		Format:        "sarif",
 		FormatVersion: "2.1.0",

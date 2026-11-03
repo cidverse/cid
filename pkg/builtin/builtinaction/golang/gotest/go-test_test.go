@@ -14,14 +14,14 @@ func TestGoModTest(t *testing.T) {
 	sdk := common.TestSetup(t)
 	sdk.On("ModuleExecutionContextV1").Return(gocommon.ModuleTestData(), nil)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: `go get -v -t ./...`,
+		Command: `go mod download`,
 		WorkDir: "/my-project",
 		Env: map[string]string{
 			"GOTOOLCHAIN": "local",
 		},
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: `go test -vet all -cover -covermode=atomic -coverprofile "/my-project/.tmp/cover.out" -parallel=4 -timeout 10s -count=1 -shuffle=on ./...`,
+		Command: `go test -vet all -cover -covermode=atomic -coverprofile "/my-project/.tmp/cover.out" -parallel=4 -timeout 10m -count=1 -shuffle=on ./...`,
 		WorkDir: "/my-project",
 		Env: map[string]string{
 			"GOTOOLCHAIN": "local",
@@ -36,7 +36,7 @@ func TestGoModTest(t *testing.T) {
 	}).Return("", "", nil)
 
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: `go test -coverprofile "/my-project/.tmp/cover.out" -json -covermode=count -parallel=4 -timeout 10s ./...`,
+		Command: `go test -json -parallel=4 -timeout 10m ./...`,
 		WorkDir: "/my-project",
 		Env: map[string]string{
 			"GOTOOLCHAIN": "local",

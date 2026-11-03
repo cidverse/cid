@@ -21,6 +21,7 @@ func TestGoModLint(t *testing.T) {
 
 	sdk.On("ArtifactUploadV1", actionsdk.ArtifactUploadRequest{
 		File:          "/my-project/.tmp/golangci-lint.sarif.json",
+		Module:        "github-com-cidverse-my-project",
 		Type:          "report",
 		Format:        "sarif",
 		FormatVersion: "2.1.0",

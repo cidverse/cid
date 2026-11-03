@@ -108,7 +108,7 @@ func (a Action) Execute() (err error) {
 
 	// pull dependencies
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: `go get -v -t ./...`,
+		Command: `go mod download`,
 		WorkDir: d.Module.ModuleDir,
 		Env: map[string]string{
 			"GOTOOLCHAIN": "local",
@@ -117,7 +117,7 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("go get failed, exit code %d", cmdResult.Code)
+		return fmt.Errorf("go mod download failed, exit code %d", cmdResult.Code)
 	}
 
 	// run tests
@@ -127,7 +127,7 @@ func (a Action) Execute() (err error) {
 		"-covermode=atomic",
 		fmt.Sprintf(`-coverprofile %q`, coverageOut),
 		"-parallel=4",
-		"-timeout 10s",
+		"-timeout 10m",
 		"-count=1",    // disable rest result caching
 		"-shuffle=on", // randomize test order to catch inter-test dependencies
 	}
@@ -142,7 +142,7 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return errors.New("tests failed: " + err.Error())
 	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("go test report generation failed, exit code %d", cmdResult.Code)
+		return fmt.Errorf("go test failed, exit code %d", cmdResult.Code)
 	}
 
 	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
@@ -159,7 +159,7 @@ func (a Action) Execute() (err error) {
 	// json report
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "generating json coverage report"})
 	coverageJSONResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: fmt.Sprintf("go test -coverprofile %q -json -covermode=count -parallel=4 -timeout 10s ./...", coverageOut),
+		Command: "go test -json -parallel=4 -timeout 10m ./...",
 		WorkDir: d.Module.ModuleDir,
 		Env: map[string]string{
 			"GOTOOLCHAIN": "local",
@@ -190,15 +190,17 @@ func (a Action) Execute() (err error) {
 
 	// html report
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "generating html coverage report"})
-	_, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
+	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: fmt.Sprintf("go tool cover -html %q -o %q", coverageOut, coverageHTML),
 		Env: map[string]string{
 			"GOTOOLCHAIN": "local",
 		},
-		WorkDir: d.ProjectDir,
+		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
 		return errors.New("failed to generate html test coverage report: " + err.Error())
+	} else if cmdResult.Code != 0 {
+		return fmt.Errorf("failed to generate html test coverage report, exit code %d", cmdResult.Code)
 	}
 
 	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
@@ -239,9 +241,9 @@ func (a Action) Execute() (err error) {
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
-		return errors.New("go test json to junit conversion failed: " + err.Error())
+		return errors.New("go coverage to cobertura conversion failed: " + err.Error())
 	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("go test json to junit conversion failed, exit code %d", cmdResult.Code)
+		return fmt.Errorf("go coverage to cobertura conversion failed, exit code %d", cmdResult.Code)
 	}
 
 	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{

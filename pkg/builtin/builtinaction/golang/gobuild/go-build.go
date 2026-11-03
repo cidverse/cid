@@ -110,7 +110,7 @@ func (a Action) Execute() (err error) {
 
 	// pull dependencies
 	pullResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: `go get -v -t ./...`,
+		Command: `go mod download`,
 		WorkDir: d.Module.ModuleDir,
 		Env: map[string]string{
 			"GOTOOLCHAIN": "local",
@@ -119,7 +119,7 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	} else if pullResult.Code != 0 {
-		return fmt.Errorf("go get failed, exit code %d", pullResult.Code)
+		return fmt.Errorf("go mod download failed, exit code %d", pullResult.Code)
 	}
 
 	// build
@@ -130,7 +130,7 @@ func (a Action) Execute() (err error) {
 		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "compile binary", Context: map[string]interface{}{"goos": goos, "goarch": goarch}})
 
 		buildEnv := map[string]string{
-			"CGO_ENABLED": "false",
+			"CGO_ENABLED": "0",
 			"GOOS":        goos,
 			"GOARCH":      goarch,
 			"GOTOOLCHAIN": "local",
@@ -138,7 +138,11 @@ func (a Action) Execute() (err error) {
 		}
 
 		wg.Go(func() error {
-			outputFile := actionsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("%s_%s", goos, goarch))
+			outputName := fmt.Sprintf("%s_%s", goos, goarch)
+			if goos == "windows" {
+				outputName += ".exe"
+			}
+			outputFile := actionsdk.JoinPath(d.Config.TempDir, outputName)
 
 			// build
 			buildResult, wgErr := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
