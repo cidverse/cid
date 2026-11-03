@@ -15,13 +15,13 @@ func TestMavenTest(t *testing.T) {
 	sdk.On("ModuleExecutionContextV1").Return(mavencommon.MavenTestData(map[string]string{
 		"WRAPPER_VERIFICATION": "false",
 	}, false), nil)
-	sdk.On("FileExistsV1", "/my-project/mvnw").Return(true)
+	sdk.On("FileExistsV1", "/my-project/.mvn/wrapper/maven-wrapper.jar").Return(true)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: `java -classpath=".mvn/wrapper/maven-wrapper.jar" org.apache.maven.wrapper.MavenWrapperMain versions:set -DnewVersion="1.0.0"`,
+		Command: `java -Dmaven.multiModuleProjectDirectory="/my-project" -classpath "/my-project/.mvn/wrapper/maven-wrapper.jar" org.apache.maven.wrapper.MavenWrapperMain versions:set -DnewVersion="1.0.0"`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: `java -classpath=".mvn/wrapper/maven-wrapper.jar" org.apache.maven.wrapper.MavenWrapperMain test --batch-mode`,
+		Command: `java -Dmaven.multiModuleProjectDirectory="/my-project" -classpath "/my-project/.mvn/wrapper/maven-wrapper.jar" org.apache.maven.wrapper.MavenWrapperMain verify --batch-mode`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
 	sdk.On("FileListV1", actionsdk.FileV1Request{Directory: "/my-project", Extensions: []string{".xml", ".sarif"}}).Return([]actionsdk.File{actionsdk.NewFile("/my-project/target/site/jacoco/jacoco.xml")}, nil)

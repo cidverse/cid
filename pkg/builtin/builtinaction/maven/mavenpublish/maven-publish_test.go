@@ -18,13 +18,14 @@ func TestMavenPublish(t *testing.T) {
 		"MAVEN_REPO_USERNAME":  "admin",
 		"MAVEN_REPO_PASSWORD":  "secret",
 	}, false), nil)
-	sdk.On("FileExistsV1", "/my-project/mvnw").Return(true)
+	sdk.On("FileExistsV1", "/my-project/.mvn/wrapper/maven-wrapper.jar").Return(true)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: `java -classpath=".mvn/wrapper/maven-wrapper.jar" org.apache.maven.wrapper.MavenWrapperMain versions:set -DnewVersion="1.0.0"`,
+		Command: `java -Dmaven.multiModuleProjectDirectory="/my-project" -classpath "/my-project/.mvn/wrapper/maven-wrapper.jar" org.apache.maven.wrapper.MavenWrapperMain versions:set -DnewVersion="1.0.0"`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
+	sdk.On("FileWriteV1", "/my-project/.tmp/maven-settings.xml", []byte(settingsXML)).Return(nil)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: `java -classpath=".mvn/wrapper/maven-wrapper.jar" org.apache.maven.wrapper.MavenWrapperMain deploy --batch-mode`,
+		Command: `java -Dmaven.multiModuleProjectDirectory="/my-project" -classpath "/my-project/.mvn/wrapper/maven-wrapper.jar" org.apache.maven.wrapper.MavenWrapperMain deploy --batch-mode -DskipTests -DaltDeploymentRepository="cid-maven-repo::default::http://localhost:9100/test" --settings "/my-project/.tmp/maven-settings.xml"`,
 		WorkDir: "/my-project",
 		Env: map[string]string{
 			"MAVEN_REPO_URL":      "http://localhost:9100/test",

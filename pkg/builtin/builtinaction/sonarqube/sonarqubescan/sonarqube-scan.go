@@ -108,6 +108,14 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Type:   "report",
 					Format: "trx",
 				},
+				{
+					Type:   "report",
+					Format: "go-coverage",
+				},
+				{
+					Type:   "report",
+					Format: "sarif",
+				},
 			},
 		},
 	}

@@ -96,48 +96,51 @@ func (a Action) Execute() (err error) {
 		return fmt.Errorf("command failed, exit code %d", cmdResult.Code)
 	}
 
-	if d.Module.HasDependencyByTypeAndId("pypi", "pytest") {
-		if d.Module.HasDependencyByTypeAndId("pypi", "pytest-cov") {
-			cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-				Command: fmt.Sprintf(`poetry run pytest -v --cov --cov-report term --cov-report xml:%q --junit-xml=%q`, coverageFile, reportFile),
-				WorkDir: d.Module.ModuleDir,
-			})
-			if err != nil {
-				return err
-			} else if cmdResult.Code != 0 {
-				return fmt.Errorf("command failed, exit code %d", cmdResult.Code)
-			}
+	if !d.Module.HasDependencyByTypeAndId("pypi", "pytest") {
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "warn", Message: "pytest is not a dependency of the module, skipping tests"})
+		return nil
+	}
 
-			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
-				File:   coverageFile,
-				Module: d.Module.Slug,
-				Type:   "report",
-				Format: "cobertura",
-			})
-			if err != nil {
-				return err
-			}
-		} else {
-			cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-				Command: fmt.Sprintf(`poetry run pytest -v --junit-xml=%q`, reportFile),
-				WorkDir: d.Module.ModuleDir,
-			})
-			if err != nil {
-				return err
-			} else if cmdResult.Code != 0 {
-				return fmt.Errorf("command failed, exit code %d", cmdResult.Code)
-			}
+	if d.Module.HasDependencyByTypeAndId("pypi", "pytest-cov") {
+		cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
+			Command: fmt.Sprintf(`poetry run pytest -v --cov --cov-report term --cov-report xml:%q --junit-xml=%q`, coverageFile, reportFile),
+			WorkDir: d.Module.ModuleDir,
+		})
+		if err != nil {
+			return err
+		} else if cmdResult.Code != 0 {
+			return fmt.Errorf("command failed, exit code %d", cmdResult.Code)
 		}
 
 		_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
-			File:   reportFile,
+			File:   coverageFile,
 			Module: d.Module.Slug,
 			Type:   "report",
-			Format: "junit",
+			Format: "cobertura",
 		})
 		if err != nil {
 			return err
 		}
+	} else {
+		cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
+			Command: fmt.Sprintf(`poetry run pytest -v --junit-xml=%q`, reportFile),
+			WorkDir: d.Module.ModuleDir,
+		})
+		if err != nil {
+			return err
+		} else if cmdResult.Code != 0 {
+			return fmt.Errorf("command failed, exit code %d", cmdResult.Code)
+		}
+	}
+
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
+		File:   reportFile,
+		Module: d.Module.Slug,
+		Type:   "report",
+		Format: "junit",
+	})
+	if err != nil {
+		return err
 	}
 
 	return nil

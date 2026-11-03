@@ -38,6 +38,10 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Name:        "WRAPPER_VERIFICATION",
 					Description: "Enable verification of the gradle wrapper",
 				},
+				{
+					Name:        "MAVEN_VERSION",
+					Description: "Overwrites the version of the maven artifact, defaults to the git tag or branch name.",
+				},
 			},
 			Executables: []actionsdk.ActionAccessExecutable{
 				{

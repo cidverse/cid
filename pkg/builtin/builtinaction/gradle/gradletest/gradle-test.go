@@ -36,7 +36,16 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 			},
 		},
 		Access: actionsdk.ActionAccess{
-			Environment: []actionsdk.ActionAccessEnv{},
+			Environment: []actionsdk.ActionAccessEnv{
+				{
+					Name:        "WRAPPER_VERIFICATION",
+					Description: "Enable verification of the gradle wrapper",
+				},
+				{
+					Name:        "MAVEN_VERSION",
+					Description: "Overwrites the version of the maven artifact, defaults to the git tag or branch name.",
+				},
+			},
 			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name:       "java",
@@ -132,8 +141,11 @@ func (a Action) Execute() (err error) {
 	// collect and store jacoco test reports
 	testReports, err := a.Sdk.FileListV1(actionsdk.FileV1Request{
 		Directory:  d.Module.ModuleDir,
-		Extensions: []string{"jacocoTestReport.xml", ".sarif", ".xml"},
+		Extensions: []string{".sarif", ".xml"},
 	})
+	if err != nil {
+		return err
+	}
 	for _, report := range testReports {
 		if strings.HasSuffix(report.Path, actionsdk.JoinPath("build", "reports", "jacoco", "test", "jacocoTestReport.xml")) {
 			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{

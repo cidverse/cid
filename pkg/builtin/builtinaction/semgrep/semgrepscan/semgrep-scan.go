@@ -16,7 +16,7 @@ type Action struct {
 }
 
 type Config struct {
-	RuleSets []string
+	RuleSets []string `json:"rule_sets"`
 }
 
 func (a Action) Metadata() actionsdk.ActionMetadata {
@@ -35,7 +35,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 			Environment: []actionsdk.ActionAccessEnv{
 				{
 					Name:        "SEMGREP_RULES",
-					Description: "See option --config.",
+					Description: "Whitespace-separated list of rule configs (see option --config), defaults to p/ci. Ignored when SEMGREP_APP_TOKEN is set, the rules configured in the Semgrep AppSec Platform are used instead.",
 				},
 				{
 					Name:        "SEMGREP_APP_TOKEN",
@@ -92,15 +92,21 @@ func (a Action) Execute() (err error) {
 	// files
 	reportFile := actionsdk.JoinPath(d.Config.TempDir, "semgrep.sarif.json")
 
-	// defaults
+	// rules, the --config flag takes precedence over the SEMGREP_RULES env var, so it needs to be resolved here
+	if rules := strings.Fields(d.Env["SEMGREP_RULES"]); len(rules) > 0 {
+		cfg.RuleSets = rules
+	}
 	if len(cfg.RuleSets) == 0 {
 		cfg.RuleSets = []string{"p/ci"}
 	}
 
 	// scan
 	var opts = []string{"semgrep", "ci"}
-	for _, config := range cfg.RuleSets {
-		opts = append(opts, "--config", strconv.Quote(config))
+	if d.Env["SEMGREP_APP_TOKEN"] == "" {
+		// semgrep ci uses the platform policies when logged in and rejects --config
+		for _, config := range cfg.RuleSets {
+			opts = append(opts, "--config", strconv.Quote(config))
+		}
 	}
 	opts = append(opts, "--text", // output plain text format in stdout
 		"--sarif-output="+strconv.Quote(reportFile), // output sarif format to file
@@ -115,7 +121,6 @@ func (a Action) Execute() (err error) {
 		Command: strings.Join(opts, " "),
 		WorkDir: d.ProjectDir,
 		Env: map[string]string{
-			"SEMGREP_RULES":     d.Env["SEMGREP_RULES"],
 			"SEMGREP_APP_TOKEN": d.Env["SEMGREP_APP_TOKEN"],
 		},
 	})

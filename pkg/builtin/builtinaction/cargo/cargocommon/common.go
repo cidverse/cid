@@ -38,6 +38,17 @@ func GetVersion(refType string, refName string, shortHash string) string {
 		return strings.TrimPrefix(refName, "v")
 	}
 
-	refName = strings.ReplaceAll(refName, "/", "-")
 	return "0.0.0+" + shortHash
+}
+
+// Network contains the hosts required to resolve and download crates (sparse index + downloads)
+var Network = []actionsdk.ActionAccessNetwork{
+	{Host: "crates.io:443"},
+	{Host: "index.crates.io:443"},
+	{Host: "static.crates.io:443"},
+}
+
+// TargetDir returns the module-local target directory, used to keep artifact paths predictable for workspace members
+func TargetDir(moduleDir string) string {
+	return actionsdk.JoinPath(moduleDir, "target")
 }

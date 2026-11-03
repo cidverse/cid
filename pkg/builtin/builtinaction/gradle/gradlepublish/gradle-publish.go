@@ -80,6 +80,10 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 		Access: actionsdk.ActionAccess{
 			Environment: []actionsdk.ActionAccessEnv{
 				{
+					Name:        "WRAPPER_VERIFICATION",
+					Description: "Enable verification of the gradle wrapper",
+				},
+				{
 					Name:        "MAVEN_VERSION",
 					Description: "Overwrites the version of the maven artifact to publish, defaults to the git tag or branch name.",
 				},

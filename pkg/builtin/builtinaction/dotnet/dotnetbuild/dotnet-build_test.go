@@ -20,7 +20,7 @@ func TestDotNetBuild(t *testing.T) {
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: `dotnet build --runtime linux-x64 --self-contained --configuration Release`,
+		Command: `dotnet build --no-restore --configuration Release`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
 

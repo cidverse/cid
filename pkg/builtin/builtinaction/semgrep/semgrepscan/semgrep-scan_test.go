@@ -19,7 +19,54 @@ func TestSemgrepScan(t *testing.T) {
 		WorkDir: "/my-project",
 		Env: map[string]string{
 			"SEMGREP_APP_TOKEN": "",
-			"SEMGREP_RULES":     "",
+		},
+	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
+	sdk.On("ArtifactUploadV1", actionsdk.ArtifactUploadRequest{
+		File:          "/my-project/.tmp/semgrep.sarif.json",
+		Type:          "report",
+		Format:        "sarif",
+		FormatVersion: "2.1.0",
+	}).Return("", "", nil)
+
+	action := Action{Sdk: sdk}
+	err := action.Execute()
+	assert.NoError(t, err)
+}
+
+func TestSemgrepScanCustomRules(t *testing.T) {
+	sdk := common.TestSetup(t)
+	data := common.TestProjectData()
+	data.Env["SEMGREP_RULES"] = "p/golang  p/secrets"
+	sdk.On("ProjectExecutionContextV1").Return(data, nil)
+	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
+		Command: `semgrep ci --config "p/golang" --config "p/secrets" --text --sarif-output="/my-project/.tmp/semgrep.sarif.json" --metrics=off --disable-version-check --exclude=.dist --exclude=.tmp --suppress-errors`,
+		WorkDir: "/my-project",
+		Env: map[string]string{
+			"SEMGREP_APP_TOKEN": "",
+		},
+	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
+	sdk.On("ArtifactUploadV1", actionsdk.ArtifactUploadRequest{
+		File:          "/my-project/.tmp/semgrep.sarif.json",
+		Type:          "report",
+		Format:        "sarif",
+		FormatVersion: "2.1.0",
+	}).Return("", "", nil)
+
+	action := Action{Sdk: sdk}
+	err := action.Execute()
+	assert.NoError(t, err)
+}
+
+func TestSemgrepScanAppToken(t *testing.T) {
+	sdk := common.TestSetup(t)
+	data := common.TestProjectData()
+	data.Env["SEMGREP_APP_TOKEN"] = "token"
+	sdk.On("ProjectExecutionContextV1").Return(data, nil)
+	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
+		Command: `semgrep ci --text --sarif-output="/my-project/.tmp/semgrep.sarif.json" --metrics=off --disable-version-check --exclude=.dist --exclude=.tmp --suppress-errors`,
+		WorkDir: "/my-project",
+		Env: map[string]string{
+			"SEMGREP_APP_TOKEN": "token",
 		},
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
 	sdk.On("ArtifactUploadV1", actionsdk.ArtifactUploadRequest{

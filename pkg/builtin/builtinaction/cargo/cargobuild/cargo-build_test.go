@@ -16,20 +16,20 @@ func TestCargoBuildCrate(t *testing.T) {
 	sdk.On("FileReadV1", "/my-project/Cargo.toml").Return(`[package]
 name = "my-crate"
 version = "0.0.0"`, nil)
-	sdk.On("FileExistsV1", "src/main.rs").Return(false)
-	sdk.On("FileExistsV1", "src/lib.rs").Return(true)
+	sdk.On("FileExistsV1", "/my-project/src/main.rs").Return(false)
+	sdk.On("FileExistsV1", "/my-project/src/lib.rs").Return(true)
 	sdk.On("FileWriteV1", "/my-project/Cargo.toml", []byte(`[package]
 name = "my-crate"
 version = "2.0.0"`)).Return(nil)
 
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: "cargo package --allow-dirty -vv",
+		Command: `cargo package --allow-dirty -vv --target-dir "/my-project/target"`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
 
 	sdk.On("ArtifactUploadV1", actionsdk.ArtifactUploadRequest{
 		Module: "my-package",
-		File:   "target/package/my-crate-2.0.0.crate",
+		File:   "/my-project/target/package/my-crate-2.0.0.crate",
 		Type:   "crate",
 	}).Return("", "", nil)
 
@@ -44,20 +44,20 @@ func TestCargoBuildApplication(t *testing.T) {
 	sdk.On("FileReadV1", "/my-project/Cargo.toml").Return(`[package]
 name = "my-app"
 version = "0.0.0"`, nil)
-	sdk.On("FileExistsV1", "src/main.rs").Return(true)
-	sdk.On("FileExistsV1", "src/lib.rs").Return(false)
+	sdk.On("FileExistsV1", "/my-project/src/main.rs").Return(true)
+	sdk.On("FileExistsV1", "/my-project/src/lib.rs").Return(false)
 	sdk.On("FileWriteV1", "/my-project/Cargo.toml", []byte(`[package]
 name = "my-app"
 version = "2.0.0"`)).Return(nil)
 
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: "cargo build --release -vv",
+		Command: `cargo build --release -vv --target-dir "/my-project/target"`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
 
 	sdk.On("ArtifactUploadV1", actionsdk.ArtifactUploadRequest{
 		Module: "my-package",
-		File:   "target/release/my-app",
+		File:   "/my-project/target/release/my-app",
 		Type:   "binary",
 	}).Return("", "", nil)
 

@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -45,15 +43,16 @@ type ChartConfig struct {
 }
 
 // UploadChart will upload the chart to a nexus repository
-func UploadChart(url string, username string, password string, file string) (responseCode int, responseContent []byte) {
+func UploadChart(url string, username string, password string, file string) (responseCode int, responseContent []byte, err error) {
 	// prepare
 	contentType, body, err := createForm(map[string]string{"file": "@" + file})
 	if err != nil {
-		//log.Err(err).Msg("failed to prepare request body")
+		return 0, nil, fmt.Errorf("failed to prepare request body: %w", err)
 	}
+
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
-		//log.Err(err).Msg("failed to prepare request")
+		return 0, nil, fmt.Errorf("failed to prepare request: %w", err)
 	}
 
 	// auth
@@ -63,18 +62,21 @@ func UploadChart(url string, username string, password string, file string) (res
 	// execute
 	resp, err := netClient.Do(req)
 	if err != nil {
-		//log.Err(err).Msg("failed to upload chart")
+		return 0, nil, fmt.Errorf("failed to upload chart: %w", err)
 	}
+	defer resp.Body.Close()
 
 	content, err := io.ReadAll(resp.Body)
 	if err != nil {
-		//log.Err(err).Msg("failed to parse response")
+		return resp.StatusCode, nil, fmt.Errorf("failed to read response: %w", err)
 	}
 
-	// resp code
-	responseCodeInt, _ := strconv.Atoi(extractNumbers(resp.Status))
+	return resp.StatusCode, content, nil
+}
 
-	return responseCodeInt, content
+// ChartArtifactQuery returns the artifact query for the packaged charts of a module
+func ChartArtifactQuery(moduleSlug string) string {
+	return fmt.Sprintf(`artifact_type == "helm-chart" && format == "tgz" && module == %q`, moduleSlug)
 }
 
 func ParseChart(content []byte) (ChartConfig, error) {
@@ -101,7 +103,7 @@ func createForm(form map[string]string) (string, io.Reader, error) {
 			defer file.Close() //nolint
 			part, partErr := mp.CreateFormFile(key, val)
 			if partErr != nil {
-				return "", nil, err
+				return "", nil, partErr
 			}
 			_, _ = io.Copy(part, file)
 		} else {
@@ -109,11 +111,6 @@ func createForm(form map[string]string) (string, io.Reader, error) {
 		}
 	}
 	return mp.FormDataContentType(), body, nil
-}
-
-func extractNumbers(input string) string {
-	reg := regexp.MustCompile(`\D+`)
-	return reg.ReplaceAllString(input, "")
 }
 
 type ChartSource string

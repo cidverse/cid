@@ -4,7 +4,9 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 )
 
 //go:embed wrapper-checksums.json
@@ -30,7 +32,6 @@ type GradleRelease struct {
 }
 
 // FindGradleRelease orchestrates the lookup: local first, then online if needed.
-// If resolve is true, ResolveGradleRelease is called on the found release.
 func FindGradleRelease(version string) (GradleRelease, error) {
 	// try embedded checksums first
 	if release, found, err := findGradleReleaseLocal(version); err == nil && found {
@@ -62,25 +63,58 @@ func findGradleReleaseLocal(version string) (GradleRelease, bool, error) {
 	return GradleRelease{}, false, nil
 }
 
-// findGradleReleaseOnline searches for a release by querying the Gradle services API.
+// findGradleReleaseOnline searches for a release by querying the Gradle services API and resolves its checksums.
 func findGradleReleaseOnline(version string) (GradleRelease, error) {
-	url := "https://services.gradle.org/versions/all"
-	resp, err := http.Get(url)
+	body, err := httpGet("https://services.gradle.org/versions/all")
 	if err != nil {
 		return GradleRelease{}, err
 	}
-	defer resp.Body.Close()
 
 	var releases []GradleRelease
-	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
+	if err := json.Unmarshal(body, &releases); err != nil {
 		return GradleRelease{}, err
 	}
 
 	for _, release := range releases {
 		if release.Version == version {
-			return release, nil
+			return resolveGradleReleaseChecksums(release)
 		}
 	}
 
 	return GradleRelease{}, fmt.Errorf("version not found: %s", version)
+}
+
+// resolveGradleReleaseChecksums downloads the distribution and wrapper checksums of a release.
+func resolveGradleReleaseChecksums(release GradleRelease) (GradleRelease, error) {
+	if release.ChecksumUrl == "" || release.WrapperChecksumUrl == "" {
+		return GradleRelease{}, fmt.Errorf("release %s has no published checksums", release.Version)
+	}
+
+	checksum, err := httpGet(release.ChecksumUrl)
+	if err != nil {
+		return GradleRelease{}, fmt.Errorf("failed to fetch distribution checksum: %w", err)
+	}
+	release.Checksum = strings.TrimSpace(string(checksum))
+
+	wrapperChecksum, err := httpGet(release.WrapperChecksumUrl)
+	if err != nil {
+		return GradleRelease{}, fmt.Errorf("failed to fetch wrapper checksum: %w", err)
+	}
+	release.WrapperChecksum = strings.TrimSpace(string(wrapperChecksum))
+
+	return release, nil
+}
+
+func httpGet(url string) ([]byte, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("GET %s returned status %d", url, resp.StatusCode)
+	}
+
+	return io.ReadAll(resp.Body)
 }

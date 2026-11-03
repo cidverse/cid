@@ -38,11 +38,15 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Name: "cargo",
 				},
 			},
+			Network: cargocommon.Network,
 		},
 		Output: actionsdk.ActionOutput{
 			Artifacts: []actionsdk.ActionArtifactType{
 				{
 					Type: "binary",
+				},
+				{
+					Type: "crate",
 				},
 			},
 		},
@@ -82,8 +86,9 @@ func (a Action) Execute() (err error) {
 		return fmt.Errorf("error reading cargo.toml: %v", err)
 	}
 
-	mainExists := a.Sdk.FileExistsV1("src/main.rs")
-	libExists := a.Sdk.FileExistsV1("src/lib.rs")
+	mainExists := a.Sdk.FileExistsV1(actionsdk.JoinPath(d.Module.ModuleDir, "src", "main.rs"))
+	libExists := a.Sdk.FileExistsV1(actionsdk.JoinPath(d.Module.ModuleDir, "src", "lib.rs"))
+	targetDir := cargocommon.TargetDir(d.Module.ModuleDir)
 
 	// TD-003: patch version in Cargo.toml due to cargo limitations
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "patching cargo.toml version", Context: map[string]interface{}{"version": cfg.CargoVersion}})
@@ -107,7 +112,7 @@ func (a Action) Execute() (err error) {
 		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "main.rs found, building executable"})
 
 		cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-			Command: `cargo build --release -vv`,
+			Command: fmt.Sprintf(`cargo build --release -vv --target-dir %q`, targetDir),
 			WorkDir: d.Module.ModuleDir,
 		})
 		if err != nil {
@@ -117,7 +122,7 @@ func (a Action) Execute() (err error) {
 		}
 
 		_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
-			File:   fmt.Sprintf("target/release/%s", packageConfig.Package.Name),
+			File:   actionsdk.JoinPath(targetDir, "release", packageConfig.Package.Name),
 			Module: d.Module.Slug,
 			Type:   "binary",
 		})
@@ -131,17 +136,17 @@ func (a Action) Execute() (err error) {
 		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "lib.rs found, building crate"})
 
 		cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-			Command: `cargo package --allow-dirty -vv`,
+			Command: fmt.Sprintf(`cargo package --allow-dirty -vv --target-dir %q`, targetDir),
 			WorkDir: d.Module.ModuleDir,
 		})
 		if err != nil {
 			return err
 		} else if cmdResult.Code != 0 {
-			return fmt.Errorf("cargo build failed, exit code %d", cmdResult.Code)
+			return fmt.Errorf("cargo package failed, exit code %d", cmdResult.Code)
 		}
 
 		_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
-			File:   fmt.Sprintf("target/package/%s-%s.crate", packageConfig.Package.Name, packageConfig.Package.Version),
+			File:   actionsdk.JoinPath(targetDir, "package", fmt.Sprintf("%s-%s.crate", packageConfig.Package.Name, packageConfig.Package.Version)),
 			Module: d.Module.Slug,
 			Type:   "crate",
 		})

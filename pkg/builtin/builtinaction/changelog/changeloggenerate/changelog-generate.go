@@ -19,12 +19,12 @@ type Action struct {
 }
 
 type Config struct {
-	Templates     []string                      `yaml:"templates"`
-	CommitPattern []string                      `yaml:"commit_pattern"`
-	TitleMaps     map[string]string             `yaml:"title_maps"`
-	NoteKeywords  []changelogcommon.NoteKeyword `yaml:"note_keywords"`
-	IssuePrefix   string                        `yaml:"issue_prefix"`
-	CommitLimit   int                           `yaml:"commit_limit"`
+	Templates     []string                      `json:"templates" yaml:"templates"`
+	CommitPattern []string                      `json:"commit_pattern" yaml:"commit_pattern"`
+	TitleMaps     map[string]string             `json:"title_maps" yaml:"title_maps"`
+	NoteKeywords  []changelogcommon.NoteKeyword `json:"note_keywords" yaml:"note_keywords"`
+	IssuePrefix   string                        `json:"issue_prefix" yaml:"issue_prefix"`
+	CommitLimit   int                           `json:"commit_limit" yaml:"commit_limit"`
 }
 
 func (a Action) Metadata() actionsdk.ActionMetadata {

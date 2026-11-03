@@ -21,7 +21,7 @@ func TestGradleTest(t *testing.T) {
 		Command: `java -Dorg.gradle.appname="gradlew" -classpath "/my-project/gradle/wrapper/gradle-wrapper.jar" org.gradle.wrapper.GradleWrapperMain -Pversion="1.0.0" check --no-daemon --warning-mode=all --console=plain --stacktrace`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
-	sdk.On("FileListV1", actionsdk.FileV1Request{Directory: "/my-project", Extensions: []string{"jacocoTestReport.xml", ".sarif", ".xml"}}).Return([]actionsdk.File{actionsdk.NewFile("/my-project/build/reports/jacoco/test/jacocoTestReport.xml")}, nil)
+	sdk.On("FileListV1", actionsdk.FileV1Request{Directory: "/my-project", Extensions: []string{".sarif", ".xml"}}).Return([]actionsdk.File{actionsdk.NewFile("/my-project/build/reports/jacoco/test/jacocoTestReport.xml")}, nil)
 	sdk.On("ArtifactUploadV1", actionsdk.ArtifactUploadRequest{
 		Module: "my-module",
 		File:   "/my-project/build/reports/jacoco/test/jacocoTestReport.xml",

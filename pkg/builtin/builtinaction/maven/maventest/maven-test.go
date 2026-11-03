@@ -91,30 +91,29 @@ func (a Action) Execute() (err error) {
 		return err
 	}
 
-	// wrapper
-	mavenWrapper := actionsdk.JoinPath(d.Module.ModuleDir, "mvnw")
-	isUsingWrapper := a.Sdk.FileExistsV1(mavenWrapper)
+	// wrapper (only-script wrappers without a jar fall back to mvn)
+	isUsingWrapper := a.Sdk.FileExistsV1(mavencommon.WrapperJar(d.Module.ModuleDir))
 
 	// version
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, fmt.Sprintf("versions:set -DnewVersion=%q", cfg.MavenVersion)),
+		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, d.Module.ModuleDir, fmt.Sprintf("versions:set -DnewVersion=%q", cfg.MavenVersion)),
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
 		return err
 	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("maven build failed, exit code %d", cmdResult.Code)
+		return fmt.Errorf("maven versions:set failed, exit code %d", cmdResult.Code)
 	}
 
 	// test
 	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, `test --batch-mode`),
+		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, d.Module.ModuleDir, `verify --batch-mode`),
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
 		return err
 	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("maven build failed, exit code %d", cmdResult.Code)
+		return fmt.Errorf("maven test failed, exit code %d", cmdResult.Code)
 	}
 
 	// collect and store test reports for Gradle and Maven

@@ -67,7 +67,7 @@ func (a Action) Execute() (err error) {
 
 	// restore
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: fmt.Sprintf(`dotnet restore`),
+		Command: `dotnet restore`,
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
@@ -78,7 +78,7 @@ func (a Action) Execute() (err error) {
 
 	// build
 	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: fmt.Sprintf(`dotnet build --runtime linux-x64 --self-contained --configuration Release`),
+		Command: `dotnet build --no-restore --configuration Release`,
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {

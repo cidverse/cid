@@ -4,10 +4,9 @@ import (
 	_ "embed"
 	"fmt"
 
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargocommon"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-
-	"path"
 )
 
 const URI = "builtin://actions/cargo-test"
@@ -40,12 +39,11 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				{
 					Name: "cargo",
 				},
-			},
-			Network: []actionsdk.ActionAccessNetwork{
 				{
-					Host: "crates.io:443",
+					Name: "cargo-nextest",
 				},
 			},
+			Network: cargocommon.Network,
 		},
 		Output: actionsdk.ActionOutput{
 			Artifacts: []actionsdk.ActionArtifactType{
@@ -89,8 +87,9 @@ func (a Action) Execute() (err error) {
 	}
 
 	// test
+	targetDir := cargocommon.TargetDir(d.Module.ModuleDir)
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: fmt.Sprintf(`cargo nextest run --profile=ci --tool-config-file ci:%s`, configFile),
+		Command: fmt.Sprintf(`cargo nextest run --profile=ci --tool-config-file ci:%s --target-dir %q`, configFile, targetDir),
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
@@ -101,7 +100,8 @@ func (a Action) Execute() (err error) {
 
 	// junit report
 	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
-		File:   path.Join(d.Module.ModuleDir, "target", "nextest", "ci", "junit.xml"),
+		File:   actionsdk.JoinPath(targetDir, "nextest", "ci", "junit.xml"),
+		Module: d.Module.Slug,
 		Type:   "report",
 		Format: "junit",
 	})

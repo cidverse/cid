@@ -81,13 +81,12 @@ func (a Action) Execute() (err error) {
 		return err
 	}
 
-	// files
-	junitReport := actionsdk.JoinPath(d.Config.TempDir, "junit.xml")
-	trxReport := actionsdk.JoinPath(d.Config.TempDir, "vstest.trx")
+	// all reports are written into a dedicated results directory, to support multiple test projects
+	resultsDir := actionsdk.JoinPath(d.Config.TempDir, "dotnet-test")
 
 	// restore
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: fmt.Sprintf(`dotnet restore`),
+		Command: `dotnet restore`,
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
@@ -97,8 +96,19 @@ func (a Action) Execute() (err error) {
 	}
 
 	// test
+	testArgs := []string{
+		`--no-restore`,
+		fmt.Sprintf(`--results-directory %q`, resultsDir),
+		`--logger:"trx"`,
+		`--collect "Code Coverage;Format=cobertura"`,
+	}
+	if a.hasJunitLogger(d.Module) {
+		testArgs = append(testArgs, fmt.Sprintf(`--logger:"junit;LogFilePath=%s;MethodFormat=Class;FailureBodyFormat=Verbose"`, actionsdk.JoinPath(resultsDir, "{assembly}.junit.xml")))
+	} else {
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "JunitXml.TestLogger package not referenced, skipping junit report"})
+	}
 	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: fmt.Sprintf(`dotnet test --logger:"junit;LogFilePath=%s;MethodFormat=Class;FailureBodyFormat=Verbose" --logger:"trx;LogFileName=%s" --collect "Code Coverage;Format=cobertura"`, junitReport, trxReport),
+		Command: `dotnet test ` + strings.Join(testArgs, " "),
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
@@ -107,44 +117,52 @@ func (a Action) Execute() (err error) {
 		return fmt.Errorf("dotnet test failed, exit code %d", cmdResult.Code)
 	}
 
-	// store report
-	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
-		File:   trxReport,
-		Module: d.Module.Slug,
-		Type:   "report",
-		Format: "trx",
-	})
-	if err != nil {
-		return err
-	}
-	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
-		File:   junitReport,
-		Module: d.Module.Slug,
-		Type:   "report",
-		Format: "junit",
-	})
-	if err != nil {
-		return err
-	}
-
-	// collect and store cobertura reports
+	// collect and store reports
 	testReports, err := a.Sdk.FileListV1(actionsdk.FileV1Request{
-		Directory:  d.Module.ModuleDir,
-		Extensions: []string{".xml"},
+		Directory:  resultsDir,
+		Extensions: []string{".trx", ".xml"},
 	})
+	if err != nil {
+		return err
+	}
 	for _, report := range testReports {
-		if strings.HasSuffix(report.Path, ".cobertura.xml") {
-			_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
-				File:   report.Path,
-				Module: d.Module.Slug,
-				Type:   "report",
-				Format: "cobertura",
-			})
-			if err != nil {
-				return err
-			}
+		format := ""
+		if strings.HasSuffix(report.Path, ".trx") {
+			format = "trx"
+		} else if strings.HasSuffix(report.Path, ".junit.xml") {
+			format = "junit"
+		} else if strings.HasSuffix(report.Path, ".cobertura.xml") {
+			format = "cobertura"
+		} else {
+			continue
+		}
+
+		_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
+			File:   report.Path,
+			Module: d.Module.Slug,
+			Type:   "report",
+			Format: format,
+		})
+		if err != nil {
+			return err
 		}
 	}
 
 	return nil
+}
+
+// hasJunitLogger checks if any project file references the JunitXml.TestLogger package, which is required for the junit logger
+func (a Action) hasJunitLogger(module *actionsdk.ProjectModule) bool {
+	for _, file := range module.Files {
+		if !strings.HasSuffix(file, "proj") && !strings.HasSuffix(file, ".props") {
+			continue
+		}
+
+		content, err := a.Sdk.FileReadV1(file)
+		if err == nil && strings.Contains(content, "JunitXml.TestLogger") {
+			return true
+		}
+	}
+
+	return false
 }

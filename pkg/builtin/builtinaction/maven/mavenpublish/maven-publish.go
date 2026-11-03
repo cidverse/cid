@@ -1,6 +1,7 @@
 package mavenpublish
 
 import (
+	"encoding/base64"
 	"fmt"
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
@@ -12,6 +13,20 @@ import (
 )
 
 const URI = "builtin://actions/maven-publish"
+
+const repositoryId = "cid-maven-repo"
+
+const settingsXML = `<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
+  <servers>
+    <server>
+      <id>` + repositoryId + `</id>
+      <username>${env.MAVEN_REPO_USERNAME}</username>
+      <password>${env.MAVEN_REPO_PASSWORD}</password>
+    </server>
+  </servers>
+</settings>
+`
 
 type Action struct {
 	Sdk actionsdk.SDKClient
@@ -40,6 +55,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
         **Signing**
 
         To sign the artifacts, MAVEN_GPG_SIGN_PRIVATEKEY and MAVEN_GPG_SIGN_PASSWORD must be set.
+        The project must configure the maven-gpg-plugin (>= 3.2.0) sign goal, the key is passed to the bouncycastle signer (-Dgpg.signer=bc).
         You can generate a private key using the gpg command line tools:
 
         gpg --full-generate-key
@@ -73,22 +89,27 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				{
 					Name:        "MAVEN_REPO_USERNAME",
 					Description: "The username to use for authentication with the maven repository.",
+					Secret:      true,
 				},
 				{
 					Name:        "MAVEN_REPO_PASSWORD",
 					Description: "The password to use for authentication with the maven repository.",
+					Secret:      true,
 				},
 				{
 					Name:        "MAVEN_GPG_SIGN_PRIVATEKEY",
 					Description: "The ASCII-armored private key (base64 encoded).",
+					Secret:      true,
 				},
 				{
 					Name:        "MAVEN_GPG_SIGN_PASSWORD",
 					Description: "The password for the private key.",
+					Secret:      true,
 				},
 				{
 					Name:        "MAVEN_GPG_SIGN_KEYID",
 					Description: "The GPG key ID, only required when using sub keys.",
+					Secret:      true,
 				},
 				{
 					Name:        "GITHUB_ACTOR",
@@ -149,36 +170,73 @@ func (a Action) Execute() (err error) {
 		}
 	}
 
-	// wrapper
-	mavenWrapper := actionsdk.JoinPath(d.Module.ModuleDir, "mvnw")
-	isUsingWrapper := a.Sdk.FileExistsV1(mavenWrapper)
+	// wrapper (only-script wrappers without a jar fall back to mvn)
+	isUsingWrapper := a.Sdk.FileExistsV1(mavencommon.WrapperJar(d.Module.ModuleDir))
 
 	// version
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, fmt.Sprintf("versions:set -DnewVersion=%q", cfg.MavenVersion)),
+		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, d.Module.ModuleDir, fmt.Sprintf("versions:set -DnewVersion=%q", cfg.MavenVersion)),
 		WorkDir: d.Module.ModuleDir,
 	})
 	if err != nil {
 		return err
 	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("maven build failed, exit code %d", cmdResult.Code)
+		return fmt.Errorf("maven versions:set failed, exit code %d", cmdResult.Code)
 	}
 
-	// publish
+	// publish, tests already ran in the test stage
+	publishEnv := map[string]string{
+		"MAVEN_REPO_URL":      cfg.MavenRepositoryUrl,
+		"MAVEN_REPO_USERNAME": cfg.MavenRepositoryUsername,
+		"MAVEN_REPO_PASSWORD": cfg.MavenRepositoryPassword,
+	}
+	publishArgs := []string{
+		`deploy`,
+		`--batch-mode`,
+		`-DskipTests`,
+		fmt.Sprintf(`-DaltDeploymentRepository=%q`, repositoryId+"::default::"+cfg.MavenRepositoryUrl),
+	}
+
+	// credentials are resolved by maven from the server entry in the settings file, the settings file only references env vars
+	if cfg.MavenRepositoryUsername != "" || cfg.MavenRepositoryPassword != "" {
+		settingsFile := actionsdk.JoinPath(d.Config.TempDir, "maven-settings.xml")
+		err = a.Sdk.FileWriteV1(settingsFile, []byte(settingsXML))
+		if err != nil {
+			return fmt.Errorf("failed to write maven settings file: %w", err)
+		}
+		publishArgs = append(publishArgs, fmt.Sprintf(`--settings %q`, settingsFile))
+	}
+
+	// signing via the maven-gpg-plugin bouncycastle signer (requires maven-gpg-plugin >= 3.2.0 configured in the project)
+	if cfg.GPGSignPrivateKey != "" {
+		publishEnv["MAVEN_GPG_KEY"] = decodeGPGKey(cfg.GPGSignPrivateKey)
+		publishEnv["MAVEN_GPG_PASSPHRASE"] = cfg.GPGSignPassword
+		publishArgs = append(publishArgs, `-Dgpg.signer=bc`)
+		if cfg.GPGSignKeyId != "" {
+			publishArgs = append(publishArgs, fmt.Sprintf(`-Dgpg.keyname=%q`, cfg.GPGSignKeyId))
+		}
+	}
+
 	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
-		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, `deploy --batch-mode`),
+		Command: mavencommon.MavenWrapperCommand(isUsingWrapper, d.Module.ModuleDir, strings.Join(publishArgs, " ")),
 		WorkDir: d.Module.ModuleDir,
-		Env: map[string]string{
-			"MAVEN_REPO_URL":      cfg.MavenRepositoryUrl,
-			"MAVEN_REPO_USERNAME": cfg.MavenRepositoryUsername,
-			"MAVEN_REPO_PASSWORD": cfg.MavenRepositoryPassword,
-		},
+		Env:     publishEnv,
 	})
 	if err != nil {
 		return err
 	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("maven build failed, exit code %d", cmdResult.Code)
+		return fmt.Errorf("maven deploy failed, exit code %d", cmdResult.Code)
 	}
 
 	return nil
+}
+
+// decodeGPGKey decodes the base64 encoded ascii-armored key, keys that are not base64 encoded are passed as-is
+func decodeGPGKey(key string) string {
+	decoded, err := base64.StdEncoding.DecodeString(strings.TrimSpace(key))
+	if err != nil {
+		return key
+	}
+
+	return string(decoded)
 }

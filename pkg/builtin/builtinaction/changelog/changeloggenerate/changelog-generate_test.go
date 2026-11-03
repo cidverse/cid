@@ -26,7 +26,7 @@ func testProjectData(t *testing.T, refName string, templates []string, commitLim
 		cfgMap["templates"] = templates
 	}
 	if commitLimit > 0 {
-		cfgMap["commitlimit"] = commitLimit
+		cfgMap["commit_limit"] = commitLimit
 	}
 	if len(cfgMap) > 0 {
 		cfgJson, err := json.Marshal(cfgMap)

@@ -15,11 +15,12 @@ func TestCargoTest(t *testing.T) {
 	sdk.On("ModuleExecutionContextV1").Return(cargocommon.TestModuleData(), nil)
 	sdk.On("FileWriteV1", ".tmp/nextest.toml", nextestBytes).Return(nil)
 	sdk.On("ExecuteCommandV1", actionsdk.ExecuteCommandV1Request{
-		Command: "cargo nextest run --profile=ci --tool-config-file ci:.tmp/nextest.toml",
+		Command: `cargo nextest run --profile=ci --tool-config-file ci:.tmp/nextest.toml --target-dir "/my-project/target"`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
 	sdk.On("ArtifactUploadV1", actionsdk.ArtifactUploadRequest{
 		File:   "/my-project/target/nextest/ci/junit.xml",
+		Module: "my-package",
 		Type:   "report",
 		Format: "junit",
 	}).Return("", "", nil)

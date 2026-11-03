@@ -36,6 +36,6 @@ type Config struct {
 }
 
 type NoteKeyword struct {
-	Keyword string
-	Title   string
+	Keyword string `json:"keyword" yaml:"keyword"`
+	Title   string `json:"title"   yaml:"title"`
 }

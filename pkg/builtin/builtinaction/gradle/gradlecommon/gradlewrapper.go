@@ -14,14 +14,18 @@ import (
 )
 
 func VerifyGradleWrapper(moduleDir string) error {
-	gradlewSh := actionsdk.JoinPath(moduleDir, "gradlew")
-	gradlewBat := actionsdk.JoinPath(moduleDir, "gradlew.bat")
 	wrapperJar := actionsdk.JoinPath(moduleDir, "gradle", "wrapper", "gradle-wrapper.jar")
 	wrapperProperties := actionsdk.JoinPath(moduleDir, "gradle", "wrapper", "gradle-wrapper.properties")
 
-	// check for presence of gradle wrapper files
-	if !filesystem.FileExists(wrapperProperties) && !filesystem.FileExists(wrapperJar) && !filesystem.FileExists(gradlewSh) && !filesystem.FileExists(gradlewBat) {
-		return fmt.Errorf("required gradle wrapper files are missing, required files: %s, %s, %s, %s", wrapperProperties, wrapperJar, gradlewSh, gradlewBat)
+	// check for presence of the gradle wrapper files that are verified
+	var missing []string
+	for _, file := range []string{wrapperProperties, wrapperJar} {
+		if !filesystem.FileExists(file) {
+			missing = append(missing, file)
+		}
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("required gradle wrapper files are missing: %s", strings.Join(missing, ", "))
 	}
 
 	// read gradle-wrapper.properties
