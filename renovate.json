@@ -16,8 +16,9 @@
         "/^pkg/app/appgithub/constant\\.go$/"
       ],
       "matchStrings": [
-        "// renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+Id:\\s+\"[^\"]+\",\\s+Type:\\s+\"[^\"]+\",\\s+Version:\\s+\"(?<currentValue>[^\"]+)\",\\s+Hash:\\s+\"(?<currentDigest>[0-9a-f]{40})\""
-      ]
+        "// renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+Id:\\s+\"[^\"]+\",\\s+Type:\\s+\"[^\"]+\",\\s+Version:\\s+\"v(?<currentValue>[^\"]+)\",\\s+Hash:\\s+\"(?<currentDigest>[0-9a-f]{40})\""
+      ],
+      "extractVersionTemplate": "^v(?<version>.+)$"
     }
   ]
 }
