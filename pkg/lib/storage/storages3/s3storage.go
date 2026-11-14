@@ -2,6 +2,7 @@ package storages3
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/minio/minio-go/v7"
@@ -10,6 +11,18 @@ import (
 
 type S3Client struct {
 	minioClient *minio.Client
+}
+
+func (s3 S3Client) CheckBucket(ctx context.Context, bucketName string) error {
+	exists, err := s3.minioClient.BucketExists(ctx, bucketName)
+	if err != nil {
+		return fmt.Errorf("failed to access bucket %q: %w", bucketName, err)
+	}
+	if !exists {
+		return fmt.Errorf("bucket %q does not exist", bucketName)
+	}
+
+	return nil
 }
 
 func (s3 S3Client) GetObject(ctx context.Context, bucketName string, objectName string) (*minio.Object, error) {

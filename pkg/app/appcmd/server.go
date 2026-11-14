@@ -1,6 +1,7 @@
 package appcmd
 
 import (
+	"context"
 	"log/slog"
 	"os"
 	"time"
@@ -28,10 +29,24 @@ func ServerCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			// init storage client
+			// init storage client, fail fast if configured but unusable instead of silently running uncached
 			storageClient, err := storage.GetStorageApi()
 			if err != nil {
 				slog.Error("Failed to initialize storage client", "err", err)
+				os.Exit(1)
+			}
+			storageBucket := storage.GetBucketName()
+			if storageClient != nil {
+				ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+				err = storageClient.CheckBucket(ctx, storageBucket)
+				cancel()
+				if err != nil {
+					slog.Error("Storage is configured but not usable", "bucket", storageBucket, "err", err)
+					os.Exit(1)
+				}
+				slog.Info("Pipeline cache enabled", "bucket", storageBucket)
+			} else {
+				slog.Warn("Storage not configured (CID_STORAGE_S3_*), running without pipeline cache")
 			}
 
 			// listen
@@ -39,7 +54,7 @@ func ServerCmd() *cobra.Command {
 				Platform:      platform,
 				Addr:          appserver.DefaultServerAddr,
 				StorageApi:    storageClient,
-				StorageBucket: storage.GetBucketName(),
+				StorageBucket: storageBucket,
 
 				RenderTimeout:        renderTimeout,
 				MaxConcurrentRenders: maxConcurrentRenders,
