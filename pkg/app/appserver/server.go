@@ -14,6 +14,7 @@ import (
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"github.com/labstack/echo/v5"
 	"github.com/labstack/echo/v5/middleware"
+	"golang.org/x/sync/singleflight"
 )
 
 const DefaultServerAddr = "0.0.0.0:9056"
@@ -24,6 +25,7 @@ type Config struct {
 	RepositoriesByID map[int64]api.Repository
 	Addr             string
 	StorageApi       storageapi.API
+	StorageBucket    string
 }
 
 func (c *Config) SetRepositories(repos []api.Repository) {
@@ -37,6 +39,8 @@ func (c *Config) SetRepositories(repos []api.Repository) {
 type Server struct {
 	cfg *Config
 	e   *echo.Echo
+	// inflight deduplicates concurrent renders of the same cache key: duplicate requests wait for the running render and share its result.
+	inflight singleflight.Group
 }
 
 func NewServer(cfg *Config) *Server {

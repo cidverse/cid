@@ -44,9 +44,10 @@ func ServerCmd() *cobra.Command {
 
 			// listen
 			cfg := &appserver.Config{
-				Platform:   platform,
-				Addr:       appserver.DefaultServerAddr,
-				StorageApi: storageClient,
+				Platform:      platform,
+				Addr:          appserver.DefaultServerAddr,
+				StorageApi:    storageClient,
+				StorageBucket: storage.GetBucketName(),
 			}
 			cfg.SetRepositories(repos)
 			srv := appserver.NewServer(cfg)

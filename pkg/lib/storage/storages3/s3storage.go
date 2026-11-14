@@ -39,10 +39,11 @@ func (s3 S3Client) PutObjectFile(ctx context.Context, bucketName string, objectN
 	return nil
 }
 
-func NewS3Client(endpoint, accessKeyID, secretAccessKey string, useSSL bool) (*S3Client, error) {
+func NewS3Client(endpoint, accessKeyID, secretAccessKey, region string, useSSL bool) (*S3Client, error) {
 	minioClient, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 		Secure: useSSL,
+		Region: region,
 	})
 	if err != nil {
 		return nil, err
