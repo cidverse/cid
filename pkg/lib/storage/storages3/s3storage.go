@@ -52,12 +52,24 @@ func (s3 S3Client) PutObjectFile(ctx context.Context, bucketName string, objectN
 	return nil
 }
 
-func NewS3Client(endpoint, accessKeyID, secretAccessKey, region string, useSSL bool) (*S3Client, error) {
-	minioClient, err := minio.New(endpoint, &minio.Options{
+// NewS3Client creates an S3 client. With useSSL and !tlsVerify, any server certificate is accepted (self-signed / private CA).
+func NewS3Client(endpoint, accessKeyID, secretAccessKey, region string, useSSL bool, tlsVerify bool) (*S3Client, error) {
+	opts := &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 		Secure: useSSL,
 		Region: region,
-	})
+	}
+	if useSSL && !tlsVerify {
+		// start from minio's default transport (timeouts, proxy, SSL_CERT_FILE) and only disable verification
+		transport, err := minio.DefaultTransport(true)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create s3 transport: %w", err)
+		}
+		transport.TLSClientConfig.InsecureSkipVerify = true // #nosec G402 -- explicit opt-in via CID_STORAGE_S3_TLS_VERIFY=false
+		opts.Transport = transport
+	}
+
+	minioClient, err := minio.New(endpoint, opts)
 	if err != nil {
 		return nil, err
 	}

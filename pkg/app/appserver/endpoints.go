@@ -42,24 +42,42 @@ type PipelineArtifact struct {
 	WorkflowContent map[string]string        `json:"workflow_content"`
 }
 
-// pipelineGenerator
+// pipelineGenerator returns the full PipelineArtifact as JSON, or the raw content of one generated file if `file` is set.
 func (s *Server) pipelineGenerator(c *echo.Context) error {
-	projectIdStr := c.QueryParam("project_id")
-	projectId, err := strconv.ParseInt(projectIdStr, 10, 64)
+	projectId, err := strconv.ParseInt(c.QueryParam("project_id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid project_id")
 	}
 	file := c.QueryParam("file")
 
+	responseData, err := s.resolvePipeline(c, projectId)
+	if err != nil {
+		return err
+	}
+
+	// return file content
+	if file != "" {
+		if content, ok := responseData.WorkflowContent[file]; ok {
+			return c.String(http.StatusOK, content)
+		}
+
+		return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("file %s not found in pipeline", file))
+	}
+
+	return c.JSON(http.StatusOK, responseData)
+}
+
+// resolvePipeline looks up the repository and returns its cached or freshly rendered pipeline; errors are echo HTTP errors.
+func (s *Server) resolvePipeline(c *echo.Context, projectId int64) (*PipelineArtifact, error) {
 	// lookup repo live, so new / changed / archived projects are picked up without a restart
 	repo, err := s.lookupRepository(projectId)
 	if err != nil {
 		if errors.Is(err, api.ErrRepositoryNotFound) || errors.Is(err, errRepositoryNotAccessible) {
 			slog.With("project_id", projectId).With("reason", err).Debug("Repository not found or not accessible")
-			return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("repository with ID %d not found", projectId))
+			return nil, echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("repository with ID %d not found", projectId))
 		}
 		slog.With("project_id", projectId).With("err", err).Warn("Failed to look up repository")
-		return echo.NewHTTPError(http.StatusBadGateway, "failed to look up repository")
+		return nil, echo.NewHTTPError(http.StatusBadGateway, "failed to look up repository")
 	}
 	branch := repo.DefaultBranch
 	key := cacheKey(constants.Version, repoInstance(repo, s.cfg.Platform), projectId, branch)
@@ -77,29 +95,19 @@ func (s *Server) pipelineGenerator(c *echo.Context) error {
 	case res = <-ch:
 	case <-timer.C:
 		slog.With("repository", repo.Path).With("key", key).With("timeout", s.cfg.RenderTimeout).Warn("Timed out waiting for pipeline")
-		return echo.NewHTTPError(http.StatusGatewayTimeout, "pipeline generation timed out, retry later")
+		return nil, echo.NewHTTPError(http.StatusGatewayTimeout, "pipeline generation timed out, retry later")
 	case <-c.Request().Context().Done():
-		return c.Request().Context().Err()
+		return nil, c.Request().Context().Err()
 	}
 	if res.Err != nil {
 		slog.With("repository", repo.Path).With("key", key).With("err", res.Err).Warn("Failed to provide pipeline")
-		return echo.NewHTTPError(http.StatusBadGateway, "failed to generate pipeline")
+		return nil, echo.NewHTTPError(http.StatusBadGateway, "failed to generate pipeline")
 	}
 	if res.Shared {
 		slog.With("key", key).Debug("served pipeline from a concurrent in-flight request")
 	}
-	responseData := res.Val.(*PipelineArtifact)
 
-	// return file content
-	if file != "" {
-		if content, ok := responseData.WorkflowContent[file]; ok {
-			return c.String(http.StatusOK, content)
-		}
-
-		return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("file %s not found in pipeline", file))
-	}
-
-	return c.JSON(http.StatusOK, responseData)
+	return res.Val.(*PipelineArtifact), nil
 }
 
 // loadOrRenderPipeline returns the cached pipeline for key, or renders and caches it.

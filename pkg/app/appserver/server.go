@@ -20,7 +20,7 @@ import (
 
 const (
 	DefaultServerAddr           = "0.0.0.0:9056"
-	DefaultRenderTimeout        = 60 * time.Second
+	DefaultRenderTimeout        = 25 * time.Second // below GitLab's 30s limit for resolving all includes
 	DefaultMaxConcurrentRenders = 10
 )
 
@@ -29,6 +29,8 @@ type Config struct {
 	Addr          string
 	StorageApi    storageapi.API
 	StorageBucket string
+	// PublicURL is the externally reachable base URL of this server (e.g. https://cid.example.com), used to generate GitLab include snippets.
+	PublicURL string
 	// RenderTimeout is how long a request waits for its pipeline (cache lookup + render); <= 0 uses DefaultRenderTimeout.
 	RenderTimeout time.Duration
 	// MaxConcurrentRenders limits parallel renders of distinct cache keys, cache hits are not limited; <= 0 uses DefaultMaxConcurrentRenders.
@@ -65,6 +67,8 @@ func NewServer(cfg *Config) *Server {
 	// endpoints
 	s.e.GET("/health", s.healthCheck)
 	s.e.GET("/v1/pipeline", s.pipelineGenerator)
+	s.e.GET("/v1/gitlab/bootstrap.yml", s.gitlabBootstrap)
+	s.e.GET("/v1/gitlab/:project_id/:source/*", s.gitlabFile)
 
 	return s
 }
