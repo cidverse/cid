@@ -32,7 +32,7 @@ func ProcessRepository(platform api.Platform, repo api.Repository, dryRun bool) 
 		return apptask.WorkflowTaskResult{}, fmt.Errorf("failed to create directory: %w", err)
 	}
 	if platform.Slug() == "github" {
-		return apptask.WorkflowTaskResult{}, appgithub.GitHubWorkflowTask(taskContext)
+		return appgithub.GitHubWorkflowTask(taskContext, dryRun)
 	} else if platform.Slug() == "gitlab" {
 		return appgitlab.GitLabWorkflowTask(taskContext, dryRun)
 	} else {
