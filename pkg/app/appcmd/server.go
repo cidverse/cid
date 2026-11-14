@@ -3,6 +3,7 @@ package appcmd
 import (
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/cidverse/cid/pkg/app/appserver"
 	"github.com/cidverse/cid/pkg/lib/storage"
@@ -12,6 +13,9 @@ import (
 )
 
 func ServerCmd() *cobra.Command {
+	var renderTimeout time.Duration
+	var maxConcurrentRenders int
+
 	cmd := &cobra.Command{
 		Use:     "app-server",
 		Aliases: []string{},
@@ -48,6 +52,9 @@ func ServerCmd() *cobra.Command {
 				Addr:          appserver.DefaultServerAddr,
 				StorageApi:    storageClient,
 				StorageBucket: storage.GetBucketName(),
+
+				RenderTimeout:        renderTimeout,
+				MaxConcurrentRenders: maxConcurrentRenders,
 			}
 			cfg.SetRepositories(repos)
 			srv := appserver.NewServer(cfg)
@@ -57,6 +64,9 @@ func ServerCmd() *cobra.Command {
 			}
 		},
 	}
+
+	cmd.Flags().DurationVar(&renderTimeout, "render-timeout", appserver.DefaultRenderTimeout, "max time a request waits for its pipeline; a timed-out render keeps running and populates the cache")
+	cmd.Flags().IntVar(&maxConcurrentRenders, "max-concurrent-renders", appserver.DefaultMaxConcurrentRenders, "max number of pipelines rendered in parallel (cache hits are not limited)")
 
 	return cmd
 }

@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/cidverse/cid/pkg/lib/storage/storageapi"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
@@ -17,7 +18,11 @@ import (
 	"golang.org/x/sync/singleflight"
 )
 
-const DefaultServerAddr = "0.0.0.0:9056"
+const (
+	DefaultServerAddr           = "0.0.0.0:9056"
+	DefaultRenderTimeout        = 60 * time.Second
+	DefaultMaxConcurrentRenders = 10
+)
 
 type Config struct {
 	Platform         api.Platform
@@ -26,6 +31,10 @@ type Config struct {
 	Addr             string
 	StorageApi       storageapi.API
 	StorageBucket    string
+	// RenderTimeout is how long a request waits for its pipeline (cache lookup + render); <= 0 uses DefaultRenderTimeout.
+	RenderTimeout time.Duration
+	// MaxConcurrentRenders limits parallel renders of distinct cache keys, cache hits are not limited; <= 0 uses DefaultMaxConcurrentRenders.
+	MaxConcurrentRenders int
 }
 
 func (c *Config) SetRepositories(repos []api.Repository) {
@@ -41,12 +50,22 @@ type Server struct {
 	e   *echo.Echo
 	// inflight deduplicates concurrent renders of the same cache key: duplicate requests wait for the running render and share its result.
 	inflight singleflight.Group
+	// renderSlots is a semaphore bounding concurrent renders to cfg.MaxConcurrentRenders.
+	renderSlots chan struct{}
 }
 
 func NewServer(cfg *Config) *Server {
+	if cfg.RenderTimeout <= 0 {
+		cfg.RenderTimeout = DefaultRenderTimeout
+	}
+	if cfg.MaxConcurrentRenders <= 0 {
+		cfg.MaxConcurrentRenders = DefaultMaxConcurrentRenders
+	}
+
 	s := &Server{
-		cfg: cfg,
-		e:   echo.New(),
+		cfg:         cfg,
+		e:           echo.New(),
+		renderSlots: make(chan struct{}, cfg.MaxConcurrentRenders),
 	}
 
 	// middleware

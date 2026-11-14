@@ -15,10 +15,12 @@ import (
 
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/app/appcore"
+	"github.com/cidverse/cid/pkg/app/apptask"
 	"github.com/cidverse/cid/pkg/constants"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"github.com/labstack/echo/v5"
 	"github.com/minio/minio-go/v7"
+	"golang.org/x/sync/singleflight"
 )
 
 // healthCheck returns a simple up status
@@ -56,18 +58,31 @@ func (s *Server) pipelineGenerator(c *echo.Context) error {
 	branch := repo.DefaultBranch
 	key := cacheKey(constants.Version, repoInstance(repo, s.cfg.Platform), projectId, branch)
 
-	// concurrent requests for the same key block until the first one is done and share its result
-	result, err, shared := s.inflight.Do(key, func() (any, error) {
+	// concurrent requests for the same key share one in-flight lookup/render; each request waits at most RenderTimeout.
+	// A timed-out render keeps running and still populates the cache, so a retry is served from cache.
+	ch := s.inflight.DoChan(key, func() (any, error) {
 		return s.loadOrRenderPipeline(key, repo, branch)
 	})
-	if err != nil {
-		slog.With("repository", repo.Path).With("key", key).With("err", err).Warn("Failed to provide pipeline")
+	timer := time.NewTimer(s.cfg.RenderTimeout)
+	defer timer.Stop()
+
+	var res singleflight.Result
+	select {
+	case res = <-ch:
+	case <-timer.C:
+		slog.With("repository", repo.Path).With("key", key).With("timeout", s.cfg.RenderTimeout).Warn("Timed out waiting for pipeline")
+		return echo.NewHTTPError(http.StatusGatewayTimeout, "pipeline generation timed out, retry later")
+	case <-c.Request().Context().Done():
+		return c.Request().Context().Err()
+	}
+	if res.Err != nil {
+		slog.With("repository", repo.Path).With("key", key).With("err", res.Err).Warn("Failed to provide pipeline")
 		return echo.NewHTTPError(http.StatusBadGateway, "failed to generate pipeline")
 	}
-	if shared {
+	if res.Shared {
 		slog.With("key", key).Debug("served pipeline from a concurrent in-flight request")
 	}
-	responseData := result.(*PipelineArtifact)
+	responseData := res.Val.(*PipelineArtifact)
 
 	// return file content
 	if file != "" {
@@ -83,6 +98,7 @@ func (s *Server) pipelineGenerator(c *echo.Context) error {
 
 // loadOrRenderPipeline returns the cached pipeline for key, or renders and caches it.
 // Runs detached from the request context, since the result is shared with other waiting requests.
+// Only renders (cache misses) take a render slot.
 func (s *Server) loadOrRenderPipeline(key string, repo api.Repository, branch string) (*PipelineArtifact, error) {
 	ctx := context.Background()
 
@@ -98,12 +114,13 @@ func (s *Server) loadOrRenderPipeline(key string, repo api.Repository, branch st
 		slog.Debug("Storage API not configured, skipping retrieval from cache")
 	}
 
-	// render pipeline
-	platform := s.cfg.Platform
-	slog.With("namespace", repo.Namespace).With("repo", repo.Name).With("branch", branch).With("platform", platform.Name()).Info("rendering pipeline")
-	pipelineResult, err := appcore.ProcessRepository(platform, repo, true)
+	// render pipeline, limited to MaxConcurrentRenders in parallel
+	s.renderSlots <- struct{}{}
+	defer func() { <-s.renderSlots }()
+
+	pipelineResult, err := s.processRepository(repo, branch)
 	if err != nil {
-		return nil, fmt.Errorf("failed to process repository: %w", err)
+		return nil, err
 	}
 
 	artifact := &PipelineArtifact{
@@ -126,6 +143,24 @@ func (s *Server) loadOrRenderPipeline(key string, repo api.Repository, branch st
 	}
 
 	return artifact, nil
+}
+
+// processRepository renders the pipeline; panics become errors, since this runs outside echo's recover middleware.
+func (s *Server) processRepository(repo api.Repository, branch string) (result apptask.WorkflowTaskResult, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic while processing repository: %v", r)
+		}
+	}()
+
+	platform := s.cfg.Platform
+	slog.With("namespace", repo.Namespace).With("repo", repo.Name).With("branch", branch).With("platform", platform.Name()).Info("rendering pipeline")
+	result, err = appcore.ProcessRepository(platform, repo, true)
+	if err != nil {
+		return result, fmt.Errorf("failed to process repository: %w", err)
+	}
+
+	return result, nil
 }
 
 // readCachedPipeline returns the cached pipeline, nil if the key does not exist, or an error if the cache could not be read.
