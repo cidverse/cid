@@ -25,24 +25,14 @@ const (
 )
 
 type Config struct {
-	Platform         api.Platform
-	Repositories     []api.Repository
-	RepositoriesByID map[int64]api.Repository
-	Addr             string
-	StorageApi       storageapi.API
-	StorageBucket    string
+	Platform      api.Platform
+	Addr          string
+	StorageApi    storageapi.API
+	StorageBucket string
 	// RenderTimeout is how long a request waits for its pipeline (cache lookup + render); <= 0 uses DefaultRenderTimeout.
 	RenderTimeout time.Duration
 	// MaxConcurrentRenders limits parallel renders of distinct cache keys, cache hits are not limited; <= 0 uses DefaultMaxConcurrentRenders.
 	MaxConcurrentRenders int
-}
-
-func (c *Config) SetRepositories(repos []api.Repository) {
-	c.Repositories = repos
-	c.RepositoriesByID = make(map[int64]api.Repository, len(repos))
-	for _, repo := range repos {
-		c.RepositoriesByID[repo.Id] = repo
-	}
 }
 
 type Server struct {

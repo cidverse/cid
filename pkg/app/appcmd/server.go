@@ -7,7 +7,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/app/appserver"
 	"github.com/cidverse/cid/pkg/lib/storage"
-	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
 	"github.com/spf13/cobra"
 )
@@ -29,17 +28,6 @@ func ServerCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			// list repositories
-			repos, err := platform.Repositories(api.RepositoryListOpts{
-				IncludeBranches:   false,
-				IncludeCommitHash: false,
-			})
-			if err != nil {
-				slog.Error("Failed to list repositories", "err", err)
-				os.Exit(1)
-			}
-			slog.With("repos", len(repos)).Info("Loaded repositories")
-
 			// init storage client
 			storageClient, err := storage.GetStorageApi()
 			if err != nil {
@@ -56,7 +44,6 @@ func ServerCmd() *cobra.Command {
 				RenderTimeout:        renderTimeout,
 				MaxConcurrentRenders: maxConcurrentRenders,
 			}
-			cfg.SetRepositories(repos)
 			srv := appserver.NewServer(cfg)
 			if err = srv.ListenAndServe(); err != nil {
 				slog.Error("Failed to start server", "err", err)

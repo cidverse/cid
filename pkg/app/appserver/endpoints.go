@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -50,10 +51,15 @@ func (s *Server) pipelineGenerator(c *echo.Context) error {
 	}
 	file := c.QueryParam("file")
 
-	// lookup repo
-	repo, ok := s.cfg.RepositoriesByID[projectId]
-	if !ok {
-		return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("repository with ID %d not found", projectId))
+	// lookup repo live, so new / changed / archived projects are picked up without a restart
+	repo, err := s.lookupRepository(projectId)
+	if err != nil {
+		if errors.Is(err, api.ErrRepositoryNotFound) || errors.Is(err, errRepositoryNotAccessible) {
+			slog.With("project_id", projectId).With("reason", err).Debug("Repository not found or not accessible")
+			return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("repository with ID %d not found", projectId))
+		}
+		slog.With("project_id", projectId).With("err", err).Warn("Failed to look up repository")
+		return echo.NewHTTPError(http.StatusBadGateway, "failed to look up repository")
 	}
 	branch := repo.DefaultBranch
 	key := cacheKey(constants.Version, repoInstance(repo, s.cfg.Platform), projectId, branch)
@@ -198,10 +204,10 @@ func cacheKey(version string, instance string, projectId int64, branch string) s
 	}, "/")
 }
 
-// repoInstance returns the host of the repository's platform instance (e.g. gitlab.com), falling back to the platform slug.
+// repoInstance returns the id of the repository's platform instance (slugified hostname, e.g. gitlab-com), falling back to the platform slug.
 func repoInstance(repo api.Repository, platform api.Platform) string {
-	if u, err := url.Parse(repo.URL); err == nil && u.Host != "" {
-		return strings.ToLower(u.Host)
+	if repo.PlatformId != "" && repo.PlatformId != "unknown" {
+		return repo.PlatformId
 	}
 
 	return platform.Slug()
