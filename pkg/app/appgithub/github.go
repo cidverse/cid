@@ -63,7 +63,7 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool) (apptas
 	}
 
 	// app context
-	cid, err := context.NewAppContextFromDir(taskContext.Directory, taskContext.Directory)
+	cid, err := context.NewIsolatedAppContextFromDir(taskContext.Directory)
 	if err != nil {
 		return apptask.WorkflowTaskResult{}, err
 	}

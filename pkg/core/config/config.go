@@ -26,9 +26,19 @@ func LoadConfigurationFile(config interface{}, file string) (err error) {
 	return cfgErr
 }
 
+// Current is the configuration of the last LoadConfig call, used by the CLI runtime (e.g. action executors).
+// It is process-global: code that loads configs for multiple projects concurrently (cid app-server) must use Load instead.
 var Current = CIDConfig{}
 
+// LoadConfig loads the configuration of the project and stores it in Current.
 func LoadConfig(projectDirectory string) *CIDConfig {
+	cfg := Load(projectDirectory)
+	Current = *cfg
+	return cfg
+}
+
+// Load loads the configuration of the project (embedded defaults, catalogs, cid.yml) without modifying Current.
+func Load(projectDirectory string) *CIDConfig {
 	cfg := CIDConfig{}
 
 	// defaults
@@ -63,7 +73,6 @@ func LoadConfig(projectDirectory string) *CIDConfig {
 		cfg.Dependencies = make(map[string]string)
 	}
 
-	Current = cfg
 	return &cfg
 }
 

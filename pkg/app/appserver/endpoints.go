@@ -69,8 +69,8 @@ func (s *Server) pipelineGenerator(c *echo.Context) error {
 
 // resolvePipeline looks up the repository and returns its cached or freshly rendered pipeline; errors are echo HTTP errors.
 func (s *Server) resolvePipeline(c *echo.Context, projectId int64) (*PipelineArtifact, error) {
-	// lookup repo live, so new / changed / archived projects are picked up without a restart
-	repo, err := s.lookupRepository(projectId)
+	// lookup repo live (cached for RepositoryCacheTTL), so new / changed / archived projects are picked up without a restart
+	repo, err := s.repos.Get(projectId)
 	if err != nil {
 		if errors.Is(err, api.ErrRepositoryNotFound) || errors.Is(err, errRepositoryNotAccessible) {
 			slog.With("project_id", projectId).With("reason", err).Debug("Repository not found or not accessible")
@@ -169,7 +169,8 @@ func (s *Server) processRepository(repo api.Repository, branch string) (result a
 
 	platform := s.cfg.Platform
 	slog.With("namespace", repo.Namespace).With("repo", repo.Name).With("branch", branch).With("platform", platform.Name()).Info("rendering pipeline")
-	result, err = appcore.ProcessRepository(platform, repo, true)
+	// dry-run: never commit; self-contained: the pipeline is served via include:remote, so it must not depend on .cid/ files
+	result, err = appcore.ProcessRepository(platform, repo, appcore.ProcessOptions{DryRun: true, SelfContained: true})
 	if err != nil {
 		return result, fmt.Errorf("failed to process repository: %w", err)
 	}

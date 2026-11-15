@@ -46,7 +46,7 @@ func WorkflowTaskData(taskContext taskcommon.TaskContext, opts PlatformWorkflowT
 	}
 
 	// app context
-	cid, err := context.NewAppContextFromDir(taskContext.Directory, taskContext.Directory)
+	cid, err := context.NewIsolatedAppContextFromDir(taskContext.Directory)
 	if err != nil {
 		return PlatformWorkflowData{}, err
 	}

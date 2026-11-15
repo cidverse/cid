@@ -89,6 +89,11 @@ func planExecuteCmd() *cobra.Command {
 			steps, _ := cmd.Flags().GetStringArray("step")
 			stateFile, _ := cmd.Flags().GetString("state-file")
 			stateWfName, _ := cmd.Flags().GetString("state-wf-name")
+			planEnv, _ := cmd.Flags().GetString("plan-env")
+			if planEnv != "" && stateWfName != "" {
+				slog.Error("--plan-env and --state-wf-name are mutually exclusive")
+				os.Exit(1)
+			}
 			if stateFile == "" {
 				stateFile = filepath.Join(".cid", "state.json")
 			}
@@ -102,7 +107,19 @@ func planExecuteCmd() *cobra.Command {
 
 			// read plan file
 			var plan plangenerate.Plan
-			if stateWfName != "" {
+			if planEnv != "" {
+				// plan embedded in the CI configuration (self-contained GitLab pipelines rendered by cid app-server)
+				encoded := os.Getenv(planEnv)
+				if encoded == "" {
+					slog.With("env", planEnv).Error("plan environment variable is empty or not set")
+					os.Exit(1)
+				}
+				plan, err = plangenerate.DecodePlan(encoded)
+				if err != nil {
+					slog.With("env", planEnv).With("err", err).Error("failed to decode plan from environment variable")
+					os.Exit(1)
+				}
+			} else if stateWfName != "" {
 				state, stateReadErr := appconfig.ReadWorkflowState(filepath.Join(cid.ProjectDir, stateFile))
 				if stateReadErr != nil {
 					log.Fatal().Err(stateReadErr).Msg("failed to read workflow state file")
@@ -155,6 +172,7 @@ func planExecuteCmd() *cobra.Command {
 	cmd.Flags().StringArray("step", []string{}, "limit execution to the specified step(s)")
 	cmd.Flags().String("state-file", "", "path to the state file, defaults to .cid/state.json")
 	cmd.Flags().String("state-wf-name", "", "workflow name, MUST BE present in .cid/state.json")
+	cmd.Flags().String("plan-env", "", "name of an environment variable holding the plan as base64(gzip(json)), used by self-contained pipelines instead of --state-file / --state-wf-name")
 
 	return cmd
 }

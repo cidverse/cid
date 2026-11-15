@@ -16,7 +16,9 @@ import (
 //
 // Links of interest:
 // https://gitlab.com/gitlab-org/gitlab/-/tree/master/doc/ci/runners/hosted_runners?ref_type=heads for all available runner tags
-func GitLabWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool) (apptask.WorkflowTaskResult, error) {
+// GitLabWorkflowTask renders .gitlab-ci.yml and, unless dryRun, commits it and opens a merge request.
+// selfContained renders a pipeline without .cid/ file dependencies (inlined install script, embedded plans), see RenderOptions.
+func GitLabWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool, selfContained bool) (apptask.WorkflowTaskResult, error) {
 	return apptask.WorkflowTask(taskContext, apptask.PlatformWorkflowTaskOptions{
 		LoadConfig: func(taskContext taskcommon.TaskContext) (appconfig.Config, error) {
 			return appconfig.Config{
@@ -58,7 +60,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool) (apptas
 			}
 
 			// render workflow
-			wfResult, wfErr := renderWorkflow(workflowTemplateData, data.Conf.RunnerTags, "wf-main.gohtml", filepath.Join(taskContext.Directory, ".gitlab-ci.yml"))
+			wfResult, wfErr := renderWorkflow(workflowTemplateData, data.Conf.RunnerTags, "wf-main.gohtml", filepath.Join(taskContext.Directory, ".gitlab-ci.yml"), RenderOptions{SelfContained: selfContained})
 			if wfErr != nil {
 				return "", fmt.Errorf("failed to render [gitlab-ci.yml]: %w", wfErr)
 			}

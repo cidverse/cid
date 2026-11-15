@@ -64,10 +64,30 @@ var systemEnvVariables = []string{
 	"_",
 }
 
+// CIDEnvironmentOptions controls how GetCIDEnvironment builds the environment.
+type CIDEnvironmentOptions struct {
+	ProjectDirectory string                    // ProjectDirectory is the root directory of the project
+	ConfigEnv        map[string]string         // ConfigEnv holds the env entries of the project configuration (cid.yml)
+	Conventions      config.ProjectConventions // Conventions of the project, exposed as CID_CONVENTION_*
+
+	// Isolated builds the environment from the project only, for rendering workflows of other repositories (cid app-run, cid app-server):
+	// the process environment and a .env file in the working directory are ignored, so the result does not depend on (or leak)
+	// the host's environment, e.g. platform tokens or storage credentials of the server.
+	Isolated bool
+}
+
+// isolatedMachineEnvVariables are the only process env entries passed to the normalizer in isolated mode, they carry no CI markers.
+var isolatedMachineEnvVariables = []string{"PATH", "HOME"}
+
 // GetCIDEnvironment returns the normalized ci variables
-func GetCIDEnvironment(configEnv map[string]string, projectDirectory string) (map[string]string, error) {
+func GetCIDEnvironment(opts CIDEnvironmentOptions) (map[string]string, error) {
+	machineEnv := api.GetMachineEnvironment()
+	if opts.Isolated {
+		machineEnv = isolatedMachineEnv(machineEnv)
+	}
+
 	// TODO: allow overriding of NCI_ variables?
-	normalized, err := normalizer.NormalizeEnv(normalizer.Options{ProjectDir: projectDirectory, Env: api.GetMachineEnvironment()})
+	normalized, err := normalizer.NormalizeEnv(normalizer.Options{ProjectDir: opts.ProjectDirectory, Env: machineEnv})
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to prepare ci environment variables")
 	}
@@ -79,32 +99,34 @@ func GetCIDEnvironment(configEnv map[string]string, projectDirectory string) (ma
 	}
 
 	// append cid vars
-	env["CID_CONVENTION_BRANCHING"] = string(config.Current.Conventions.Branching)
-	env["CID_CONVENTION_COMMIT"] = string(config.Current.Conventions.Commit)
+	env["CID_CONVENTION_BRANCHING"] = string(opts.Conventions.Branching)
+	env["CID_CONVENTION_COMMIT"] = string(opts.Conventions.Commit)
 
 	// prio 3: cid config file
-	for key, value := range configEnv {
+	for key, value := range opts.ConfigEnv {
 		env[key] = value
 	}
 
-	// prio 2: dotenv override
-	if filesystem.FileExists(".env") {
-		dotEnv, err := godotenv.Read(".env")
-		if err != nil {
-			return nil, err
+	if !opts.Isolated {
+		// prio 2: dotenv override
+		if filesystem.FileExists(".env") {
+			dotEnv, err := godotenv.Read(".env")
+			if err != nil {
+				return nil, err
+			}
+
+			for k, v := range dotEnv {
+				env[k] = v
+			}
 		}
 
-		for k, v := range dotEnv {
+		// prio 1: system env override
+		for k, v := range machineEnv {
+			if slices.Contains(systemEnvVariables, k) || strings.HasPrefix(k, "_") {
+				continue
+			}
 			env[k] = v
 		}
-	}
-
-	// prio 1: system env override
-	for k, v := range api.GetMachineEnvironment() {
-		if slices.Contains(systemEnvVariables, k) || strings.HasPrefix(k, "_") {
-			continue
-		}
-		env[k] = v
 	}
 
 	// decode encoded or encrypted values
@@ -118,13 +140,25 @@ func GetCIDEnvironment(configEnv map[string]string, projectDirectory string) (ma
 	// customization
 	// - suggested release version
 	/*
-		enrichErr := EnrichEnvironment(projectDirectory, string(config.Current.Conventions.Branching), env)
+		enrichErr := EnrichEnvironment(opts.ProjectDirectory, string(opts.Conventions.Branching), env)
 		if enrichErr != nil {
 			log.Err(enrichErr).Msg("failed to enrich project context")
 		}
 	*/
 
 	return decodedEnv, nil
+}
+
+// isolatedMachineEnv returns the subset of the process environment that is safe to use in isolated mode.
+func isolatedMachineEnv(machineEnv map[string]string) map[string]string {
+	env := make(map[string]string, len(isolatedMachineEnvVariables))
+	for _, k := range isolatedMachineEnvVariables {
+		if v, ok := machineEnv[k]; ok {
+			env[k] = v
+		}
+	}
+
+	return env
 }
 
 func AutoProtectValues(key string, original string, decoded string) {

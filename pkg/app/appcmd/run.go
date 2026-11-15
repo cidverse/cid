@@ -63,7 +63,7 @@ func RunCmd() *cobra.Command {
 				}
 
 				slog.With("namespace", repo.Namespace).With("repo", repo.Name).With("repo_channel", channel).With("platform", platform.Name()).Info("running workflow update task")
-				_, err = appcore.ProcessRepository(platform, repo, false)
+				_, err = appcore.ProcessRepository(platform, repo, appcore.ProcessOptions{})
 				if err != nil {
 					slog.With("repository", fmt.Sprintf("%s/%s", repo.Namespace, repo.Name)).With("err", err).Warn("Failed to process repository")
 				}

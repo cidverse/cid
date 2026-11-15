@@ -22,6 +22,7 @@ const (
 	DefaultServerAddr           = "0.0.0.0:9056"
 	DefaultRenderTimeout        = 25 * time.Second // below GitLab's 30s limit for resolving all includes
 	DefaultMaxConcurrentRenders = 10
+	DefaultRepositoryCacheTTL   = 60 * time.Second // how long repository lookups (metadata + access checks) are reused
 )
 
 type Config struct {
@@ -35,6 +36,8 @@ type Config struct {
 	RenderTimeout time.Duration
 	// MaxConcurrentRenders limits parallel renders of distinct cache keys, cache hits are not limited; <= 0 uses DefaultMaxConcurrentRenders.
 	MaxConcurrentRenders int
+	// RepositoryCacheTTL is how long a repository lookup is reused, so cache hits need no platform API call; 0 uses DefaultRepositoryCacheTTL, < 0 disables the cache.
+	RepositoryCacheTTL time.Duration
 }
 
 type Server struct {
@@ -44,6 +47,8 @@ type Server struct {
 	inflight singleflight.Group
 	// renderSlots is a semaphore bounding concurrent renders to cfg.MaxConcurrentRenders.
 	renderSlots chan struct{}
+	// repos caches repository lookups for cfg.RepositoryCacheTTL.
+	repos *repositoryCache
 }
 
 func NewServer(cfg *Config) *Server {
@@ -53,12 +58,16 @@ func NewServer(cfg *Config) *Server {
 	if cfg.MaxConcurrentRenders <= 0 {
 		cfg.MaxConcurrentRenders = DefaultMaxConcurrentRenders
 	}
+	if cfg.RepositoryCacheTTL == 0 {
+		cfg.RepositoryCacheTTL = DefaultRepositoryCacheTTL
+	}
 
 	s := &Server{
 		cfg:         cfg,
 		e:           echo.New(),
 		renderSlots: make(chan struct{}, cfg.MaxConcurrentRenders),
 	}
+	s.repos = newRepositoryCache(cfg.RepositoryCacheTTL, s.lookupRepository)
 
 	// middleware
 	s.e.Use(middleware.Recover())

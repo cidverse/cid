@@ -19,18 +19,26 @@ type TemplateData struct {
 	VersionFileHash string // CLI Version - SHA256 File Hash
 }
 
-// RenderFile renders a template file
-func RenderFile(templateFile string, data TemplateData, outputFile string) error {
-	// read
+// Render renders a template and returns its content
+func Render(templateFile string, data TemplateData) ([]byte, error) {
 	content, err := embedFS.ReadFile(path.Join("templates", templateFile))
 	if err != nil {
-		return fmt.Errorf("failed to read workflow template %s: %w", templateFile, err)
+		return nil, fmt.Errorf("failed to read workflow template %s: %w", templateFile, err)
 	}
 
-	// render
-	template, err := vcsapp.Render(string(content), data)
+	rendered, err := vcsapp.Render(string(content), data)
 	if err != nil {
-		return fmt.Errorf("failed to render template %s: %w", templateFile, err)
+		return nil, fmt.Errorf("failed to render template %s: %w", templateFile, err)
+	}
+
+	return rendered, nil
+}
+
+// RenderFile renders a template file
+func RenderFile(templateFile string, data TemplateData, outputFile string) error {
+	template, err := Render(templateFile, data)
+	if err != nil {
+		return err
 	}
 
 	// create file

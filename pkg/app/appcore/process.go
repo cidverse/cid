@@ -13,7 +13,15 @@ import (
 	"github.com/gosimple/slug"
 )
 
-func ProcessRepository(platform api.Platform, repo api.Repository, dryRun bool) (apptask.WorkflowTaskResult, error) {
+// ProcessOptions controls how a repository is processed.
+type ProcessOptions struct {
+	// DryRun renders the workflows without committing or opening a merge request.
+	DryRun bool
+	// SelfContained renders GitLab pipelines that need no committed .cid/ files (used by cid app-server). Ignored for GitHub.
+	SelfContained bool
+}
+
+func ProcessRepository(platform api.Platform, repo api.Repository, opts ProcessOptions) (apptask.WorkflowTaskResult, error) {
 	// create temp directory
 	tempDir, err := os.MkdirTemp("", "cid-app-*")
 	if err != nil {
@@ -32,9 +40,9 @@ func ProcessRepository(platform api.Platform, repo api.Repository, dryRun bool) 
 		return apptask.WorkflowTaskResult{}, fmt.Errorf("failed to create directory: %w", err)
 	}
 	if platform.Slug() == "github" {
-		return appgithub.GitHubWorkflowTask(taskContext, dryRun)
+		return appgithub.GitHubWorkflowTask(taskContext, opts.DryRun)
 	} else if platform.Slug() == "gitlab" {
-		return appgitlab.GitLabWorkflowTask(taskContext, dryRun)
+		return appgitlab.GitLabWorkflowTask(taskContext, opts.DryRun, opts.SelfContained)
 	} else {
 		return apptask.WorkflowTaskResult{}, fmt.Errorf("platform %s not supported", platform.Slug())
 	}

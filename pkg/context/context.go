@@ -31,12 +31,34 @@ var (
 	ErrWorkDirNotInProjectDir = fmt.Errorf("workDir must be the projectDir or a subdirectory of projectDir")
 )
 
+// NewAppContextFromDir creates the context for running cid in projectDir; it sets config.Current and uses the process environment.
 func NewAppContextFromDir(projectDir string, workDir string) (*CIDContext, error) {
-	slog.With("dir", projectDir).Debug("initializing cid context")
-	cfg := config.LoadConfig(projectDir)
+	return newAppContext(projectDir, workDir, false)
+}
+
+// NewIsolatedAppContextFromDir creates the context for rendering workflows of the project in projectDir (cid app-run, cid app-server).
+// It is safe for concurrent use: config.Current is not modified, and neither the process environment nor a .env file in the
+// working directory affect the result.
+func NewIsolatedAppContextFromDir(projectDir string) (*CIDContext, error) {
+	return newAppContext(projectDir, projectDir, true)
+}
+
+func newAppContext(projectDir string, workDir string, isolated bool) (*CIDContext, error) {
+	slog.With("dir", projectDir).With("isolated", isolated).Debug("initializing cid context")
+	var cfg *config.CIDConfig
+	if isolated {
+		cfg = config.Load(projectDir)
+	} else {
+		cfg = config.LoadConfig(projectDir)
+	}
 
 	// env
-	env, err := api.GetCIDEnvironment(cfg.Env, projectDir)
+	env, err := api.GetCIDEnvironment(api.CIDEnvironmentOptions{
+		ProjectDirectory: projectDir,
+		ConfigEnv:        cfg.Env,
+		Conventions:      cfg.Conventions,
+		Isolated:         isolated,
+	})
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("failed to prepare cid environment"), err)
 	}

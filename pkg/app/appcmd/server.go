@@ -18,6 +18,7 @@ import (
 func ServerCmd() *cobra.Command {
 	var renderTimeout time.Duration
 	var maxConcurrentRenders int
+	var repositoryCacheTTL time.Duration
 
 	cmd := &cobra.Command{
 		Use:     "app-server",
@@ -26,7 +27,7 @@ func ServerCmd() *cobra.Command {
 		GroupID: "vcsapp",
 		Run: func(cmd *cobra.Command, args []string) {
 			// flags not set explicitly can be overridden via env
-			if err := applyServerEnvOverrides(cmd, &renderTimeout, &maxConcurrentRenders); err != nil {
+			if err := applyServerEnvOverrides(cmd, &renderTimeout, &maxConcurrentRenders, &repositoryCacheTTL); err != nil {
 				slog.Error("Invalid server configuration", "err", err)
 				os.Exit(1)
 			}
@@ -68,6 +69,7 @@ func ServerCmd() *cobra.Command {
 
 				RenderTimeout:        renderTimeout,
 				MaxConcurrentRenders: maxConcurrentRenders,
+				RepositoryCacheTTL:   repositoryCacheTTL,
 			}
 			srv := appserver.NewServer(cfg)
 			if err = srv.ListenAndServe(); err != nil {
@@ -79,6 +81,7 @@ func ServerCmd() *cobra.Command {
 
 	cmd.Flags().DurationVar(&renderTimeout, "render-timeout", appserver.DefaultRenderTimeout, "max time a request waits for its pipeline, keep below GitLab's 30s include limit; a timed-out render keeps running and populates the cache [env: "+envRenderTimeout+"]")
 	cmd.Flags().IntVar(&maxConcurrentRenders, "max-concurrent-renders", appserver.DefaultMaxConcurrentRenders, "max number of pipelines rendered in parallel (cache hits are not limited) [env: "+envMaxConcurrentRenders+"]")
+	cmd.Flags().DurationVar(&repositoryCacheTTL, "repository-cache-ttl", appserver.DefaultRepositoryCacheTTL, "how long repository lookups (metadata and access checks) are reused before asking the platform again, negative disables the cache [env: "+envRepositoryCacheTTL+"]")
 
 	return cmd
 }
@@ -86,10 +89,11 @@ func ServerCmd() *cobra.Command {
 const (
 	envRenderTimeout        = "CID_SERVER_RENDER_TIMEOUT"
 	envMaxConcurrentRenders = "CID_SERVER_MAX_CONCURRENT_RENDERS"
+	envRepositoryCacheTTL   = "CID_SERVER_REPOSITORY_CACHE_TTL"
 )
 
 // applyServerEnvOverrides applies env values to flags that were not set on the command line (precedence: flag > env > default).
-func applyServerEnvOverrides(cmd *cobra.Command, renderTimeout *time.Duration, maxConcurrentRenders *int) error {
+func applyServerEnvOverrides(cmd *cobra.Command, renderTimeout *time.Duration, maxConcurrentRenders *int, repositoryCacheTTL *time.Duration) error {
 	if v := os.Getenv(envRenderTimeout); v != "" && !cmd.Flags().Changed("render-timeout") {
 		d, err := time.ParseDuration(v)
 		if err != nil || d <= 0 {
@@ -103,6 +107,13 @@ func applyServerEnvOverrides(cmd *cobra.Command, renderTimeout *time.Duration, m
 			return fmt.Errorf("invalid %s value %q, expected a positive integer", envMaxConcurrentRenders, v)
 		}
 		*maxConcurrentRenders = n
+	}
+	if v := os.Getenv(envRepositoryCacheTTL); v != "" && !cmd.Flags().Changed("repository-cache-ttl") {
+		d, err := time.ParseDuration(v)
+		if err != nil || d == 0 {
+			return fmt.Errorf("invalid %s value %q, expected a non-zero duration like 60s (negative disables the cache)", envRepositoryCacheTTL, v)
+		}
+		*repositoryCacheTTL = d
 	}
 
 	return nil

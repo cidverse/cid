@@ -13,7 +13,14 @@
 default:
   image: {{ $defaultImage.AsDependencyReference }} # {{ $defaultImage.Version }}
   before_script:
+{{- if .SelfContained }}
+    - |
+      bash -s -- "{{ $cidRelease.Version }}" "{{ $cidRelease.Hash }}" "{{ $cidRelease.GPGFingerprint }}" <<'CID_INSTALL_EOF'
+{{ .InstallScript }}
+      CID_INSTALL_EOF
+{{- else }}
     - bash .cid/scripts/install.sh "{{ $cidRelease.Version }}" "{{ $cidRelease.Hash }}" "{{ $cidRelease.GPGFingerprint }}"
+{{- end }}
 
 # variables
 variables:
@@ -25,6 +32,15 @@ variables:
   SERVICE_PORT_2376_TCP_PORT: 2375
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
+  {{- end }}
+  {{- if .SelfContained }}
+  # embedded workflow plans: base64(gzip(json)), decoded by `cid plan execute --plan-env`
+  {{- range $wf := .Workflows }}
+  {{- $plan := index $.EmbeddedPlans $wf.WorkflowKey }}
+  {{ $plan.Variable }}:
+    value: "{{ $plan.Value }}"
+    expand: false
+  {{- end }}
   {{- end }}
 
 {{- if eq .ContainerRuntime "docker" }}
@@ -103,7 +119,11 @@ stages:
 {{- end }}
       - when: never
     script:
+    {{- if $.SelfContained }}
+        - cid --log-level=${CID_LOGLEVEL:-info} plan execute --plan-env "{{ (index $.EmbeddedPlans $wf.WorkflowKey).Variable }}" --step "{{ $step.Slug }}"
+    {{- else }}
         - cid --log-level=${CID_LOGLEVEL:-info} plan execute --state-file ".cid/state-gitlab.json" --state-wf-name "{{ $wf.WorkflowKey }}" --step "{{ $step.Slug }}"
+    {{- end }}
     {{- if or
         ($step.HasOutputWithTypeAndFormat "report" "jacoco")
         ($step.HasOutputWithTypeAndFormat "report" "cobertura")

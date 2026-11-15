@@ -7,10 +7,13 @@ import (
 	"path"
 	"path/filepath"
 	"slices"
+	"strings"
 
 	"github.com/cidverse/cid/pkg/app/appconfig"
+	"github.com/cidverse/cid/pkg/app/apptemplate"
 	"github.com/cidverse/cid/pkg/common/dependency"
 	"github.com/cidverse/cid/pkg/constants"
+	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
 )
 
@@ -25,7 +28,33 @@ type TemplateData struct {
 	Workflows                    []appconfig.WorkflowData         `json:"workflows"`
 	WorkflowDependency           map[string]dependency.Dependency `json:"workflow_dependency"`
 	ReferencedWorkflowDependency map[string]dependency.Dependency `json:"-"`
+
+	// SelfContained renders a pipeline that needs no files from the repository (used by cid app-server via include:remote):
+	// the install script is inlined and every workflow's plan is embedded as a CI/CD variable.
+	SelfContained bool                    `json:"self_contained,omitempty"`
+	InstallScript string                  `json:"-"` // install script, indented for the before_script block
+	EmbeddedPlans map[string]EmbeddedPlan `json:"-"` // workflow key -> embedded plan
 }
+
+// EmbeddedPlan is a workflow plan stored in a CI/CD variable, see plangenerate.EncodePlan.
+type EmbeddedPlan struct {
+	Variable string // variable name, e.g. CID_PLAN_MAIN
+	Value    string // base64(gzip(json))
+}
+
+// RenderOptions controls optional rendering modes.
+type RenderOptions struct {
+	SelfContained bool
+}
+
+// maxEmbeddedPlanSize caps one encoded plan, well below Linux's 128 KiB limit for a single environment variable.
+const maxEmbeddedPlanSize = 64 << 10
+
+// installScriptIndent matches the indentation of the install script inside the before_script block scalar.
+const installScriptIndent = "      "
+
+// installScriptHeredocDelimiter terminates the inlined install script, it must not occur in the script itself.
+const installScriptHeredocDelimiter = "CID_INSTALL_EOF"
 
 func (t *TemplateData) GetDependencyReference(key string) string {
 	if dep, ok := t.WorkflowDependency[key]; ok {
@@ -54,7 +83,7 @@ type RenderWorkflowResult struct {
 }
 
 // renderWorkflow renders the workflow template and returns the rendered template and the hash
-func renderWorkflow(data []appconfig.WorkflowData, runnerTags []string, templateFile string, outputFile string) (RenderWorkflowResult, error) {
+func renderWorkflow(data []appconfig.WorkflowData, runnerTags []string, templateFile string, outputFile string, opts RenderOptions) (RenderWorkflowResult, error) {
 	content, err := embedFS.ReadFile(path.Join("templates", templateFile))
 	if err != nil {
 		return RenderWorkflowResult{}, fmt.Errorf("failed to read workflow template %s: %w", templateFile, err)
@@ -85,6 +114,11 @@ func renderWorkflow(data []appconfig.WorkflowData, runnerTags []string, template
 		WorkflowDependency:           wfDependencies,
 		ReferencedWorkflowDependency: make(map[string]dependency.Dependency),
 	}
+	if opts.SelfContained {
+		if err = templateData.prepareSelfContained(); err != nil {
+			return RenderWorkflowResult{}, err
+		}
+	}
 	template, err := vcsapp.Render(string(content), templateData)
 	if err != nil {
 		return RenderWorkflowResult{}, fmt.Errorf("failed to render template %s: %w", templateFile, err)
@@ -105,4 +139,63 @@ func renderWorkflow(data []appconfig.WorkflowData, runnerTags []string, template
 	}
 
 	return RenderWorkflowResult{WorkflowContent: templateString}, nil
+}
+
+// prepareSelfContained inlines the install script and encodes every workflow plan.
+func (t *TemplateData) prepareSelfContained() error {
+	script, err := apptemplate.Render("install.gohtml", apptemplate.TemplateData{Version: t.Version})
+	if err != nil {
+		return fmt.Errorf("failed to render install script: %w", err)
+	}
+	if strings.Contains(string(script), installScriptHeredocDelimiter) {
+		return fmt.Errorf("install script must not contain the heredoc delimiter %s", installScriptHeredocDelimiter)
+	}
+
+	t.SelfContained = true
+	t.InstallScript = indentLines(strings.TrimRight(string(script), "\n"), installScriptIndent)
+	t.EmbeddedPlans = make(map[string]EmbeddedPlan, len(t.Workflows))
+	for _, wf := range t.Workflows {
+		encoded, err := plangenerate.EncodePlan(wf.Plan)
+		if err != nil {
+			return fmt.Errorf("failed to encode plan of workflow %s: %w", wf.WorkflowKey, err)
+		}
+		if len(encoded) > maxEmbeddedPlanSize {
+			return fmt.Errorf("encoded plan of workflow %s is %d bytes, exceeds the limit of %d bytes for self-contained pipelines", wf.WorkflowKey, len(encoded), maxEmbeddedPlanSize)
+		}
+
+		t.EmbeddedPlans[wf.WorkflowKey] = EmbeddedPlan{
+			Variable: planVariableName(wf.WorkflowKey),
+			Value:    encoded,
+		}
+	}
+
+	return nil
+}
+
+// planVariableName returns the CI/CD variable name for a workflow plan, e.g. pull-request -> CID_PLAN_PULL_REQUEST.
+func planVariableName(workflowKey string) string {
+	name := strings.Map(func(r rune) rune {
+		switch {
+		case r >= 'a' && r <= 'z':
+			return r - 'a' + 'A'
+		case (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9'):
+			return r
+		default:
+			return '_'
+		}
+	}, workflowKey)
+
+	return "CID_PLAN_" + name
+}
+
+// indentLines prefixes every non-empty line with indent.
+func indentLines(s string, indent string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		if line != "" {
+			lines[i] = indent + line
+		}
+	}
+
+	return strings.Join(lines, "\n")
 }
