@@ -5,7 +5,8 @@ import (
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
-const HelmVersionConstraint = ">=3.16.0"
+// HelmVersionConstraint excludes helm 4 until the actions are verified against it (server-side apply by default, post-renderer and flag changes)
+const HelmVersionConstraint = ">=3.16.0, <4.0.0-0"
 
 func GetHelmTestData(env map[string]string, debug bool) *actionsdk.ModuleExecutionContextV1Response {
 	return &actionsdk.ModuleExecutionContextV1Response{

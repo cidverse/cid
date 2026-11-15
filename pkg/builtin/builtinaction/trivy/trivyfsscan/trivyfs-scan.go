@@ -34,7 +34,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 			Environment: []actionsdk.ActionAccessEnv{},
 			Executables: []actionsdk.ActionAccessExecutable{
 				{
-					Name: "trivy",
+					Name:       "trivy",
 					Constraint: "> 0.69.6",
 				},
 			},
