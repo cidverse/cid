@@ -65,6 +65,11 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Constraint: helmcommon.HelmVersionConstraint,
 				},
 			},
+			Network: []actionsdk.ActionAccessNetwork{
+				// push access, the global allow list only permits pulls (type http without rules = every request)
+				{Host: "ghcr.io:443", Type: "http"},
+				{Host: "pkg-containers.githubusercontent.com:443", Type: "http"},
+			},
 			Resources: []actionsdk.ActionAccessResource{
 				actionsdk.ResourcePackages,
 			},

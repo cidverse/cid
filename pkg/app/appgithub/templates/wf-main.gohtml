@@ -118,7 +118,7 @@ jobs:
         with:
           disable-telemetry: true
           egress-policy: "{{ printf "%s" "${{ env.EGRESS_POLICY }}" }}"
-          {{- $allowedEndpoints := $.AllowedEndpoints $step }}
+          {{- $allowedEndpoints := $.AllowedHosts $step }}
           {{- if $allowedEndpoints }}
           allowed-endpoints: >-
             {{- range $n := $allowedEndpoints }}

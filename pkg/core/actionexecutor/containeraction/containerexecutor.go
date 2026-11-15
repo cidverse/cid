@@ -29,7 +29,6 @@ import (
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/cidverseutils/containerruntime"
-	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/cidverse/cidverseutils/hash"
 	"github.com/cidverse/cidverseutils/network"
 	"github.com/cidverse/cidverseutils/redact"
@@ -177,25 +176,16 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 
 	// enterprise (proxy, ca-certs)
 	containerExec.AutoProxyConfiguration()
+	util.MountEgressCABundle(&containerExec)
 	for _, cert := range catalogAction.Container.Certs {
 		certPath, certErr := util.GetCertFileByType(cert.Type)
 		if certErr != nil {
 			return certErr
 		}
 
-		// copy files into a custom directory if CID_CERT_MOUNT_DIR is set, workaround for some dind setups
-		customCertDir := os.Getenv("CID_CERT_MOUNT_DIR")
-		if customCertDir != "" {
-			_ = os.MkdirAll(customCertDir, os.ModePerm)
-			certDestinationFile := filepath.Join(customCertDir, filepath.Base(certPath))
-			_ = filesystem.CopyFile(certPath, certDestinationFile)
-
-			certPath = certDestinationFile
-		}
-
 		containerExec.AddVolume(containerruntime.ContainerMount{
 			MountType: "directory",
-			Source:    certPath,
+			Source:    util.CertMountSource(certPath),
 			Target:    cert.ContainerPath,
 			Mode:      containerruntime.ReadMode,
 		})

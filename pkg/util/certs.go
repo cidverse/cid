@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/adrg/xdg"
+	"github.com/cidverse/cidverseutils/containerruntime"
 	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/rs/zerolog/log"
 )
@@ -97,4 +98,58 @@ func ExportMachineCACertsToFile(target string) error {
 
 	log.Debug().Str("file", target).Msg("merged CA bundle file written")
 	return nil
+}
+
+// EgressCABundleEnv points to the ca bundle (system roots + inspection ca) of the active egress filter, set for the
+// process that runs under the filter. The file only exists while the filter inspects tls (type http endpoints).
+const EgressCABundleEnv = "CID_EGRESS_CA_BUNDLE"
+
+// EgressCABundleInContainer is where the egress ca bundle is mounted in action / executable containers
+const EgressCABundleInContainer = "/cid/certs/egress-ca-bundle.crt"
+
+// egressCABundleVariables point common clients to the mounted bundle (it contains the system roots, so it can replace
+// the image's trust store). Java needs a truststore and is not covered.
+var egressCABundleVariables = []string{
+	"SSL_CERT_FILE",       // openssl (python ssl, ruby, .net on linux), go, rust (openssl-probe / rustls-native-certs), uv
+	"NODE_EXTRA_CA_CERTS", // node / npm / yarn / pnpm
+	"REQUESTS_CA_BUNDLE",  // python requests / pip
+	"PIP_CERT",            // pip
+	"CURL_CA_BUNDLE",      // curl
+	"GIT_SSL_CAINFO",      // git
+	"CARGO_HTTP_CAINFO",   // cargo
+}
+
+// MountEgressCABundle mounts the ca bundle of the active egress filter into the container and points common clients to
+// it, so tls connections the filter inspects are trusted. No-op if the filter doesn't inspect tls.
+func MountEgressCABundle(c *containerruntime.Container) {
+	path := os.Getenv(EgressCABundleEnv)
+	if path == "" {
+		return
+	}
+	if _, err := os.Stat(path); err != nil {
+		return
+	}
+
+	c.AddVolume(containerruntime.ContainerMount{
+		MountType: "directory",
+		Source:    CertMountSource(path),
+		Target:    EgressCABundleInContainer,
+		Mode:      containerruntime.ReadMode,
+	})
+	for _, name := range egressCABundleVariables {
+		c.AddEnvironmentVariable(name, EgressCABundleInContainer)
+	}
+}
+
+// CertMountSource returns the path to mount a cert file from, copied into CID_CERT_MOUNT_DIR if set (workaround for
+// some dind setups, where only that directory is shared with the container runtime)
+func CertMountSource(certPath string) string {
+	customCertDir := os.Getenv("CID_CERT_MOUNT_DIR")
+	if customCertDir == "" {
+		return certPath
+	}
+	_ = os.MkdirAll(customCertDir, os.ModePerm)
+	certDestinationFile := filepath.Join(customCertDir, filepath.Base(certPath))
+	_ = filesystem.CopyFile(certPath, certDestinationFile)
+	return certDestinationFile
 }

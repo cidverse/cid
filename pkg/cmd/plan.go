@@ -106,53 +106,15 @@ func planExecuteCmd() *cobra.Command {
 			}
 
 			// read plan file
-			var plan plangenerate.Plan
-			if planEnv != "" {
-				// plan embedded in the CI configuration (self-contained GitLab pipelines rendered by cid app-server)
-				encoded := os.Getenv(planEnv)
-				if encoded == "" {
-					slog.With("env", planEnv).Error("plan environment variable is empty or not set")
-					os.Exit(1)
-				}
-				plan, err = plangenerate.DecodePlan(encoded)
-				if err != nil {
-					slog.With("env", planEnv).With("err", err).Error("failed to decode plan from environment variable")
-					os.Exit(1)
-				}
-			} else if stateWfName != "" {
-				state, stateReadErr := appconfig.ReadWorkflowState(filepath.Join(cid.ProjectDir, stateFile))
-				if stateReadErr != nil {
-					log.Fatal().Err(stateReadErr).Msg("failed to read workflow state file")
-					os.Exit(1)
-				}
+			plan, networkGlobal, err := loadPlan(cid, stateFile, stateWfName, planEnv)
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to load plan")
+				os.Exit(1)
+			}
 
-				// iterate over all workflows to match via workflow key
-				for pair := state.Workflows.Newest(); pair != nil; pair = pair.Prev() {
-					if pair.Value.WorkflowKey == stateWfName {
-						plan = pair.Value.Plan
-						break
-					}
-				}
-				if plan.Name == "" {
-					slog.With("workflow_key", stateWfName).Error("workflow key not found in state file")
-					os.Exit(1)
-				}
-			} else {
-				// generate
-				plan, err = plangenerate.GeneratePlan(plangenerate.GeneratePlanRequest{
-					Modules:      cid.Modules,
-					Registry:     cid.Config.Registry,
-					ProjectDir:   cid.ProjectDir,
-					Env:          cid.Env,
-					Executables:  cid.Executables,
-					PinVersions:  false,
-					Environments: nil,
-					WorkflowType: "",
-				})
-				if err != nil {
-					log.Fatal().Err(err).Msg("failed to generate action plan")
-					os.Exit(1)
-				}
+			// egress filter: re-executes this command as a child process under the filter, never returns
+			if egressFilterEnabled(cmd) {
+				runPlanExecuteWithEgress(cmd, cid.ProjectDir, plan, networkGlobal, stages, steps)
 			}
 
 			// run plan
@@ -173,6 +135,61 @@ func planExecuteCmd() *cobra.Command {
 	cmd.Flags().String("state-file", "", "path to the state file, defaults to .cid/state.json")
 	cmd.Flags().String("state-wf-name", "", "workflow name, MUST BE present in .cid/state.json")
 	cmd.Flags().String("plan-env", "", "name of an environment variable holding the plan as base64(gzip(json)), used by self-contained pipelines instead of --state-file / --state-wf-name")
+	addPlanEgressFlags(cmd)
 
 	return cmd
+}
+
+// loadPlan returns the plan from an environment variable (self-contained pipelines), the state file (generated
+// pipelines) or generates it from the current project. The workflow's global network allow list is only available
+// from the state file.
+func loadPlan(cid *context.CIDContext, stateFile string, stateWfName string, planEnv string) (plangenerate.Plan, plangenerate.StepAccessNetwork, error) {
+	if planEnv != "" && stateWfName != "" {
+		return plangenerate.Plan{}, nil, fmt.Errorf("--plan-env and --state-wf-name are mutually exclusive")
+	}
+	if stateFile == "" {
+		stateFile = filepath.Join(".cid", "state.json")
+	}
+
+	if planEnv != "" {
+		// plan embedded in the CI configuration (self-contained GitLab pipelines rendered by cid app-server)
+		encoded := os.Getenv(planEnv)
+		if encoded == "" {
+			return plangenerate.Plan{}, nil, fmt.Errorf("plan environment variable %s is empty or not set", planEnv)
+		}
+		plan, err := plangenerate.DecodePlan(encoded)
+		if err != nil {
+			return plangenerate.Plan{}, nil, fmt.Errorf("failed to decode plan from environment variable %s: %w", planEnv, err)
+		}
+		return plan, nil, nil
+	}
+
+	if stateWfName != "" {
+		state, err := appconfig.ReadWorkflowState(filepath.Join(cid.ProjectDir, stateFile))
+		if err != nil {
+			return plangenerate.Plan{}, nil, fmt.Errorf("failed to read workflow state file: %w", err)
+		}
+		// iterate over all workflows to match via workflow key
+		for pair := state.Workflows.Newest(); pair != nil; pair = pair.Prev() {
+			if pair.Value.WorkflowKey == stateWfName {
+				return pair.Value.Plan, pair.Value.NetworkGlobal, nil
+			}
+		}
+		return plangenerate.Plan{}, nil, fmt.Errorf("workflow key %s not found in state file", stateWfName)
+	}
+
+	plan, err := plangenerate.GeneratePlan(plangenerate.GeneratePlanRequest{
+		Modules:      cid.Modules,
+		Registry:     cid.Config.Registry,
+		ProjectDir:   cid.ProjectDir,
+		Env:          cid.Env,
+		Executables:  cid.Executables,
+		PinVersions:  false,
+		Environments: nil,
+		WorkflowType: "",
+	})
+	if err != nil {
+		return plangenerate.Plan{}, nil, fmt.Errorf("failed to generate action plan: %w", err)
+	}
+	return plan, nil, nil
 }

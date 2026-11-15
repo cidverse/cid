@@ -161,3 +161,25 @@ func TestRenderWorkflowRunnerTagsStageOnly(t *testing.T) {
 	assert.Nil(t, jobTags["main/go-build"])
 	assert.Equal(t, []string{"deploy-prod"}, jobTags["main/helm-deploy"])
 }
+
+func TestRenderWorkflowEgressFilterVariable(t *testing.T) {
+	variables := func(runtime string, egressFilter string) map[string]any {
+		data := testWorkflowData()
+		data[0].ContainerRuntime = runtime
+		result, err := renderWorkflow(data, appconfig.RunnerTags{}, "wf-main.gohtml", "", RenderOptions{EgressFilter: egressFilter})
+		require.NoError(t, err)
+		var doc struct {
+			Variables map[string]any `yaml:"variables"`
+		}
+		require.NoError(t, yaml.Unmarshal([]byte(result.WorkflowContent), &doc))
+		return doc.Variables
+	}
+
+	// disabled by default
+	assert.NotContains(t, variables("podman", ""), "CID_EGRESS_FILTER")
+	assert.NotContains(t, variables("podman", "off"), "CID_EGRESS_FILTER")
+
+	assert.Equal(t, "audit", variables("podman", "audit")["CID_EGRESS_FILTER"])
+	assert.Equal(t, "block", variables("podman", "block")["CID_EGRESS_FILTER"])
+	assert.NotContains(t, variables("docker", "audit"), "CID_EGRESS_FILTER", "the filter can't see containers in the dind service")
+}

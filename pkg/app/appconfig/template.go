@@ -49,6 +49,11 @@ func (t *WorkflowData) AllowedEndpoints(step plangenerate.Step) plangenerate.Ste
 	return plangenerate.MergeNetworkHosts(step.Access.Network, t.NetworkGlobal)
 }
 
+// AllowedHosts returns the hosts (host:port) a step may use, for allow lists without request rules (harden-runner)
+func (t *WorkflowData) AllowedHosts(step plangenerate.Step) plangenerate.StepAccessNetwork {
+	return plangenerate.NetworkHostPorts(t.AllowedEndpoints(step))
+}
+
 type RenderWorkflowResult struct {
 	Plan            plangenerate.Plan
 	WorkflowContent string

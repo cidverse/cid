@@ -29,6 +29,7 @@ type TemplateData struct {
 	Workflows                    []appconfig.WorkflowData         `json:"workflows"`
 	WorkflowDependency           map[string]dependency.Dependency `json:"workflow_dependency"`
 	ReferencedWorkflowDependency map[string]dependency.Dependency `json:"-"`
+	EgressFilter                 string                           `json:"egress_filter,omitempty"` // CID_EGRESS_FILTER default, empty = not rendered (see RenderOptions.EgressFilter)
 
 	// SelfContained renders a pipeline that needs no files from the repository (used by cid app-server via include:remote):
 	// the install script is inlined and every workflow's plan is embedded as a CI/CD variable.
@@ -46,6 +47,10 @@ type EmbeddedPlan struct {
 // RenderOptions controls optional rendering modes.
 type RenderOptions struct {
 	SelfContained bool
+	// EgressFilter renders `CID_EGRESS_FILTER: <mode>` (audit or block) into the pipeline (podman runtime only), which runs
+	// every step under the builtin egress filter of `cid plan execute` (see pkg/egress). Experimental, empty / off =
+	// disabled. Projects can override the mode with a CI/CD variable.
+	EgressFilter string
 }
 
 // maxEmbeddedPlanSize caps one encoded plan, well below Linux's 128 KiB limit for a single environment variable.
@@ -132,6 +137,10 @@ func renderWorkflow(data []appconfig.WorkflowData, runnerTags appconfig.RunnerTa
 		Workflows:                    data,
 		WorkflowDependency:           wfDependencies,
 		ReferencedWorkflowDependency: make(map[string]dependency.Dependency),
+	}
+	// the filter can't see containers in the dind service of the docker runtime
+	if opts.EgressFilter != "" && opts.EgressFilter != "off" && containerRuntime != "docker" {
+		templateData.EgressFilter = opts.EgressFilter
 	}
 	if opts.SelfContained {
 		if err = templateData.prepareSelfContained(); err != nil {

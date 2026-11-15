@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnetcommon"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 
 	"strings"
@@ -39,11 +40,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Name: "dotnet",
 				},
 			},
-			Network: []actionsdk.ActionAccessNetwork{
-				{
-					Host: "api.nuget.org:443",
-				},
-			},
+			Network: dotnetcommon.NetworkAccess,
 		},
 		Output: actionsdk.ActionOutput{
 			Artifacts: []actionsdk.ActionArtifactType{

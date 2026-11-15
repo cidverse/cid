@@ -23,6 +23,13 @@ func RunCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			channel, _ := cmd.Flags().GetString("channel")
 			expr, _ := cmd.Flags().GetString("expr")
+			egressFilter, _ := cmd.Flags().GetString("egress-filter")
+			switch egressFilter {
+			case "", "off", "audit", "block":
+			default:
+				slog.Error("Invalid --egress-filter, allowed: off, audit, block", "value", egressFilter)
+				os.Exit(1)
+			}
 
 			// platform
 			platform, err := vcsapp.GetPlatformFromEnvironment()
@@ -39,6 +46,8 @@ func RunCmd() *cobra.Command {
 			processOpts := appcore.ProcessOptions{
 				RunnerTags:     appconfig.RunnerTagsFromEnviron(os.Environ()),
 				AutoMergeAfter: autoMergeAfter,
+
+				EgressFilter: egressFilter,
 			}
 
 			var repoFilter *regexp.Regexp
@@ -94,6 +103,7 @@ func RunCmd() *cobra.Command {
 
 	cmd.Flags().StringP("channel", "c", "", "Channel")
 	cmd.Flags().StringP("expr", "e", "", "Regex expression to filter repositories, matched against <namespace>/<name>")
+	cmd.Flags().String("egress-filter", os.Getenv("CID_EGRESS_FILTER"), "experimental: enable the builtin egress filter in generated GitLab pipelines (podman runtime) - allowed: off, audit, block; projects can override it with the CID_EGRESS_FILTER variable [env: CID_EGRESS_FILTER]")
 
 	return cmd
 }

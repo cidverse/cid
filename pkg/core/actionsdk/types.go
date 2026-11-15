@@ -64,8 +64,19 @@ type ActionAccessExecutable struct {
 	Constraint string `json:"constraint,omitempty"`
 }
 
+// ActionAccessNetwork is a network endpoint the action may use (egress filter / harden-runner allow list)
 type ActionAccessNetwork struct {
-	Host string `json:"host"`
+	Host       string                        `json:"host"`                 // host:port, *.domain:port, ip:port or cidr
+	Type       string                        `json:"type,omitempty"`       // "" (tls sni / http host verified), "tcp" (raw relay) or "http" (request inspection, https is terminated with the egress inspection ca)
+	HTTPRules  []ActionAccessNetworkHTTPRule `json:"httpRules,omitempty"`  // allowed requests (implies type http), everything else is denied; none = every request
+	AllowedIPs []string                      `json:"allowedIPs,omitempty"` // addresses / cidrs the host may resolve to, incl. private ranges
+}
+
+// ActionAccessNetworkHTTPRule allows http requests by method and path (empty = any). In paths `*` matches within one
+// segment and `**` (as a whole segment) one or more segments.
+type ActionAccessNetworkHTTPRule struct {
+	Methods []string `json:"methods,omitempty"`
+	Paths   []string `json:"paths,omitempty"`
 }
 
 type ActionAccessResource string

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cidverse/cid/pkg/core/actionsdk"
+	"github.com/cidverse/cid/pkg/egress/policy"
 )
 
 // StepAccess is the compact access definition persisted with each step of a plan.
@@ -12,7 +13,7 @@ import (
 type StepAccess struct {
 	Environment []StepAccessEnv                    `json:"env,omitempty"`         // Environment variables that the step may access during execution
 	Executables []actionsdk.ActionAccessExecutable `json:"executables,omitempty"` // Executables that the step may invoke during execution
-	Network     StepAccessNetwork                  `json:"network,omitempty"`     // Network endpoints (host:port) that the step may use during execution
+	Network     StepAccessNetwork                  `json:"network,omitempty"`     // Network endpoints (short form, see policy.NetworkEntry) that the step may use during execution
 	Resources   []actionsdk.ActionAccessResource   `json:"resources,omitempty"`   // Resources the step may access (e.g. releases, packages, ...)
 }
 
@@ -23,7 +24,8 @@ type StepAccessEnv struct {
 	Secret   bool   `json:"secret,omitempty"`
 }
 
-// StepAccessNetwork is a list of network endpoints (host:port)
+// StepAccessNetwork is a list of network endpoints in the short form of policy.NetworkEntry: plain entries are just
+// `host:port`, http rules / types / allowed ips are appended (e.g. `http://crl3.digicert.com:80|GET:/*.crl`)
 type StepAccessNetwork []string
 
 // UnmarshalJSON accepts both plain endpoint strings and the legacy {"host": "..."} object form
@@ -45,7 +47,7 @@ func (n *StepAccessNetwork) UnmarshalJSON(data []byte) error {
 		if err := json.Unmarshal(entry, &legacy); err != nil {
 			return fmt.Errorf("invalid network access entry %s: %w", string(entry), err)
 		}
-		result = append(result, legacy.Host)
+		result = append(result, NetworkEntry(legacy))
 	}
 
 	*n = result
@@ -67,13 +69,38 @@ func NewStepAccess(access actionsdk.ActionAccess) StepAccess {
 	}
 }
 
-// NetworkHosts converts action network access entries into a list of endpoints
+// NetworkHosts converts action network access entries into a list of endpoints (short form)
 func NetworkHosts(network []actionsdk.ActionAccessNetwork) StepAccessNetwork {
 	var result StepAccessNetwork
 	for _, n := range network {
-		result = append(result, n.Host)
+		result = append(result, NetworkEntry(n))
 	}
 	return result
+}
+
+// NetworkEntry converts an action network access entry into its short form, see policy.NetworkEntry
+func NetworkEntry(n actionsdk.ActionAccessNetwork) string {
+	entry := policy.NetworkEntry{Host: n.Host, Type: n.Type, AllowedIPs: n.AllowedIPs}
+	for _, r := range n.HTTPRules {
+		entry.HTTP.Rules = append(entry.HTTP.Rules, policy.HTTPRule{Methods: r.Methods, Paths: r.Paths})
+	}
+	if len(entry.HTTP.Rules) > 0 && entry.Type == policy.TypeDefault {
+		entry.Type = policy.TypeHTTP
+	}
+	return entry.String()
+}
+
+// NetworkHostPorts reduces endpoints to their host part (host:port), for allow lists that only support hosts
+// (harden-runner). Types, http rules and allowed ips are dropped, the result is deduplicated.
+func NetworkHostPorts(network StepAccessNetwork) StepAccessNetwork {
+	hosts := make(StepAccessNetwork, 0, len(network))
+	for _, endpoint := range network {
+		if entry, err := policy.ParseNetworkEntry(endpoint); err == nil {
+			endpoint = entry.Host
+		}
+		hosts = append(hosts, endpoint)
+	}
+	return MergeNetworkHosts(hosts)
 }
 
 // MergeNetworkHosts concatenates endpoint lists into a new slice, deduplicating and preserving order

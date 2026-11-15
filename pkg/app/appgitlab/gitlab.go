@@ -58,7 +58,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext, opts TaskOptions) (a
 			}
 
 			// render workflow
-			wfResult, wfErr := renderWorkflow(workflowTemplateData, data.Conf.RunnerTags, "wf-main.gohtml", filepath.Join(taskContext.Directory, ".gitlab-ci.yml"), RenderOptions{SelfContained: opts.SelfContained})
+			wfResult, wfErr := renderWorkflow(workflowTemplateData, data.Conf.RunnerTags, "wf-main.gohtml", filepath.Join(taskContext.Directory, ".gitlab-ci.yml"), RenderOptions{SelfContained: opts.SelfContained, EgressFilter: opts.EgressFilter})
 			if wfErr != nil {
 				return "", fmt.Errorf("failed to render [gitlab-ci.yml]: %w", wfErr)
 			}
@@ -79,6 +79,8 @@ type TaskOptions struct {
 	SelfContained bool
 	// RunnerTags configures the runner tags (default / per stage), applied on top of DefaultRunnerTags; project CI/CD variables override them.
 	RunnerTags appconfig.RunnerTags
+	// EgressFilter renders CID_EGRESS_FILTER (audit / block) into the pipelines, see RenderOptions.EgressFilter.
+	EgressFilter string
 	// AutoMergeAfter enables auto-merging cid's merge request once it is this old (0 disables), see appmergerequest.AutoMerge.
 	// Project CI/CD variables override it.
 	AutoMergeAfter time.Duration

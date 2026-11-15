@@ -27,6 +27,9 @@ type ProcessOptions struct {
 	// AutoMergeAfter enables auto-merging cid's own merge request once it is this old (0 disables), e.g. from
 	// appmergerequest.ParseAutoMergeAfter. Project CI/CD variables override it. Ignored with DryRun.
 	AutoMergeAfter time.Duration
+	// EgressFilter enables the builtin egress filter in generated GitLab pipelines: "" / off (default), audit
+	// or block, rendered as CID_EGRESS_FILTER (podman runtime). Ignored for GitHub, which uses harden-runner.
+	EgressFilter string
 }
 
 // TempDirPattern is the os.MkdirTemp pattern of the per-render working directories (in os.TempDir()).
@@ -58,6 +61,8 @@ func ProcessRepository(platform api.Platform, repo api.Repository, opts ProcessO
 			SelfContained:  opts.SelfContained,
 			RunnerTags:     opts.RunnerTags,
 			AutoMergeAfter: opts.AutoMergeAfter,
+
+			EgressFilter: opts.EgressFilter,
 		})
 	} else {
 		return apptask.WorkflowTaskResult{}, fmt.Errorf("platform %s not supported", platform.Slug())
