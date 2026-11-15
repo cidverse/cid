@@ -6,8 +6,8 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/deployment"
+	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/filesystem"
-	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/normalizeci/pkg/envstruct"
 	"github.com/cidverse/normalizeci/pkg/normalizer"
 	"github.com/cidverse/normalizeci/pkg/normalizer/api"
@@ -130,12 +130,17 @@ func GetCIDEnvironment(opts CIDEnvironmentOptions) (map[string]string, error) {
 	}
 
 	// decode encoded or encrypted values
-	redact.ProtectPhrase(env["CID_SECRET_PGP_PRIVATE_KEY"])
-	redact.ProtectPhrase(env["CID_SECRET_PGP_PRIVATE_KEY_PASSWORD"])
+	util.ProtectSecret(env["CID_SECRET_PGP_PRIVATE_KEY"])
+	util.ProtectSecret(env["CID_SECRET_PGP_PRIVATE_KEY_PASSWORD"])
 	decodedEnv, err := deployment.DecodeSecrets(env, deployment.DecodeSecretsConfig{
 		PGPPrivateKey:         env["CID_SECRET_PGP_PRIVATE_KEY"],
 		PGPPrivateKeyPassword: env["CID_SECRET_PGP_PRIVATE_KEY_PASSWORD"],
 	})
+	if !opts.Isolated {
+		// isolated renders (app-server) must not grow the process-global redactor with other repositories' values
+		ProtectSensitiveEnv(env)
+		ProtectSensitiveEnv(decodedEnv)
+	}
 
 	// customization
 	// - suggested release version
@@ -161,14 +166,28 @@ func isolatedMachineEnv(machineEnv map[string]string) map[string]string {
 	return env
 }
 
+// autoProtectIgnoredKeys are env keys matching the sensitive heuristic whose values are not secret, but short and common
+// enough (e.g. "runner", "root") that protecting them would redact unrelated log output such as home directory paths.
+var autoProtectIgnoredKeys = []string{"USER", "USERNAME", "LOGNAME", "USERPROFILE", "GPG_TTY", "SSH_AUTH_SOCK"}
+
+// minAutoProtectLength is the minimum length of a value protected by ProtectSensitiveEnv, shorter values (e.g. "true", "1")
+// are not secrets and would cause excessive redaction.
+const minAutoProtectLength = 6
+
+// ProtectSensitiveEnv registers the values of all env entries whose key looks like a credential with the redactor.
+func ProtectSensitiveEnv(env map[string]string) {
+	for k, v := range env {
+		if strings.HasPrefix(k, "NCI_") || slices.Contains(autoProtectIgnoredKeys, k) || len(v) < minAutoProtectLength {
+			continue
+		}
+
+		AutoProtectValues(k, v, v)
+	}
+}
+
 func AutoProtectValues(key string, original string, decoded string) {
-	upperKey := strings.ToUpper(key)
-	if strings.Contains(upperKey, "KEY") || strings.Contains(upperKey, "USER") || strings.Contains(upperKey, "PASS") || strings.Contains(upperKey, "PRIVATE") || strings.Contains(upperKey, "TOKEN") || strings.Contains(upperKey, "SECRET") || strings.Contains(upperKey, "AUTH") {
-		if original != "" {
-			redact.ProtectPhrase(original)
-		}
-		if decoded != "" {
-			redact.ProtectPhrase(decoded)
-		}
+	if util.IsSensitiveEnvKey(key) {
+		util.ProtectSecret(original)
+		util.ProtectSecret(decoded)
 	}
 }

@@ -95,7 +95,8 @@ func (sdk ActionSDK) ExecuteCommandV1(req actionsdk.ExecuteCommandV1Request) (*a
 				"version":   selectedCandidate.GetVersion(),
 				"uri":       selectedCandidate.GetUri(),
 				"reference": selectedCandidate.GetNamedReference(),
-				"command":   redact.Redact(replaceCommandPlaceholders(req.Command, sdk.ActionEnv)),
+				// unresolved {ENV} placeholders, the audit log is persisted in the uploaded state.json
+				"command": redact.Redact(req.Command),
 			},
 		})
 	}

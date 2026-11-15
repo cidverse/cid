@@ -15,7 +15,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cidverseutils/filesystem"
-	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 )
 
@@ -85,13 +84,13 @@ func GetActionContext(modules []*analyzerapi.ProjectModule, projectDir string, e
 					actionEnv[k] = v
 
 					if envAccess.Secret {
-						redact.Redact(v)
+						util.ProtectSecret(v)
 					}
 				} else if envAccess.Name == k {
 					actionEnv[k] = v
 
 					if envAccess.Secret {
-						redact.Redact(v)
+						util.ProtectSecret(v)
 					}
 				}
 			}

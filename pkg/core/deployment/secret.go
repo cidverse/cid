@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/lib/secret"
+	"github.com/cidverse/cid/pkg/util"
 )
 
 type DecodeSecretsConfig struct {
@@ -33,6 +34,7 @@ func DecodeSecrets(env map[string]string, conf DecodeSecretsConfig) (map[string]
 					return nil, errors.Join(ErrSecretDecryptionFailed, fmt.Errorf("decoding property %s", key), err)
 				}
 
+				util.ProtectSecret(decoded)
 				secrets[key] = decoded
 			case strings.HasPrefix(innerValue, "pgp:") && conf.PGPPrivateKey != "":
 				secretValue := strings.TrimPrefix(innerValue, "pgp:")
@@ -51,6 +53,7 @@ func DecodeSecrets(env map[string]string, conf DecodeSecretsConfig) (map[string]
 					return nil, errors.Join(ErrSecretDecryptionFailed, fmt.Errorf("decoding property %s", key), err)
 				}
 
+				util.ProtectSecret(decrypted)
 				secrets[key] = decrypted
 			default:
 				secrets[key] = value

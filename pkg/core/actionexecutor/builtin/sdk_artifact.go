@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/cidverse/cid/internal/state"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
@@ -22,6 +23,7 @@ import (
 	"github.com/cidverse/cid/pkg/lib/githublib"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/compress"
+	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/go-rules/pkg/expr"
 	v1 "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1"
 	"github.com/rs/zerolog/log"
@@ -153,6 +155,14 @@ func (sdk ActionSDK) storeArtifact(request actionsdk.ArtifactUploadRequest) (fil
 		defer file.Close()
 	} else {
 		return "", "", fmt.Errorf("file, content or contentBytes must be provided when uploading an artifact")
+	}
+
+	// redact registered secrets from text artifacts, which may contain captured output (e.g. junit system-out)
+	if slices.Contains(redactedArtifactTypes, request.Type) {
+		reader, err = redactReader(reader)
+		if err != nil {
+			return "", "", fmt.Errorf("failed to redact artifact %s: %w", request.File, err)
+		}
 	}
 
 	// target dir
@@ -305,6 +315,23 @@ func (sdk ActionSDK) ArtifactDownloadByteArrayV1(request actionsdk.ArtifactDownl
 		Hash:  hex.EncodeToString(hasher.Sum(nil)),
 		Size:  int64(len(data)),
 	}, nil
+}
+
+// redactedArtifactTypes are artifact types that are redacted before they are stored.
+// Binaries and other artifacts are stored as-is, as modifying them would corrupt them.
+var redactedArtifactTypes = []string{"report"}
+
+// redactReader reads the full content and replaces registered secrets, non-UTF-8 (binary) content is returned unchanged.
+func redactReader(reader io.Reader) (io.Reader, error) {
+	content, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+	if !utf8.Valid(content) {
+		return bytes.NewReader(content), nil
+	}
+
+	return strings.NewReader(redact.Redact(string(content))), nil
 }
 
 func postProcessArtifact(sdk *ActionSDK, targetFile string, fileType string, format string, formatVersion string) error {

@@ -133,3 +133,19 @@ func TestGeneratePredicateOmitsUnknownDigests(t *testing.T) {
 		assert.Empty(t, dependency.Digest, "an unresolved action must not report a digest")
 	}
 }
+
+func TestInternalParametersAllowlist(t *testing.T) {
+	params := InternalParameters(map[string]string{
+		"NCI_COMMIT_HASH":       "abc123",
+		"NCI_REPOSITORY_REMOTE": "https://gitlab-ci-token:supersecret@gitlab.com/group/project.git",
+		"NCI_DEPLOY_TOKEN":      "supersecret",
+		"GITHUB_TOKEN":          "ghs_supersecret",
+		"CI_JOB_TOKEN":          "supersecret",
+		"MY_CUSTOM_VAR":         "value",
+	})
+
+	assert.Equal(t, map[string]string{
+		"NCI_COMMIT_HASH":       "abc123",
+		"NCI_REPOSITORY_REMOTE": "https://gitlab.com/group/project.git",
+	}, params)
+}

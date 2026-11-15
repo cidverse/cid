@@ -2,10 +2,12 @@ package provenance
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
 	"github.com/cidverse/cid/internal/state"
+	"github.com/cidverse/cid/pkg/util"
 
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/normalizeci/pkg/envstruct"
@@ -30,7 +32,7 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 	// builder
 	var resolvedDependencies []v1.ResourceDescriptor
 	resolvedDependencies = append(resolvedDependencies, v1.ResourceDescriptor{
-		URI: fmt.Sprintf("%s+%s@%s", nci.Repository.Kind, nci.Repository.Remote, nci.Commit.RefType),
+		URI: fmt.Sprintf("%s+%s@%s", nci.Repository.Kind, util.StripURLCredentials(nci.Repository.Remote), nci.Commit.RefType),
 		Digest: common.DigestSet{
 			"sha1": nci.Commit.Hash,
 		},
@@ -62,18 +64,14 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 		})
 	}
 
-	var systemParameters = map[string]string{
-		"RUNNER": fmt.Sprintf("%s:%s", nci.Worker.Type, nci.Worker.OS),
-	}
-	for k, v := range env {
-		systemParameters[redact.Redact(k)] = redact.Redact(v)
-	}
+	systemParameters := InternalParameters(env)
+	systemParameters["RUNNER"] = fmt.Sprintf("%s:%s", nci.Worker.Type, nci.Worker.OS)
 	prov.BuildDefinition = v1.ProvenanceBuildDefinition{
 		BuildType: fmt.Sprintf("https://github.com/cidverse/cid@%s", "0.0.0"),
 		ExternalParameters: map[string]string{
 			"cid-workflow-source": WorkflowSource,
 			"cid-workflow":        Workflow,
-			"source":              fmt.Sprintf("%s+%s@%s", nci.Repository.Kind, nci.Repository.Remote, nci.Commit.RefName),
+			"source":              fmt.Sprintf("%s+%s@%s", nci.Repository.Kind, util.StripURLCredentials(nci.Repository.Remote), nci.Commit.RefName),
 		},
 		InternalParameters:   systemParameters,
 		ResolvedDependencies: resolvedDependencies,
@@ -95,6 +93,30 @@ func GeneratePredicate(env map[string]string, state *state.ActionStateContext) v
 	}
 
 	return prov
+}
+
+// internalParameterPrefixes is the allowlist of environment variable prefixes recorded in the provenance.
+// The provenance is uploaded with the build artifacts (and may be public), so it must never contain the raw
+// process environment: in CI that holds platform tokens and every project/group secret.
+var internalParameterPrefixes = []string{"NCI_"}
+
+// InternalParameters returns the allowlisted subset of env recorded as provenance internal parameters.
+// Even allowlisted entries are dropped if their name looks like a credential, URL credentials are stripped and
+// registered secrets are redacted.
+func InternalParameters(env map[string]string) map[string]string {
+	result := make(map[string]string)
+	for k, v := range env {
+		if !slices.ContainsFunc(internalParameterPrefixes, func(prefix string) bool { return strings.HasPrefix(k, prefix) }) {
+			continue
+		}
+		if util.IsSensitiveEnvKey(k) {
+			continue
+		}
+
+		result[k] = redact.Redact(util.StripURLCredentials(v))
+	}
+
+	return result
 }
 
 // referenceAnnotations records the human readable reference (e.g. the tag) of a resolved dependency for
