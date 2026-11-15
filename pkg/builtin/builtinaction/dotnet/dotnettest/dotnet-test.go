@@ -1,7 +1,9 @@
 package dotnettest
 
 import (
+	"encoding/json"
 	"fmt"
+	"path/filepath"
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
@@ -96,16 +98,32 @@ func (a Action) Execute() (err error) {
 	}
 
 	// test
-	testArgs := []string{
-		`--no-restore`,
-		fmt.Sprintf(`--results-directory %q`, resultsDir),
-		`--logger:"trx"`,
-		`--collect "Code Coverage;Format=cobertura"`,
-	}
-	if a.hasJunitLogger(d.Module) {
-		testArgs = append(testArgs, fmt.Sprintf(`--logger:"junit;LogFilePath=%s;MethodFormat=Class;FailureBodyFormat=Verbose"`, actionsdk.JoinPath(resultsDir, "{assembly}.junit.xml")))
+	var testArgs []string
+	if a.usesTestingPlatform(d.Module) {
+		// Microsoft.Testing.Platform (opt-in via global.json since .NET 10) uses reporters instead of VSTest loggers, each reporter requires its extension package
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "Microsoft.Testing.Platform runner configured in global.json"})
+		testArgs = append(testArgs, `--no-restore`, fmt.Sprintf(`--results-directory %q`, resultsDir))
+		if a.referencesPackage(d.Module, "Microsoft.Testing.Extensions.TrxReport", "MSTest.Sdk") {
+			testArgs = append(testArgs, `--report-trx`)
+		}
+		if a.referencesPackage(d.Module, "Microsoft.Testing.Extensions.CodeCoverage", "MSTest.Sdk") {
+			testArgs = append(testArgs, `--coverage`, `--coverage-output-format cobertura`)
+		}
+		if a.referencesPackage(d.Module, "JunitXml.TestLogger") {
+			testArgs = append(testArgs, fmt.Sprintf(`--report-spekt-junit "LogFilePath=%s;MethodFormat=Class;FailureBodyFormat=Verbose"`, actionsdk.JoinPath(resultsDir, "{assembly}.junit.xml")))
+		}
 	} else {
-		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "JunitXml.TestLogger package not referenced, skipping junit report"})
+		testArgs = append(testArgs,
+			`--no-restore`,
+			fmt.Sprintf(`--results-directory %q`, resultsDir),
+			`--logger:"trx"`,
+			`--collect "Code Coverage;Format=cobertura"`,
+		)
+		if a.referencesPackage(d.Module, "JunitXml.TestLogger") {
+			testArgs = append(testArgs, fmt.Sprintf(`--logger:"junit;LogFilePath=%s;MethodFormat=Class;FailureBodyFormat=Verbose"`, actionsdk.JoinPath(resultsDir, "{assembly}.junit.xml")))
+		} else {
+			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "JunitXml.TestLogger package not referenced, skipping junit report"})
+		}
 	}
 	cmdResult, err = a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: `dotnet test ` + strings.Join(testArgs, " "),
@@ -151,16 +169,52 @@ func (a Action) Execute() (err error) {
 	return nil
 }
 
-// hasJunitLogger checks if any project file references the JunitXml.TestLogger package, which is required for the junit logger
-func (a Action) hasJunitLogger(module *actionsdk.ProjectModule) bool {
+// usesTestingPlatform checks if the nearest global.json (module dir up to the project root) selects the Microsoft.Testing.Platform test runner
+func (a Action) usesTestingPlatform(module *actionsdk.ProjectModule) bool {
+	dir := module.ModuleDir
+	for {
+		globalJSON := actionsdk.JoinPath(dir, "global.json")
+		if a.Sdk.FileExistsV1(globalJSON) {
+			content, err := a.Sdk.FileReadV1(globalJSON)
+			if err != nil {
+				return false
+			}
+
+			var cfg struct {
+				Test struct {
+					Runner string `json:"runner"`
+				} `json:"test"`
+			}
+			if err = json.Unmarshal([]byte(content), &cfg); err != nil {
+				return false
+			}
+
+			return cfg.Test.Runner == "Microsoft.Testing.Platform"
+		}
+
+		parent := filepath.Dir(dir)
+		if dir == module.ProjectDir || parent == dir || !strings.HasPrefix(dir, module.ProjectDir) {
+			return false
+		}
+		dir = parent
+	}
+}
+
+// referencesPackage checks if any project file references one of the given packages
+func (a Action) referencesPackage(module *actionsdk.ProjectModule, packages ...string) bool {
 	for _, file := range module.Files {
 		if !strings.HasSuffix(file, "proj") && !strings.HasSuffix(file, ".props") {
 			continue
 		}
 
 		content, err := a.Sdk.FileReadV1(file)
-		if err == nil && strings.Contains(content, "JunitXml.TestLogger") {
-			return true
+		if err != nil {
+			continue
+		}
+		for _, pkg := range packages {
+			if strings.Contains(content, pkg) {
+				return true
+			}
 		}
 	}
 

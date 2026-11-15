@@ -435,6 +435,24 @@
     {
       "type": "executable.ContainerCandidate",
       "candidate": {
+        "Name": "trivy",
+        "Version": "0.76.2",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/trivy:0.76.2",
+        "Digest": "sha256:efe46b2c306effd496115a4684b4ca92aad70d02af7877d384c1600e2448d036",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
         "Name": "wrangler",
         "Version": "3.80.1",
         "Type": "container",
@@ -3633,6 +3651,24 @@
         "Type": "container",
         "Image": "ghcr.io/cidverse/helm:4.3.0",
         "Digest": "sha256:acd04b1c961301289a96ff2f264c2979919486eb7afe84524bfa8f483236f978",
+        "ImageCache": [],
+        "Mounts": [],
+        "Security": {
+          "Capabilities": null,
+          "Privileged": false
+        },
+        "Entrypoint": null,
+        "Certs": []
+      }
+    },
+    {
+      "type": "executable.ContainerCandidate",
+      "candidate": {
+        "Name": "helm",
+        "Version": "4.3.1",
+        "Type": "container",
+        "Image": "ghcr.io/cidverse/helm:4.3.1",
+        "Digest": "sha256:743f789e65c628ecc960eca8109f7c16914853fe3cb5fbe3a489f0e9660e3de0",
         "ImageCache": [],
         "Mounts": [],
         "Security": {

@@ -1,5 +1,20 @@
 [
   {
+    "version": "8.14.7",
+    "checksum": "903bfc4bc7622323124054c10f509246212a1902948bdaf26c379cca8735e856",
+    "wrapperChecksum": "ad16bca46cb71bb5887c546860d93992aeee35c1fdaf4a242b0a612375d937e0"
+  },
+  {
+    "version": "9.9.1",
+    "checksum": "d8a18a7a841dd5df825d35a685fad6f2d7f12ac0c280e57b67c27b4a520ba228",
+    "wrapperChecksum": "621008afc4f5d59357fcf06ffa644dd5aade5e091bdc363742710445f73cdaf8"
+  },
+  {
+    "version": "9.9.0",
+    "checksum": "0b00b0ffe07c4d4789c12d4935a44a7057d55774b7540bd4a3f76f336deb177a",
+    "wrapperChecksum": "621008afc4f5d59357fcf06ffa644dd5aade5e091bdc363742710445f73cdaf8"
+  },
+  {
     "version": "9.9.0-rc-1",
     "checksum": "ef02c92a61020a0e4e0cfe2c8d6e00235538e0109e50364dd40f2065a267add3",
     "wrapperChecksum": "621008afc4f5d59357fcf06ffa644dd5aade5e091bdc363742710445f73cdaf8"

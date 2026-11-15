@@ -113,6 +113,11 @@ func ProcessCommits(config Config, commits []*actionsdk.VCSCommit) TemplateData 
 		commitGroups[commit.Context["type"]] = append(commitGroups[commit.Context["type"]], commit)
 	}
 
+	// collapse repeated dependency updates (renovate / dependabot) into a single entry per dependency
+	for groupName, groupCommits := range commitGroups {
+		commitGroups[groupName] = MergeDependencyUpdates(groupCommits)
+	}
+
 	return TemplateData{
 		Commits:      commits,
 		CommitGroups: commitGroups,
