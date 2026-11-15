@@ -3,6 +3,7 @@ package appgitlab
 import (
 	"fmt"
 	"path/filepath"
+	"time"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/app/appconfig"
@@ -64,6 +65,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext, opts TaskOptions) (a
 
 			return wfResult.WorkflowContent, nil
 		},
+		AutoMergeAfter:     opts.AutoMergeAfter,
 		WorkflowStatePath:  filepath.Join(taskContext.Directory, ".cid", "state-gitlab.json"),
 		MergeRequestFooter: mergeRequestFooter,
 	}, opts.DryRun)
@@ -77,6 +79,9 @@ type TaskOptions struct {
 	SelfContained bool
 	// RunnerTags configures the runner tags (default / per stage), applied on top of DefaultRunnerTags; project CI/CD variables override them.
 	RunnerTags appconfig.RunnerTags
+	// AutoMergeAfter enables auto-merging cid's merge request once it is this old (0 disables), see appmergerequest.AutoMerge.
+	// Project CI/CD variables override it.
+	AutoMergeAfter time.Duration
 }
 
 // DefaultRunnerTags are the default runner tags of GitLab jobs (gitlab.com hosted runners).

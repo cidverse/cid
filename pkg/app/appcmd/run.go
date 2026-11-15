@@ -9,6 +9,7 @@ import (
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/app/appcore"
+	"github.com/cidverse/cid/pkg/app/appmergerequest"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
 	"github.com/spf13/cobra"
@@ -30,7 +31,15 @@ func RunCmd() *cobra.Command {
 				os.Exit(1)
 			}
 
-			processOpts := appcore.ProcessOptions{RunnerTags: appconfig.RunnerTagsFromEnviron(os.Environ())}
+			autoMergeAfter, err := appmergerequest.ParseAutoMergeAfter(os.Getenv(appmergerequest.AutoMergeAfterVariable))
+			if err != nil {
+				slog.Error("Invalid app configuration", "err", err)
+				os.Exit(1)
+			}
+			processOpts := appcore.ProcessOptions{
+				RunnerTags:     appconfig.RunnerTagsFromEnviron(os.Environ()),
+				AutoMergeAfter: autoMergeAfter,
+			}
 
 			// list repositories
 			repos, err := platform.Repositories(api.RepositoryListOpts{

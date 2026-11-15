@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
 	"github.com/cidverse/cid/pkg/app/appconfig"
@@ -19,12 +20,20 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// TaskOptions controls GitHubWorkflowTask.
+type TaskOptions struct {
+	// DryRun only returns the rendered files (no commit, push or pull request).
+	DryRun bool
+	// AutoMergeAfter enables auto-merging cid's pull request once it is this old (0 disables), see appmergerequest.AutoMerge.
+	// Repository variables override it.
+	AutoMergeAfter time.Duration
+}
+
 // GitHubWorkflowTask generates a project-specific GitHub workflow file and creates a pull request.
-// With dryRun, the rendered files are only returned (no commit, push or pull request).
 //
 // Links of interest:
 // https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md?plain=1 for runner preinstalled software
-func GitHubWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool) (apptask.WorkflowTaskResult, error) {
+func GitHubWorkflowTask(taskContext taskcommon.TaskContext, opts TaskOptions) (apptask.WorkflowTaskResult, error) {
 	helper := simpletask.New(taskContext)
 	workflowState := appconfig.NewWorkflowState()
 	renderedFiles := make(map[string]string)
@@ -127,7 +136,7 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool) (apptas
 	}
 
 	// dry run: return the rendered files without committing
-	if dryRun {
+	if opts.DryRun {
 		stateJson, err := appconfig.WorkflowStateJSON(workflowState)
 		if err != nil {
 			return apptask.WorkflowTaskResult{}, fmt.Errorf("failed to marshal workflow state to JSON: %w", err)
@@ -161,6 +170,11 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool) (apptas
 	_ = os.Remove(filepath.Join(taskContext.Directory, ".github", "workflows", "cid.yml"))
 	_ = os.Remove(filepath.Join(taskContext.Directory, ".github", "workflows", "cid-pullrequest.yml"))
 	_ = os.Remove(filepath.Join(taskContext.Directory, ".github", "workflows", "cid-ossf.yml"))
+
+	// merge the pull request of a previous run if enabled and it matches this render, nothing left to push then
+	if apptask.AutoMergeBeforePush(taskContext, branch, opts.AutoMergeAfter, vars) {
+		return apptask.WorkflowTaskResult{WorkflowState: workflowState, WorkflowContent: renderedFiles}, nil
+	}
 
 	// commit push and create or update merge request
 	err = helper.CommitPushAndMergeRequest(title, title, description, fmt.Sprintf("%s-%s", appcommon.MergeRequestId, workflowHash))

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/app/appgithub"
@@ -23,6 +24,9 @@ type ProcessOptions struct {
 	// RunnerTags configures the runner tags of generated jobs (default / per stage), e.g. from appconfig.RunnerTagsFromEnviron.
 	// Project CI/CD variables override them. Currently only applied to GitLab.
 	RunnerTags appconfig.RunnerTags
+	// AutoMergeAfter enables auto-merging cid's own merge request once it is this old (0 disables), e.g. from
+	// appmergerequest.ParseAutoMergeAfter. Project CI/CD variables override it. Ignored with DryRun.
+	AutoMergeAfter time.Duration
 }
 
 // TempDirPattern is the os.MkdirTemp pattern of the per-render working directories (in os.TempDir()).
@@ -47,12 +51,13 @@ func ProcessRepository(platform api.Platform, repo api.Repository, opts ProcessO
 		return apptask.WorkflowTaskResult{}, fmt.Errorf("failed to create directory: %w", err)
 	}
 	if platform.Slug() == "github" {
-		return appgithub.GitHubWorkflowTask(taskContext, opts.DryRun)
+		return appgithub.GitHubWorkflowTask(taskContext, appgithub.TaskOptions{DryRun: opts.DryRun, AutoMergeAfter: opts.AutoMergeAfter})
 	} else if platform.Slug() == "gitlab" {
 		return appgitlab.GitLabWorkflowTask(taskContext, appgitlab.TaskOptions{
-			DryRun:        opts.DryRun,
-			SelfContained: opts.SelfContained,
-			RunnerTags:    opts.RunnerTags,
+			DryRun:         opts.DryRun,
+			SelfContained:  opts.SelfContained,
+			RunnerTags:     opts.RunnerTags,
+			AutoMergeAfter: opts.AutoMergeAfter,
 		})
 	} else {
 		return apptask.WorkflowTaskResult{}, fmt.Errorf("platform %s not supported", platform.Slug())
