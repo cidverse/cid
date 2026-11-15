@@ -163,23 +163,24 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 
 		// pin executable constraints
 		var executableConstraints []actionsdk.ActionAccessExecutable
+		var unfulfillableConstraints []actionsdk.ActionAccessExecutable
 		for _, ex := range catalogAction.Metadata.Access.Executables {
 			versionConstraint := ex.Constraint
 			if versionConstraint == "" {
 				versionConstraint = executable.AnyVersionConstraint
 			}
 
-			// exact version constraints
-			if pinVersions {
-				c := executable.SelectCandidate(executables, executable.CandidateFilter{
-					Types:             nil,
-					Executable:        ex.Name,
-					VersionPreference: executable.PreferHighest,
-					VersionConstraint: versionConstraint,
-				})
-				if c != nil {
-					versionConstraint = fmt.Sprintf("= %s", ptr.Value(c).GetVersion())
-				}
+			c := executable.SelectCandidate(executables, executable.CandidateFilter{
+				Types:             nil,
+				Executable:        ex.Name,
+				VersionPreference: executable.PreferHighest,
+				VersionConstraint: versionConstraint,
+			})
+			if c == nil {
+				unfulfillableConstraints = append(unfulfillableConstraints, actionsdk.ActionAccessExecutable{Name: ex.Name, Constraint: versionConstraint})
+			} else if pinVersions {
+				// exact version constraints
+				versionConstraint = fmt.Sprintf("= %s", ptr.Value(c).GetVersion())
 			}
 
 			executableConstraints = append(executableConstraints, actionsdk.ActionAccessExecutable{
@@ -189,6 +190,7 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 		}
 
 		// create steps without stage grouping, but store the stage name
+		stepCountBefore := len(steps)
 		if catalogAction.Metadata.Scope == actionsdk.ActionScopeProject {
 			ruleContext := rules.GetProjectRuleContext(projectEnv(ctx.Env, context.VCSVariables), ctx.Modules)
 			ruleContext["CID_WORKFLOW_TYPE"] = workflowType
@@ -230,6 +232,17 @@ func generateFlatExecutionPlan(context PlanContext, actions []catalog.WorkflowAc
 			}
 		} else {
 			return nil, fmt.Errorf("unsupported action scope [%s]: %s", catalogAction.URI, catalogAction.Metadata.Scope)
+		}
+
+		// warn only for actions that produced steps, other actions never run
+		if len(steps) > stepCountBefore {
+			for _, ex := range unfulfillableConstraints {
+				slog.With("action", catalogAction.Metadata.Name).
+					With("executable", ex.Name).
+					With("constraint", ex.Constraint).
+					With("candidate_len", len(executables)).
+					Debug("no executable candidate fulfills the version constraint, the step will fail at runtime unless a matching executable is available there")
+			}
 		}
 	}
 

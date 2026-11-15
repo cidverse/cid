@@ -53,9 +53,21 @@ func (sdk ActionSDK) ExecuteCommandV1(req actionsdk.ExecuteCommandV1Request) (*a
 		return nil, fmt.Errorf("command [%s] by [%s] not allowed", cmdBinary, sdk.Step.Slug)
 	}
 
+	// effective version constraint (same precedence as command.Execute), for logging
+	versionConstraint := constraints[cmdBinary]
+	if req.Constraint != "" {
+		versionConstraint = req.Constraint
+	}
+	cmdLog := slog.With("step", sdk.Step.Slug).
+		With("command", redact.Redact(req.Command)).
+		With("constraint", versionConstraint).
+		With("work_dir", execDir)
+	cmdLog.Info("[API] executing command")
+
 	// execute
 	exitCode := 0
 	var errorMessage = ""
+	startedAt := time.Now()
 	stdout, stderr, selectedCandidate, cmdErr := command.Execute(command.Opts{
 		Candidates:             sdk.ExecutableCandidates,
 		CandidateTypes:         executable.ToCandidateTypes(config.Current.CommandExecutionTypes),
@@ -88,12 +100,24 @@ func (sdk ActionSDK) ExecuteCommandV1(req actionsdk.ExecuteCommandV1Request) (*a
 		})
 	}
 
+	if selectedCandidate != nil {
+		cmdLog = cmdLog.With("candidate_type", selectedCandidate.GetType()).
+			With("candidate_version", selectedCandidate.GetVersion()).
+			With("candidate_reference", selectedCandidate.GetNamedReference())
+	}
+	cmdLog = cmdLog.With("duration", time.Since(startedAt).Round(time.Millisecond).String())
+
 	if isExitError {
 		exitCode = exitErr.ExitCode()
 		errorMessage = exitErr.Error()
+		cmdLog.With("exit_code", exitCode).Info("[API] command exited with non-zero exit code")
 	} else if cmdErr != nil {
+		// command could not be run at all (e.g. no candidate fulfills the version constraint)
 		exitCode = 1
 		errorMessage = cmdErr.Error()
+		cmdLog.With("error", errorMessage).Error("[API] command execution failed")
+	} else {
+		cmdLog.Info("[API] command finished")
 	}
 
 	return &actionsdk.ExecuteCommandV1Response{
