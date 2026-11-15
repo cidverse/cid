@@ -10,7 +10,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/app/appgitlab"
 	"github.com/labstack/echo/v5"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 // gitlabFiles maps the file name used in /v1/gitlab/<project_id>/<source>/<ref>/<file> to the generated file path.

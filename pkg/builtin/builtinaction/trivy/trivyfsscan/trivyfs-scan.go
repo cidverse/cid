@@ -34,8 +34,8 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 			Environment: []actionsdk.ActionAccessEnv{},
 			Executables: []actionsdk.ActionAccessExecutable{
 				{
-					Name:       "trivy",
-					Constraint: "=> 0.61.0",
+					Name: "trivy",
+					Constraint: "> 0.69.6",
 				},
 			},
 			Network: []actionsdk.ActionAccessNetwork{
@@ -99,7 +99,7 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	} else if cmdResult.Code != 0 {
-		return fmt.Errorf("zizmor scan failed, exit code %d. Stderr: %s", cmdResult.Code, cmdResult.Stderr)
+		return fmt.Errorf("trivy scan failed, exit code %d. Stderr: %s", cmdResult.Code, cmdResult.Stderr)
 	}
 
 	// store report

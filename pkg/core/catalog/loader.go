@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/common/executable"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 func LoadFromDirectory(dir string) (*Config, error) {

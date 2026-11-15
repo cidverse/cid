@@ -19,7 +19,7 @@ import (
 	"github.com/cidverse/cidverseutils/hash"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 	orasregistry "oras.land/oras-go/v2/registry"
 )
 

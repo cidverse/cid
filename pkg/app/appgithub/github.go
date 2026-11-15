@@ -17,7 +17,7 @@ import (
 	"github.com/cidverse/go-vcsapp/pkg/task/simpletask"
 	"github.com/cidverse/go-vcsapp/pkg/task/taskcommon"
 	"github.com/gosimple/slug"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 // TaskOptions controls GitHubWorkflowTask.

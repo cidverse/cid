@@ -16,7 +16,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 type ExecuteContext struct {

@@ -23,7 +23,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 func RunWorkflowAction(cfg *config.CIDConfig, action *catalog.WorkflowAction, env map[string]string, projectDir string, modulesFilter []string) {

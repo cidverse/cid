@@ -9,7 +9,7 @@ import (
 	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/jinzhu/configor"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 //go:embed files

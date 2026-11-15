@@ -51,7 +51,6 @@ require (
 	gitlab.com/gitlab-org/api/client-go/v3 v3.50.0
 	go.yaml.in/yaml/v4 v4.0.0
 	golang.org/x/oauth2 v0.38.0
-	gopkg.in/yaml.v3 v3.0.1
 	oras.land/oras-go/v2 v2.7.0
 )
 
@@ -136,6 +135,7 @@ require (
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/ini.v1 v1.68.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 exclude (
