@@ -44,7 +44,7 @@ func testWorkflowData() []appconfig.WorkflowData {
 }
 
 func TestRenderWorkflowDefaultUsesRepositoryFiles(t *testing.T) {
-	result, err := renderWorkflow(testWorkflowData(), nil, "wf-main.gohtml", "", RenderOptions{})
+	result, err := renderWorkflow(testWorkflowData(), appconfig.RunnerTags{}, "wf-main.gohtml", "", RenderOptions{})
 	require.NoError(t, err)
 
 	assert.Contains(t, result.WorkflowContent, `bash .cid/scripts/install.sh "0.11.0" "abc" "def"`)
@@ -55,7 +55,7 @@ func TestRenderWorkflowDefaultUsesRepositoryFiles(t *testing.T) {
 
 func TestRenderWorkflowSelfContained(t *testing.T) {
 	data := testWorkflowData()
-	result, err := renderWorkflow(data, nil, "wf-main.gohtml", "", RenderOptions{SelfContained: true})
+	result, err := renderWorkflow(data, appconfig.RunnerTags{}, "wf-main.gohtml", "", RenderOptions{SelfContained: true})
 	require.NoError(t, err)
 	content := result.WorkflowContent
 
@@ -89,4 +89,75 @@ func TestRenderWorkflowSelfContained(t *testing.T) {
 func TestPlanVariableName(t *testing.T) {
 	assert.Equal(t, "CID_PLAN_MAIN", planVariableName("main"))
 	assert.Equal(t, "CID_PLAN_PULL_REQUEST", planVariableName("pull-request"))
+}
+
+// renderedJobTags renders data and returns the effective tags of every job (after resolving the .default-job merge key).
+func renderedJobTags(t *testing.T, data []appconfig.WorkflowData, tags appconfig.RunnerTags) map[string][]string {
+	t.Helper()
+	result, err := renderWorkflow(data, tags, "wf-main.gohtml", "", RenderOptions{})
+	require.NoError(t, err)
+
+	var parsed map[string]any
+	require.NoError(t, yaml.Unmarshal([]byte(result.WorkflowContent), &parsed))
+
+	jobTags := make(map[string][]string)
+	for key, v := range parsed {
+		job, ok := v.(map[string]any)
+		if !ok || job["stage"] == nil {
+			continue
+		}
+		var jt []string
+		if raw, ok := job["tags"].([]any); ok {
+			jt = []string{}
+			for _, tag := range raw {
+				jt = append(jt, tag.(string))
+			}
+		}
+		jobTags[key] = jt
+	}
+
+	return jobTags
+}
+
+func testWorkflowDataWithDeploy() []appconfig.WorkflowData {
+	data := testWorkflowData()
+	data[0].Plan.Stages = append(data[0].Plan.Stages, "deploy")
+	data[0].Plan.Steps = append(data[0].Plan.Steps, plangenerate.Step{Name: "helm-deploy", Slug: "helm-deploy", Stage: "deploy", RunAfter: []string{"go-test"}, RunAfterByName: []string{"go-test"}})
+	return data
+}
+
+func TestRenderWorkflowRunnerTagsDefaultOnly(t *testing.T) {
+	jobTags := renderedJobTags(t, testWorkflowDataWithDeploy(), appconfig.RunnerTags{Default: []string{"linux"}})
+
+	assert.Equal(t, []string{"linux"}, jobTags["main/go-build"])
+	assert.Equal(t, []string{"linux"}, jobTags["main/helm-deploy"])
+}
+
+func TestRenderWorkflowRunnerTagsPerStage(t *testing.T) {
+	jobTags := renderedJobTags(t, testWorkflowDataWithDeploy(), appconfig.RunnerTags{
+		Default: []string{"linux", "small"},
+		Stages: map[string][]string{
+			"build":  {"linux", "large"},
+			"deploy": {"deploy-prod"},
+			"lint":   {"unused"}, // stage without jobs
+		},
+	})
+
+	assert.Equal(t, []string{"linux", "large"}, jobTags["main/go-build"])
+	assert.Equal(t, []string{"linux", "small"}, jobTags["main/go-test"])
+	assert.Equal(t, []string{"deploy-prod"}, jobTags["main/helm-deploy"])
+}
+
+func TestRenderWorkflowRunnerTagsStageWithoutTags(t *testing.T) {
+	jobTags := renderedJobTags(t, testWorkflowDataWithDeploy(), appconfig.RunnerTags{Default: []string{"linux"}, Stages: map[string][]string{"deploy": {}}})
+
+	assert.Equal(t, []string{"linux"}, jobTags["main/go-build"])
+	assert.Equal(t, []string{}, jobTags["main/helm-deploy"], "deploy job must override the anchor's tags with an empty list")
+}
+
+func TestRenderWorkflowRunnerTagsStageOnly(t *testing.T) {
+	jobTags := renderedJobTags(t, testWorkflowDataWithDeploy(), appconfig.RunnerTags{Stages: map[string][]string{"deploy": {"deploy-prod"}}})
+
+	assert.Nil(t, jobTags["main/go-build"])
+	assert.Equal(t, []string{"deploy-prod"}, jobTags["main/helm-deploy"])
 }

@@ -60,9 +60,9 @@ stages:
 
 # configuration snippets
 .default-job: &default_job
-  {{ if .RunnerTags }}
+  {{ if .RunnerTags.Default }}
   tags:
-    {{- range $tag := .RunnerTags }}
+    {{- range $tag := .RunnerTags.Default }}
     - {{ $tag }}
     {{- end }}
   {{- end }}
@@ -84,6 +84,9 @@ stages:
 "{{ $wf.NameSlug }}/{{ $step.Name }}":
     <<: *default_job
     stage: {{ $step.Stage }}
+    {{- with $.StageRunnerTagsOverride $step.Stage }}
+    tags: {{ . }}
+    {{- end }}
     needs: [{{- range $index, $elem := $step.RunAfterByName }}{{ if $index }}, {{ end }}"{{ $wf.NameSlug }}/{{ $elem }}"{{ end -}}]
     dependencies: [{{- range $index, $elem := $step.UsesOutputOfByName }}{{ if $index }}, {{ end }}"{{ $wf.NameSlug }}/{{ $elem }}"{{ end -}}]
     {{- if $step.Environment }}

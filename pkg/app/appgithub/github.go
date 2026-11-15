@@ -35,7 +35,6 @@ func GitHubWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool) (apptas
 		Version:          constants.Version,
 		VersionHash:      constants.BinaryHash,
 		JobTimeout:       20,
-		RunnerTags:       []string{},
 		EgressPolicy:     "block",
 		ContainerRuntime: "podman",
 		Workflows:        appconfig.DefaultWorkflowConfig(taskContext.Repository.DefaultBranch, taskContext.Repository.Branches),

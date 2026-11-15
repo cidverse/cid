@@ -52,7 +52,7 @@ func (s *Server) pipelineGenerator(c *echo.Context) error {
 
 	responseData, err := s.resolvePipeline(c, projectId)
 	if err != nil {
-		return err
+		return toHTTPError(err)
 	}
 
 	// return file content
@@ -67,17 +67,42 @@ func (s *Server) pipelineGenerator(c *echo.Context) error {
 	return c.JSON(http.StatusOK, responseData)
 }
 
-// resolvePipeline looks up the repository and returns its cached or freshly rendered pipeline; errors are echo HTTP errors.
+// pipelineError is a failure to provide a pipeline: an HTTP status and a message that is safe to show to API clients / in CI logs.
+type pipelineError struct {
+	status  int
+	message string
+}
+
+func (e *pipelineError) Error() string {
+	return e.message
+}
+
+func newPipelineError(status int, message string) *pipelineError {
+	return &pipelineError{status: status, message: message}
+}
+
+// toHTTPError converts a pipelineError into an echo HTTP error, other errors (e.g. a cancelled request context) are returned unchanged.
+func toHTTPError(err error) error {
+	var pe *pipelineError
+	if errors.As(err, &pe) {
+		return echo.NewHTTPError(pe.status, pe.message)
+	}
+
+	return err
+}
+
+// resolvePipeline looks up the repository and returns its cached or freshly rendered pipeline.
+// Failures are *pipelineError, except for a cancelled request context.
 func (s *Server) resolvePipeline(c *echo.Context, projectId int64) (*PipelineArtifact, error) {
 	// lookup repo live (cached for RepositoryCacheTTL), so new / changed / archived projects are picked up without a restart
 	repo, err := s.repos.Get(projectId)
 	if err != nil {
 		if errors.Is(err, api.ErrRepositoryNotFound) || errors.Is(err, errRepositoryNotAccessible) {
 			slog.With("project_id", projectId).With("reason", err).Debug("Repository not found or not accessible")
-			return nil, echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("repository with ID %d not found", projectId))
+			return nil, newPipelineError(http.StatusNotFound, fmt.Sprintf("repository with ID %d not found or not accessible (cid needs maintainer access; archived and empty repositories are skipped)", projectId))
 		}
 		slog.With("project_id", projectId).With("err", err).Warn("Failed to look up repository")
-		return nil, echo.NewHTTPError(http.StatusBadGateway, "failed to look up repository")
+		return nil, newPipelineError(http.StatusBadGateway, "failed to look up repository, retry later")
 	}
 	branch := repo.DefaultBranch
 	key := cacheKey(constants.Version, repoInstance(repo, s.cfg.Platform), projectId, branch)
@@ -95,13 +120,20 @@ func (s *Server) resolvePipeline(c *echo.Context, projectId int64) (*PipelineArt
 	case res = <-ch:
 	case <-timer.C:
 		slog.With("repository", repo.Path).With("key", key).With("timeout", s.cfg.RenderTimeout).Warn("Timed out waiting for pipeline")
-		return nil, echo.NewHTTPError(http.StatusGatewayTimeout, "pipeline generation timed out, retry later")
+		return nil, newPipelineError(http.StatusGatewayTimeout, "pipeline generation timed out; it continues in the background, retry the pipeline in a minute")
 	case <-c.Request().Context().Done():
 		return nil, c.Request().Context().Err()
 	}
+	if errors.Is(res.Err, errShuttingDown) {
+		return nil, newPipelineError(http.StatusServiceUnavailable, "cid server is shutting down, retry the pipeline")
+	}
+	var renderErr *renderFailedError
+	if errors.As(res.Err, &renderErr) {
+		return nil, newPipelineError(http.StatusBadGateway, renderErr.userMessage())
+	}
 	if res.Err != nil {
 		slog.With("repository", repo.Path).With("key", key).With("err", res.Err).Warn("Failed to provide pipeline")
-		return nil, echo.NewHTTPError(http.StatusBadGateway, "failed to generate pipeline")
+		return nil, newPipelineError(http.StatusBadGateway, "failed to generate pipeline, see the cid server logs")
 	}
 	if res.Shared {
 		slog.With("key", key).Debug("served pipeline from a concurrent in-flight request")
@@ -112,8 +144,13 @@ func (s *Server) resolvePipeline(c *echo.Context, projectId int64) (*PipelineArt
 
 // loadOrRenderPipeline returns the cached pipeline for key, or renders and caches it.
 // Runs detached from the request context, since the result is shared with other waiting requests.
-// Only renders (cache misses) take a render slot.
+// Only renders (cache misses) take a render slot. Registered with the shutdown tracking, so Shutdown waits for it.
 func (s *Server) loadOrRenderPipeline(key string, repo api.Repository, branch string) (*PipelineArtifact, error) {
+	done, err := s.beginRender()
+	if err != nil {
+		return nil, err
+	}
+	defer done()
 	ctx := context.Background()
 
 	// check storage for cached artifact
@@ -128,13 +165,22 @@ func (s *Server) loadOrRenderPipeline(key string, repo api.Repository, branch st
 		slog.Debug("Storage API not configured, skipping retrieval from cache")
 	}
 
+	// a recent render of this key failed: don't retry before RenderFailureTTL expired (checked after storage, so a
+	// successful render by another replica still wins)
+	if failed := s.renderFailures.Get(key); failed != nil {
+		slog.With("key", key).With("retry_at", failed.retryAt).Debug("serving cached render failure")
+		return nil, failed
+	}
+
 	// render pipeline, limited to MaxConcurrentRenders in parallel
 	s.renderSlots <- struct{}{}
 	defer func() { <-s.renderSlots }()
 
-	pipelineResult, err := s.processRepository(repo, branch)
+	pipelineResult, err := s.render(repo, branch)
 	if err != nil {
-		return nil, err
+		failed := s.renderFailures.Record(key, err)
+		slog.With("repository", repo.Path).With("key", key).With("err", err).With("retry_at", failed.retryAt).Warn("Failed to render pipeline")
+		return nil, failed
 	}
 
 	artifact := &PipelineArtifact{
@@ -170,7 +216,7 @@ func (s *Server) processRepository(repo api.Repository, branch string) (result a
 	platform := s.cfg.Platform
 	slog.With("namespace", repo.Namespace).With("repo", repo.Name).With("branch", branch).With("platform", platform.Name()).Info("rendering pipeline")
 	// dry-run: never commit; self-contained: the pipeline is served via include:remote, so it must not depend on .cid/ files
-	result, err = appcore.ProcessRepository(platform, repo, appcore.ProcessOptions{DryRun: true, SelfContained: true})
+	result, err = appcore.ProcessRepository(platform, repo, appcore.ProcessOptions{DryRun: true, SelfContained: true, RunnerTags: s.cfg.RunnerTags})
 	if err != nil {
 		return result, fmt.Errorf("failed to process repository: %w", err)
 	}

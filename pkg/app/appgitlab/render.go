@@ -2,6 +2,7 @@ package appgitlab
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -23,7 +24,7 @@ var embedFS embed.FS
 type TemplateData struct {
 	Version                      string                           `json:"version"`
 	ContainerRuntime             string                           `json:"container_runtime"`
-	RunnerTags                   []string                         `json:"runner_tags,omitempty"`
+	RunnerTags                   appconfig.RunnerTags             `json:"runner_tags"` // Default via the .default-job anchor, stage overrides via StageRunnerTagsOverride
 	Stages                       []string                         `json:"stages"`
 	Workflows                    []appconfig.WorkflowData         `json:"workflows"`
 	WorkflowDependency           map[string]dependency.Dependency `json:"workflow_dependency"`
@@ -56,6 +57,24 @@ const installScriptIndent = "      "
 // installScriptHeredocDelimiter terminates the inlined install script, it must not occur in the script itself.
 const installScriptHeredocDelimiter = "CID_INSTALL_EOF"
 
+// StageRunnerTagsOverride returns the tags of jobs of stage as a YAML flow list (e.g. ["a", "b"] or []) if they differ from
+// the anchor's default tags, otherwise "" (the job inherits the anchor's tags).
+func (t *TemplateData) StageRunnerTagsOverride(stage string) (string, error) {
+	tags := t.RunnerTags.ForStage(stage)
+	if slices.Equal(tags, t.RunnerTags.Default) {
+		return "", nil
+	}
+	if tags == nil {
+		tags = []string{}
+	}
+	out, err := json.Marshal(tags) // JSON is valid YAML and quotes every tag
+	if err != nil {
+		return "", err
+	}
+
+	return string(out), nil
+}
+
 func (t *TemplateData) GetDependencyReference(key string) string {
 	if dep, ok := t.WorkflowDependency[key]; ok {
 		t.ReferencedWorkflowDependency[key] = dep
@@ -83,7 +102,7 @@ type RenderWorkflowResult struct {
 }
 
 // renderWorkflow renders the workflow template and returns the rendered template and the hash
-func renderWorkflow(data []appconfig.WorkflowData, runnerTags []string, templateFile string, outputFile string, opts RenderOptions) (RenderWorkflowResult, error) {
+func renderWorkflow(data []appconfig.WorkflowData, runnerTags appconfig.RunnerTags, templateFile string, outputFile string, opts RenderOptions) (RenderWorkflowResult, error) {
 	content, err := embedFS.ReadFile(path.Join("templates", templateFile))
 	if err != nil {
 		return RenderWorkflowResult{}, fmt.Errorf("failed to read workflow template %s: %w", templateFile, err)

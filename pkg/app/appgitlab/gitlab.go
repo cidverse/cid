@@ -16,20 +16,17 @@ import (
 //
 // Links of interest:
 // https://gitlab.com/gitlab-org/gitlab/-/tree/master/doc/ci/runners/hosted_runners?ref_type=heads for all available runner tags
-// GitLabWorkflowTask renders .gitlab-ci.yml and, unless dryRun, commits it and opens a merge request.
-// selfContained renders a pipeline without .cid/ file dependencies (inlined install script, embedded plans), see RenderOptions.
-func GitLabWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool, selfContained bool) (apptask.WorkflowTaskResult, error) {
+// GitLabWorkflowTask renders .gitlab-ci.yml and, unless opts.DryRun, commits it and opens a merge request.
+func GitLabWorkflowTask(taskContext taskcommon.TaskContext, opts TaskOptions) (apptask.WorkflowTaskResult, error) {
 	return apptask.WorkflowTask(taskContext, apptask.PlatformWorkflowTaskOptions{
-		LoadConfig: func(taskContext taskcommon.TaskContext) (appconfig.Config, error) {
-			return appconfig.Config{
-				Version:          constants.Version,
-				VersionHash:      constants.BinaryHash,
-				JobTimeout:       20,
-				RunnerTags:       []string{"saas-linux-small-amd64"},
-				EgressPolicy:     "block",
-				ContainerRuntime: "podman",
-				Workflows:        appconfig.DefaultWorkflowConfig(taskContext.Repository.DefaultBranch, taskContext.Repository.Branches),
-			}, nil
+		Config: appconfig.Config{
+			Version:          constants.Version,
+			VersionHash:      constants.BinaryHash,
+			JobTimeout:       20,
+			RunnerTags:       BaseRunnerTags(opts.RunnerTags), // project variables are merged in by apptask.WorkflowTask
+			EgressPolicy:     "block",
+			ContainerRuntime: "podman",
+			Workflows:        appconfig.DefaultWorkflowConfig(taskContext.Repository.DefaultBranch, taskContext.Repository.Branches),
 		},
 		RenderWorkflow: func(workflowState *appconfig.WorkflowState, data apptask.PlatformWorkflowData, template string, targetPath string) (string, error) {
 			var workflowTemplateData []appconfig.WorkflowData
@@ -60,7 +57,7 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool, selfCon
 			}
 
 			// render workflow
-			wfResult, wfErr := renderWorkflow(workflowTemplateData, data.Conf.RunnerTags, "wf-main.gohtml", filepath.Join(taskContext.Directory, ".gitlab-ci.yml"), RenderOptions{SelfContained: selfContained})
+			wfResult, wfErr := renderWorkflow(workflowTemplateData, data.Conf.RunnerTags, "wf-main.gohtml", filepath.Join(taskContext.Directory, ".gitlab-ci.yml"), RenderOptions{SelfContained: opts.SelfContained})
 			if wfErr != nil {
 				return "", fmt.Errorf("failed to render [gitlab-ci.yml]: %w", wfErr)
 			}
@@ -69,5 +66,23 @@ func GitLabWorkflowTask(taskContext taskcommon.TaskContext, dryRun bool, selfCon
 		},
 		WorkflowStatePath:  filepath.Join(taskContext.Directory, ".cid", "state-gitlab.json"),
 		MergeRequestFooter: mergeRequestFooter,
-	}, dryRun)
+	}, opts.DryRun)
+}
+
+// TaskOptions controls GitLabWorkflowTask.
+type TaskOptions struct {
+	// DryRun renders without committing or opening a merge request.
+	DryRun bool
+	// SelfContained renders a pipeline without .cid/ file dependencies (inlined install script, embedded plans), see RenderOptions.
+	SelfContained bool
+	// RunnerTags configures the runner tags (default / per stage), applied on top of DefaultRunnerTags; project CI/CD variables override them.
+	RunnerTags appconfig.RunnerTags
+}
+
+// DefaultRunnerTags are the default runner tags of GitLab jobs (gitlab.com hosted runners).
+var DefaultRunnerTags = []string{"saas-linux-small-amd64"}
+
+// BaseRunnerTags returns the GitLab defaults overridden by configured.
+func BaseRunnerTags(configured appconfig.RunnerTags) appconfig.RunnerTags {
+	return appconfig.RunnerTags{Default: DefaultRunnerTags}.Merge(configured)
 }

@@ -7,6 +7,7 @@ import (
 	"regexp"
 
 	"github.com/cidverse/cid/pkg/app/appcommon"
+	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/app/appcore"
 	"github.com/cidverse/go-vcsapp/pkg/platform/api"
 	"github.com/cidverse/go-vcsapp/pkg/vcsapp"
@@ -28,6 +29,8 @@ func RunCmd() *cobra.Command {
 				slog.Error("Failed to configure platform from environment", "err", err)
 				os.Exit(1)
 			}
+
+			processOpts := appcore.ProcessOptions{RunnerTags: appconfig.RunnerTagsFromEnviron(os.Environ())}
 
 			// list repositories
 			repos, err := platform.Repositories(api.RepositoryListOpts{
@@ -63,7 +66,7 @@ func RunCmd() *cobra.Command {
 				}
 
 				slog.With("namespace", repo.Namespace).With("repo", repo.Name).With("repo_channel", channel).With("platform", platform.Name()).Info("running workflow update task")
-				_, err = appcore.ProcessRepository(platform, repo, appcore.ProcessOptions{})
+				_, err = appcore.ProcessRepository(platform, repo, processOpts)
 				if err != nil {
 					slog.With("repository", fmt.Sprintf("%s/%s", repo.Namespace, repo.Name)).With("err", err).Warn("Failed to process repository")
 				}
