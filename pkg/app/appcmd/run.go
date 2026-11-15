@@ -41,6 +41,15 @@ func RunCmd() *cobra.Command {
 				AutoMergeAfter: autoMergeAfter,
 			}
 
+			var repoFilter *regexp.Regexp
+			if expr != "" {
+				repoFilter, err = regexp.Compile(expr)
+				if err != nil {
+					slog.Error("Invalid repository filter expression", "expr", expr, "err", err)
+					os.Exit(1)
+				}
+			}
+
 			// list repositories
 			repos, err := platform.Repositories(api.RepositoryListOpts{
 				IncludeBranches:   true,
@@ -60,9 +69,9 @@ func RunCmd() *cobra.Command {
 					continue
 				}
 
-				if expr != "" {
-					e := regexp.MustCompile(expr)
-					if !e.Match([]byte(repo.Name)) {
+				// filter matches against the full path, e.g. "cidverse/cid"
+				if repoFilter != nil {
+					if !repoFilter.MatchString(repo.Namespace + "/" + repo.Name) {
 						slog.With("repository", fmt.Sprintf("%s/%s", repo.Namespace, repo.Name)).Debug("Skipping repository due to regex mismatch")
 						continue
 					}
@@ -84,7 +93,7 @@ func RunCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringP("channel", "c", "", "Channel")
-	cmd.Flags().StringP("expr", "e", "", "Regex expression to filter repositories")
+	cmd.Flags().StringP("expr", "e", "", "Regex expression to filter repositories, matched against <namespace>/<name>")
 
 	return cmd
 }
