@@ -30,6 +30,14 @@ type File struct {
 	Rules      []RuleSummary `json:"rules"`            // allowed traffic per policy entry
 	Denied     []Event       `json:"denied,omitempty"` // traffic outside the policy (blocked, or passed in audit mode)
 	Unused     []string      `json:"unused,omitempty"` // hostname policy entries without traffic (static ip entries are not observed)
+	Tamper     *Tamper       `json:"tamper,omitempty"` // the firewall rules were modified while the filter was active
+}
+
+// Tamper is a detected modification of the firewall rules
+type Tamper struct {
+	Reason  string   `json:"reason"`
+	Added   []string `json:"added,omitempty"`
+	Removed []string `json:"removed,omitempty"`
 }
 
 // RuleSummary is the allowed traffic of one policy entry (or several entries that matched the same requests)

@@ -1,6 +1,7 @@
 package firewall
 
 import (
+	"errors"
 	"fmt"
 	"net/netip"
 	"strings"
@@ -115,4 +116,31 @@ func TestIPTablesMissingIPv4IsFatal(t *testing.T) {
 	r := &recordingRunner{fail: func(cmd string) bool { return strings.HasPrefix(cmd, "iptables -w -N") }}
 	fw := &IPTables{Mode: policy.ModeBlock, Run: r.run}
 	assert.Error(t, fw.Setup(nil, testRedirect))
+}
+
+func TestIPTablesSnapshot(t *testing.T) {
+	fw := &IPTables{
+		active: []string{"iptables"},
+		List: func(name string, args ...string) (string, error) {
+			table := args[2]
+			if table == "raw" {
+				return "", errors.New("table does not exist")
+			}
+			return "-P OUTPUT ACCEPT (" + name + " " + table + ")\n", nil
+		},
+	}
+	out, err := fw.Snapshot()
+	require.NoError(t, err)
+	assert.Equal(t, `# iptables filter
+-P OUTPUT ACCEPT (iptables filter)
+# iptables nat
+-P OUTPUT ACCEPT (iptables nat)
+# iptables mangle
+-P OUTPUT ACCEPT (iptables mangle)
+# iptables raw
+# unavailable
+`, out)
+
+	_, err = (&IPTables{List: fw.List}).Snapshot()
+	assert.Error(t, err, "not set up")
 }

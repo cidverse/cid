@@ -100,3 +100,18 @@ func TestNFTablesRequiresRunner(t *testing.T) {
 	assert.Error(t, fw.Setup(nil, testRedirect))
 	assert.NoError(t, fw.Close(), "nothing active, no-op")
 }
+
+func TestNFTablesSnapshot(t *testing.T) {
+	var called []string
+	fw := &NFTables{List: func(name string, args ...string) (string, error) {
+		called = append([]string{name}, args...)
+		return "ruleset", nil
+	}}
+	out, err := fw.Snapshot()
+	require.NoError(t, err)
+	assert.Equal(t, "ruleset", out)
+	assert.Equal(t, []string{"nft", "-s", "list", "ruleset"}, called)
+
+	_, err = (&NFTables{}).Snapshot()
+	assert.Error(t, err)
+}

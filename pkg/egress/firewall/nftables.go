@@ -58,6 +58,7 @@ type NFTables struct {
 	Mark       uint32
 	NFLogGroup uint16       // 0 = disabled
 	Run        ScriptRunner // required, use ExecNFT to modify the host firewall (no default, so tests can't touch the host by accident)
+	List       OutputRunner // required for Snapshot, use ExecOutput
 
 	active bool
 }
@@ -159,4 +160,13 @@ func (f *NFTables) Close() error {
 	}
 	f.active = false
 	return f.Run("delete table " + nftTable + "\n")
+}
+
+// Snapshot returns the whole ruleset without counters / quotas (`nft -s list ruleset`). Other tables are included because
+// a chain there could set the filter's socket mark and so bypass the egress chain.
+func (f *NFTables) Snapshot() (string, error) {
+	if f.List == nil {
+		return "", errors.New("nftables: no output runner configured")
+	}
+	return f.List("nft", "-s", "list", "ruleset")
 }
