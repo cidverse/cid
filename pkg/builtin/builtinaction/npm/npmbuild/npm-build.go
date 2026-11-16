@@ -36,14 +36,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Name: "npm",
 				},
 			},
-			Network: []actionsdk.ActionAccessNetwork{
-				{
-					Host: "registry.npmjs.org:443",
-				},
-				{
-					Host: "registry.yarnpkg.com:443",
-				},
-			},
+			Network: common.NetworkNpm,
 		},
 	}
 }

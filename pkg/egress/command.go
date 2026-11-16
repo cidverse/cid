@@ -90,17 +90,25 @@ func RunCommand(cfg Config, command []string, extraEnv []string, failOpen bool) 
 	}
 }
 
-// caBundleEnv points an `SSL_CERT_FILE` override of the environment to the filter's ca bundle (the override's roots +
-// the inspection ca), clients using the override would reject inspected connections otherwise. The system bundles are
-// patched in place and need no override.
+// caBundleEnv points local clients to the filter's ca bundle (the roots of `SSL_CERT_FILE` or the system bundle + the
+// inspection ca). The system bundles are patched in place, but several clients ignore them: node / npm (bundled mozilla
+// roots), python requests / pip (certifi) and rustls based tools like uv (webpki roots, honor `SSL_CERT_FILE`).
+// `SSL_CERT_FILE` is always replaced (the bundle contains its roots), the other variables only if they are not set, a
+// custom value may hold roots the bundle doesn't contain.
 func caBundleEnv(bundle string, getenv func(string) string) []string {
-	if bundle == "" || getenv("SSL_CERT_FILE") == "" {
+	if bundle == "" {
 		return nil
 	}
 	if _, err := os.Stat(bundle); err != nil {
 		return nil // the filter doesn't inspect tls, no bundle written
 	}
-	return []string{"SSL_CERT_FILE=" + bundle}
+	env := []string{"SSL_CERT_FILE=" + bundle}
+	for _, name := range []string{"NODE_EXTRA_CA_CERTS", "REQUESTS_CA_BUNDLE"} {
+		if getenv(name) == "" {
+			env = append(env, name+"="+bundle)
+		}
+	}
+	return env
 }
 
 // childProcess runs a command with inherited stdio and forwards SIGINT / SIGTERM to it

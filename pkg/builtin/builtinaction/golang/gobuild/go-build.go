@@ -40,17 +40,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Constraint: "=> 1.16.0",
 				},
 			},
-			Network: []actionsdk.ActionAccessNetwork{
-				{
-					Host: "proxy.golang.org:443",
-				},
-				{
-					Host: "storage.googleapis.com:443",
-				},
-				{
-					Host: "sum.golang.org:443",
-				},
-			},
+			Network: gocommon.Network,
 		},
 		Output: actionsdk.ActionOutput{
 			Artifacts: []actionsdk.ActionArtifactType{

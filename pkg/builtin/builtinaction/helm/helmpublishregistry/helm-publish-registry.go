@@ -66,9 +66,11 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				},
 			},
 			Network: []actionsdk.ActionAccessNetwork{
-				// push access, the global allow list only permits pulls (type http without rules = every request)
-				{Host: "ghcr.io:443", Type: "http"},
-				{Host: "pkg-containers.githubusercontent.com:443", Type: "http"},
+				// push access to the registry api, the global allow list only permits pulls. Blob downloads from
+				// pkg-containers.githubusercontent.com stay pull only (global allow list), deletes are denied.
+				{Host: "ghcr.io:443", HTTPRules: []actionsdk.ActionAccessNetworkHTTPRule{
+					actionsdk.HTTPRule([]string{"GET", "HEAD", "POST", "PUT", "PATCH"}, "/v2/", "/v2/**", "/token"),
+				}},
 			},
 			Resources: []actionsdk.ActionAccessResource{
 				actionsdk.ResourcePackages,
