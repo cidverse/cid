@@ -26,6 +26,7 @@ import (
 	"github.com/cidverse/cid/pkg/core/config"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/cid/pkg/core/restapi"
+	"github.com/cidverse/cid/pkg/egress/hardening"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/cidverseutils/containerruntime"
@@ -203,6 +204,13 @@ func (e Executor) Execute(ctx *commonapi.ActionExecutionContext, localState *sta
 			}
 		}
 	}
+
+	// security: dangerous capabilities dropped (see hardening.ContainerArgs)
+	hardeningArgs, err := hardening.ContainerArgs(containerExec.Image, containerExec.Privileged, containerExec.Capabilities)
+	if err != nil {
+		return err
+	}
+	containerExec.UserArgs = hardening.AppendArgs(containerExec.UserArgs, hardeningArgs)
 
 	containerCmd, err := containerExec.GetRunCommand(containerExec.DetectRuntime())
 	if err != nil {

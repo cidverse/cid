@@ -15,6 +15,7 @@ import (
 	"sync"
 
 	"github.com/cidverse/cid/pkg/common/shellcommand"
+	"github.com/cidverse/cid/pkg/egress/hardening"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/ci"
 	"github.com/cidverse/cidverseutils/containerruntime"
@@ -85,11 +86,13 @@ func (c ContainerCandidate) Run(opts RunParameters) (string, string, error) {
 		containerExec.TTY = true
 	}
 
-	// security
-	if c.Security.Privileged {
-		containerExec.Privileged = true
-	}
+	// security: privileged containers are refused, dangerous capabilities dropped (see hardening.ContainerArgs)
 	containerExec.Capabilities = append(containerExec.Capabilities, c.Security.Capabilities...)
+	hardeningArgs, err := hardening.ContainerArgs(c.Reference(), c.Security.Privileged, containerExec.Capabilities)
+	if err != nil {
+		return "", "", err
+	}
+	containerExec.UserArgs = hardening.AppendArgs(containerExec.UserArgs, hardeningArgs)
 
 	// mounts
 	containerExec.AddVolume(containerruntime.ContainerMount{MountType: "directory", Source: opts.RootDir, Target: ci.ToUnixPath(opts.RootDir)})
