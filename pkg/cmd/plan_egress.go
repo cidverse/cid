@@ -11,6 +11,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/cidverse/cid/pkg/egress"
+	"github.com/cidverse/cid/pkg/egress/hardening"
 	"github.com/cidverse/cid/pkg/egress/policy"
 	"github.com/cidverse/cid/pkg/egress/report"
 	"github.com/cidverse/cid/pkg/util"
@@ -19,9 +20,8 @@ import (
 )
 
 const (
-	egressFilterEnv       = "CID_EGRESS_FILTER"        // default of --egress-filter (off, block, audit)
-	egressFilterActiveEnv = "CID_EGRESS_FILTER_ACTIVE" // set for the child process that runs under the filter
-	egressFilterOff       = "off"
+	egressFilterEnv = "CID_EGRESS_FILTER" // default of --egress-filter (off, block, audit)
+	egressFilterOff = "off"
 )
 
 // addPlanEgressFlags registers the egress filter flags of `plan execute`
@@ -37,7 +37,7 @@ func addPlanEgressFlags(cmd *cobra.Command) {
 }
 
 func egressFilterEnabled(cmd *cobra.Command) bool {
-	if os.Getenv(egressFilterActiveEnv) != "" {
+	if os.Getenv(hardening.EnvActive) != "" {
 		return false // already running under the filter
 	}
 	mode, _ := cmd.Flags().GetString("egress-filter")
@@ -80,7 +80,8 @@ func runPlanExecuteWithEgress(cmd *cobra.Command, projectDir string, plan plange
 		log.Fatal().Err(err).Msg("failed to determine the cid executable")
 	}
 	command := append([]string{self}, os.Args[1:]...)
-	env := []string{egressFilterActiveEnv + "=1", util.EgressCABundleEnv + "=" + cfg.CABundle}
+	// the child hardens everything it starts (hardening.ContainerArgs / hardening.WrapCommand)
+	env := []string{hardening.EnvActive + "=" + string(mode), util.EgressCABundleEnv + "=" + cfg.CABundle}
 	os.Exit(egress.RunCommand(cfg, command, env, mode == policy.ModeAudit))
 }
 

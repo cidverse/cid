@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/cidverse/cid/pkg/common/shellcommand"
+	"github.com/cidverse/cid/pkg/egress/hardening"
 	"github.com/cidverse/cid/pkg/util"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/rs/zerolog/log"
@@ -57,6 +58,10 @@ func (c NixShellCandidate) Run(opts RunParameters) (string, string, error) {
 	env["NIX_PATH"] = os.Getenv("NIX_PATH")
 	cmd, err := shellcommand.PrepareCommand(strings.Join(nixShellArgs, " "), runtime.GOOS, "", false, env, opts.WorkDir, opts.Stdin, stdoutWriter, stderrWriter)
 	if err != nil {
+		return "", "", err
+	}
+	// under the egress filter: started without the privileges that could disable it
+	if err := hardening.WrapCommand(cmd); err != nil {
 		return "", "", err
 	}
 
