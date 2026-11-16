@@ -44,6 +44,7 @@ type IPTables struct {
 	Mark       uint32
 	NFLogGroup uint16        // 0 = disabled
 	Run        CommandRunner // required, use ExecRunner to modify the host firewall (no default, so tests can't touch the host by accident)
+	List       OutputRunner  // required for Snapshot, use ExecOutput
 
 	active []string // binaries whose chains were set up
 }
@@ -172,4 +173,32 @@ func (f *IPTables) teardownFamily(bin string) {
 		_ = f.Run(bin, "-w", "-t", table.name, "-F", firewallChain)
 		_ = f.Run(bin, "-w", "-t", table.name, "-X", firewallChain)
 	}
+}
+
+// snapshotTables are listed by Snapshot: rules in any of them can bypass the egress chain (accept before the jump, set
+// the socket mark, notrack)
+var snapshotTables = []string{"filter", "nat", "mangle", "raw"}
+
+// Snapshot returns the rules (`-S`, without counters) of all tables for every family that was set up. A table that
+// can't be listed (module not available) is recorded as unavailable instead of failing.
+func (f *IPTables) Snapshot() (string, error) {
+	if f.List == nil {
+		return "", errors.New("iptables: no output runner configured")
+	}
+	if len(f.active) == 0 {
+		return "", errors.New("iptables: not set up")
+	}
+	var b strings.Builder
+	for _, bin := range f.active {
+		for _, table := range snapshotTables {
+			b.WriteString("# " + bin + " " + table + "\n")
+			out, err := f.List(bin, "-w", "-t", table, "-S")
+			if err != nil {
+				b.WriteString("# unavailable\n")
+				continue
+			}
+			b.WriteString(out)
+		}
+	}
+	return b.String(), nil
 }

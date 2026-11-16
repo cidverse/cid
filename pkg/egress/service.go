@@ -16,6 +16,7 @@ import (
 	"net/netip"
 	"os"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/cidverse/cid/pkg/egress/ca"
@@ -43,6 +44,11 @@ type Config struct {
 	CABundle    string            // written with the trusted roots + inspection ca while the filter runs (only if a type http endpoint needs the ca), see ca.TrustInstall.WriteBundle
 	OnReady     func()            // called once the filter is active, Run keeps running until the context is cancelled
 	OnSummary   func(report.File) // called with the traffic summary when the filter stops
+	// OnTamper is called (at most once) when the firewall rules were modified while the filter was active. In block mode
+	// the rules are left in place on shutdown, so nothing that is still running (e.g. a detached container) gets
+	// unfiltered access.
+	OnTamper            func(firewall.Tamper)
+	TamperCheckInterval time.Duration // default firewall.DefaultWatchInterval
 }
 
 func loadPolicy(cfg Config) (*policy.Policy, error) {
@@ -100,6 +106,13 @@ func Run(ctx context.Context, cfg Config) (err error) {
 		}
 	}()
 	started := time.Now().UTC()
+	var tamperMu sync.Mutex
+	var tampered *firewall.Tamper
+	getTamper := func() *firewall.Tamper {
+		tamperMu.Lock()
+		defer tamperMu.Unlock()
+		return tampered
+	}
 	cleanup = append(cleanup, reporter.Close, func() error {
 		events := reporter.Summary()
 		report.LogSummary(events)
@@ -109,6 +122,9 @@ func Run(ctx context.Context, cfg Config) (err error) {
 			file.Inspection = pol.HasInspection()
 			file.Started = started
 			file.Finished = time.Now().UTC()
+			if t := getTamper(); t != nil {
+				file.Tamper = &report.Tamper{Reason: t.Reason, Added: t.Added, Removed: t.Removed}
+			}
 			cfg.OnSummary(file)
 		}
 		return nil
@@ -191,7 +207,22 @@ func Run(ctx context.Context, cfg Config) (err error) {
 	if err = fw.Setup(pol.StaticEndpoints(), firewall.Redirect{Prefix: synthetic.Prefix, Port: proxyAddr.Port()}); err != nil {
 		return err
 	}
-	cleanup = append(cleanup, fw.Close)
+	cleanup = append(cleanup, func() error {
+		if getTamper() != nil && cfg.Mode == policy.ModeBlock {
+			log.Error().Msg("egress filter: the firewall rules were tampered with, leaving them in place (blocks all egress), remove them with 'nft delete table inet cid_egress' or by deleting the iptables CID-EGRESS chains")
+			return nil
+		}
+		return fw.Close()
+	})
+
+	// baseline for tamper detection, taken right after setup
+	baseline, snapshotErr := fw.Snapshot()
+	if snapshotErr != nil {
+		if cfg.Mode == policy.ModeBlock {
+			return fmt.Errorf("failed to read the firewall rules for tamper detection: %w", snapshotErr)
+		}
+		log.Warn().Err(snapshotErr).Msg("failed to read the firewall rules, tamper detection is disabled")
+	}
 
 	transparent := &proxy.Server{
 		Policy:        pol,
@@ -219,6 +250,30 @@ func Run(ctx context.Context, cfg Config) (err error) {
 		return fmt.Errorf("failed to configure %s: %w", dnsproxy.DefaultResolvConf, err)
 	}
 	cleanup = append(cleanup, rc.Restore)
+
+	if snapshotErr == nil {
+		watchCtx, stopWatch := context.WithCancel(runCtx)
+		watchDone := make(chan struct{})
+		watcher := firewall.Watcher{Snapshot: fw.Snapshot, Interval: cfg.TamperCheckInterval}
+		go func() {
+			defer close(watchDone)
+			watcher.Run(watchCtx, baseline, func(t firewall.Tamper) {
+				tamperMu.Lock()
+				tampered = &t
+				tamperMu.Unlock()
+				log.Error().Strs("added", t.Added).Strs("removed", t.Removed).Str("mode", string(cfg.Mode)).Msg("egress filter: " + t.Reason)
+				if cfg.OnTamper != nil {
+					cfg.OnTamper(t)
+				}
+			})
+		}()
+		// stop (and wait for) the watcher before anything is torn down, the teardown itself changes the rules
+		cleanup = append(cleanup, func() error {
+			stopWatch()
+			<-watchDone
+			return nil
+		})
+	}
 
 	log.Info().Msg("egress filter active")
 	if cfg.OnReady != nil {

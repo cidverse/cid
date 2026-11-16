@@ -7,8 +7,11 @@ import (
 	"os/exec"
 	"os/signal"
 	"sync"
+	"sync/atomic"
 	"syscall"
 
+	"github.com/cidverse/cid/pkg/egress/firewall"
+	"github.com/cidverse/cid/pkg/egress/policy"
 	"github.com/rs/zerolog/log"
 )
 
@@ -18,6 +21,9 @@ import (
 // SIGINT / SIGTERM are forwarded to the command and the filter is only removed after the command exited, so the
 // command never runs unfiltered. If the filter can't be started the command is not run, unless failOpen is set (audit
 // mode: report, never break).
+//
+// If the firewall rules are modified while the command runs (block mode), the command and all its descendants are
+// killed and RunCommand returns 1. In audit mode the modification is only reported.
 func RunCommand(cfg Config, command []string, extraEnv []string, failOpen bool) int {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -25,6 +31,21 @@ func RunCommand(cfg Config, command []string, extraEnv []string, failOpen bool) 
 	child := &childProcess{command: command, env: extraEnv}
 	stopForwarding := child.forwardSignals(cancel)
 	defer stopForwarding()
+
+	var tampered atomic.Bool
+	onTamper := cfg.OnTamper
+	cfg.OnTamper = func(t firewall.Tamper) {
+		if onTamper != nil {
+			onTamper(t)
+		}
+		if cfg.Mode != policy.ModeBlock {
+			log.Warn().Msg("egress filter: firewall tampering detected, the command keeps running (audit mode)")
+			return
+		}
+		tampered.Store(true)
+		log.Error().Strs("command", command).Msg("egress filter: firewall tampering detected, terminating the command and all its processes")
+		child.kill()
+	}
 
 	result := make(chan int, 1)
 	started := false // only accessed from the goroutine calling Run (OnReady runs synchronously inside Run)
@@ -59,6 +80,10 @@ func RunCommand(cfg Config, command []string, extraEnv []string, failOpen bool) 
 
 	select {
 	case code := <-result:
+		if tampered.Load() {
+			log.Error().Int("exit_code", code).Msg("egress filter: the command was terminated because the firewall rules were modified while it was running, failing the step")
+			return 1
+		}
 		return code
 	default:
 		return 130 // interrupted while the filter was starting, the command never ran
@@ -141,6 +166,16 @@ func (p *childProcess) start() error {
 	}
 	p.cmd = c
 	return nil
+}
+
+// kill sends SIGKILL to the command and all its descendants, the egress filter stops once it exited
+func (p *childProcess) kill() {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.interrupted = true // never start it later
+	if p.cmd != nil && p.cmd.Process != nil {
+		killProcessTree(p.cmd.Process)
+	}
 }
 
 // wait waits for the started command and returns its exit code

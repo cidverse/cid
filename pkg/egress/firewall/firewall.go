@@ -55,6 +55,22 @@ type Firewall interface {
 	Setup(static []policy.Endpoint, redirect Redirect) error
 	// Close removes all rules
 	Close() error
+	// Snapshot returns the current firewall rules (without counters) as text, used to detect modifications after Setup.
+	// It covers more than the filter's own rules: rules elsewhere can bypass them (e.g. set the filter's socket mark or
+	// accept before the filter's jump in iptables).
+	Snapshot() (string, error)
+}
+
+// OutputRunner executes a read-only firewall command and returns its output, replaceable for tests
+type OutputRunner func(name string, args ...string) (string, error)
+
+// ExecOutput executes the read-only firewall command on the host
+func ExecOutput(name string, args ...string) (string, error) {
+	out, err := exec.Command(name, args...).Output()
+	if err != nil {
+		return "", fmt.Errorf("%s %s: %w", name, strings.Join(args, " "), err)
+	}
+	return string(out), nil
 }
 
 // Redirect sends tcp connections to a prefix to a local port
@@ -82,9 +98,9 @@ func New(backend string, mode policy.Mode, mark uint32, nflogGroup uint16) (Fire
 
 	switch backend {
 	case BackendNFTables:
-		return &NFTables{Mode: mode, Mark: mark, NFLogGroup: nflogGroup, Run: ExecNFT}, nil
+		return &NFTables{Mode: mode, Mark: mark, NFLogGroup: nflogGroup, Run: ExecNFT, List: ExecOutput}, nil
 	case BackendIPTables:
-		return &IPTables{Mode: mode, Mark: mark, NFLogGroup: nflogGroup, Run: ExecRunner}, nil
+		return &IPTables{Mode: mode, Mark: mark, NFLogGroup: nflogGroup, Run: ExecRunner, List: ExecOutput}, nil
 	default:
 		return nil, fmt.Errorf("invalid firewall backend %q, allowed: auto, nftables, iptables", backend)
 	}
