@@ -50,7 +50,11 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 			},
 			Network: []actionsdk.ActionAccessNetwork{
 				{
+					// rule downloads (/c/p/...) and, with SEMGREP_APP_TOKEN, the platform api (scan registration, findings)
 					Host: "semgrep.dev:443",
+					HTTPRules: append(actionsdk.HTTPReadOnly(),
+						actionsdk.HTTPRule([]string{"POST", "PUT"}, "/api/**"),
+					),
 				},
 			},
 			Resources: []actionsdk.ActionAccessResource{

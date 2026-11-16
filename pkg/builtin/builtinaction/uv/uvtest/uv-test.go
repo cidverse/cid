@@ -39,14 +39,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Name: "uv",
 				},
 			},
-			Network: []actionsdk.ActionAccessNetwork{
-				{
-					Host: "files.pythonhosted.org:443",
-				},
-				{
-					Host: "pypi.org:443",
-				},
-			},
+			Network: common.NetworkPyPI,
 		},
 		Output: actionsdk.ActionOutput{
 			Artifacts: []actionsdk.ActionArtifactType{

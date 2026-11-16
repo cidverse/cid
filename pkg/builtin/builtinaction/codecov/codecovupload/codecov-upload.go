@@ -51,7 +51,9 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Host: "ingest.codecov.io:443", // used to prepare report upload
 				},
 				{
-					Host: "storage.googleapis.com:443", // actual report upload
+					// actual report upload (pre-signed url into the codecov bucket), any other bucket stays blocked
+					Host:      "storage.googleapis.com:443",
+					HTTPRules: []actionsdk.ActionAccessNetworkHTTPRule{actionsdk.HTTPRule([]string{"PUT"}, "/codecov/**")},
 				},
 				{
 					Host: "api.codecov.io:443", // used to generate reports, send notifications

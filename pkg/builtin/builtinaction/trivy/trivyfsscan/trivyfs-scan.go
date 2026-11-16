@@ -40,7 +40,8 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 			},
 			Network: []actionsdk.ActionAccessNetwork{
 				{
-					Host: "mirror.gcr.io:443",
+					Host:      "mirror.gcr.io:443", // vulnerability / java / checks databases (oci pull)
+					HTTPRules: actionsdk.HTTPReadOnly(),
 				},
 			},
 			Resources: []actionsdk.ActionAccessResource{

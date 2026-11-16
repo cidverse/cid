@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/golang/gocommon"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 )
 
@@ -42,17 +43,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Name: "golangci-lint",
 				},
 			},
-			Network: []actionsdk.ActionAccessNetwork{
-				{
-					Host: "proxy.golang.org:443",
-				},
-				{
-					Host: "storage.googleapis.com:443",
-				},
-				{
-					Host: "sum.golang.org:443",
-				},
-			},
+			Network: gocommon.Network,
 			Resources: []actionsdk.ActionAccessResource{
 				actionsdk.ResourceSecurityEvents,
 			},

@@ -61,7 +61,8 @@ func runShim(t *testing.T, mode string, script string) (string, int) {
 }
 
 func TestExecShim(t *testing.T) {
-	out, code := runShim(t, "block", "grep -E '^(CapBnd|CapInh|CapAmb|NoNewPrivs):' /proc/self/status")
+	// shell builtins only (no grep / cat), minimal ci images don't ship them; the shell reads its own status
+	out, code := runShim(t, "block", `while IFS= read -r line; do echo "$line"; done < /proc/self/status`)
 
 	if os.Geteuid() != 0 {
 		// no CAP_SETPCAP: block mode must not run the command

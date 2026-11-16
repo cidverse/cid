@@ -32,12 +32,12 @@ func ModuleTestData() *actionsdk.ModuleExecutionContextV1Response {
 }
 
 // crlRules only allow certificate revocation list downloads
-var crlRules = []actionsdk.ActionAccessNetworkHTTPRule{{Methods: []string{"GET", "HEAD"}, Paths: []string{"/*.crl"}}}
+var crlRules = actionsdk.HTTPReadOnly("/*.crl")
 
 // NetworkAccess is the network access of actions that restore nuget packages. Besides the feed, nuget checks the
 // revocation of package signing / timestamp certificates (crl over plain http, the crls are signed).
 var NetworkAccess = []actionsdk.ActionAccessNetwork{
-	{Host: "api.nuget.org:443"},
+	{Host: "api.nuget.org:443", HTTPRules: actionsdk.HTTPReadOnly()}, // feed + vulnerability data, pushes go to www.nuget.org
 	// DigiCert, nuget.org repository + author signatures
 	{Host: "crl3.digicert.com:80", HTTPRules: crlRules},
 	{Host: "crl4.digicert.com:80", HTTPRules: crlRules},
@@ -45,5 +45,5 @@ var NetworkAccess = []actionsdk.ActionAccessNetwork{
 	{Host: "ts-crl.ws.symantec.com:80", HTTPRules: crlRules},
 	{Host: "s.symcb.com:80", HTTPRules: crlRules},
 	// Microsoft PKI, microsoft signed packages (/pkiops/crl/..., legacy /pki/crl/...)
-	{Host: "www.microsoft.com:80", HTTPRules: []actionsdk.ActionAccessNetworkHTTPRule{{Methods: []string{"GET", "HEAD"}, Paths: []string{"/pkiops/crl/**", "/pki/crl/**"}}}},
+	{Host: "www.microsoft.com:80", HTTPRules: actionsdk.HTTPReadOnly("/pkiops/crl/**", "/pki/crl/**")},
 }

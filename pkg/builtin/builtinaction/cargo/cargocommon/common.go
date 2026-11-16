@@ -41,11 +41,12 @@ func GetVersion(refType string, refName string, shortHash string) string {
 	return "0.0.0+" + shortHash
 }
 
-// Network contains the hosts required to resolve and download crates (sparse index + downloads)
+// Network is read-only access to the hosts required to resolve and download crates (sparse index + downloads).
+// Publishing (PUT crates.io/api/v1/crates/new) is denied, build / test steps must not use a CARGO_REGISTRY_TOKEN.
 var Network = []actionsdk.ActionAccessNetwork{
-	{Host: "crates.io:443"},
-	{Host: "index.crates.io:443"},
-	{Host: "static.crates.io:443"},
+	{Host: "crates.io:443", HTTPRules: actionsdk.HTTPReadOnly()},
+	{Host: "index.crates.io:443", HTTPRules: actionsdk.HTTPReadOnly()},
+	{Host: "static.crates.io:443", HTTPRules: actionsdk.HTTPReadOnly("/crates/**")},
 }
 
 // TargetDir returns the module-local target directory, used to keep artifact paths predictable for workspace members
