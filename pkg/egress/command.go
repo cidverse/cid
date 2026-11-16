@@ -10,6 +10,7 @@ import (
 	"sync/atomic"
 	"syscall"
 
+	"github.com/cidverse/cid/pkg/egress/ca"
 	"github.com/cidverse/cid/pkg/egress/firewall"
 	"github.com/cidverse/cid/pkg/egress/policy"
 	"github.com/rs/zerolog/log"
@@ -51,7 +52,7 @@ func RunCommand(cfg Config, command []string, extraEnv []string, failOpen bool) 
 	started := false // only accessed from the goroutine calling Run (OnReady runs synchronously inside Run)
 	cfg.OnReady = func() {
 		started = true
-		child.env = append(child.env, caBundleEnv(cfg.CABundle, os.Getenv)...)
+		child.env = append(child.env, caBundleEnv(cfg.CABundle, cfg.JavaTrustStore, os.Getenv)...)
 		if err := child.start(); err != nil {
 			result <- 1
 			cancel()
@@ -94,8 +95,8 @@ func RunCommand(cfg Config, command []string, extraEnv []string, failOpen bool) 
 // inspection ca). The system bundles are patched in place, but several clients ignore them: node / npm (bundled mozilla
 // roots), python requests / pip (certifi) and rustls based tools like uv (webpki roots, honor `SSL_CERT_FILE`).
 // `SSL_CERT_FILE` is always replaced (the bundle contains its roots), the other variables only if they are not set, a
-// custom value may hold roots the bundle doesn't contain.
-func caBundleEnv(bundle string, getenv func(string) string) []string {
+// custom value may hold roots the bundle doesn't contain. Java gets the truststore appended to `JAVA_TOOL_OPTIONS`.
+func caBundleEnv(bundle string, javaTrustStore string, getenv func(string) string) []string {
 	if bundle == "" {
 		return nil
 	}
@@ -106,6 +107,11 @@ func caBundleEnv(bundle string, getenv func(string) string) []string {
 	for _, name := range []string{"NODE_EXTRA_CA_CERTS", "REQUESTS_CA_BUNDLE"} {
 		if getenv(name) == "" {
 			env = append(env, name+"="+bundle)
+		}
+	}
+	if javaTrustStore != "" {
+		if _, err := os.Stat(javaTrustStore); err == nil {
+			env = append(env, "JAVA_TOOL_OPTIONS="+ca.JavaToolOptions(getenv("JAVA_TOOL_OPTIONS"), javaTrustStore))
 		}
 	}
 	return env

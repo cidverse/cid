@@ -28,7 +28,7 @@ variables:
   GIT_STRATEGY: clone
   GIT_DEPTH: 10
   {{- if .EgressFilter }}
-  # builtin egress filter of `cid plan execute` (experimental): off, audit or block, override with a project CI/CD variable
+  # builtin egress filter
   CID_EGRESS_FILTER: "{{ .EgressFilter }}"
   {{- end }}
   {{- if eq .ContainerRuntime "docker" }}

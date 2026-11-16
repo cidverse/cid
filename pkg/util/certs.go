@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/adrg/xdg"
+	"github.com/cidverse/cid/pkg/egress/ca"
 	"github.com/cidverse/cidverseutils/containerruntime"
 	"github.com/cidverse/cidverseutils/filesystem"
 	"github.com/rs/zerolog/log"
@@ -107,8 +108,15 @@ const EgressCABundleEnv = "CID_EGRESS_CA_BUNDLE"
 // EgressCABundleInContainer is where the egress ca bundle is mounted in action / executable containers
 const EgressCABundleInContainer = "/cid/certs/egress-ca-bundle.crt"
 
+// EgressJavaTrustStoreEnv points to the pkcs12 java truststore (same certificates as the ca bundle) of the active egress
+// filter, the file only exists while the filter inspects tls
+const EgressJavaTrustStoreEnv = "CID_EGRESS_JAVA_TRUSTSTORE"
+
+// EgressJavaTrustStoreInContainer is where the egress java truststore is mounted in action / executable containers
+const EgressJavaTrustStoreInContainer = "/cid/certs/egress-truststore.p12"
+
 // egressCABundleVariables point common clients to the mounted bundle (it contains the system roots, so it can replace
-// the image's trust store). Java needs a truststore and is not covered.
+// the image's trust store). Java gets a truststore via JAVA_TOOL_OPTIONS instead.
 var egressCABundleVariables = []string{
 	"SSL_CERT_FILE",       // openssl (python ssl, ruby, .net on linux), go, rust (openssl-probe / rustls-native-certs), uv
 	"NODE_EXTRA_CA_CERTS", // node / npm / yarn / pnpm
@@ -138,6 +146,20 @@ func MountEgressCABundle(c *containerruntime.Container) {
 	})
 	for _, name := range egressCABundleVariables {
 		c.AddEnvironmentVariable(name, EgressCABundleInContainer)
+	}
+
+	// java ignores pem bundles. Replaces the image's own JAVA_TOOL_OPTIONS (if any); the host's value is not used, under
+	// the filter it points to the host path of the truststore (see egress.caBundleEnv)
+	if trustStore := os.Getenv(EgressJavaTrustStoreEnv); trustStore != "" {
+		if _, err := os.Stat(trustStore); err == nil {
+			c.AddVolume(containerruntime.ContainerMount{
+				MountType: "directory",
+				Source:    CertMountSource(trustStore),
+				Target:    EgressJavaTrustStoreInContainer,
+				Mode:      containerruntime.ReadMode,
+			})
+			c.AddEnvironmentVariable("JAVA_TOOL_OPTIONS", ca.JavaToolOptions("", EgressJavaTrustStoreInContainer))
+		}
 	}
 }
 

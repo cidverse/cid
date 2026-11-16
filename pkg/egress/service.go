@@ -42,8 +42,11 @@ type Config struct {
 	PolicyFiles []string          // yaml policy files, see policy.ParsePolicy
 	ReportFile  string            // json-lines file with all reported events
 	CABundle    string            // written with the trusted roots + inspection ca while the filter runs (only if a type http endpoint needs the ca), see ca.TrustInstall.WriteBundle
-	OnReady     func()            // called once the filter is active, Run keeps running until the context is cancelled
-	OnSummary   func(report.File) // called with the traffic summary when the filter stops
+	// JavaTrustStore is written with the certificates of CABundle as pkcs12 java truststore (requires CABundle), see
+	// ca.WriteJavaTrustStore
+	JavaTrustStore string
+	OnReady        func()            // called once the filter is active, Run keeps running until the context is cancelled
+	OnSummary      func(report.File) // called with the traffic summary when the filter stops
 	// OnTamper is called (at most once) when the firewall rules were modified while the filter was active. In block mode
 	// the rules are left in place on shutdown, so nothing that is still running (e.g. a detached container) gets
 	// unfiltered access.
@@ -169,12 +172,17 @@ func Run(ctx context.Context, cfg Config) (err error) {
 			if err = trust.WriteBundle(cfg.CABundle, os.Getenv); err != nil {
 				return err
 			}
-			cleanup = append(cleanup, func() error {
-				if err := os.Remove(cfg.CABundle); err != nil && !errors.Is(err, os.ErrNotExist) {
+			cleanup = append(cleanup, func() error { return removeIfExists(cfg.CABundle) })
+			if cfg.JavaTrustStore != "" {
+				bundle, readErr := os.ReadFile(cfg.CABundle)
+				if readErr != nil {
+					return fmt.Errorf("failed to read ca bundle: %w", readErr)
+				}
+				if err = ca.WriteJavaTrustStore(cfg.JavaTrustStore, bundle); err != nil {
 					return err
 				}
-				return nil
-			})
+				cleanup = append(cleanup, func() error { return removeIfExists(cfg.JavaTrustStore) })
+			}
 		}
 	}
 
@@ -294,4 +302,11 @@ func hostnameRules(pol *policy.Policy) []string {
 		}
 	}
 	return rules
+}
+
+func removeIfExists(path string) error {
+	if err := os.Remove(path); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	return nil
 }

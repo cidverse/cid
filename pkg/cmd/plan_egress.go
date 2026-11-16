@@ -63,12 +63,13 @@ func runPlanExecuteWithEgress(cmd *cobra.Command, projectDir string, plan plange
 	}
 	selected := selectSteps(plan, stages, steps)
 	cfg := egress.Config{
-		Mode:        mode,
-		Allow:       append(egressHostsForSteps(selected, networkGlobal), extraAllow...),
-		Endpoints:   ciHosts,
-		PolicyFiles: policyFiles,
-		ReportFile:  reportFile,
-		CABundle:    filepath.Join(os.TempDir(), fmt.Sprintf("cid-egress-ca-%d.crt", os.Getpid())),
+		Mode:           mode,
+		Allow:          append(egressHostsForSteps(selected, networkGlobal), extraAllow...),
+		Endpoints:      ciHosts,
+		PolicyFiles:    policyFiles,
+		ReportFile:     reportFile,
+		CABundle:       filepath.Join(os.TempDir(), fmt.Sprintf("cid-egress-ca-%d.crt", os.Getpid())),
+		JavaTrustStore: filepath.Join(os.TempDir(), fmt.Sprintf("cid-egress-truststore-%d.p12", os.Getpid())),
 		OnSummary: func(file report.File) {
 			writeEgressSummary(file, filepath.Join(projectDir, ".dist"), selected)
 		},
@@ -81,7 +82,7 @@ func runPlanExecuteWithEgress(cmd *cobra.Command, projectDir string, plan plange
 	}
 	command := append([]string{self}, os.Args[1:]...)
 	// the child hardens everything it starts (hardening.ContainerArgs / hardening.WrapCommand)
-	env := []string{hardening.EnvActive + "=" + string(mode), util.EgressCABundleEnv + "=" + cfg.CABundle}
+	env := []string{hardening.EnvActive + "=" + string(mode), util.EgressCABundleEnv + "=" + cfg.CABundle, util.EgressJavaTrustStoreEnv + "=" + cfg.JavaTrustStore}
 	os.Exit(egress.RunCommand(cfg, command, env, mode == policy.ModeAudit))
 }
 
