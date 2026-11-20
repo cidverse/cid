@@ -37,7 +37,7 @@ func TestCABundleEnv(t *testing.T) {
 
 func TestCABundleEnvJavaTrustStore(t *testing.T) {
 	dir := t.TempDir()
-	bundle, trustStore := filepath.Join(dir, "bundle.crt"), filepath.Join(dir, "truststore.p12")
+	bundle, trustStore := filepath.Join(dir, "bundle.crt"), filepath.Join(dir, "truststore.jks")
 	require.NoError(t, os.WriteFile(bundle, []byte("pem"), 0o644))
 	javaOptions := func(k string) string {
 		if k == "JAVA_TOOL_OPTIONS" {
@@ -48,7 +48,7 @@ func TestCABundleEnvJavaTrustStore(t *testing.T) {
 
 	assert.NotContains(t, strings.Join(caBundleEnv(bundle, trustStore, javaOptions), "\n"), "JAVA_TOOL_OPTIONS", "no truststore written")
 
-	require.NoError(t, os.WriteFile(trustStore, []byte("p12"), 0o644))
+	require.NoError(t, os.WriteFile(trustStore, []byte("jks"), 0o644))
 	env := caBundleEnv(bundle, trustStore, javaOptions)
-	assert.Contains(t, env, "JAVA_TOOL_OPTIONS=-Xmx1g -Djavax.net.ssl.trustStore="+trustStore+" -Djavax.net.ssl.trustStoreType=PKCS12 -Djavax.net.ssl.trustStorePassword=changeit", "existing options are kept")
+	assert.Contains(t, env, "JAVA_TOOL_OPTIONS=-Xmx1g -Djavax.net.ssl.trustStore="+trustStore+" -Djavax.net.ssl.trustStoreType=JKS -Djavax.net.ssl.trustStorePassword=changeit", "existing options are kept")
 }

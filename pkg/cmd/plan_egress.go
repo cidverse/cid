@@ -69,7 +69,7 @@ func runPlanExecuteWithEgress(cmd *cobra.Command, projectDir string, plan plange
 		PolicyFiles:    policyFiles,
 		ReportFile:     reportFile,
 		CABundle:       filepath.Join(os.TempDir(), fmt.Sprintf("cid-egress-ca-%d.crt", os.Getpid())),
-		JavaTrustStore: filepath.Join(os.TempDir(), fmt.Sprintf("cid-egress-truststore-%d.p12", os.Getpid())),
+		JavaTrustStore: filepath.Join(os.TempDir(), fmt.Sprintf("cid-egress-truststore-%d.jks", os.Getpid())),
 		OnSummary: func(file report.File) {
 			writeEgressSummary(file, filepath.Join(projectDir, ".dist"), selected)
 		},

@@ -108,12 +108,12 @@ const EgressCABundleEnv = "CID_EGRESS_CA_BUNDLE"
 // EgressCABundleInContainer is where the egress ca bundle is mounted in action / executable containers
 const EgressCABundleInContainer = "/cid/certs/egress-ca-bundle.crt"
 
-// EgressJavaTrustStoreEnv points to the pkcs12 java truststore (same certificates as the ca bundle) of the active egress
+// EgressJavaTrustStoreEnv points to the jks java truststore (same certificates as the ca bundle) of the active egress
 // filter, the file only exists while the filter inspects tls
 const EgressJavaTrustStoreEnv = "CID_EGRESS_JAVA_TRUSTSTORE"
 
 // EgressJavaTrustStoreInContainer is where the egress java truststore is mounted in action / executable containers
-const EgressJavaTrustStoreInContainer = "/cid/certs/egress-truststore.p12"
+const EgressJavaTrustStoreInContainer = "/cid/certs/egress-truststore.jks"
 
 // egressCABundleVariables point common clients to the mounted bundle (it contains the system roots, so it can replace
 // the image's trust store). Java gets a truststore via JAVA_TOOL_OPTIONS instead.

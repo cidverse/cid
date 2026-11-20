@@ -53,7 +53,6 @@ require (
 	go.yaml.in/yaml/v4 v4.0.0
 	golang.org/x/oauth2 v0.38.0
 	oras.land/oras-go/v2 v2.7.0
-	software.sslmate.com/src/go-pkcs12 v0.7.4
 )
 
 require (

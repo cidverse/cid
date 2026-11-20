@@ -42,7 +42,7 @@ type Config struct {
 	PolicyFiles []string          // yaml policy files, see policy.ParsePolicy
 	ReportFile  string            // json-lines file with all reported events
 	CABundle    string            // written with the trusted roots + inspection ca while the filter runs (only if a type http endpoint needs the ca), see ca.TrustInstall.WriteBundle
-	// JavaTrustStore is written with the certificates of CABundle as pkcs12 java truststore (requires CABundle), see
+	// JavaTrustStore is written with the certificates of CABundle as jks java truststore (requires CABundle), see
 	// ca.WriteJavaTrustStore
 	JavaTrustStore string
 	OnReady        func()            // called once the filter is active, Run keeps running until the context is cancelled
