@@ -60,8 +60,8 @@ var githubWorkflowDependencyList = []dependency.Dependency{
 		// renovate: datasource=github-tags depName=step-security/harden-runner
 		Id:      "step-security/harden-runner",
 		Type:    "github-action",
-		Version: "v2.22.4",
-		Hash:    "1d88384fd173af6ecb012dfd0264a306b711241a",
+		Version: "v2.23.0",
+		Hash:    "aebdcf6156ab6691adf63218240e476564a1ed4c",
 	},
 	// see https://github.com/actions/runner-images
 	{
