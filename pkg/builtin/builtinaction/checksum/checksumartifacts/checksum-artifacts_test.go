@@ -9,9 +9,6 @@ import (
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
-	"github.com/cidverse/cid/pkg/core/catalog"
-	"github.com/cidverse/cid/pkg/core/rules"
-	analyzerapi "github.com/cidverse/repoanalyzer/analyzerapi"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -83,16 +80,4 @@ func TestChecksumArtifactsWithoutBinaries(t *testing.T) {
 
 	action := Action{Sdk: sdk}
 	require.NoError(t, action.Execute())
-}
-
-func TestMetadataRequiresBinaryBuildSystem(t *testing.T) {
-	rule := catalog.WorkflowRule{
-		Type:       catalog.WorkflowExpressionCEL,
-		Expression: Action{}.Metadata().Rules[0].Expression,
-	}
-
-	assert.False(t, rules.EvaluateRule(rule, rules.GetProjectRuleContext(map[string]string{}, nil)))
-	assert.False(t, rules.EvaluateRule(rule, rules.GetProjectRuleContext(map[string]string{}, []*analyzerapi.ProjectModule{{BuildSystem: "maven"}})))
-	assert.True(t, rules.EvaluateRule(rule, rules.GetProjectRuleContext(map[string]string{}, []*analyzerapi.ProjectModule{{BuildSystem: "gomod"}})))
-	assert.True(t, rules.EvaluateRule(rule, rules.GetProjectRuleContext(map[string]string{}, []*analyzerapi.ProjectModule{{BuildSystem: "cargo"}})))
 }

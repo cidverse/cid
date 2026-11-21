@@ -10,6 +10,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/lib/sigstore"
+	"github.com/cidverse/cid/pkg/util"
 )
 
 const URI = "builtin://actions/sigstore-sign"
@@ -38,6 +39,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				// enabled by default on github.com / gitlab.com (public Fulcio trusts their OIDC issuers, not self-hosted GitLab),
 				// opt-out with CID_SIGSTORE_SIGN=false. A configured GPG key (sign-artifacts) takes precedence: checked at plan
 				// time only, declaring GPG_PRIVATE_KEY here would make the GitHub workflow template pass the key into this job.
+				// The workflow config limits it to projects with binary producing build systems.
 				Type:       "cel",
 				Expression: `(hasPrefix(ENV["NCI_REPOSITORY_REMOTE"], "https://github.com/") || hasPrefix(ENV["NCI_REPOSITORY_REMOTE"], "https://gitlab.com/")) && getMapValue(ENV, "CID_SIGSTORE_SIGN") != "false" && getMapValue(ENV, "GPG_PRIVATE_KEY") == ""`,
 			},
@@ -126,6 +128,8 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
+	// GitLab's SIGSTORE_ID_TOKEN is redacted as a declared secret, a token requested from GitHub Actions is not
+	util.ProtectSecret(idToken)
 
 	newSignerFn := a.newSigner
 	if newSignerFn == nil {

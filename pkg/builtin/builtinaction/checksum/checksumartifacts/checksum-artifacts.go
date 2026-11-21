@@ -21,12 +21,6 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 		Description: "Creates SHA-256 checksums for binary artifacts: one <asset>.sha256 file per binary and an aggregated SHA256SUMS file.",
 		Category:    "publish",
 		Scope:       actionsdk.ActionScopeProject,
-		Rules: []actionsdk.ActionRule{
-			{
-				Type:       "cel",
-				Expression: `"gomod" in PROJECT_BUILD_SYSTEMS || "cargo" in PROJECT_BUILD_SYSTEMS`,
-			},
-		},
 		Access: actionsdk.ActionAccess{
 			Environment: []actionsdk.ActionAccessEnv{},
 			Executables: []actionsdk.ActionAccessExecutable{},

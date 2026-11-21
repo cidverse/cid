@@ -45,6 +45,10 @@ import (
 	"github.com/cidverse/cid/pkg/core/catalog"
 )
 
+// releaseBinariesExpression selects release workflows of projects with binary producing build systems (go-build /
+// cargo-build), used for the actions that checksum and sign release binaries.
+const releaseBinariesExpression = `CID_WORKFLOW_TYPE == "release" && ("gomod" in PROJECT_BUILD_SYSTEMS || "cargo" in PROJECT_BUILD_SYSTEMS)`
+
 func GetWorkflows() []catalog.Workflow {
 	var workflows []catalog.Workflow
 
@@ -243,7 +247,7 @@ func GetWorkflows() []catalog.Workflow {
 						Rules: []catalog.WorkflowRule{
 							{
 								Type:       "cel",
-								Expression: `CID_WORKFLOW_TYPE == "release"`,
+								Expression: releaseBinariesExpression,
 							},
 						},
 					},
@@ -253,7 +257,7 @@ func GetWorkflows() []catalog.Workflow {
 						Rules: []catalog.WorkflowRule{
 							{
 								Type:       "cel",
-								Expression: `CID_WORKFLOW_TYPE == "release"`,
+								Expression: releaseBinariesExpression,
 							},
 						},
 					},
@@ -262,7 +266,7 @@ func GetWorkflows() []catalog.Workflow {
 						Rules: []catalog.WorkflowRule{
 							{
 								Type:       "cel",
-								Expression: `CID_WORKFLOW_TYPE == "release"`,
+								Expression: releaseBinariesExpression,
 							},
 						},
 					},
