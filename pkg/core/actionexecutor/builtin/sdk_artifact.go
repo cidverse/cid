@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -25,7 +24,6 @@ import (
 	"github.com/cidverse/cidverseutils/compress"
 	"github.com/cidverse/cidverseutils/redact"
 	"github.com/cidverse/go-rules/pkg/expr"
-	v1 "github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v1"
 	"github.com/rs/zerolog/log"
 )
 
@@ -102,11 +100,26 @@ func (sdk ActionSDK) ArtifactUploadV1(request actionsdk.ArtifactUploadRequest) (
 	// generate build provenance?
 	if slices.Contains(provenance.FileTypes, request.Type) {
 		log.Info().Str("artifact", request.File).Str("type", request.Type).Msg("generating provenance for artifact")
-		prov := provenance.GenerateInTotoPredicate(filepath.Base(request.File), fileHash, sdk.Env, sdk.State)
-
-		provJSON, provErr := json.Marshal(prov)
+		provJSON, provErr := provenance.GenerateStatement(provenance.Subject{
+			Name:   filepath.Base(request.File),
+			SHA256: fileHash,
+			Module: request.ModuleSlug(),
+		}, provenance.Input{
+			NCI:   sdk.NCI,
+			Env:   sdk.Env,
+			State: sdk.State,
+			Step: provenance.Step{
+				Name:         sdk.Step.Name,
+				Slug:         sdk.Step.Slug,
+				Stage:        sdk.Step.Stage,
+				Action:       sdk.Step.Action,
+				Module:       sdk.Step.Module,
+				Environment:  sdk.Step.Environment,
+				UsesOutputOf: sdk.Step.UsesOutputOf,
+			},
+		})
 		if provErr != nil {
-			return "", "", provErr
+			return "", "", fmt.Errorf("failed to generate provenance for %s: %w", request.File, provErr)
 		}
 
 		_, _, err = sdk.storeArtifact(actionsdk.ArtifactUploadRequest{
@@ -114,7 +127,7 @@ func (sdk ActionSDK) ArtifactUploadV1(request actionsdk.ArtifactUploadRequest) (
 			Module:        request.ModuleSlug(),
 			Type:          provenance.ArtifactType,
 			Format:        provenance.ArtifactFormat,
-			FormatVersion: v1.PredicateSLSAProvenance,
+			FormatVersion: provenance.PredicateType,
 			ContentBytes:  provJSON,
 		})
 		if err != nil {
