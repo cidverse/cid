@@ -18,7 +18,6 @@ import (
 
 func TestSignArtifacts(t *testing.T) {
 	tmpDir := t.TempDir()
-	binaryFile := filepath.Join(tmpDir, "linux_amd64")
 
 	key, err := crypto.PGPWithProfile(profile.RFC9580()).KeyGeneration().
 		AddUserId("CID Test", "cid@example.com").
@@ -34,46 +33,70 @@ func TestSignArtifacts(t *testing.T) {
 
 	sdk := common.TestSetup(t)
 	sdk.On("ProjectExecutionContextV1").Return(data, nil)
+	// two modules produce linux_amd64, cli produces a unique darwin_arm64
 	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return([]*actionsdk.Artifact{
-		{
-			ArtifactID: "my-module|binary|linux_amd64",
-			Module:     "my-module",
-			Name:       "linux_amd64",
-			Type:       "binary",
-		},
+		{ArtifactID: "cli|binary|linux_amd64", Module: "cli", Name: "linux_amd64", Type: "binary"},
+		{ArtifactID: "server|binary|linux_amd64", Module: "server", Name: "linux_amd64", Type: "binary"},
+		{ArtifactID: "cli|binary|darwin_arm64", Module: "cli", Name: "darwin_arm64", Type: "binary"},
 	}, nil)
-	sdk.On("ArtifactDownloadV1", actionsdk.ArtifactDownloadRequest{
-		ID:         "my-module|binary|linux_amd64",
-		TargetFile: binaryFile,
-	}).Run(func(_ mock.Arguments) {
-		require.NoError(t, os.WriteFile(binaryFile, []byte("binary content"), 0600))
-	}).Return(&actionsdk.ArtifactDownloadResult{Path: binaryFile}, nil)
-	var uploadReq *actionsdk.ArtifactUploadRequest
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "checksum" && name == "SHA256SUMS"`}).Return([]*actionsdk.Artifact{
+		{ArtifactID: "root|checksum|SHA256SUMS", Module: "root", Name: "SHA256SUMS", Type: "checksum", Format: "sha256"},
+	}, nil)
 
+	contents := map[string]string{
+		"cli|binary|linux_amd64":    "cli linux",
+		"server|binary|linux_amd64": "server linux",
+		"cli|binary|darwin_arm64":   "cli darwin",
+		"root|checksum|SHA256SUMS":  "checksums",
+	}
+	expectedTargets := map[string]string{
+		"cli|binary|linux_amd64":    "cli_linux_amd64",
+		"server|binary|linux_amd64": "server_linux_amd64",
+		"cli|binary|darwin_arm64":   "darwin_arm64",
+		"root|checksum|SHA256SUMS":  "SHA256SUMS",
+	}
+	for id, name := range expectedTargets {
+		file := filepath.Join(tmpDir, name)
+		content := contents[id]
+		sdk.On("ArtifactDownloadV1", actionsdk.ArtifactDownloadRequest{ID: id, TargetFile: file}).Run(func(_ mock.Arguments) {
+			require.NoError(t, os.WriteFile(file, []byte(content), 0600))
+		}).Return(&actionsdk.ArtifactDownloadResult{Path: file}, nil)
+	}
+
+	uploads := map[string]actionsdk.ArtifactUploadRequest{}
 	sdk.On("ArtifactUploadV1", mock.MatchedBy(func(req actionsdk.ArtifactUploadRequest) bool {
 		if req.Type != "signature" {
 			return false
 		}
-		uploadReq = &req
+		uploads[filepath.Base(req.File)] = req
 		return true
 	})).Return("", "hash", nil)
 
 	action := Action{Sdk: sdk}
 	require.NoError(t, action.Execute())
 
-	require.NotNil(t, uploadReq)
-	assert.Equal(t, "signature", uploadReq.Type)
-	assert.Equal(t, "pgp", uploadReq.Format)
-	assert.Equal(t, "my-module", uploadReq.Module)
-	assert.Equal(t, binaryFile+".asc", uploadReq.File)
-
 	verifier, err := crypto.PGPWithProfile(profile.RFC9580()).Verify().
 		VerificationKey(key).
 		New()
 	require.NoError(t, err)
-	result, err := verifier.VerifyDetached([]byte("binary content"), uploadReq.ContentBytes, crypto.Armor)
-	require.NoError(t, err)
-	assert.NoError(t, result.SignatureError())
+
+	expected := map[string]struct{ module, content string }{
+		"cli_linux_amd64.asc":    {"cli", "cli linux"},
+		"server_linux_amd64.asc": {"server", "server linux"},
+		"darwin_arm64.asc":       {"cli", "cli darwin"},
+		"SHA256SUMS.asc":         {"root", "checksums"},
+	}
+	require.Len(t, uploads, len(expected))
+	for name, want := range expected {
+		req, ok := uploads[name]
+		require.True(t, ok, "missing signature %s", name)
+		assert.Equal(t, "pgp", req.Format)
+		assert.Equal(t, want.module, req.Module)
+
+		result, err := verifier.VerifyDetached([]byte(want.content), req.ContentBytes, crypto.Armor)
+		require.NoError(t, err)
+		assert.NoError(t, result.SignatureError())
+	}
 }
 
 func TestMetadataRequiresSigningKey(t *testing.T) {

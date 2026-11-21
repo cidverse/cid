@@ -7,6 +7,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargobuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/cargo/cargotest"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/changelog/changeloggenerate"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/checksum/checksumartifacts"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/codecov/codecovupload"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnetbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/dotnet/dotnettest"
@@ -60,6 +61,8 @@ func GetActions(sdk actionsdk.SDKClient) map[string]actionsdk.Action {
 		githubreleasepublish.Action{Sdk: sdk},
 		// gitlab
 		gitlabreleasepublish.Action{Sdk: sdk},
+		// checksum
+		checksumartifacts.Action{Sdk: sdk},
 		// sign
 		signartifacts.Action{Sdk: sdk},
 		// go

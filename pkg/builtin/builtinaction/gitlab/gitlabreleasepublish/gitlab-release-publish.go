@@ -71,6 +71,10 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Type:   "signature",
 					Format: "pgp",
 				},
+				{
+					Type:   common.ArtifactTypeChecksum,
+					Format: common.ArtifactFormatSHA256,
+				},
 			},
 		},
 	}
@@ -141,13 +145,19 @@ func (a Action) Execute() (err error) {
 
 	// release artifacts
 	var releaseAssets []*gitlab.ReleaseAssetLinkOptions
-	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `(artifact_type == "binary" || artifact_type == "signature")`})
+	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: common.ReleaseArtifactQuery})
 	if err != nil {
 		return err
 	}
+	assetNames := common.ReleaseAssetNames(common.BinaryArtifacts(artifacts))
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "searching for artifacts to include in the release", Context: map[string]interface{}{"artifact_count": len(artifacts)}})
 	for _, artifact := range artifacts {
-		targetFile := actionsdk.JoinPath(d.Config.TempDir, artifact.Name)
+		// binaries get their (collision-free) release asset name, signatures and checksums are already named after it
+		assetName := artifact.Name
+		if name, ok := assetNames[artifact.ArtifactID]; ok {
+			assetName = name
+		}
+		targetFile := actionsdk.JoinPath(d.Config.TempDir, assetName)
 		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 			ID:         artifact.ArtifactID,
 			TargetFile: targetFile,
@@ -159,10 +169,10 @@ func (a Action) Execute() (err error) {
 
 		reader, err := os.Open(targetFile)
 		if err != nil {
-			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "warn", Message: "failed to open release artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
+			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "warn", Message: "failed to open release artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, assetName)}})
 			continue
 		}
-		gpf, _, err := glab.GenericPackages.PublishPackageFile(projectId, artifact.Module, releaseVersion, artifact.Name, reader, &gitlab.PublishPackageFileOptions{
+		gpf, _, err := glab.GenericPackages.PublishPackageFile(projectId, artifact.Module, releaseVersion, assetName, reader, &gitlab.PublishPackageFileOptions{
 			Status: gitlab.Ptr(gitlab.PackageDefault),
 			Select: gitlab.Ptr(gitlab.SelectPackageFile),
 		})
@@ -177,7 +187,7 @@ func (a Action) Execute() (err error) {
 			URL:      gitlab.Ptr(assetUrl),
 			LinkType: gitlab.Ptr(gitlab.OtherLinkType),
 		})
-		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "added artifact to release", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name), "url": assetUrl}})
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "added artifact to release", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, assetName), "url": assetUrl}})
 	}
 
 	// create release

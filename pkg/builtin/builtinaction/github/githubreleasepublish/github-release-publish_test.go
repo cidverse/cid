@@ -19,7 +19,7 @@ func TestGithubReleasePublishWithChangelog(t *testing.T) {
 	sdk.On("ArtifactDownloadByteArrayV1", actionsdk.ArtifactDownloadByteArrayRequest{
 		ID: "root|changelog|github.changelog",
 	}).Return(&actionsdk.ArtifactDownloadByteArrayResult{Bytes: []byte("feat: example")}, nil)
-	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `(artifact_type == "binary" || artifact_type == "signature")`}).Return([]*actionsdk.Artifact{
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: common.ReleaseArtifactQuery}).Return([]*actionsdk.Artifact{
 		/*
 			{
 				BuildID:    "0",
@@ -54,7 +54,7 @@ func TestGithubReleasePublishAutoChangelog(t *testing.T) {
 	sdk.On("ArtifactDownloadByteArrayV1", actionsdk.ArtifactDownloadByteArrayRequest{
 		ID: "root|changelog|github.changelog",
 	}).Return(nil, fmt.Errorf("a error of some kind"))
-	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `(artifact_type == "binary" || artifact_type == "signature")`}).Return([]*actionsdk.Artifact{
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: common.ReleaseArtifactQuery}).Return([]*actionsdk.Artifact{
 		/*
 			{
 				BuildID:    "0",

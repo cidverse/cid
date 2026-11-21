@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/lib/secret"
 )
@@ -17,7 +18,7 @@ type Action struct {
 func (a Action) Metadata() actionsdk.ActionMetadata {
 	return actionsdk.ActionMetadata{
 		Name:        "sign-artifacts",
-		Description: "Signs binary artifacts with an OpenPGP key and stores the detached signatures as additional artifacts.",
+		Description: "Signs binary artifacts and the aggregated SHA256SUMS file with an OpenPGP key and stores the detached signatures as additional artifacts.",
 		Category:    "publish",
 		Scope:       actionsdk.ActionScopeProject,
 		Rules: []actionsdk.ActionRule{
@@ -48,6 +49,10 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				{
 					Type: "binary",
 				},
+				{
+					Type:   common.ArtifactTypeChecksum,
+					Format: common.ArtifactFormatSHA256,
+				},
 			},
 		},
 		Output: actionsdk.ActionOutput{
@@ -75,14 +80,35 @@ func (a Action) Execute() (err error) {
 		return nil
 	}
 
-	// sign all binary artifacts
-	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`})
+	// sign all binary artifacts, using their release asset names so signatures of same-named binaries from
+	// different modules don't overwrite each other
+	binaries, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`})
 	if err != nil {
 		return err
 	}
-	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "signing artifacts", Context: map[string]interface{}{"artifact_count": len(artifacts)}})
-	for _, artifact := range artifacts {
-		targetFile := actionsdk.JoinPath(d.Config.TempDir, artifact.Name)
+	assetNames := common.ReleaseAssetNames(binaries)
+	type signTarget struct {
+		artifact  *actionsdk.Artifact
+		assetName string
+	}
+	var targets []signTarget
+	for _, artifact := range binaries {
+		targets = append(targets, signTarget{artifact: artifact, assetName: assetNames[artifact.ArtifactID]})
+	}
+
+	// sign the aggregated checksum file (per-file .sha256 files are not signed, the binary signature covers them)
+	checksums, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: fmt.Sprintf(`artifact_type == "%s" && name == "%s"`, common.ArtifactTypeChecksum, common.ChecksumsFileName)})
+	if err != nil {
+		return err
+	}
+	for _, artifact := range checksums {
+		targets = append(targets, signTarget{artifact: artifact, assetName: artifact.Name})
+	}
+
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "signing artifacts", Context: map[string]interface{}{"artifact_count": len(targets)}})
+	for _, target := range targets {
+		artifact := target.artifact
+		targetFile := actionsdk.JoinPath(d.Config.TempDir, target.assetName)
 		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 			ID:         artifact.ArtifactID,
 			TargetFile: targetFile,
@@ -112,7 +138,7 @@ func (a Action) Execute() (err error) {
 			return fmt.Errorf("failed to store signature for %s: %w", artifact.ArtifactID, uploadErr)
 		}
 
-		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "signed artifact", Context: map[string]interface{}{"artifact": artifact.Name, "signature": artifact.Name + ".asc"}})
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "signed artifact", Context: map[string]interface{}{"artifact": target.assetName, "signature": target.assetName + ".asc"}})
 	}
 
 	return nil

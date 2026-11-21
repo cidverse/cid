@@ -60,6 +60,10 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Type:   "signature",
 					Format: "pgp",
 				},
+				{
+					Type:   common.ArtifactTypeChecksum,
+					Format: common.ArtifactFormatSHA256,
+				},
 			},
 		},
 	}
@@ -99,10 +103,11 @@ func (a Action) Execute() (err error) {
 	})
 
 	// release artifacts
-	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `(artifact_type == "binary" || artifact_type == "signature")`})
+	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: common.ReleaseArtifactQuery})
 	if err != nil {
 		return err
 	}
+	assetNames := common.ReleaseAssetNames(common.BinaryArtifacts(artifacts))
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "searching for artifacts to include in the release", Context: map[string]interface{}{"artifact_count": len(artifacts)}})
 
 	// download the artifacts we intend to publish
@@ -112,7 +117,12 @@ func (a Action) Execute() (err error) {
 	}
 	var releaseFiles []releaseFile
 	for _, artifact := range artifacts {
-		targetFile := actionsdk.JoinPath(d.Config.TempDir, artifact.Name)
+		// binaries get their (collision-free) release asset name, signatures and checksums are already named after it
+		assetName := artifact.Name
+		if name, ok := assetNames[artifact.ArtifactID]; ok {
+			assetName = name
+		}
+		targetFile := actionsdk.JoinPath(d.Config.TempDir, assetName)
 		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 			ID:         artifact.ArtifactID,
 			TargetFile: targetFile,
@@ -121,7 +131,7 @@ func (a Action) Execute() (err error) {
 			_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "warn", Message: "failed to retrieve release artifact", Context: map[string]interface{}{"artifact": fmt.Sprintf("%s-%s", artifact.Module, artifact.Name)}})
 			continue
 		}
-		releaseFiles = append(releaseFiles, releaseFile{Name: artifact.Name, Path: targetFile})
+		releaseFiles = append(releaseFiles, releaseFile{Name: assetName, Path: targetFile})
 	}
 
 	// options
