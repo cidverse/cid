@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestMavenBuild(t *testing.T) {
@@ -24,6 +25,8 @@ func TestMavenBuild(t *testing.T) {
 		Command: `java -Dmaven.multiModuleProjectDirectory="/my-project" -classpath "/my-project/.mvn/wrapper/maven-wrapper.jar" org.apache.maven.wrapper.MavenWrapperMain package --batch-mode -Dmaven.test.skip=true`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
+
+	sdk.On("FileExistsV1", mock.Anything).Return(false) // no sboms generated
 
 	action := Action{Sdk: sdk}
 	err := action.Execute()

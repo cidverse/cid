@@ -68,6 +68,14 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Type:   common.ArtifactTypeChecksum,
 					Format: common.ArtifactFormatSHA256,
 				},
+				{
+					Type:   common.SBOMArtifactType,
+					Format: common.SBOMFormatCycloneDX,
+				},
+				{
+					Type:   common.SBOMArtifactType,
+					Format: common.SBOMFormatSPDX,
+				},
 			},
 		},
 	}

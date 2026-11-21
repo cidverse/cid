@@ -38,6 +38,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/sign/signartifacts"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/sign/sigstoresign"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/sonarqube/sonarqubescan"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/syft/syftsbom"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/trivy/trivyfsscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvtest"
@@ -48,6 +49,10 @@ import (
 // releaseBinariesExpression selects release workflows of projects with binary producing build systems (go-build /
 // cargo-build), used for the actions that checksum and sign release binaries.
 const releaseBinariesExpression = `CID_WORKFLOW_TYPE == "release" && ("gomod" in PROJECT_BUILD_SYSTEMS || "cargo" in PROJECT_BUILD_SYSTEMS)`
+
+// releaseSignExpression selects release workflows of projects with binaries (gomod / cargo) or SBOMs (every syft-sbom
+// build system, which includes gomod / cargo), used for the signing actions so no SBOM is released unsigned.
+var releaseSignExpression = `CID_WORKFLOW_TYPE == "release" && PROJECT_BUILD_SYSTEMS.exists(b, b in ` + syftsbom.BuildSystemsCELList() + `)`
 
 func GetWorkflows() []catalog.Workflow {
 	var workflows []catalog.Workflow
@@ -171,8 +176,19 @@ func GetWorkflows() []catalog.Workflow {
 				},
 			},
 			{
-				Name:    "package",
-				Actions: []catalog.WorkflowAction{},
+				Name: "package",
+				Actions: []catalog.WorkflowAction{
+					// sbom
+					{
+						ID: syftsbom.URI,
+						Rules: []catalog.WorkflowRule{
+							{
+								Type:       "cel",
+								Expression: `CID_WORKFLOW_TYPE == "release"`,
+							},
+						},
+					},
+				},
 			},
 			{
 				Name: "scan",
@@ -257,7 +273,7 @@ func GetWorkflows() []catalog.Workflow {
 						Rules: []catalog.WorkflowRule{
 							{
 								Type:       "cel",
-								Expression: releaseBinariesExpression,
+								Expression: releaseSignExpression,
 							},
 						},
 					},
@@ -266,7 +282,7 @@ func GetWorkflows() []catalog.Workflow {
 						Rules: []catalog.WorkflowRule{
 							{
 								Type:       "cel",
-								Expression: releaseBinariesExpression,
+								Expression: releaseSignExpression,
 							},
 						},
 					},

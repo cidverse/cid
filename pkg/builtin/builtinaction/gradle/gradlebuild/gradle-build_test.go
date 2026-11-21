@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestGradleBuild(t *testing.T) {
@@ -21,6 +22,8 @@ func TestGradleBuild(t *testing.T) {
 		Command: `java -Dorg.gradle.appname="gradlew" -classpath "/my-project/gradle/wrapper/gradle-wrapper.jar" org.gradle.wrapper.GradleWrapperMain -Pversion="1.0.0" assemble --no-daemon --warning-mode=all --console=plain --stacktrace`,
 		WorkDir: "/my-project",
 	}).Return(&actionsdk.ExecuteCommandV1Response{Code: 0}, nil)
+
+	sdk.On("FileExistsV1", mock.Anything).Return(false) // no sboms generated
 
 	action := Action{Sdk: sdk}
 	err := action.Execute()

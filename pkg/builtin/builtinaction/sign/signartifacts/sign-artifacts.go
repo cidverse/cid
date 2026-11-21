@@ -18,7 +18,7 @@ type Action struct {
 func (a Action) Metadata() actionsdk.ActionMetadata {
 	return actionsdk.ActionMetadata{
 		Name:        "sign-artifacts",
-		Description: "Signs binary artifacts, their provenance and the aggregated SHA256SUMS file with an OpenPGP key and stores the detached signatures as additional artifacts.",
+		Description: "Signs binary artifacts, their provenance, SBOMs and the aggregated SHA256SUMS file with an OpenPGP key and stores the detached signatures as additional artifacts.",
 		Category:    "publish",
 		Scope:       actionsdk.ActionScopeProject,
 		Rules: []actionsdk.ActionRule{
@@ -53,6 +53,14 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Type:   common.ArtifactTypeChecksum,
 					Format: common.ArtifactFormatSHA256,
 				},
+				{
+					Type:   common.SBOMArtifactType,
+					Format: common.SBOMFormatCycloneDX,
+				},
+				{
+					Type:   common.SBOMArtifactType,
+					Format: common.SBOMFormatSPDX,
+				},
 			},
 		},
 		Output: actionsdk.ActionOutput{
@@ -80,7 +88,7 @@ func (a Action) Execute() (err error) {
 		return nil
 	}
 
-	// sign all binary artifacts and their provenance, using their release asset names so signatures of same-named
+	// sign all binary artifacts, their provenance and sboms, using their release asset names so signatures of same-named
 	// binaries from different modules don't overwrite each other
 	signable, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: common.SignableArtifactQuery})
 	if err != nil {

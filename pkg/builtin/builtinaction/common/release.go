@@ -25,10 +25,10 @@ const (
 )
 
 // ReleaseArtifactQuery selects every artifact published as a release asset.
-const ReleaseArtifactQuery = `(artifact_type == "binary" || artifact_type == "signature" || artifact_type == "checksum" || (artifact_type == "attestation" && format == "provenance"))`
+const ReleaseArtifactQuery = `(artifact_type == "binary" || artifact_type == "signature" || artifact_type == "checksum" || artifact_type == "sbom" || (artifact_type == "attestation" && format == "provenance"))`
 
-// SignableArtifactQuery selects the artifacts signed individually: binaries and their provenance statements.
-const SignableArtifactQuery = `(artifact_type == "binary" || (artifact_type == "attestation" && format == "provenance"))`
+// SignableArtifactQuery selects the artifacts signed individually: binaries, their provenance statements and SBOMs.
+const SignableArtifactQuery = `(artifact_type == "binary" || artifact_type == "sbom" || (artifact_type == "attestation" && format == "provenance"))`
 
 // BinaryArtifacts returns the binary artifacts of the given artifacts.
 func BinaryArtifacts(artifacts []*actionsdk.Artifact) []*actionsdk.Artifact {
@@ -75,10 +75,19 @@ func IsProvenance(artifact *actionsdk.Artifact) bool {
 //
 // Binaries are named by ReleaseAssetNames, provenance statements follow the binary they describe
 // (`<binary asset name>.provenance.json`), so a module prefix applied to the binary is applied to its provenance too.
+// SBOMs get the same collision handling as binaries (`<module>_<name>` when several modules store the same name, e.g.
+// `maven-target-bom.cdx.json`), callers must pass every SBOM so all actions derive the same names.
 // Everything else (signatures, checksums) is already named after the asset and keeps its name.
 func ReleaseFileNames(artifacts []*actionsdk.Artifact) map[string]string {
 	binaries := BinaryArtifacts(artifacts)
 	binaryNames := ReleaseAssetNames(binaries)
+	var sboms []*actionsdk.Artifact
+	for _, a := range artifacts {
+		if a.Type == SBOMArtifactType {
+			sboms = append(sboms, a)
+		}
+	}
+	sbomNames := ReleaseAssetNames(sboms)
 	binaryByModuleAndName := make(map[string]*actionsdk.Artifact, len(binaries))
 	for _, b := range binaries {
 		binaryByModuleAndName[b.Module+"|"+b.Name] = b
@@ -89,6 +98,8 @@ func ReleaseFileNames(artifacts []*actionsdk.Artifact) map[string]string {
 		switch {
 		case a.Type == "binary":
 			names[a.ArtifactID] = binaryNames[a.ArtifactID]
+		case a.Type == SBOMArtifactType:
+			names[a.ArtifactID] = sbomNames[a.ArtifactID]
 		case IsProvenance(a):
 			names[a.ArtifactID] = a.Name
 			if b, ok := binaryByModuleAndName[a.Module+"|"+strings.TrimSuffix(a.Name, provenance.FileExtension)]; ok {

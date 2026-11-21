@@ -82,7 +82,7 @@ func TestSigstoreSign(t *testing.T) {
 	}
 }
 
-func TestSigstoreSignWithoutBinaries(t *testing.T) {
+func TestSigstoreSignWithoutArtifacts(t *testing.T) {
 	sdk := common.TestSetup(t)
 	sdk.On("ProjectExecutionContextV1").Return(common.TestProjectData(), nil)
 	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: common.SignableArtifactQuery}).Return([]*actionsdk.Artifact{}, nil)

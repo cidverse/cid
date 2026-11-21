@@ -31,7 +31,7 @@ type Action struct {
 func (a Action) Metadata() actionsdk.ActionMetadata {
 	return actionsdk.ActionMetadata{
 		Name:        "sigstore-sign",
-		Description: "Signs binary artifacts keyless with Sigstore, using the CI job's OIDC identity (GitHub Actions / GitLab CI), and stores a Sigstore bundle (<asset>.sigstore.json) per binary and provenance statement.",
+		Description: "Signs binary artifacts keyless with Sigstore, using the CI job's OIDC identity (GitHub Actions / GitLab CI), and stores a Sigstore bundle (<asset>.sigstore.json) per binary, provenance statement and SBOM.",
 		Category:    "publish",
 		Scope:       actionsdk.ActionScopeProject,
 		Rules: []actionsdk.ActionRule{
@@ -39,7 +39,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				// enabled by default on github.com / gitlab.com (public Fulcio trusts their OIDC issuers, not self-hosted GitLab),
 				// opt-out with CID_SIGSTORE_SIGN=false. A configured GPG key (sign-artifacts) takes precedence: checked at plan
 				// time only, declaring GPG_PRIVATE_KEY here would make the GitHub workflow template pass the key into this job.
-				// The workflow config limits it to projects with binary producing build systems.
+				// The workflow config limits it to release workflows of projects with binaries or SBOMs.
 				Type:       "cel",
 				Expression: `(hasPrefix(ENV["NCI_REPOSITORY_REMOTE"], "https://github.com/") || hasPrefix(ENV["NCI_REPOSITORY_REMOTE"], "https://gitlab.com/")) && getMapValue(ENV, "CID_SIGSTORE_SIGN") != "false" && getMapValue(ENV, "GPG_PRIVATE_KEY") == ""`,
 			},
@@ -86,6 +86,14 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 				{
 					Type: "binary",
 				},
+				{
+					Type:   common.SBOMArtifactType,
+					Format: common.SBOMFormatCycloneDX,
+				},
+				{
+					Type:   common.SBOMArtifactType,
+					Format: common.SBOMFormatSPDX,
+				},
 			},
 		},
 		Output: actionsdk.ActionOutput{
@@ -110,8 +118,8 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
-	if len(common.BinaryArtifacts(signable)) == 0 {
-		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "no binary artifacts found, skipping sigstore signing"})
+	if len(signable) == 0 {
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "no binary or sbom artifacts found, skipping sigstore signing"})
 		return nil
 	}
 
@@ -142,7 +150,7 @@ func (a Action) Execute() (err error) {
 		return err
 	}
 
-	// sign every binary and its provenance under its release asset name
+	// sign every binary, its provenance and every sbom under its release asset name
 	assetNames := common.ReleaseFileNames(signable)
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "signing artifacts with sigstore", Context: map[string]interface{}{"artifact_count": len(signable)}})
 	for _, artifact := range signable {

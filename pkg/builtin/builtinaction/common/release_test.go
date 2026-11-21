@@ -58,6 +58,22 @@ func TestReleaseFileNames(t *testing.T) {
 	}, names)
 }
 
+func TestReleaseFileNamesSBOM(t *testing.T) {
+	names := ReleaseFileNames([]*actionsdk.Artifact{
+		{ArtifactID: "api|sbom|maven-target-bom.cdx.json", Module: "api", Name: "maven-target-bom.cdx.json", Type: "sbom", Format: "cyclonedx-json"},
+		{ArtifactID: "web|sbom|maven-target-bom.cdx.json", Module: "web", Name: "maven-target-bom.cdx.json", Type: "sbom", Format: "cyclonedx-json"},
+		{ArtifactID: "api|sbom|/tmp/syft-api.cdx.json", Module: "api", Name: "syft-api.cdx.json", Type: "sbom", Format: "cyclonedx-json"},
+		{ArtifactID: "api|signature|api_maven-target-bom.cdx.json.asc", Module: "api", Name: "api_maven-target-bom.cdx.json.asc", Type: "signature", Format: "pgp"},
+	})
+
+	assert.Equal(t, map[string]string{
+		"api|sbom|maven-target-bom.cdx.json":              "api_maven-target-bom.cdx.json",
+		"web|sbom|maven-target-bom.cdx.json":              "web_maven-target-bom.cdx.json",
+		"api|sbom|/tmp/syft-api.cdx.json":                 "syft-api.cdx.json",
+		"api|signature|api_maven-target-bom.cdx.json.asc": "api_maven-target-bom.cdx.json.asc",
+	}, names)
+}
+
 func TestBinaryArtifacts(t *testing.T) {
 	binaries := BinaryArtifacts([]*actionsdk.Artifact{
 		{ArtifactID: "a", Type: "binary"},
