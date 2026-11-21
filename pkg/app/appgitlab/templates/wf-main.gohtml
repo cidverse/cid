@@ -97,6 +97,13 @@ stages:
     environment:
       name: {{ $step.Environment}}
     {{- end }}
+    {{- if $step.Access.IDTokens }}
+    id_tokens:
+      {{- range $t := $step.Access.IDTokens }}
+      {{ $t.Name }}:
+        aud: "{{ $t.Audience }}"
+      {{- end }}
+    {{- end }}
     timeout: {{ $wf.JobTimeout }}m
     rules:
 {{- if $wf.WorkflowConfig.TriggerPush }}

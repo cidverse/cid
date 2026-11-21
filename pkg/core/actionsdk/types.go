@@ -49,6 +49,15 @@ type ActionAccess struct {
 	Executables []ActionAccessExecutable `json:"executables,omitempty"` // Executables that the action may invoke during execution
 	Network     []ActionAccessNetwork    `json:"network,omitempty"`     // Network access that the action may use during execution
 	Resources   []ActionAccessResource   `json:"resources,omitempty"`   // Resources the action may access (e.g. releases, packages, ...)
+	IDTokens    []ActionAccessIDToken    `json:"idTokens,omitempty"`    // OIDC ID tokens the CI job has to provide (GitLab: id_tokens, GitHub: id-token permission)
+}
+
+// ActionAccessIDToken is an OIDC ID token of the CI job's identity, provided in an environment variable.
+// GitLab renders it as job `id_tokens`; GitHub provides tokens on request (ACTIONS_ID_TOKEN_REQUEST_*) with the
+// `id-token: write` permission, so Name is only used on GitLab.
+type ActionAccessIDToken struct {
+	Name     string `json:"name"`     // environment variable holding the token, e.g. SIGSTORE_ID_TOKEN
+	Audience string `json:"audience"` // token audience, e.g. sigstore
 }
 
 type ActionAccessEnv struct {

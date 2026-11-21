@@ -38,6 +38,7 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/renovate/renovatelint"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/semgrep/semgrepscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/sign/signartifacts"
+	"github.com/cidverse/cid/pkg/builtin/builtinaction/sign/sigstoresign"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/sonarqube/sonarqubescan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/trivy/trivyfsscan"
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/uv/uvbuild"
@@ -65,6 +66,7 @@ func GetActions(sdk actionsdk.SDKClient) map[string]actionsdk.Action {
 		checksumartifacts.Action{Sdk: sdk},
 		// sign
 		signartifacts.Action{Sdk: sdk},
+		sigstoresign.Action{Sdk: sdk},
 		// go
 		gobuild.Action{Sdk: sdk},
 		gotest.Action{Sdk: sdk},

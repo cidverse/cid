@@ -15,6 +15,7 @@ type StepAccess struct {
 	Executables []actionsdk.ActionAccessExecutable `json:"executables,omitempty"` // Executables that the step may invoke during execution
 	Network     StepAccessNetwork                  `json:"network,omitempty"`     // Network endpoints (short form, see policy.NetworkEntry) that the step may use during execution
 	Resources   []actionsdk.ActionAccessResource   `json:"resources,omitempty"`   // Resources the step may access (e.g. releases, packages, ...)
+	IDTokens    []actionsdk.ActionAccessIDToken    `json:"idTokens,omitempty"`    // OIDC ID tokens the CI job has to provide
 }
 
 type StepAccessEnv struct {
@@ -66,6 +67,7 @@ func NewStepAccess(access actionsdk.ActionAccess) StepAccess {
 		Executables: access.Executables,
 		Network:     NetworkHosts(access.Network),
 		Resources:   access.Resources,
+		IDTokens:    access.IDTokens,
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/cidverse/cid/pkg/app/appconfig"
 	"github.com/cidverse/cid/pkg/common/dependency"
+	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/core/plangenerate"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -182,4 +183,20 @@ func TestRenderWorkflowEgressFilterVariable(t *testing.T) {
 	assert.Equal(t, "audit", variables("podman", "audit")["CID_EGRESS_FILTER"])
 	assert.Equal(t, "block", variables("podman", "block")["CID_EGRESS_FILTER"])
 	assert.NotContains(t, variables("docker", "audit"), "CID_EGRESS_FILTER", "the filter can't see containers in the dind service")
+}
+
+func TestRenderWorkflowIDTokens(t *testing.T) {
+	data := testWorkflowData()
+	data[0].Plan.Steps[0].Access.IDTokens = []actionsdk.ActionAccessIDToken{{Name: "SIGSTORE_ID_TOKEN", Audience: "sigstore"}}
+	result, err := renderWorkflow(data, appconfig.RunnerTags{}, "wf-main.gohtml", "", RenderOptions{})
+	require.NoError(t, err)
+
+	var doc map[string]any
+	require.NoError(t, yaml.Unmarshal([]byte(result.WorkflowContent), &doc))
+	build, ok := doc["main/go-build"].(map[string]any)
+	require.True(t, ok)
+	test, ok := doc["main/go-test"].(map[string]any)
+	require.True(t, ok)
+	assert.Equal(t, map[string]any{"SIGSTORE_ID_TOKEN": map[string]any{"aud": "sigstore"}}, build["id_tokens"])
+	assert.NotContains(t, test, "id_tokens")
 }

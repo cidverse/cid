@@ -61,6 +61,10 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Format: "pgp",
 				},
 				{
+					Type:   "signature",
+					Format: "sigstore",
+				},
+				{
 					Type:   common.ArtifactTypeChecksum,
 					Format: common.ArtifactFormatSHA256,
 				},
