@@ -161,10 +161,11 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
+	artifacts = common.ReleaseAssets(artifacts)
 	assetNames := common.ReleaseFileNames(artifacts)
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "searching for artifacts to include in the release", Context: map[string]interface{}{"artifact_count": len(artifacts)}})
 	for _, artifact := range artifacts {
-		// binaries (and their provenance) get their collision-free release asset name, signatures and checksums are already named after it
+		// binaries, sboms (and their provenance) get their collision-free release asset name, signatures and checksums are already named after it
 		assetName := assetNames[artifact.ArtifactID]
 		targetFile := actionsdk.JoinPath(d.Config.TempDir, assetName)
 		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{

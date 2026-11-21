@@ -4,20 +4,22 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
+	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/lib/sigstore"
 	"github.com/cidverse/cid/pkg/util"
+	"github.com/cidverse/normalizeci/pkg/envstruct"
+	nci "github.com/cidverse/normalizeci/pkg/ncispec/v1"
 )
 
 const URI = "builtin://actions/sigstore-sign"
 
-// blobSigner signs data and returns a Sigstore bundle (JSON).
-type blobSigner interface {
-	SignBlob(data []byte) ([]byte, error)
+// statementSigner signs an in-toto statement and returns a Sigstore bundle (JSON).
+type statementSigner interface {
+	SignStatement(statement []byte) ([]byte, error)
 }
 
 type Action struct {
@@ -25,13 +27,13 @@ type Action struct {
 
 	// test hooks, nil uses the real GitHub Actions token endpoint / Sigstore public-good instance
 	idToken   func(ctx context.Context, env map[string]string) (string, error)
-	newSigner func(idToken string, cacheDir string) (blobSigner, error)
+	newSigner func(idToken string, cacheDir string) (statementSigner, error)
 }
 
 func (a Action) Metadata() actionsdk.ActionMetadata {
 	return actionsdk.ActionMetadata{
 		Name:        "sigstore-sign",
-		Description: "Signs binary artifacts keyless with Sigstore, using the CI job's OIDC identity (GitHub Actions / GitLab CI), and stores a Sigstore bundle (<asset>.sigstore.json) per binary, provenance statement and SBOM.",
+		Description: "Generates one SLSA provenance statement covering every release binary and SBOM, signs it keyless with Sigstore using the CI job's OIDC identity (GitHub Actions / GitLab CI) and stores the bundle as " + common.ReleaseAttestationFileName + ".",
 		Category:    "publish",
 		Scope:       actionsdk.ActionScopeProject,
 		Rules: []actionsdk.ActionRule{
@@ -68,6 +70,22 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Pattern:     true,
 					Secret:      true,
 				},
+				// runner-provided, identify the builder in the provenance (provenance.builderID)
+				{
+					Name:        "^GITHUB_SERVER_URL$",
+					Description: "GitHub server URL (runner-provided).",
+					Pattern:     true,
+				},
+				{
+					Name:        "^GITHUB_WORKFLOW_REF$",
+					Description: "GitHub workflow reference (runner-provided).",
+					Pattern:     true,
+				},
+				{
+					Name:        "^CI_RUNNER_ID$",
+					Description: "GitLab runner id (runner-provided).",
+					Pattern:     true,
+				},
 			},
 			IDTokens: []actionsdk.ActionAccessIDToken{
 				{Name: sigstore.IDTokenEnv, Audience: sigstore.Audience},
@@ -94,6 +112,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 					Type:   common.SBOMArtifactType,
 					Format: common.SBOMFormatSPDX,
 				},
+				// the per-binary provenance is stored by the build step next to its binary and arrives with the binary input
 			},
 		},
 		Output: actionsdk.ActionOutput{
@@ -114,13 +133,56 @@ func (a Action) Execute() (err error) {
 		return err
 	}
 
-	signable, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: common.SignableArtifactQuery})
+	artifacts, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: common.SignableArtifactQuery})
 	if err != nil {
 		return err
 	}
-	if len(signable) == 0 {
+	var subjects, buildProvenance []*actionsdk.Artifact
+	for _, artifact := range artifacts {
+		if common.IsProvenance(artifact) {
+			buildProvenance = append(buildProvenance, artifact)
+		} else {
+			subjects = append(subjects, artifact)
+		}
+	}
+	if len(subjects) == 0 {
 		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "no binary or sbom artifacts found, skipping sigstore signing"})
 		return nil
+	}
+
+	// release statement: every binary and sbom under its release asset name, with the build steps' provenance merged in
+	assetNames := common.ReleaseFileNames(subjects)
+	releaseSubjects := make([]provenance.ReleaseSubject, 0, len(subjects))
+	for _, artifact := range subjects {
+		digest, digestErr := a.artifactSHA256(d, artifact, assetNames[artifact.ArtifactID])
+		if digestErr != nil {
+			return digestErr
+		}
+		releaseSubjects = append(releaseSubjects, provenance.ReleaseSubject{
+			Name:   assetNames[artifact.ArtifactID],
+			SHA256: digest,
+			Module: artifact.Module,
+			Step:   artifact.StepSlug,
+			Type:   artifact.Type,
+			Format: artifact.Format,
+		})
+	}
+	buildStatements := make([][]byte, 0, len(buildProvenance))
+	for _, artifact := range buildProvenance {
+		content, dlErr := a.Sdk.ArtifactDownloadByteArrayV1(actionsdk.ArtifactDownloadByteArrayRequest{ID: artifact.ArtifactID})
+		if dlErr != nil {
+			return fmt.Errorf("failed to retrieve provenance %s: %w", artifact.ArtifactID, dlErr)
+		}
+		buildStatements = append(buildStatements, content.Bytes)
+	}
+
+	var spec nci.Spec
+	if specErr := envstruct.EnvMapToStruct(&spec, d.Env); specErr != nil {
+		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "warn", Message: "failed to read nci spec, provenance may be incomplete", Context: map[string]interface{}{"error": specErr.Error()}})
+	}
+	statement, err := provenance.GenerateReleaseStatement(releaseSubjects, provenance.Input{NCI: spec, Env: d.Env}, buildStatements)
+	if err != nil {
+		return fmt.Errorf("failed to generate release provenance: %w", err)
 	}
 
 	// identity token for the job
@@ -141,7 +203,7 @@ func (a Action) Execute() (err error) {
 
 	newSignerFn := a.newSigner
 	if newSignerFn == nil {
-		newSignerFn = func(idToken string, cacheDir string) (blobSigner, error) {
+		newSignerFn = func(idToken string, cacheDir string) (statementSigner, error) {
 			return sigstore.NewSigner(idToken, cacheDir)
 		}
 	}
@@ -150,43 +212,40 @@ func (a Action) Execute() (err error) {
 		return err
 	}
 
-	// sign every binary, its provenance and every sbom under its release asset name
-	assetNames := common.ReleaseFileNames(signable)
-	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "signing artifacts with sigstore", Context: map[string]interface{}{"artifact_count": len(signable)}})
-	for _, artifact := range signable {
-		assetName := assetNames[artifact.ArtifactID]
-		targetFile := actionsdk.JoinPath(d.Config.TempDir, assetName)
-		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
-			ID:         artifact.ArtifactID,
-			TargetFile: targetFile,
-		})
-		if dlErr != nil {
-			return fmt.Errorf("failed to retrieve artifact %s: %w", artifact.ArtifactID, dlErr)
-		}
-
-		content, readErr := os.ReadFile(targetFile)
-		if readErr != nil {
-			return fmt.Errorf("failed to read artifact %s: %w", artifact.ArtifactID, readErr)
-		}
-
-		bundle, signErr := signer.SignBlob(content)
-		if signErr != nil {
-			return fmt.Errorf("failed to sign artifact %s: %w", artifact.ArtifactID, signErr)
-		}
-
-		_, _, uploadErr := a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
-			File:         targetFile + sigstore.BundleExtension,
-			ContentBytes: bundle,
-			Module:       artifact.Module,
-			Type:         "signature",
-			Format:       "sigstore",
-		})
-		if uploadErr != nil {
-			return fmt.Errorf("failed to store sigstore bundle for %s: %w", artifact.ArtifactID, uploadErr)
-		}
-
-		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "signed artifact", Context: map[string]interface{}{"artifact": assetName, "bundle": assetName + sigstore.BundleExtension}})
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "signing release provenance with sigstore", Context: map[string]interface{}{"subject_count": len(releaseSubjects), "build_provenance_count": len(buildStatements)}})
+	bundle, err := signer.SignStatement(statement)
+	if err != nil {
+		return fmt.Errorf("failed to sign release provenance: %w", err)
 	}
 
+	_, _, err = a.Sdk.ArtifactUploadV1(actionsdk.ArtifactUploadRequest{
+		File:         actionsdk.JoinPath(d.Config.TempDir, common.ReleaseAttestationFileName),
+		ContentBytes: bundle,
+		Module:       common.ReleaseAttestationModule,
+		Type:         "signature",
+		Format:       "sigstore",
+	})
+	if err != nil {
+		return fmt.Errorf("failed to store sigstore bundle: %w", err)
+	}
+
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "signed release provenance", Context: map[string]interface{}{"bundle": common.ReleaseAttestationFileName}})
 	return nil
+}
+
+// artifactSHA256 returns the recorded digest of the artifact, or downloads and hashes it when none was recorded.
+func (a Action) artifactSHA256(d *actionsdk.ProjectExecutionContextV1Response, artifact *actionsdk.Artifact, assetName string) (string, error) {
+	if artifact.SHA256 != "" {
+		return artifact.SHA256, nil
+	}
+
+	targetFile := actionsdk.JoinPath(d.Config.TempDir, assetName)
+	if _, err := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{ID: artifact.ArtifactID, TargetFile: targetFile}); err != nil {
+		return "", fmt.Errorf("failed to retrieve artifact %s: %w", artifact.ArtifactID, err)
+	}
+	digest, err := common.SHA256File(targetFile)
+	if err != nil {
+		return "", fmt.Errorf("failed to hash artifact %s: %w", artifact.ArtifactID, err)
+	}
+	return digest, nil
 }

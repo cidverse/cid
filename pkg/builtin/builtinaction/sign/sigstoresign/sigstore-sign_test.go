@@ -2,6 +2,9 @@ package sigstoresign
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -9,16 +12,18 @@ import (
 	"github.com/cidverse/cid/pkg/builtin/builtinaction/common"
 	"github.com/cidverse/cid/pkg/core/actionsdk"
 	"github.com/cidverse/cid/pkg/core/catalog"
+	"github.com/cidverse/cid/pkg/core/provenance"
 	"github.com/cidverse/cid/pkg/core/rules"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
+// fakeSigner wraps the statement instead of signing it, so tests can inspect it.
 type fakeSigner struct{}
 
-func (fakeSigner) SignBlob(data []byte) ([]byte, error) {
-	return []byte(`{"signed":"` + string(data) + `"}`), nil
+func (fakeSigner) SignStatement(statement []byte) ([]byte, error) {
+	return append([]byte(`{"signed":`), append(statement, '}')...), nil
 }
 
 func TestSigstoreSign(t *testing.T) {
@@ -28,26 +33,28 @@ func TestSigstoreSign(t *testing.T) {
 	data.Env["ACTIONS_ID_TOKEN_REQUEST_URL"] = "https://token.example/?api-version=2.0"
 	data.Env["ACTIONS_ID_TOKEN_REQUEST_TOKEN"] = "request-token"
 
+	cliSHA := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	buildProvenance, err := provenance.GenerateStatement(provenance.Subject{Name: "linux_amd64", SHA256: cliSHA, Module: "cli"}, provenance.Input{Step: provenance.Step{Slug: "go-build-cli"}})
+	require.NoError(t, err)
+
 	sdk := common.TestSetup(t)
 	sdk.On("ProjectExecutionContextV1").Return(data, nil)
 	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: common.SignableArtifactQuery}).Return([]*actionsdk.Artifact{
-		{ArtifactID: "cli|binary|linux_amd64", Module: "cli", Name: "linux_amd64", Type: "binary"},
-		{ArtifactID: "server|binary|linux_amd64", Module: "server", Name: "linux_amd64", Type: "binary"},
+		{ArtifactID: "cli|binary|linux_amd64", Module: "cli", Name: "linux_amd64", Type: "binary", StepSlug: "go-build-cli", SHA256: cliSHA},
+		{ArtifactID: "server|binary|linux_amd64", Module: "server", Name: "linux_amd64", Type: "binary", StepSlug: "go-build-server"}, // no recorded digest, hashed after download
+		{ArtifactID: "cli|sbom|cli.cdx.json", Module: "cli", Name: "cli.cdx.json", Type: "sbom", Format: "cyclonedx-json", StepSlug: "syft-sbom", SHA256: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
 		{ArtifactID: "cli|attestation|linux_amd64.provenance.json", Module: "cli", Name: "linux_amd64.provenance.json", Type: "attestation", Format: "provenance"},
 	}, nil)
-	for id, name := range map[string]string{"cli|binary|linux_amd64": "cli_linux_amd64", "server|binary|linux_amd64": "server_linux_amd64", "cli|attestation|linux_amd64.provenance.json": "cli_linux_amd64.provenance.json"} {
-		file := filepath.Join(tmpDir, name)
-		content := id
-		sdk.On("ArtifactDownloadV1", actionsdk.ArtifactDownloadRequest{ID: id, TargetFile: file}).Run(func(_ mock.Arguments) {
-			require.NoError(t, os.WriteFile(file, []byte(content), 0600))
-		}).Return(&actionsdk.ArtifactDownloadResult{Path: file}, nil)
-	}
+	serverFile := filepath.Join(tmpDir, "server_linux_amd64")
+	sdk.On("ArtifactDownloadV1", actionsdk.ArtifactDownloadRequest{ID: "server|binary|linux_amd64", TargetFile: serverFile}).Run(func(_ mock.Arguments) {
+		require.NoError(t, os.WriteFile(serverFile, []byte("server"), 0600))
+	}).Return(&actionsdk.ArtifactDownloadResult{Path: serverFile}, nil)
+	sdk.On("ArtifactDownloadByteArrayV1", actionsdk.ArtifactDownloadByteArrayRequest{ID: "cli|attestation|linux_amd64.provenance.json"}).Return(&actionsdk.ArtifactDownloadByteArrayResult{Bytes: buildProvenance}, nil)
 
-	uploads := map[string]actionsdk.ArtifactUploadRequest{}
-	sdk.On("ArtifactUploadV1", mock.MatchedBy(func(req actionsdk.ArtifactUploadRequest) bool {
-		uploads[filepath.Base(req.File)] = req
-		return true
-	})).Return("", "hash", nil)
+	var upload actionsdk.ArtifactUploadRequest
+	sdk.On("ArtifactUploadV1", mock.Anything).Run(func(args mock.Arguments) {
+		upload = args.Get(0).(actionsdk.ArtifactUploadRequest)
+	}).Return("", "hash", nil).Once()
 
 	var gotRequestURL, gotRequestToken, gotIDToken string
 	action := Action{
@@ -56,7 +63,7 @@ func TestSigstoreSign(t *testing.T) {
 			gotRequestURL, gotRequestToken = env["ACTIONS_ID_TOKEN_REQUEST_URL"], env["ACTIONS_ID_TOKEN_REQUEST_TOKEN"]
 			return "id-token", nil
 		},
-		newSigner: func(idToken string, _ string) (blobSigner, error) {
+		newSigner: func(idToken string, _ string) (statementSigner, error) {
 			gotIDToken = idToken
 			return fakeSigner{}, nil
 		},
@@ -67,19 +74,40 @@ func TestSigstoreSign(t *testing.T) {
 	assert.Equal(t, "request-token", gotRequestToken)
 	assert.Equal(t, "id-token", gotIDToken)
 
-	require.Len(t, uploads, 3)
-	for name, want := range map[string]struct{ module, content string }{
-		"cli_linux_amd64.sigstore.json":                 {"cli", `{"signed":"cli|binary|linux_amd64"}`},
-		"server_linux_amd64.sigstore.json":              {"server", `{"signed":"server|binary|linux_amd64"}`},
-		"cli_linux_amd64.provenance.json.sigstore.json": {"cli", `{"signed":"cli|attestation|linux_amd64.provenance.json"}`},
-	} {
-		req, ok := uploads[name]
-		require.True(t, ok, "missing bundle %s", name)
-		assert.Equal(t, "signature", req.Type)
-		assert.Equal(t, "sigstore", req.Format)
-		assert.Equal(t, want.module, req.Module)
-		assert.Equal(t, want.content, string(req.ContentBytes))
+	// one bundle for the whole release
+	assert.Equal(t, common.ReleaseAttestationFileName, filepath.Base(upload.File))
+	assert.Equal(t, common.ReleaseAttestationModule, upload.Module)
+	assert.Equal(t, "signature", upload.Type)
+	assert.Equal(t, "sigstore", upload.Format)
+
+	var signed struct {
+		Signed struct {
+			PredicateType string `json:"predicateType"`
+			Subject       []struct {
+				Name   string            `json:"name"`
+				Digest map[string]string `json:"digest"`
+			} `json:"subject"`
+			Predicate struct {
+				BuildDefinition struct {
+					ExternalParameters map[string]interface{} `json:"externalParameters"`
+				} `json:"buildDefinition"`
+			} `json:"predicate"`
+		} `json:"signed"`
 	}
+	require.NoError(t, json.Unmarshal(upload.ContentBytes, &signed))
+	serverDigest := sha256.Sum256([]byte("server"))
+	serverSHA := hex.EncodeToString(serverDigest[:])
+	assert.Equal(t, provenance.PredicateType, signed.Signed.PredicateType)
+	subjects := map[string]string{}
+	for _, subject := range signed.Signed.Subject {
+		subjects[subject.Name] = subject.Digest["sha256"]
+	}
+	assert.Equal(t, map[string]string{
+		"cli_linux_amd64":    cliSHA,
+		"server_linux_amd64": serverSHA,
+		"cli.cdx.json":       "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+	}, subjects, "binaries and sboms under their release asset names, the provenance itself is no subject")
+	assert.Equal(t, "git+https://github.com/cidverse/normalizeci.git@refs/tags/v1.2.0", signed.Signed.Predicate.BuildDefinition.ExternalParameters["source"])
 }
 
 func TestSigstoreSignWithoutArtifacts(t *testing.T) {

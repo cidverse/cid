@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/cidverse/cid/pkg/core/actionsdk"
@@ -22,13 +23,32 @@ const (
 	ChecksumsFileName = "SHA256SUMS"
 	// ChecksumsModule is the module the aggregated checksum file and its signature are stored in.
 	ChecksumsModule = "root"
+	// ReleaseAttestationFileName is the Sigstore bundle of the signed release provenance, covering every release file.
+	ReleaseAttestationFileName = "release.intoto.sigstore.json"
+	// ReleaseAttestationModule is the module the release attestation is stored in.
+	ReleaseAttestationModule = "root"
 )
 
 // ReleaseArtifactQuery selects every artifact published as a release asset.
 const ReleaseArtifactQuery = `(artifact_type == "binary" || artifact_type == "signature" || artifact_type == "checksum" || artifact_type == "sbom" || (artifact_type == "attestation" && format == "provenance"))`
 
-// SignableArtifactQuery selects the artifacts signed individually: binaries, their provenance statements and SBOMs.
+// SignableArtifactQuery selects the artifacts to sign: binaries, their provenance statements and SBOMs.
 const SignableArtifactQuery = `(artifact_type == "binary" || artifact_type == "sbom" || (artifact_type == "attestation" && format == "provenance"))`
+
+// IsReleaseAttestation reports whether the artifact is the signed release attestation (ReleaseAttestationFileName).
+func IsReleaseAttestation(artifact *actionsdk.Artifact) bool {
+	return artifact.Type == "signature" && artifact.Format == "sigstore" && artifact.Name == ReleaseAttestationFileName
+}
+
+// ReleaseAssets returns the artifacts to publish as release assets, from the artifacts selected by ReleaseArtifactQuery.
+// When the release attestation is present, the per-binary provenance statements are left out: the attestation lists
+// every release file and merges their resolved dependencies, so they would only duplicate it unsigned.
+func ReleaseAssets(artifacts []*actionsdk.Artifact) []*actionsdk.Artifact {
+	if !slices.ContainsFunc(artifacts, IsReleaseAttestation) {
+		return artifacts
+	}
+	return slices.DeleteFunc(slices.Clone(artifacts), IsProvenance)
+}
 
 // BinaryArtifacts returns the binary artifacts of the given artifacts.
 func BinaryArtifacts(artifacts []*actionsdk.Artifact) []*actionsdk.Artifact {

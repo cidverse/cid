@@ -119,15 +119,19 @@ func GenerateStatement(subject Subject, in Input) ([]byte, error) {
 		return nil, err
 	}
 
-	statement := &attestation.Statement{
+	return marshalStatement(&attestation.Statement{
 		Type: attestation.StatementTypeUri,
 		Subject: []*attestation.ResourceDescriptor{
 			{Name: subject.Name, Digest: map[string]string{"sha256": subject.SHA256}, Annotations: subjectAnnotations(subject, in.Step)},
 		},
 		PredicateType: PredicateType,
 		Predicate:     predicateStruct,
-	}
-	if err = statement.Validate(); err != nil {
+	})
+}
+
+// marshalStatement validates the statement and serializes it as compact, redacted JSON.
+func marshalStatement(statement *attestation.Statement) ([]byte, error) {
+	if err := statement.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid in-toto statement: %w", err)
 	}
 

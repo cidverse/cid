@@ -1,6 +1,7 @@
 // Package sigstore signs artifacts keyless with Sigstore: an ephemeral key is certified by Fulcio for the CI job's
 // OIDC identity and the signature is recorded in the Rekor transparency log. The result is a Sigstore bundle
-// (`.sigstore.json`), verifiable with e.g. `cosign verify-blob --bundle <file>.sigstore.json ...`.
+// (`.sigstore.json`). In-toto statements are signed as DSSE envelope, the bundle verifies every subject by digest with
+// e.g. `cosign verify-blob-attestation --bundle <bundle> --new-bundle-format ...` or `gh attestation verify`.
 package sigstore
 
 import (
@@ -30,6 +31,8 @@ const (
 	IDTokenEnv = "SIGSTORE_ID_TOKEN"
 	// BundleExtension is the file extension of a Sigstore bundle published next to the signed file.
 	BundleExtension = ".sigstore.json"
+	// InTotoPayloadType is the DSSE payload type of in-toto statements.
+	InTotoPayloadType = "application/vnd.in-toto+json"
 )
 
 // IDToken returns the CI job's OIDC ID token for the sigstore audience: SIGSTORE_ID_TOKEN when the job provides it
@@ -121,8 +124,13 @@ func NewSigner(idToken string, cacheDir string) (*Signer, error) {
 	return &Signer{idToken: idToken, trustedRoot: trustedRoot, signingConfig: signingConfig}, nil
 }
 
-// SignBlob signs data with a fresh ephemeral key and returns the Sigstore bundle as JSON.
-func (s *Signer) SignBlob(data []byte) ([]byte, error) {
+// SignStatement signs an in-toto statement as DSSE envelope with a fresh ephemeral key and returns the Sigstore bundle
+// as JSON. The bundle verifies every subject of the statement by digest.
+func (s *Signer) SignStatement(statement []byte) ([]byte, error) {
+	return s.sign(&sign.DSSEData{Data: statement, PayloadType: InTotoPayloadType})
+}
+
+func (s *Signer) sign(content sign.Content) ([]byte, error) {
 	now := time.Now()
 	opts := sign.BundleOptions{
 		TrustedRoot: s.trustedRoot, // verifies the fulcio certificate and transparency log / timestamp responses
@@ -172,7 +180,7 @@ func (s *Signer) SignBlob(data []byte) ([]byte, error) {
 		return nil, fmt.Errorf("failed to create ephemeral keypair: %w", err)
 	}
 
-	bundle, err := sign.Bundle(&sign.PlainData{Data: data}, keypair, opts)
+	bundle, err := sign.Bundle(content, keypair, opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign: %w", err)
 	}

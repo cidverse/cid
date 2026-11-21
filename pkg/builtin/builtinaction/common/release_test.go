@@ -94,3 +94,18 @@ func TestSHA256FileAndChecksumLine(t *testing.T) {
 	assert.Equal(t, "5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03", digest)
 	assert.Equal(t, "5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03  linux_amd64\n", ChecksumLine(digest, "linux_amd64"))
 }
+
+func TestReleaseAssets(t *testing.T) {
+	binary := &actionsdk.Artifact{ArtifactID: "cli|binary|app", Module: "cli", Name: "app", Type: "binary"}
+	prov := &actionsdk.Artifact{ArtifactID: "cli|attestation|app.provenance.json", Module: "cli", Name: "app.provenance.json", Type: "attestation", Format: "provenance"}
+	asc := &actionsdk.Artifact{ArtifactID: "cli|signature|app.asc", Module: "cli", Name: "app.asc", Type: "signature", Format: "pgp"}
+	attestation := &actionsdk.Artifact{ArtifactID: "root|signature|" + ReleaseAttestationFileName, Module: "root", Name: ReleaseAttestationFileName, Type: "signature", Format: "sigstore"}
+
+	// without the release attestation (e.g. gpg signing) the per-binary provenance is published
+	assert.Equal(t, []*actionsdk.Artifact{binary, prov, asc}, ReleaseAssets([]*actionsdk.Artifact{binary, prov, asc}))
+
+	// the release attestation replaces it
+	input := []*actionsdk.Artifact{binary, prov, attestation}
+	assert.Equal(t, []*actionsdk.Artifact{binary, attestation}, ReleaseAssets(input))
+	assert.Len(t, input, 3, "input is not modified")
+}
