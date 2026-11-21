@@ -30,11 +30,12 @@ func TestSigstoreSign(t *testing.T) {
 
 	sdk := common.TestSetup(t)
 	sdk.On("ProjectExecutionContextV1").Return(data, nil)
-	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return([]*actionsdk.Artifact{
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: common.SignableArtifactQuery}).Return([]*actionsdk.Artifact{
 		{ArtifactID: "cli|binary|linux_amd64", Module: "cli", Name: "linux_amd64", Type: "binary"},
 		{ArtifactID: "server|binary|linux_amd64", Module: "server", Name: "linux_amd64", Type: "binary"},
+		{ArtifactID: "cli|attestation|linux_amd64.provenance.json", Module: "cli", Name: "linux_amd64.provenance.json", Type: "attestation", Format: "provenance"},
 	}, nil)
-	for id, name := range map[string]string{"cli|binary|linux_amd64": "cli_linux_amd64", "server|binary|linux_amd64": "server_linux_amd64"} {
+	for id, name := range map[string]string{"cli|binary|linux_amd64": "cli_linux_amd64", "server|binary|linux_amd64": "server_linux_amd64", "cli|attestation|linux_amd64.provenance.json": "cli_linux_amd64.provenance.json"} {
 		file := filepath.Join(tmpDir, name)
 		content := id
 		sdk.On("ArtifactDownloadV1", actionsdk.ArtifactDownloadRequest{ID: id, TargetFile: file}).Run(func(_ mock.Arguments) {
@@ -66,10 +67,11 @@ func TestSigstoreSign(t *testing.T) {
 	assert.Equal(t, "request-token", gotRequestToken)
 	assert.Equal(t, "id-token", gotIDToken)
 
-	require.Len(t, uploads, 2)
+	require.Len(t, uploads, 3)
 	for name, want := range map[string]struct{ module, content string }{
-		"cli_linux_amd64.sigstore.json":    {"cli", `{"signed":"cli|binary|linux_amd64"}`},
-		"server_linux_amd64.sigstore.json": {"server", `{"signed":"server|binary|linux_amd64"}`},
+		"cli_linux_amd64.sigstore.json":                 {"cli", `{"signed":"cli|binary|linux_amd64"}`},
+		"server_linux_amd64.sigstore.json":              {"server", `{"signed":"server|binary|linux_amd64"}`},
+		"cli_linux_amd64.provenance.json.sigstore.json": {"cli", `{"signed":"cli|attestation|linux_amd64.provenance.json"}`},
 	} {
 		req, ok := uploads[name]
 		require.True(t, ok, "missing bundle %s", name)
@@ -83,7 +85,7 @@ func TestSigstoreSign(t *testing.T) {
 func TestSigstoreSignWithoutBinaries(t *testing.T) {
 	sdk := common.TestSetup(t)
 	sdk.On("ProjectExecutionContextV1").Return(common.TestProjectData(), nil)
-	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`}).Return([]*actionsdk.Artifact{}, nil)
+	sdk.On("ArtifactListV1", actionsdk.ArtifactListRequest{Query: common.SignableArtifactQuery}).Return([]*actionsdk.Artifact{}, nil)
 
 	action := Action{Sdk: sdk}
 	require.NoError(t, action.Execute())

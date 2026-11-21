@@ -31,7 +31,7 @@ type Action struct {
 func (a Action) Metadata() actionsdk.ActionMetadata {
 	return actionsdk.ActionMetadata{
 		Name:        "sigstore-sign",
-		Description: "Signs binary artifacts keyless with Sigstore, using the CI job's OIDC identity (GitHub Actions / GitLab CI), and stores a Sigstore bundle (<asset>.sigstore.json) per binary.",
+		Description: "Signs binary artifacts keyless with Sigstore, using the CI job's OIDC identity (GitHub Actions / GitLab CI), and stores a Sigstore bundle (<asset>.sigstore.json) per binary and provenance statement.",
 		Category:    "publish",
 		Scope:       actionsdk.ActionScopeProject,
 		Rules: []actionsdk.ActionRule{
@@ -106,11 +106,11 @@ func (a Action) Execute() (err error) {
 		return err
 	}
 
-	binaries, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`})
+	signable, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: common.SignableArtifactQuery})
 	if err != nil {
 		return err
 	}
-	if len(binaries) == 0 {
+	if len(common.BinaryArtifacts(signable)) == 0 {
 		_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "no binary artifacts found, skipping sigstore signing"})
 		return nil
 	}
@@ -142,10 +142,10 @@ func (a Action) Execute() (err error) {
 		return err
 	}
 
-	// sign every binary under its release asset name
-	assetNames := common.ReleaseAssetNames(binaries)
-	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "signing artifacts with sigstore", Context: map[string]interface{}{"artifact_count": len(binaries)}})
-	for _, artifact := range binaries {
+	// sign every binary and its provenance under its release asset name
+	assetNames := common.ReleaseFileNames(signable)
+	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "signing artifacts with sigstore", Context: map[string]interface{}{"artifact_count": len(signable)}})
+	for _, artifact := range signable {
 		assetName := assetNames[artifact.ArtifactID]
 		targetFile := actionsdk.JoinPath(d.Config.TempDir, assetName)
 		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{

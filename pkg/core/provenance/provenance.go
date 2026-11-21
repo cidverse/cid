@@ -154,7 +154,8 @@ func digestSet(digest string) common.DigestSet {
 	return common.DigestSet{algorithm: value}
 }
 
-// GenerateInTotoPredicate generates an in-toto statement with a SLSA-Predicate
+// GenerateInTotoPredicate generates an in-toto statement with a SLSA-Predicate for the file with the given name and
+// hex encoded SHA-256 digest.
 func GenerateInTotoPredicate(fileName string, hash string, env map[string]string, state *state.ActionStateContext) intoto.Statement {
 	return intoto.Statement{
 		StatementHeader: intoto.StatementHeader{
@@ -163,7 +164,7 @@ func GenerateInTotoPredicate(fileName string, hash string, env map[string]string
 			Subject: []intoto.Subject{
 				{
 					Name:   fileName,
-					Digest: common.DigestSet{"hash": hash},
+					Digest: common.DigestSet{"sha256": hash},
 				},
 			},
 		},

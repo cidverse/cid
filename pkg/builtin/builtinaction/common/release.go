@@ -7,8 +7,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/cidverse/cid/pkg/core/actionsdk"
+	"github.com/cidverse/cid/pkg/core/provenance"
 )
 
 const (
@@ -23,7 +25,10 @@ const (
 )
 
 // ReleaseArtifactQuery selects every artifact published as a release asset.
-const ReleaseArtifactQuery = `(artifact_type == "binary" || artifact_type == "signature" || artifact_type == "checksum")`
+const ReleaseArtifactQuery = `(artifact_type == "binary" || artifact_type == "signature" || artifact_type == "checksum" || (artifact_type == "attestation" && format == "provenance"))`
+
+// SignableArtifactQuery selects the artifacts signed individually: binaries and their provenance statements.
+const SignableArtifactQuery = `(artifact_type == "binary" || (artifact_type == "attestation" && format == "provenance"))`
 
 // BinaryArtifacts returns the binary artifacts of the given artifacts.
 func BinaryArtifacts(artifacts []*actionsdk.Artifact) []*actionsdk.Artifact {
@@ -55,6 +60,41 @@ func ReleaseAssetNames(artifacts []*actionsdk.Artifact) map[string]string {
 		if len(modulesByName[a.Name]) > 1 {
 			names[a.ArtifactID] = fmt.Sprintf("%s_%s", a.Module, a.Name)
 		} else {
+			names[a.ArtifactID] = a.Name
+		}
+	}
+	return names
+}
+
+// IsProvenance reports whether the artifact is a generated provenance statement (`<binary>.provenance.json`).
+func IsProvenance(artifact *actionsdk.Artifact) bool {
+	return artifact.Type == provenance.ArtifactType && artifact.Format == provenance.ArtifactFormat
+}
+
+// ReleaseFileNames returns the release asset name for each given artifact, keyed by ArtifactID.
+//
+// Binaries are named by ReleaseAssetNames, provenance statements follow the binary they describe
+// (`<binary asset name>.provenance.json`), so a module prefix applied to the binary is applied to its provenance too.
+// Everything else (signatures, checksums) is already named after the asset and keeps its name.
+func ReleaseFileNames(artifacts []*actionsdk.Artifact) map[string]string {
+	binaries := BinaryArtifacts(artifacts)
+	binaryNames := ReleaseAssetNames(binaries)
+	binaryByModuleAndName := make(map[string]*actionsdk.Artifact, len(binaries))
+	for _, b := range binaries {
+		binaryByModuleAndName[b.Module+"|"+b.Name] = b
+	}
+
+	names := make(map[string]string, len(artifacts))
+	for _, a := range artifacts {
+		switch {
+		case a.Type == "binary":
+			names[a.ArtifactID] = binaryNames[a.ArtifactID]
+		case IsProvenance(a):
+			names[a.ArtifactID] = a.Name
+			if b, ok := binaryByModuleAndName[a.Module+"|"+strings.TrimSuffix(a.Name, provenance.FileExtension)]; ok {
+				names[a.ArtifactID] = binaryNames[b.ArtifactID] + provenance.FileExtension
+			}
+		default:
 			names[a.ArtifactID] = a.Name
 		}
 	}

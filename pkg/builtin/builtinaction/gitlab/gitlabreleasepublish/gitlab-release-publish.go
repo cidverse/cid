@@ -153,14 +153,11 @@ func (a Action) Execute() (err error) {
 	if err != nil {
 		return err
 	}
-	assetNames := common.ReleaseAssetNames(common.BinaryArtifacts(artifacts))
+	assetNames := common.ReleaseFileNames(artifacts)
 	_ = a.Sdk.LogV1(actionsdk.LogV1Request{Level: "info", Message: "searching for artifacts to include in the release", Context: map[string]interface{}{"artifact_count": len(artifacts)}})
 	for _, artifact := range artifacts {
-		// binaries get their (collision-free) release asset name, signatures and checksums are already named after it
-		assetName := artifact.Name
-		if name, ok := assetNames[artifact.ArtifactID]; ok {
-			assetName = name
-		}
+		// binaries (and their provenance) get their collision-free release asset name, signatures and checksums are already named after it
+		assetName := assetNames[artifact.ArtifactID]
 		targetFile := actionsdk.JoinPath(d.Config.TempDir, assetName)
 		_, dlErr := a.Sdk.ArtifactDownloadV1(actionsdk.ArtifactDownloadRequest{
 			ID:         artifact.ArtifactID,
@@ -185,9 +182,11 @@ func (a Action) Execute() (err error) {
 			return fmt.Errorf("failed to upload package: %w", err)
 		}
 
+		// asset names are already unique within the release (module prefix only on collisions), the generic package
+		// per module is just storage - don't repeat the module in the link name
 		assetUrl := fmt.Sprintf("%s/-/package_files/%d/download", d.Env["NCI_PROJECT_URL"], gpf.ID)
 		releaseAssets = append(releaseAssets, &gitlab.ReleaseAssetLinkOptions{
-			Name:     gitlab.Ptr(fmt.Sprintf("%s/%s", artifact.Module, gpf.FileName)),
+			Name:     gitlab.Ptr(assetName),
 			URL:      gitlab.Ptr(assetUrl),
 			LinkType: gitlab.Ptr(gitlab.OtherLinkType),
 		})

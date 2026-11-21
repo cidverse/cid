@@ -102,7 +102,7 @@ func (sdk ActionSDK) ArtifactUploadV1(request actionsdk.ArtifactUploadRequest) (
 	// generate build provenance?
 	if slices.Contains(provenance.FileTypes, request.Type) {
 		log.Info().Str("artifact", request.File).Str("type", request.Type).Msg("generating provenance for artifact")
-		prov := provenance.GenerateInTotoPredicate(request.File, fileHash, sdk.Env, sdk.State)
+		prov := provenance.GenerateInTotoPredicate(filepath.Base(request.File), fileHash, sdk.Env, sdk.State)
 
 		provJSON, provErr := json.Marshal(prov)
 		if provErr != nil {
@@ -110,10 +110,10 @@ func (sdk ActionSDK) ArtifactUploadV1(request actionsdk.ArtifactUploadRequest) (
 		}
 
 		_, _, err = sdk.storeArtifact(actionsdk.ArtifactUploadRequest{
-			File:          fmt.Sprintf("%s-provenance.json", strings.TrimSuffix(request.File, filepath.Ext(request.File))),
+			File:          request.File + provenance.FileExtension,
 			Module:        request.ModuleSlug(),
-			Type:          "attestation",
-			Format:        "provenance",
+			Type:          provenance.ArtifactType,
+			Format:        provenance.ArtifactFormat,
 			FormatVersion: v1.PredicateSLSAProvenance,
 			ContentBytes:  provJSON,
 		})

@@ -18,7 +18,7 @@ type Action struct {
 func (a Action) Metadata() actionsdk.ActionMetadata {
 	return actionsdk.ActionMetadata{
 		Name:        "sign-artifacts",
-		Description: "Signs binary artifacts and the aggregated SHA256SUMS file with an OpenPGP key and stores the detached signatures as additional artifacts.",
+		Description: "Signs binary artifacts, their provenance and the aggregated SHA256SUMS file with an OpenPGP key and stores the detached signatures as additional artifacts.",
 		Category:    "publish",
 		Scope:       actionsdk.ActionScopeProject,
 		Rules: []actionsdk.ActionRule{
@@ -80,19 +80,19 @@ func (a Action) Execute() (err error) {
 		return nil
 	}
 
-	// sign all binary artifacts, using their release asset names so signatures of same-named binaries from
-	// different modules don't overwrite each other
-	binaries, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: `artifact_type == "binary"`})
+	// sign all binary artifacts and their provenance, using their release asset names so signatures of same-named
+	// binaries from different modules don't overwrite each other
+	signable, err := a.Sdk.ArtifactListV1(actionsdk.ArtifactListRequest{Query: common.SignableArtifactQuery})
 	if err != nil {
 		return err
 	}
-	assetNames := common.ReleaseAssetNames(binaries)
+	assetNames := common.ReleaseFileNames(signable)
 	type signTarget struct {
 		artifact  *actionsdk.Artifact
 		assetName string
 	}
 	var targets []signTarget
-	for _, artifact := range binaries {
+	for _, artifact := range signable {
 		targets = append(targets, signTarget{artifact: artifact, assetName: assetNames[artifact.ArtifactID]})
 	}
 

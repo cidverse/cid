@@ -36,6 +36,28 @@ func TestReleaseAssetNamesSingleModule(t *testing.T) {
 	}, names)
 }
 
+func TestReleaseFileNames(t *testing.T) {
+	names := ReleaseFileNames([]*actionsdk.Artifact{
+		{ArtifactID: "cli|binary|linux_amd64", Module: "cli", Name: "linux_amd64", Type: "binary"},
+		{ArtifactID: "server|binary|linux_amd64", Module: "server", Name: "linux_amd64", Type: "binary"},
+		{ArtifactID: "cli|binary|darwin_arm64", Module: "cli", Name: "darwin_arm64", Type: "binary"},
+		{ArtifactID: "cli|attestation|linux_amd64.provenance.json", Module: "cli", Name: "linux_amd64.provenance.json", Type: "attestation", Format: "provenance"},
+		{ArtifactID: "cli|attestation|darwin_arm64.provenance.json", Module: "cli", Name: "darwin_arm64.provenance.json", Type: "attestation", Format: "provenance"},
+		{ArtifactID: "cli|attestation|orphan.provenance.json", Module: "cli", Name: "orphan.provenance.json", Type: "attestation", Format: "provenance"},
+		{ArtifactID: "cli|signature|cli_linux_amd64.asc", Module: "cli", Name: "cli_linux_amd64.asc", Type: "signature", Format: "pgp"},
+	})
+
+	assert.Equal(t, map[string]string{
+		"cli|binary|linux_amd64":                       "cli_linux_amd64",
+		"server|binary|linux_amd64":                    "server_linux_amd64",
+		"cli|binary|darwin_arm64":                      "darwin_arm64",
+		"cli|attestation|linux_amd64.provenance.json":  "cli_linux_amd64.provenance.json",
+		"cli|attestation|darwin_arm64.provenance.json": "darwin_arm64.provenance.json",
+		"cli|attestation|orphan.provenance.json":       "orphan.provenance.json",
+		"cli|signature|cli_linux_amd64.asc":            "cli_linux_amd64.asc",
+	}, names)
+}
+
 func TestBinaryArtifacts(t *testing.T) {
 	binaries := BinaryArtifacts([]*actionsdk.Artifact{
 		{ArtifactID: "a", Type: "binary"},
