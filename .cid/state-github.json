@@ -1,7 +1,7 @@
 {
   "workflows": {
     "Nightly": {
-      "version": "0.11.13",
+      "version": "0.13.0",
       "name": "Nightly",
       "name_slug": "nightly",
       "job_timeout": 20,
@@ -56,9 +56,10 @@
                 }
               ],
               "network": [
-                "proxy.golang.org:443",
-                "storage.googleapis.com:443",
-                "sum.golang.org:443"
+                "http://proxy.golang.org:443|GET,HEAD",
+                "http://sum.golang.org:443|GET,HEAD:/lookup/**,/tile/**,/latest",
+                "http://storage.googleapis.com:443|GET,HEAD:/proxy-golang-org-prod/**",
+                "proxy.golang.org:443"
               ]
             },
             "inputs": {},
@@ -96,9 +97,10 @@
                 }
               ],
               "network": [
-                "proxy.golang.org:443",
-                "storage.googleapis.com:443",
-                "sum.golang.org:443"
+                "http://proxy.golang.org:443|GET,HEAD",
+                "http://sum.golang.org:443|GET,HEAD:/lookup/**,/tile/**,/latest",
+                "http://storage.googleapis.com:443|GET,HEAD:/proxy-golang-org-prod/**",
+                "proxy.golang.org:443"
               ]
             },
             "inputs": {},
@@ -137,9 +139,10 @@
                 }
               ],
               "network": [
-                "proxy.golang.org:443",
-                "storage.googleapis.com:443",
-                "sum.golang.org:443"
+                "http://proxy.golang.org:443|GET,HEAD",
+                "http://sum.golang.org:443|GET,HEAD:/lookup/**,/tile/**,/latest",
+                "http://storage.googleapis.com:443|GET,HEAD:/proxy-golang-org-prod/**",
+                "proxy.golang.org:443"
               ],
               "resources": [
                 "security-events"
@@ -158,15 +161,15 @@
           },
           {
             "id": "3",
-            "name": "gitleaks-scan",
-            "slug": "gitleaks-scan",
+            "name": "betterleaks-scan",
+            "slug": "betterleaks-scan",
             "stage": "scan",
             "scope": "project",
-            "action": "builtin://actions/gitleaks-scan",
+            "action": "builtin://actions/betterleaks-scan",
             "access": {
               "executables": [
                 {
-                  "name": "gitleaks",
+                  "name": "betterleaks",
                   "constraint": "\u003e= 0.0.0-0"
                 }
               ],
@@ -209,7 +212,7 @@
                 }
               ],
               "network": [
-                "semgrep.dev:443"
+                "http://semgrep.dev:443|GET,HEAD|POST,PUT:/api/**"
               ],
               "resources": [
                 "security-events"
@@ -237,11 +240,11 @@
               "executables": [
                 {
                   "name": "trivy",
-                  "constraint": "=\u003e 0.61.0"
+                  "constraint": "\u003e 0.69.6"
                 }
               ],
               "network": [
-                "mirror.gcr.io:443"
+                "http://mirror.gcr.io:443|GET,HEAD"
               ],
               "resources": [
                 "security-events"
@@ -266,16 +269,32 @@
             "scope": "project",
             "action": "builtin://actions/sonarqube-scan",
             "run-after": [
-              "go-test-github-com-cidverse-cid"
+              "betterleaks-scan",
+              "go-test-github-com-cidverse-cid",
+              "golangci-lint-github-com-cidverse-cid",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "run-after-by-name": [
-              "go-test [github.com/cidverse/cid]"
+              "betterleaks-scan",
+              "go-test [github.com/cidverse/cid]",
+              "golangci-lint [github.com/cidverse/cid]",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "uses-output-of": [
-              "go-test-github-com-cidverse-cid"
+              "betterleaks-scan",
+              "go-test-github-com-cidverse-cid",
+              "golangci-lint-github-com-cidverse-cid",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "uses-output-of-by-name": [
-              "go-test [github.com/cidverse/cid]"
+              "betterleaks-scan",
+              "go-test [github.com/cidverse/cid]",
+              "golangci-lint [github.com/cidverse/cid]",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "access": {
               "env": [
@@ -329,6 +348,14 @@
                 {
                   "type": "report",
                   "format": "trx"
+                },
+                {
+                  "type": "report",
+                  "format": "go-coverage"
+                },
+                {
+                  "type": "report",
+                  "format": "sarif"
                 }
               ]
             },
@@ -364,14 +391,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.22.3",
-          "hash": "46b06cea07f9e64621fdf066ba77ac6915163d43"
+          "version": "v2.23.0",
+          "hash": "aebdcf6156ab6691adf63218240e476564a1ed4c"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.13",
-          "hash": "800d546523ee7c20a031a250bff0651e741c89211b6bec66bfaeeeb47664f5c9",
+          "version": "0.13.0",
+          "hash": "617e3bf2dfef293e18a757060fad5777d8c841a81c2ef97eac5969ca51a340f5",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
@@ -387,7 +414,7 @@
       ]
     },
     "Pull Request": {
-      "version": "0.11.13",
+      "version": "0.13.0",
       "name": "Pull Request",
       "name_slug": "pull-request",
       "job_timeout": 20,
@@ -440,9 +467,10 @@
                 }
               ],
               "network": [
-                "proxy.golang.org:443",
-                "storage.googleapis.com:443",
-                "sum.golang.org:443"
+                "http://proxy.golang.org:443|GET,HEAD",
+                "http://sum.golang.org:443|GET,HEAD:/lookup/**,/tile/**,/latest",
+                "http://storage.googleapis.com:443|GET,HEAD:/proxy-golang-org-prod/**",
+                "proxy.golang.org:443"
               ]
             },
             "inputs": {},
@@ -480,9 +508,10 @@
                 }
               ],
               "network": [
-                "proxy.golang.org:443",
-                "storage.googleapis.com:443",
-                "sum.golang.org:443"
+                "http://proxy.golang.org:443|GET,HEAD",
+                "http://sum.golang.org:443|GET,HEAD:/lookup/**,/tile/**,/latest",
+                "http://storage.googleapis.com:443|GET,HEAD:/proxy-golang-org-prod/**",
+                "proxy.golang.org:443"
               ]
             },
             "inputs": {},
@@ -521,9 +550,10 @@
                 }
               ],
               "network": [
-                "proxy.golang.org:443",
-                "storage.googleapis.com:443",
-                "sum.golang.org:443"
+                "http://proxy.golang.org:443|GET,HEAD",
+                "http://sum.golang.org:443|GET,HEAD:/lookup/**,/tile/**,/latest",
+                "http://storage.googleapis.com:443|GET,HEAD:/proxy-golang-org-prod/**",
+                "proxy.golang.org:443"
               ],
               "resources": [
                 "security-events"
@@ -542,15 +572,15 @@
           },
           {
             "id": "3",
-            "name": "gitleaks-scan",
-            "slug": "gitleaks-scan",
+            "name": "betterleaks-scan",
+            "slug": "betterleaks-scan",
             "stage": "scan",
             "scope": "project",
-            "action": "builtin://actions/gitleaks-scan",
+            "action": "builtin://actions/betterleaks-scan",
             "access": {
               "executables": [
                 {
-                  "name": "gitleaks",
+                  "name": "betterleaks",
                   "constraint": "\u003e= 0.0.0-0"
                 }
               ],
@@ -593,7 +623,7 @@
                 }
               ],
               "network": [
-                "semgrep.dev:443"
+                "http://semgrep.dev:443|GET,HEAD|POST,PUT:/api/**"
               ],
               "resources": [
                 "security-events"
@@ -621,11 +651,11 @@
               "executables": [
                 {
                   "name": "trivy",
-                  "constraint": "=\u003e 0.61.0"
+                  "constraint": "\u003e 0.69.6"
                 }
               ],
               "network": [
-                "mirror.gcr.io:443"
+                "http://mirror.gcr.io:443|GET,HEAD"
               ],
               "resources": [
                 "security-events"
@@ -650,16 +680,32 @@
             "scope": "project",
             "action": "builtin://actions/sonarqube-scan",
             "run-after": [
-              "go-test-github-com-cidverse-cid"
+              "betterleaks-scan",
+              "go-test-github-com-cidverse-cid",
+              "golangci-lint-github-com-cidverse-cid",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "run-after-by-name": [
-              "go-test [github.com/cidverse/cid]"
+              "betterleaks-scan",
+              "go-test [github.com/cidverse/cid]",
+              "golangci-lint [github.com/cidverse/cid]",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "uses-output-of": [
-              "go-test-github-com-cidverse-cid"
+              "betterleaks-scan",
+              "go-test-github-com-cidverse-cid",
+              "golangci-lint-github-com-cidverse-cid",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "uses-output-of-by-name": [
-              "go-test [github.com/cidverse/cid]"
+              "betterleaks-scan",
+              "go-test [github.com/cidverse/cid]",
+              "golangci-lint [github.com/cidverse/cid]",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "access": {
               "env": [
@@ -713,6 +759,14 @@
                 {
                   "type": "report",
                   "format": "trx"
+                },
+                {
+                  "type": "report",
+                  "format": "go-coverage"
+                },
+                {
+                  "type": "report",
+                  "format": "sarif"
                 }
               ]
             },
@@ -748,14 +802,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.22.3",
-          "hash": "46b06cea07f9e64621fdf066ba77ac6915163d43"
+          "version": "v2.23.0",
+          "hash": "aebdcf6156ab6691adf63218240e476564a1ed4c"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.13",
-          "hash": "800d546523ee7c20a031a250bff0651e741c89211b6bec66bfaeeeb47664f5c9",
+          "version": "0.13.0",
+          "hash": "617e3bf2dfef293e18a757060fad5777d8c841a81c2ef97eac5969ca51a340f5",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
@@ -771,7 +825,7 @@
       ]
     },
     "Release": {
-      "version": "0.11.13",
+      "version": "0.13.0",
       "name": "Release",
       "name_slug": "release",
       "job_timeout": 20,
@@ -805,6 +859,7 @@
           "build",
           "test",
           "scan",
+          "package",
           "publish"
         ],
         "steps": [
@@ -825,9 +880,10 @@
                 }
               ],
               "network": [
-                "proxy.golang.org:443",
-                "storage.googleapis.com:443",
-                "sum.golang.org:443"
+                "http://proxy.golang.org:443|GET,HEAD",
+                "http://sum.golang.org:443|GET,HEAD:/lookup/**,/tile/**,/latest",
+                "http://storage.googleapis.com:443|GET,HEAD:/proxy-golang-org-prod/**",
+                "proxy.golang.org:443"
               ]
             },
             "inputs": {},
@@ -865,9 +921,10 @@
                 }
               ],
               "network": [
-                "proxy.golang.org:443",
-                "storage.googleapis.com:443",
-                "sum.golang.org:443"
+                "http://proxy.golang.org:443|GET,HEAD",
+                "http://sum.golang.org:443|GET,HEAD:/lookup/**,/tile/**,/latest",
+                "http://storage.googleapis.com:443|GET,HEAD:/proxy-golang-org-prod/**",
+                "proxy.golang.org:443"
               ]
             },
             "inputs": {},
@@ -891,15 +948,50 @@
           },
           {
             "id": "2",
-            "name": "gitleaks-scan",
-            "slug": "gitleaks-scan",
-            "stage": "scan",
-            "scope": "project",
-            "action": "builtin://actions/gitleaks-scan",
+            "name": "syft-sbom [github.com/cidverse/cid]",
+            "slug": "syft-sbom-github-com-cidverse-cid",
+            "stage": "package",
+            "scope": "module",
+            "action": "builtin://actions/syft-sbom",
+            "module": "gomod-go-mod",
+            "module-dir": ".",
             "access": {
               "executables": [
                 {
-                  "name": "gitleaks",
+                  "name": "syft",
+                  "constraint": "\u003e= 1.0.0"
+                }
+              ],
+              "network": [
+                "proxy.golang.org:443"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "sbom",
+                  "format": "cyclonedx-json"
+                },
+                {
+                  "type": "sbom",
+                  "format": "spdx-json"
+                }
+              ]
+            },
+            "order": 2
+          },
+          {
+            "id": "3",
+            "name": "betterleaks-scan",
+            "slug": "betterleaks-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/betterleaks-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "betterleaks",
                   "constraint": "\u003e= 0.0.0-0"
                 }
               ],
@@ -916,10 +1008,10 @@
                 }
               ]
             },
-            "order": 2
+            "order": 3
           },
           {
-            "id": "3",
+            "id": "4",
             "name": "semgrep-scan",
             "slug": "semgrep-scan",
             "stage": "scan",
@@ -942,39 +1034,7 @@
                 }
               ],
               "network": [
-                "semgrep.dev:443"
-              ],
-              "resources": [
-                "security-events"
-              ]
-            },
-            "inputs": {},
-            "outputs": {
-              "artifacts": [
-                {
-                  "type": "report",
-                  "format": "sarif"
-                }
-              ]
-            },
-            "order": 3
-          },
-          {
-            "id": "4",
-            "name": "trivyfs-scan",
-            "slug": "trivyfs-scan",
-            "stage": "scan",
-            "scope": "project",
-            "action": "builtin://actions/trivyfs-scan",
-            "access": {
-              "executables": [
-                {
-                  "name": "trivy",
-                  "constraint": "=\u003e 0.61.0"
-                }
-              ],
-              "network": [
-                "mirror.gcr.io:443"
+                "http://semgrep.dev:443|GET,HEAD|POST,PUT:/api/**"
               ],
               "resources": [
                 "security-events"
@@ -993,22 +1053,66 @@
           },
           {
             "id": "5",
+            "name": "trivyfs-scan",
+            "slug": "trivyfs-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/trivyfs-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "trivy",
+                  "constraint": "\u003e 0.69.6"
+                }
+              ],
+              "network": [
+                "http://mirror.gcr.io:443|GET,HEAD"
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 5
+          },
+          {
+            "id": "6",
             "name": "sonarqube-scan",
             "slug": "sonarqube-scan",
             "stage": "scan",
             "scope": "project",
             "action": "builtin://actions/sonarqube-scan",
             "run-after": [
-              "go-test-github-com-cidverse-cid"
+              "betterleaks-scan",
+              "go-test-github-com-cidverse-cid",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "run-after-by-name": [
-              "go-test [github.com/cidverse/cid]"
+              "betterleaks-scan",
+              "go-test [github.com/cidverse/cid]",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "uses-output-of": [
-              "go-test-github-com-cidverse-cid"
+              "betterleaks-scan",
+              "go-test-github-com-cidverse-cid",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "uses-output-of-by-name": [
-              "go-test [github.com/cidverse/cid]"
+              "betterleaks-scan",
+              "go-test [github.com/cidverse/cid]",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "access": {
               "env": [
@@ -1062,33 +1166,43 @@
                 {
                   "type": "report",
                   "format": "trx"
+                },
+                {
+                  "type": "report",
+                  "format": "go-coverage"
+                },
+                {
+                  "type": "report",
+                  "format": "sarif"
                 }
               ]
             },
             "outputs": {},
-            "order": 5
+            "order": 6
           },
           {
-            "id": "6",
-            "name": "sign-artifacts",
-            "slug": "sign-artifacts",
+            "id": "7",
+            "name": "checksum-artifacts",
+            "slug": "checksum-artifacts",
             "stage": "publish",
             "scope": "project",
-            "action": "builtin://actions/sign-artifacts",
+            "action": "builtin://actions/checksum-artifacts",
             "run-after": [
-              "gitleaks-scan",
+              "betterleaks-scan",
               "go-build-github-com-cidverse-cid",
               "go-test-github-com-cidverse-cid",
               "semgrep-scan",
               "sonarqube-scan",
+              "syft-sbom-github-com-cidverse-cid",
               "trivyfs-scan"
             ],
             "run-after-by-name": [
-              "gitleaks-scan",
+              "betterleaks-scan",
               "go-build [github.com/cidverse/cid]",
               "go-test [github.com/cidverse/cid]",
               "semgrep-scan",
               "sonarqube-scan",
+              "syft-sbom [github.com/cidverse/cid]",
               "trivyfs-scan"
             ],
             "uses-output-of": [
@@ -1096,6 +1210,61 @@
             ],
             "uses-output-of-by-name": [
               "go-build [github.com/cidverse/cid]"
+            ],
+            "access": {},
+            "inputs": {
+              "artifacts": [
+                {
+                  "type": "binary"
+                }
+              ]
+            },
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "checksum",
+                  "format": "sha256"
+                }
+              ]
+            },
+            "order": 7
+          },
+          {
+            "id": "8",
+            "name": "sign-artifacts",
+            "slug": "sign-artifacts",
+            "stage": "publish",
+            "scope": "project",
+            "action": "builtin://actions/sign-artifacts",
+            "run-after": [
+              "betterleaks-scan",
+              "checksum-artifacts",
+              "go-build-github-com-cidverse-cid",
+              "go-test-github-com-cidverse-cid",
+              "semgrep-scan",
+              "sonarqube-scan",
+              "syft-sbom-github-com-cidverse-cid",
+              "trivyfs-scan"
+            ],
+            "run-after-by-name": [
+              "betterleaks-scan",
+              "checksum-artifacts",
+              "go-build [github.com/cidverse/cid]",
+              "go-test [github.com/cidverse/cid]",
+              "semgrep-scan",
+              "sonarqube-scan",
+              "syft-sbom [github.com/cidverse/cid]",
+              "trivyfs-scan"
+            ],
+            "uses-output-of": [
+              "checksum-artifacts",
+              "go-build-github-com-cidverse-cid",
+              "syft-sbom-github-com-cidverse-cid"
+            ],
+            "uses-output-of-by-name": [
+              "checksum-artifacts",
+              "go-build [github.com/cidverse/cid]",
+              "syft-sbom [github.com/cidverse/cid]"
             ],
             "access": {
               "env": [
@@ -1113,6 +1282,18 @@
               "artifacts": [
                 {
                   "type": "binary"
+                },
+                {
+                  "type": "checksum",
+                  "format": "sha256"
+                },
+                {
+                  "type": "sbom",
+                  "format": "cyclonedx-json"
+                },
+                {
+                  "type": "sbom",
+                  "format": "spdx-json"
                 }
               ]
             },
@@ -1124,29 +1305,31 @@
                 }
               ]
             },
-            "order": 6
+            "order": 8
           },
           {
-            "id": "7",
+            "id": "9",
             "name": "changelog-generate",
             "slug": "changelog-generate",
             "stage": "publish",
             "scope": "project",
             "action": "builtin://actions/changelog-generate",
             "run-after": [
-              "gitleaks-scan",
+              "betterleaks-scan",
               "go-build-github-com-cidverse-cid",
               "go-test-github-com-cidverse-cid",
               "semgrep-scan",
               "sonarqube-scan",
+              "syft-sbom-github-com-cidverse-cid",
               "trivyfs-scan"
             ],
             "run-after-by-name": [
-              "gitleaks-scan",
+              "betterleaks-scan",
               "go-build [github.com/cidverse/cid]",
               "go-test [github.com/cidverse/cid]",
               "semgrep-scan",
               "sonarqube-scan",
+              "syft-sbom [github.com/cidverse/cid]",
               "trivyfs-scan"
             ],
             "access": {},
@@ -1158,44 +1341,52 @@
                 }
               ]
             },
-            "order": 7
+            "order": 9
           },
           {
-            "id": "8",
+            "id": "10",
             "name": "github-release-publish",
             "slug": "github-release-publish",
             "stage": "publish",
             "scope": "project",
             "action": "builtin://actions/github-release-publish",
             "run-after": [
+              "betterleaks-scan",
               "changelog-generate",
-              "gitleaks-scan",
+              "checksum-artifacts",
               "go-build-github-com-cidverse-cid",
               "go-test-github-com-cidverse-cid",
               "semgrep-scan",
               "sign-artifacts",
               "sonarqube-scan",
+              "syft-sbom-github-com-cidverse-cid",
               "trivyfs-scan"
             ],
             "run-after-by-name": [
+              "betterleaks-scan",
               "changelog-generate",
-              "gitleaks-scan",
+              "checksum-artifacts",
               "go-build [github.com/cidverse/cid]",
               "go-test [github.com/cidverse/cid]",
               "semgrep-scan",
               "sign-artifacts",
               "sonarqube-scan",
+              "syft-sbom [github.com/cidverse/cid]",
               "trivyfs-scan"
             ],
             "uses-output-of": [
               "changelog-generate",
+              "checksum-artifacts",
               "go-build-github-com-cidverse-cid",
-              "sign-artifacts"
+              "sign-artifacts",
+              "syft-sbom-github-com-cidverse-cid"
             ],
             "uses-output-of-by-name": [
               "changelog-generate",
+              "checksum-artifacts",
               "go-build [github.com/cidverse/cid]",
-              "sign-artifacts"
+              "sign-artifacts",
+              "syft-sbom [github.com/cidverse/cid]"
             ],
             "access": {
               "env": [
@@ -1219,11 +1410,27 @@
                 {
                   "type": "signature",
                   "format": "pgp"
+                },
+                {
+                  "type": "signature",
+                  "format": "sigstore"
+                },
+                {
+                  "type": "checksum",
+                  "format": "sha256"
+                },
+                {
+                  "type": "sbom",
+                  "format": "cyclonedx-json"
+                },
+                {
+                  "type": "sbom",
+                  "format": "spdx-json"
                 }
               ]
             },
             "outputs": {},
-            "order": 8
+            "order": 10
           }
         ]
       },
@@ -1254,14 +1461,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.22.3",
-          "hash": "46b06cea07f9e64621fdf066ba77ac6915163d43"
+          "version": "v2.23.0",
+          "hash": "aebdcf6156ab6691adf63218240e476564a1ed4c"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.13",
-          "hash": "800d546523ee7c20a031a250bff0651e741c89211b6bec66bfaeeeb47664f5c9",
+          "version": "0.13.0",
+          "hash": "617e3bf2dfef293e18a757060fad5777d8c841a81c2ef97eac5969ca51a340f5",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
@@ -1277,7 +1484,7 @@
       ]
     },
     "Main": {
-      "version": "0.11.13",
+      "version": "0.13.0",
       "name": "Main",
       "name_slug": "main",
       "job_timeout": 20,
@@ -1330,9 +1537,10 @@
                 }
               ],
               "network": [
-                "proxy.golang.org:443",
-                "storage.googleapis.com:443",
-                "sum.golang.org:443"
+                "http://proxy.golang.org:443|GET,HEAD",
+                "http://sum.golang.org:443|GET,HEAD:/lookup/**,/tile/**,/latest",
+                "http://storage.googleapis.com:443|GET,HEAD:/proxy-golang-org-prod/**",
+                "proxy.golang.org:443"
               ]
             },
             "inputs": {},
@@ -1370,9 +1578,10 @@
                 }
               ],
               "network": [
-                "proxy.golang.org:443",
-                "storage.googleapis.com:443",
-                "sum.golang.org:443"
+                "http://proxy.golang.org:443|GET,HEAD",
+                "http://sum.golang.org:443|GET,HEAD:/lookup/**,/tile/**,/latest",
+                "http://storage.googleapis.com:443|GET,HEAD:/proxy-golang-org-prod/**",
+                "proxy.golang.org:443"
               ]
             },
             "inputs": {},
@@ -1411,9 +1620,10 @@
                 }
               ],
               "network": [
-                "proxy.golang.org:443",
-                "storage.googleapis.com:443",
-                "sum.golang.org:443"
+                "http://proxy.golang.org:443|GET,HEAD",
+                "http://sum.golang.org:443|GET,HEAD:/lookup/**,/tile/**,/latest",
+                "http://storage.googleapis.com:443|GET,HEAD:/proxy-golang-org-prod/**",
+                "proxy.golang.org:443"
               ],
               "resources": [
                 "security-events"
@@ -1432,15 +1642,15 @@
           },
           {
             "id": "3",
-            "name": "gitleaks-scan",
-            "slug": "gitleaks-scan",
+            "name": "betterleaks-scan",
+            "slug": "betterleaks-scan",
             "stage": "scan",
             "scope": "project",
-            "action": "builtin://actions/gitleaks-scan",
+            "action": "builtin://actions/betterleaks-scan",
             "access": {
               "executables": [
                 {
-                  "name": "gitleaks",
+                  "name": "betterleaks",
                   "constraint": "\u003e= 0.0.0-0"
                 }
               ],
@@ -1483,7 +1693,7 @@
                 }
               ],
               "network": [
-                "semgrep.dev:443"
+                "http://semgrep.dev:443|GET,HEAD|POST,PUT:/api/**"
               ],
               "resources": [
                 "security-events"
@@ -1511,11 +1721,11 @@
               "executables": [
                 {
                   "name": "trivy",
-                  "constraint": "=\u003e 0.61.0"
+                  "constraint": "\u003e 0.69.6"
                 }
               ],
               "network": [
-                "mirror.gcr.io:443"
+                "http://mirror.gcr.io:443|GET,HEAD"
               ],
               "resources": [
                 "security-events"
@@ -1540,16 +1750,32 @@
             "scope": "project",
             "action": "builtin://actions/sonarqube-scan",
             "run-after": [
-              "go-test-github-com-cidverse-cid"
+              "betterleaks-scan",
+              "go-test-github-com-cidverse-cid",
+              "golangci-lint-github-com-cidverse-cid",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "run-after-by-name": [
-              "go-test [github.com/cidverse/cid]"
+              "betterleaks-scan",
+              "go-test [github.com/cidverse/cid]",
+              "golangci-lint [github.com/cidverse/cid]",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "uses-output-of": [
-              "go-test-github-com-cidverse-cid"
+              "betterleaks-scan",
+              "go-test-github-com-cidverse-cid",
+              "golangci-lint-github-com-cidverse-cid",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "uses-output-of-by-name": [
-              "go-test [github.com/cidverse/cid]"
+              "betterleaks-scan",
+              "go-test [github.com/cidverse/cid]",
+              "golangci-lint [github.com/cidverse/cid]",
+              "semgrep-scan",
+              "trivyfs-scan"
             ],
             "access": {
               "env": [
@@ -1603,6 +1829,14 @@
                 {
                   "type": "report",
                   "format": "trx"
+                },
+                {
+                  "type": "report",
+                  "format": "go-coverage"
+                },
+                {
+                  "type": "report",
+                  "format": "sarif"
                 }
               ]
             },
@@ -1638,14 +1872,14 @@
         "pkg:github-action/step-security/harden-runner": {
           "id": "step-security/harden-runner",
           "type": "github-action",
-          "version": "v2.22.3",
-          "hash": "46b06cea07f9e64621fdf066ba77ac6915163d43"
+          "version": "v2.23.0",
+          "hash": "aebdcf6156ab6691adf63218240e476564a1ed4c"
         },
         "pkg:github/cidverse/cid": {
           "id": "cidverse/cid",
           "type": "github",
-          "version": "0.11.13",
-          "hash": "800d546523ee7c20a031a250bff0651e741c89211b6bec66bfaeeeb47664f5c9",
+          "version": "0.13.0",
+          "hash": "617e3bf2dfef293e18a757060fad5777d8c841a81c2ef97eac5969ca51a340f5",
           "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
         }
       },
