@@ -42,8 +42,8 @@ func TestGenerateReleaseStatement(t *testing.T) {
 		require.NoError(t, err)
 		return out
 	}
-	goCommand := state.AuditEvents{Type: "command", Payload: map[string]string{"binary": "go", "uri": "oci://golang@sha256:aaa"}}
-	trivy := state.AuditEvents{Type: "action", Payload: map[string]string{"action": "trivy", "uri": "oci://ghcr.io/cidverse/trivy@sha256:ddd"}}
+	goCommand := state.AuditEvents{Type: "command", Payload: map[string]string{"binary": "go", "uri": "oci://golang@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}
+	trivy := state.AuditEvents{Type: "action", Payload: map[string]string{"action": "trivy", "uri": "oci://ghcr.io/cidverse/trivy@sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"}}
 	statements := [][]byte{
 		buildStatement("go-build-cli", "2023-11-14T22:10:00Z", []state.AuditEvents{goCommand}),
 		buildStatement("go-build-server", "2023-11-14T22:05:00Z", []state.AuditEvents{goCommand, trivy}),
@@ -55,7 +55,7 @@ func TestGenerateReleaseStatement(t *testing.T) {
 	}, Input{
 		NCI:   releaseTestSpec("https://gitlab.com/group/project/-/jobs/99", "2023-11-14T22:15:00Z"),
 		Env:   map[string]string{"CI_RUNNER_ID": "42"},
-		State: &state.ActionStateContext{AuditLog: []state.AuditEvents{{Type: "command", Payload: map[string]string{"binary": "ignored", "uri": "oci://ignored@sha256:eee"}}}},
+		State: &state.ActionStateContext{AuditLog: []state.AuditEvents{{Type: "command", Payload: map[string]string{"binary": "ignored", "uri": "oci://ignored@sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}}}},
 		Step:  Step{Slug: "sigstore-sign"},
 		Now:   time.Date(2023, 11, 14, 22, 20, 0, 0, time.UTC),
 	}, statements)
@@ -93,8 +93,8 @@ func TestGenerateReleaseStatement(t *testing.T) {
 	}
 	assert.Equal(t, []string{
 		"git+https://gitlab.com/group/project.git@refs/tags/v1.0.0",
-		"oci://golang@sha256:aaa",
-		"oci://ghcr.io/cidverse/trivy@sha256:ddd",
+		"oci://golang@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		"oci://ghcr.io/cidverse/trivy@sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
 	}, uris, "source once, build dependencies merged without duplicates, the signing job's own audit log is ignored")
 
 	metadata := predicate["runDetails"].(map[string]interface{})["metadata"].(map[string]interface{})
@@ -103,7 +103,7 @@ func TestGenerateReleaseStatement(t *testing.T) {
 }
 
 func TestGenerateReleaseStatementWithoutBuildProvenance(t *testing.T) {
-	out, err := GenerateReleaseStatement([]ReleaseSubject{{Name: "app.cdx.json", SHA256: "abc"}}, Input{}, nil)
+	out, err := GenerateReleaseStatement([]ReleaseSubject{{Name: "app.cdx.json", SHA256: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}}, Input{}, nil)
 	require.NoError(t, err)
 	assert.True(t, json.Valid(out))
 }
@@ -115,6 +115,6 @@ func TestGenerateReleaseStatementErrors(t *testing.T) {
 	_, err = GenerateReleaseStatement([]ReleaseSubject{{Name: "app"}}, Input{}, nil)
 	assert.Error(t, err, "subject without digest")
 
-	_, err = GenerateReleaseStatement([]ReleaseSubject{{Name: "app", SHA256: "abc"}}, Input{}, [][]byte{[]byte(`{"_type":"https://in-toto.io/Statement/v1","predicateType":"https://example.com/other"}`)})
+	_, err = GenerateReleaseStatement([]ReleaseSubject{{Name: "app", SHA256: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}}, Input{}, [][]byte{[]byte(`{"_type":"https://in-toto.io/Statement/v1","predicateType":"https://example.com/other"}`)})
 	assert.Error(t, err, "foreign predicate type")
 }
