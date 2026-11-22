@@ -46,7 +46,7 @@ func (a Action) Metadata() actionsdk.ActionMetadata {
 			Executables: []actionsdk.ActionAccessExecutable{
 				{
 					Name:       "syft",
-					Constraint: ">= 1.0.0",
+					Constraint: ">= 1.46.0", // spdx-json@3.0 output
 				},
 			},
 			// directory scans are offline by default (no remote license / parent pom lookups), update check is disabled
@@ -84,6 +84,7 @@ func (a Action) Execute() (err error) {
 	// files
 	cdxFile := actionsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("syft-%s.cdx.json", d.Module.Slug))
 	spdxFile := actionsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("syft-%s.spdx.json", d.Module.Slug))
+	spdx3File := actionsdk.JoinPath(d.Config.TempDir, fmt.Sprintf("syft-%s.spdx3.json", d.Module.Slug))
 
 	// generate
 	opts := []string{
@@ -98,7 +99,9 @@ func (a Action) Execute() (err error) {
 	}
 	opts = append(opts,
 		fmt.Sprintf("--output %q", "cyclonedx-json="+cdxFile),
-		fmt.Sprintf("--output %q", "spdx-json="+spdxFile),
+		// SPDX 2.3 stays for consumers that don't read SPDX 3 yet, both versions are pinned explicitly
+		fmt.Sprintf("--output %q", "spdx-json@2.3="+spdxFile),
+		fmt.Sprintf("--output %q", "spdx-json@3.0="+spdx3File),
 	)
 	cmdResult, err := a.Sdk.ExecuteCommandV1(actionsdk.ExecuteCommandV1Request{
 		Command: strings.Join(opts, " "),
@@ -114,7 +117,7 @@ func (a Action) Execute() (err error) {
 	}
 
 	// store sboms
-	for _, file := range []string{cdxFile, spdxFile} {
+	for _, file := range []string{cdxFile, spdxFile, spdx3File} {
 		content, readErr := a.Sdk.FileReadV1(file)
 		if readErr != nil {
 			return fmt.Errorf("failed to read sbom %s: %w", file, readErr)

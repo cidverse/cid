@@ -19,6 +19,13 @@ func TestDetectSBOMFormat(t *testing.T) {
 	assert.Equal(t, SBOMFormatSPDX, format)
 	assert.Equal(t, "2.3", version)
 
+	format, version, ok = DetectSBOMFormat([]byte(`{"@context":"https://spdx.org/rdf/3.0.1/spdx-context.jsonld","@graph":[{"type":"Tool","name":"syft"},{"type":"CreationInfo","@id":"_:creationinfo","specVersion":"3.0.1"}]}`))
+	assert.True(t, ok)
+	assert.Equal(t, SBOMFormatSPDX, format)
+	assert.Equal(t, "3.0.1", version)
+
+	_, _, ok = DetectSBOMFormat([]byte(`{"@graph":[{"type":"Person","name":"x"}]}`))
+	assert.False(t, ok)
 	_, _, ok = DetectSBOMFormat([]byte(`{"name":"not-an-sbom"}`))
 	assert.False(t, ok)
 	_, _, ok = DetectSBOMFormat([]byte(`not json`))

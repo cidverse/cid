@@ -34,12 +34,18 @@ type SBOMDiscovery struct {
 
 var sbomNameSanitizer = regexp.MustCompile(`[^a-zA-Z0-9._-]+`)
 
-// DetectSBOMFormat inspects JSON content and returns the SBOM format and spec version (CycloneDX or SPDX JSON).
+// DetectSBOMFormat inspects JSON content and returns the SBOM format and spec version (CycloneDX, SPDX 2.x JSON or
+// SPDX 3 JSON-LD). Both SPDX generations share the format `spdx-json` and differ in the version ("2.3" vs "3.0.1").
 func DetectSBOMFormat(content []byte) (format string, version string, ok bool) {
 	var doc struct {
 		BOMFormat   string `json:"bomFormat"`
 		SpecVersion string `json:"specVersion"`
 		SPDXVersion string `json:"spdxVersion"`
+		// SPDX 3 (JSON-LD): the spec version lives in the CreationInfo element of the graph
+		Graph []struct {
+			Type        string `json:"type"`
+			SpecVersion string `json:"specVersion"`
+		} `json:"@graph"`
 	}
 	if err := json.Unmarshal(content, &doc); err != nil {
 		return "", "", false
@@ -51,6 +57,11 @@ func DetectSBOMFormat(content []byte) (format string, version string, ok bool) {
 	if strings.HasPrefix(doc.SPDXVersion, "SPDX-") {
 		return SBOMFormatSPDX, strings.TrimPrefix(doc.SPDXVersion, "SPDX-"), true
 	}
+	for _, element := range doc.Graph {
+		if element.Type == "CreationInfo" && strings.HasPrefix(element.SpecVersion, "3.") {
+			return SBOMFormatSPDX, element.SpecVersion, true
+		}
+	}
 
 	return "", "", false
 }
@@ -59,7 +70,7 @@ func DetectSBOMFormat(content []byte) (format string, version string, ok bool) {
 // e.g. source "gradle", rel "sub/build/reports/cyclonedx/bom.json" -> "gradle-sub-build-reports-cyclonedx-bom.cdx.json"
 func SBOMArtifactName(source string, rel string, format string) string {
 	base := strings.ToLower(rel)
-	for _, suffix := range []string{".cdx.json", ".spdx.json", ".json"} {
+	for _, suffix := range []string{".cdx.json", ".spdx3.json", ".spdx.json", ".json"} {
 		if strings.HasSuffix(base, suffix) {
 			base = strings.TrimSuffix(base, suffix)
 			break
